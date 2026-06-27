@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatórios | itsbrendacleto Kids</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1; --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0; --text: #3D2B1F; --white: #FFFFFF; --radius: 20px; }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--white); padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: var(--cream); border: 2px solid #EEE; border-radius: 12px; padding: 7px 14px; font-size: 13px; font-weight: 800; color: var(--text); text-decoration: none; }
+    .btn-back:hover { border-color: var(--rose); }
+    .header-title { font-size: 16px; font-weight: 900; color: var(--text); }
+
+    .hero { background: linear-gradient(135deg, #FFD97D, #C3B1E1); padding: 28px 24px; text-align: center; }
+    .hero-icon { font-size: 48px; margin-bottom: 8px; }
+    .hero-title { font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+    .hero-sub { font-size: 13px; font-weight: 700; color: rgba(61,43,31,0.65); }
+
+    main { padding: 24px 20px; max-width: 600px; margin: 0 auto; }
+
+    .report-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 14px;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: all 0.2s;
+    }
+    .report-card:hover { border-color: var(--lavender); transform: translateY(-2px); }
+    .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .report-title { font-size: 16px; font-weight: 900; color: var(--text); }
+    .report-period { background: var(--lavender); color: var(--text); border-radius: 99px; padding: 3px 12px; font-size: 11px; font-weight: 800; }
+    .report-preview { font-size: 13px; font-weight: 600; color: #AAA; line-height: 1.5; }
+    .report-date { font-size: 11px; color: #CCC; font-weight: 700; margin-top: 8px; }
+
+    .new-badge { background: var(--mint); color: #1E5C3A; font-size: 10px; font-weight: 900; border-radius: 99px; padding: 2px 8px; text-transform: uppercase; margin-left: 8px; }
+
+    .empty-state { text-align: center; padding: 48px 20px; }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .empty-title { font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .empty-sub { font-size: 14px; font-weight: 600; color: #AAA; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+    .modal-period { display: inline-block; background: var(--lavender); color: var(--text); border-radius: 99px; padding: 4px 14px; font-size: 12px; font-weight: 800; margin-bottom: 12px; }
+    .modal-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 16px; }
+    .modal-content { font-size: 15px; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
+    .modal-close { margin-top: 20px; width: 100%; padding: 14px; background: var(--lavender); border: none; border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 900; color: var(--text); cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-kids.html" class="btn-back">← Voltar</a>
+  <div class="header-title">📊 Relatórios</div>
+</header>
+
+<div class="hero">
+  <div class="hero-icon">📊</div>
+  <div class="hero-title">Seus Relatórios</div>
+  <div class="hero-sub">Veja como você está evoluindo!</div>
+</div>
+
+<main id="mainContent">
+  <div class="empty-state">
+    <div class="empty-icon">⏳</div>
+    <div class="empty-title">Carregando...</div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-period" id="modalPeriod"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-content" id="modalContent"></div>
+    <button class="modal-close" id="modalClose">Fechar ✓</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  async function init() {
+    // Session already verified before init()
+
+    const { data: reports } = await sb.from('reports')
+      .select('*').eq('student_id', session.user.id).eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    const main = document.getElementById('mainContent');
+
+    if (!reports || reports.length === 0) {
+      main.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📭</div>
+          <div class="empty-title">Nenhum relatório ainda</div>
+          <div class="empty-sub">Seus relatórios aparecerão aqui quando sua professora publicar!</div>
+        </div>`;
+      return;
+    }
+
+    main.innerHTML = reports.map(r => {
+      const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+      return `
+        <div class="report-card" onclick="openReport('${r.title}', '${r.period || ''}', \`${(r.content||'').replace(/`/g,"'")}\`)">
+          <div class="report-header">
+            <div class="report-title">${r.title}</div>
+            ${r.period ? `<span class="report-period">${r.period}</span>` : ''}
+          </div>
+          <div class="report-preview">${(r.content||'').substring(0,100)}${r.content && r.content.length > 100 ? '...' : ''}</div>
+          <div class="report-date">${date}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function openReport(title, period, content) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalPeriod').textContent = period || '';
+    document.getElementById('modalPeriod').style.display = period ? 'inline-block' : 'none';
+    document.getElementById('modalContent').textContent = content;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  document.getElementById('modalClose').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('open'));
+  document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('open'); });
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

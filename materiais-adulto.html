@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materiais | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); font-weight: 400; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px; }
+
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 14px; margin-top: 24px; }
+    .section-title:first-child { margin-top: 0; }
+
+    .material-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1.5px solid var(--sand);
+    }
+    .material-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(92,64,51,0.12); border-color: var(--brown-light); }
+    .material-item.unavailable { opacity: 0.5; pointer-events: none; }
+
+    .material-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .material-info { flex: 1; }
+    .material-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .material-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .material-arrow { font-size: 18px; color: var(--sand); }
+
+    /* Subpastas */
+    .subfolder-item {
+      background: var(--cream);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      border: 1.5px solid var(--sand);
+      transition: all 0.2s;
+    }
+    .subfolder-item:hover { border-color: var(--brown-light); background: var(--white); }
+    .subfolder-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
+
+    .loading-card { text-align: center; padding: 40px; color: var(--muted); }
+
+    /* Relatórios */
+    .report-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 10px;
+      border: 1.5px solid var(--sand);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .report-item:hover { border-color: var(--brown-light); }
+    .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .report-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .report-period { font-size: 12px; color: var(--muted); background: var(--cream); border-radius: 99px; padding: 2px 10px; }
+    .report-preview { font-size: 13px; color: var(--muted); line-height: 1.4; }
+    .report-new { background: var(--mint); color: #1E5C3A; font-size: 10px; font-weight: 700; border-radius: 99px; padding: 2px 8px; text-transform: uppercase; }
+
+    /* Modal relatório */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 4px; }
+    .modal-period { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
+    .modal-content { font-size: 15px; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
+    .modal-close { margin-top: 20px; width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Materiais</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Sua área de recursos</div>
+    <div class="hero-title">Materiais & Conteúdos 📚</div>
+  </div>
+</div>
+
+<main>
+  <div id="mainContent"><div class="loading-card">Carregando...</div></div>
+</main>
+
+<!-- Modal relatório -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-period" id="modalPeriod"></div>
+    <div class="modal-content" id="modalContent"></div>
+    <button class="modal-close" id="modalClose">Fechar</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  const GLOBAL_CATEGORIES = [
+    { key: 'adulto-materiais',    icon: '📖', label: 'Material digital',   sub: 'Slides e atividades' },
+    { key: 'adulto-gravacoes',    icon: '🎥', label: 'Gravações das aulas', sub: 'Assista quando quiser' },
+    { key: 'adulto-auloes',       icon: '🎓', label: 'Aulões',              sub: 'Aulas especiais extras' },
+
+  ];
+
+  let userId = null;
+
+  async function init() {
+    // Session already verified before init()
+    userId = session.user.id;
+
+    // Busca links globais
+    const { data: links } = await sb.from('material_links')
+      .select('*').in('category', GLOBAL_CATEGORIES.map(c => c.key));
+    const linkMap = {};
+    (links || []).forEach(l => { linkMap[l.category] = l.url; });
+
+    // Busca subpastas do aluno
+    const { data: folders } = await sb.from('student_folders')
+      .select('*').eq('student_id', userId).order('created_at');
+
+    // Busca relatórios
+    const { data: reports } = await sb.from('reports')
+      .select('*').eq('student_id', userId).eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    renderAll(linkMap, folders || [], reports || []);
+  }
+
+  function renderAll(linkMap, folders, reports) {
+    const main = document.getElementById('mainContent');
+    let html = '';
+
+    // Links globais
+    html += '<div class="section-title">Recursos</div>';
+    GLOBAL_CATEGORIES.forEach(cat => {
+      const url = linkMap[cat.key];
+      const hasUrl = url && url.trim() !== '';
+      html += `
+        <a href="${hasUrl ? url : '#'}" target="${hasUrl ? '_blank' : '_self'}"
+           class="material-item ${!hasUrl ? 'unavailable' : ''}">
+          <div class="material-icon">${cat.icon}</div>
+          <div class="material-info">
+            <div class="material-title">${cat.label}</div>
+            <div class="material-sub">${hasUrl ? cat.sub : 'Em breve...'}</div>
+          </div>
+          <div class="material-arrow">${hasUrl ? '›' : '⏳'}</div>
+        </a>`;
+    });
+
+    // Subpastas do aluno
+    if (folders.length > 0) {
+      html += '<div class="section-title">Suas pastas</div>';
+      folders.forEach(f => {
+        html += `
+          <a href="${f.url}" target="_blank" class="subfolder-item">
+            <span>📂</span>
+            <span class="subfolder-label">${f.label}</span>
+            <span style="color:#DDD;font-size:18px;">›</span>
+          </a>`;
+      });
+    }
+
+    // Relatórios
+    html += '<div class="section-title">Relatórios</div>';
+    if (reports.length === 0) {
+      html += `<div class="material-item unavailable">
+        <div class="material-icon">📊</div>
+        <div class="material-info">
+          <div class="material-title">Nenhum relatório ainda</div>
+          <div class="material-sub">Seus relatórios aparecerão aqui</div>
+        </div>
+      </div>`;
+    } else {
+      reports.forEach(r => {
+        const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+        html += `
+          <div class="report-item" onclick="openReport('${r.id}', '${r.title}', '${r.period || ''}', \`${(r.content || '').replace(/`/g, "'")}\`)">
+            <div class="report-header">
+              <div class="report-title">${r.title}</div>
+              ${r.period ? `<span class="report-period">${r.period}</span>` : ''}
+            </div>
+            <div class="report-preview">${(r.content || '').substring(0, 80)}${r.content && r.content.length > 80 ? '...' : ''}</div>
+          </div>`;
+      });
+    }
+
+    main.innerHTML = html;
+  }
+
+  function openReport(id, title, period, content) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalPeriod').textContent = period;
+    document.getElementById('modalContent').textContent = content;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  document.getElementById('modalClose').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.remove('open');
+  });
+
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+  });
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

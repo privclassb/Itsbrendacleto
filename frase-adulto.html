@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frase do Dia | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--white); text-decoration: none; }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+    main { max-width: 580px; margin: 0 auto; padding: 28px 20px; }
+
+    .quote-card {
+      background: var(--brown);
+      border-radius: var(--radius);
+      padding: 36px 28px;
+      text-align: center;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .quote-card::before { content: '"'; position: absolute; top: -20px; left: 16px; font-size: 120px; color: rgba(255,255,255,0.06); font-family: 'DM Serif Display', serif; line-height: 1; }
+    .quote-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
+    .quote-text { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--white); font-style: italic; line-height: 1.4; margin-bottom: 8px; position: relative; }
+    .quote-author { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 500; margin-bottom: 20px; }
+    .btn-audio { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--white); cursor: pointer; transition: all 0.2s; }
+    .btn-audio:hover { background: rgba(255,255,255,0.25); }
+
+    .translation-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .trans-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .trans-text { font-size: 16px; color: var(--text); font-style: italic; }
+
+    .vocab-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .vocab-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sand); }
+    .vocab-item:last-child { border-bottom: none; }
+    .vocab-word { font-weight: 600; color: var(--text); font-size: 14px; }
+    .vocab-meaning { font-size: 13px; color: var(--muted); }
+
+    .btn-next { width: 100%; padding: 16px; background: var(--brown); border: none; border-radius: var(--radius); font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); cursor: pointer; transition: all 0.2s; }
+    .btn-next:hover { background: var(--brown-light); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Frase do dia</div>
+</header>
+
+<main>
+
+  <div class="quote-card">
+    <div class="quote-label">Frase do dia</div>
+    <div class="quote-text" id="quoteText">"The limits of my language mean the limits of my world."</div>
+    <div class="quote-author" id="quoteAuthor">— Ludwig Wittgenstein</div>
+    <button class="btn-audio" id="btnAudio">🔊 Ouvir pronúncia</button>
+  </div>
+
+  <div class="translation-card">
+    <div class="trans-label">Tradução</div>
+    <div class="trans-text" id="quotePt">"Os limites da minha linguagem são os limites do meu mundo."</div>
+  </div>
+
+  <div class="vocab-card">
+    <div class="vocab-title">Vocabulário da frase</div>
+    <div id="vocabList"></div>
+  </div>
+
+  <div style="background:var(--cream);border:1.5px solid var(--sand);border-radius:16px;padding:14px 20px;text-align:center;font-size:13px;font-weight:500;color:var(--muted);">
+    📅 Volte amanhã para uma nova frase.
+  </div>
+
+</main>
+
+<script>
+  const quotes = [
+    {
+      en: '"The limits of my language mean the limits of my world."',
+      pt: '"Os limites da minha linguagem são os limites do meu mundo."',
+      author: '— Ludwig Wittgenstein',
+      vocab: [{ w: 'limits', m: 'limites' }, { w: 'language', m: 'linguagem' }, { w: 'mean', m: 'significar' }, { w: 'world', m: 'mundo' }]
+    },
+    {
+      en: '"To have another language is to possess a second soul."',
+      pt: '"Ter outro idioma é possuir uma segunda alma."',
+      author: '— Charlemagne',
+      vocab: [{ w: 'possess', m: 'possuir' }, { w: 'second', m: 'segundo/a' }, { w: 'soul', m: 'alma' }, { w: 'another', m: 'outro/a' }]
+    },
+    {
+      en: '"Language is the road map of a culture."',
+      pt: '"A língua é o mapa rodoviário de uma cultura."',
+      author: '— Rita Mae Brown',
+      vocab: [{ w: 'road map', m: 'mapa / guia' }, { w: 'culture', m: 'cultura' }, { w: 'language', m: 'língua / idioma' }]
+    },
+    {
+      en: '"One language sets you in a corridor for life. Two languages open every door along the way."',
+      pt: '"Um idioma te coloca num corredor pela vida. Dois idiomas abrem cada porta ao longo do caminho."',
+      author: '— Frank Smith',
+      vocab: [{ w: 'corridor', m: 'corredor' }, { w: 'door', m: 'porta' }, { w: 'along the way', m: 'ao longo do caminho' }]
+    },
+    {
+      en: '"Learning another language is like becoming another person."',
+      pt: '"Aprender outro idioma é como se tornar outra pessoa."',
+      author: '— Haruki Murakami',
+      vocab: [{ w: 'learning', m: 'aprender / aprendizado' }, { w: 'becoming', m: 'tornar-se' }, { w: 'another', m: 'outro/a' }]
+    },
+  ];
+
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  let idx = dayOfYear % quotes.length;
+
+  function showQuote(i) {
+    const q = quotes[i];
+    document.getElementById('quoteText').textContent = q.en;
+    document.getElementById('quoteAuthor').textContent = q.author;
+    document.getElementById('quotePt').textContent = q.pt;
+    const list = document.getElementById('vocabList');
+    list.innerHTML = q.vocab.map(v => `<div class="vocab-item"><span class="vocab-word">${v.w}</span><span class="vocab-meaning">${v.m}</span></div>`).join('');
+  }
+
+  document.getElementById('btnAudio').addEventListener('click', () => {
+    const text = quotes[idx].en.replace(/["""]/g, '');
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US'; u.rate = 0.85;
+    window.speechSynthesis.speak(u);
+  });
+
+  showQuote(idx);
+</script>
+</body>
+</html>

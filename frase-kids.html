@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palavra do Dia | itsbrendacleto Kids</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1; --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0; --text: #3D2B1F; --white: #FFFFFF; --radius: 20px; }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--white); padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+    .btn-back { background: var(--cream); border: 2px solid #EEE; border-radius: 12px; padding: 7px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; color: var(--text); text-decoration: none; }
+    .btn-back:hover { border-color: var(--rose); }
+    .header-title { font-size: 16px; font-weight: 900; color: var(--text); }
+    main { padding: 28px 20px; max-width: 500px; margin: 0 auto; }
+
+    .word-card {
+      background: linear-gradient(135deg, #FFD97D, #F9A8C9);
+      border-radius: var(--radius);
+      padding: 36px 24px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .word-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(61,43,31,0.6); margin-bottom: 8px; }
+    .word-english { font-size: 48px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .word-portuguese { font-size: 20px; font-weight: 700; color: rgba(61,43,31,0.7); margin-bottom: 20px; }
+    .word-emoji { font-size: 48px; margin-bottom: 16px; display: block; }
+    .btn-audio { background: rgba(255,255,255,0.5); border: none; border-radius: 14px; padding: 12px 24px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: var(--text); cursor: pointer; transition: all 0.2s; }
+    .btn-audio:hover { background: rgba(255,255,255,0.7); }
+
+    .example-card { background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .example-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #AAA; margin-bottom: 10px; }
+    .example-en { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+    .example-pt { font-size: 14px; font-weight: 600; color: #AAA; }
+
+    .btn-next { width: 100%; padding: 16px; background: var(--lavender); border: none; border-radius: var(--radius); font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 900; color: var(--text); cursor: pointer; transition: all 0.2s; }
+    .btn-next:hover { background: #B8A0D8; }
+
+    .tip { background: #F0FFF7; border: 2px solid var(--mint); border-radius: var(--radius); padding: 14px 18px; font-size: 13px; font-weight: 700; color: var(--text); display: flex; gap: 10px; margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-kids.html" class="btn-back">← Voltar</a>
+  <div class="header-title">💬 Palavra do dia</div>
+</header>
+
+<main>
+
+  <div class="word-card">
+    <div class="word-label">Palavra do dia</div>
+    <span class="word-emoji" id="wordEmoji">😊</span>
+    <div class="word-english" id="wordEn">Happy</div>
+    <div class="word-portuguese" id="wordPt">Feliz</div>
+    <button class="btn-audio" id="btnAudio">🔊 Ouvir pronúncia</button>
+  </div>
+
+  <div class="example-card">
+    <div class="example-label">Exemplo de uso</div>
+    <div class="example-en" id="exampleEn">"I am happy today!"</div>
+    <div class="example-pt" id="examplePt">"Eu estou feliz hoje!"</div>
+  </div>
+
+  <div class="tip">
+    💡 <span id="tipText">Tente usar essa palavra hoje numa frase!</span>
+  </div>
+
+  <div style="background:#F0FFF7;border:2px solid #7ECBA1;border-radius:20px;padding:14px 18px;text-align:center;font-size:13px;font-weight:700;color:#3D2B1F;">
+    📅 Volte amanhã para uma nova palavra!
+  </div>
+
+</main>
+
+<script>
+  const words = [
+    { en: 'Happy', pt: 'Feliz', emoji: '😊', example_en: '"I am happy today!"', example_pt: '"Eu estou feliz hoje!"', tip: 'Diga para alguém: I am happy! Veja a reação!' },
+    { en: 'Beautiful', pt: 'Bonito/a', emoji: '🌸', example_en: '"The flower is beautiful."', example_pt: '"A flor é bonita."', tip: 'Olhe ao redor e diga o que é beautiful!' },
+    { en: 'Friend', pt: 'Amigo/a', emoji: '👫', example_en: '"She is my best friend."', example_pt: '"Ela é minha melhor amiga."', tip: 'Chame seu amigo de friend hoje!' },
+    { en: 'Delicious', pt: 'Delicioso', emoji: '😋', example_en: '"This pizza is delicious!"', example_pt: '"Essa pizza é deliciosa!"', tip: 'Na próxima refeição, diga: This is delicious!' },
+    { en: 'Funny', pt: 'Engraçado', emoji: '😂', example_en: '"That movie is so funny!"', example_pt: '"Esse filme é muito engraçado!"', tip: 'Quando rir de algo, diga: This is funny!' },
+    { en: 'Strong', pt: 'Forte', emoji: '💪', example_en: '"You are so strong!"', example_pt: '"Você é muito forte!"', tip: 'Diga para alguém: You are strong!' },
+    { en: 'Wonderful', pt: 'Maravilhoso', emoji: '🌟', example_en: '"What a wonderful day!"', example_pt: '"Que dia maravilhoso!"', tip: 'Quando o dia estiver ótimo, diga: What a wonderful day!' },
+  ];
+
+  // Choose word based on day of year so it changes daily
+  const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  let currentIdx = dayOfYear % words.length;
+
+  function showWord(idx) {
+    const w = words[idx];
+    document.getElementById('wordEmoji').textContent = w.emoji;
+    document.getElementById('wordEn').textContent = w.en;
+    document.getElementById('wordPt').textContent = w.pt;
+    document.getElementById('exampleEn').textContent = w.example_en;
+    document.getElementById('examplePt').textContent = w.example_pt;
+    document.getElementById('tipText').textContent = w.tip;
+  }
+
+  document.getElementById('btnAudio').addEventListener('click', () => {
+    const w = words[currentIdx];
+    const u = new SpeechSynthesisUtterance(w.en.toLowerCase());
+    u.lang = 'en-US'; u.rate = 0.8; u.pitch = 1.1;
+    window.speechSynthesis.speak(u);
+  });
+
+  showWord(currentIdx);
+</script>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conquistas | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); font-weight: 400; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px; }
+
+    .progress-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .card-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .progress-row { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+    .progress-bar { height: 8px; background: var(--sand); border-radius: 99px; overflow: hidden; margin-bottom: 20px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--mint), #90C9F9); border-radius: 99px; transition: width 0.8s ease; }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    .stat-box { background: var(--cream); border-radius: 12px; padding: 16px 12px; text-align: center; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--brown); display: block; }
+    .stat-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .badges-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .badges-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 16px; }
+    .badge-item { text-align: center; }
+    .badge-icon { width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 8px; }
+    .badge-icon.earned { background: linear-gradient(135deg, #EDE8DF, #A8C5B5); box-shadow: 0 4px 12px rgba(92,64,51,0.15); }
+    .badge-icon.locked { background: #F0F0F0; filter: grayscale(1); opacity: 0.4; }
+    .badge-name { font-size: 12px; font-weight: 600; color: var(--text); line-height: 1.3; }
+    .badge-name.locked { color: #CCC; }
+    .badge-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .streak-card { background: var(--brown); border-radius: var(--radius); padding: 22px 24px; text-align: center; }
+    .streak-value { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--white); display: block; }
+    .streak-label { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 4px; }
+    .streak-emoji { font-size: 32px; margin-bottom: 8px; display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Conquistas</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Seu histórico</div>
+    <div class="hero-title">Conquistas & Progresso 🏆</div>
+  </div>
+</div>
+
+<main>
+
+  <div class="progress-card">
+    <div class="card-title">Seu progresso</div>
+    <div class="progress-row">
+      <span id="progressLevel">Level 1</span>
+      <span id="progressText">0 aulas completadas</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box">
+        <span class="stat-value" id="statAulas">0</span>
+        <span class="stat-label">Aulas</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="statStreak">0</span>
+        <span class="stat-label">Sequência</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value" id="statBadges">0</span>
+        <span class="stat-label">Badges</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="badges-card">
+    <div class="card-title">Coleção de badges</div>
+    <div class="badges-grid">
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-aula1">⭐</div>
+        <div class="badge-name locked" id="bn-aula1">Primeira aula</div>
+        <div class="badge-date" id="bd-aula1"></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-quiz">🎯</div>
+        <div class="badge-name locked" id="bn-quiz">Quiz perfeito</div>
+        <div class="badge-date" id="bd-quiz"></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-streak7">🔥</div>
+        <div class="badge-name locked" id="bn-streak7">7 dias seguidos</div>
+        <div class="badge-date" id="bd-streak7"></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-level1">📖</div>
+        <div class="badge-name locked" id="bn-level1">Level 1 completo</div>
+        <div class="badge-date" id="bd-level1"></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-conv">💬</div>
+        <div class="badge-name locked" id="bn-conv">Conversação</div>
+        <div class="badge-date" id="bd-conv"></div>
+      </div>
+      <div class="badge-item">
+        <div class="badge-icon locked" id="b-streak30">🏅</div>
+        <div class="badge-name locked" id="bn-streak30">30 dias seguidos</div>
+        <div class="badge-date" id="bd-streak30"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="streak-card">
+    <span class="streak-emoji">🔥</span>
+    <span class="streak-value" id="streakValue">0</span>
+    <div class="streak-label">dias consecutivos de estudo</div>
+  </div>
+
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  const BADGE_MAP = {
+    'primeira-aula':  'aula1',
+    'quiz-perfeito':  'quiz',
+    '7-dias':         'streak7',
+    'level-1-completo': 'level1',
+    'conversacao':    'conv',
+    '30-dias':        'streak30'
+  };
+
+  async function init() {
+    // Session already verified before init()
+    const user = session.user;
+
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    const level = profile?.level || 1;
+    document.getElementById('progressLevel').textContent = 'Level ' + level;
+
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id).like('lesson_id', 'adulto-l%');
+    const completed = (progress || []).filter(p => p.lesson_id.match(/^adulto-l\d+-a\d+$/));
+    document.getElementById('statAulas').textContent = completed.length;
+    document.getElementById('progressText').textContent = completed.length + ' aulas completadas';
+    document.getElementById('progressFill').style.width = Math.min(completed.length * 10, 100) + '%';
+
+    const { data: badges } = await sb.from('badges').select('*').eq('user_id', user.id);
+    const earnedBadges = badges || [];
+    document.getElementById('statBadges').textContent = earnedBadges.length;
+
+    earnedBadges.forEach(b => {
+      const key = BADGE_MAP[b.badge_name];
+      if (!key) return;
+      const icon = document.getElementById('b-' + key);
+      const name = document.getElementById('bn-' + key);
+      const date = document.getElementById('bd-' + key);
+      if (icon) { icon.classList.remove('locked'); icon.classList.add('earned'); }
+      if (name) name.classList.remove('locked');
+      if (date && b.earned_at) date.textContent = new Date(b.earned_at).toLocaleDateString('pt-BR');
+    });
+
+    const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
+    const s = streak?.current_streak || 0;
+    document.getElementById('statStreak').textContent = s;
+    document.getElementById('streakValue').textContent = s;
+  }
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

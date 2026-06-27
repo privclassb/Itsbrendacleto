@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>itsbrendacleto — Inglês para a Vida Real</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #FAF7F2;
+      --sand: #EDE8DF;
+      --brown: #5C4033;
+      --brown-light: #8B6355;
+      --mint: #A8C5B5;
+      --rose: #E8A598;
+      --text: #2C1F1A;
+      --text-muted: #7A6560;
+      --white: #FFFFFF;
+      --radius: 16px;
+      --shadow: 0 4px 24px rgba(92,64,51,0.10);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* Decorative background blobs */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(168,197,181,0.35) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: -100px;
+      width: 350px; height: 350px;
+      background: radial-gradient(circle, rgba(232,165,152,0.25) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--brown);
+      letter-spacing: -0.5px;
+      display: block;
+    }
+
+    .brand-tagline {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 400;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .divider-dot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 auto 32px;
+      justify-content: center;
+    }
+    .divider-dot span {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--mint);
+      display: inline-block;
+    }
+    .divider-dot span:nth-child(2) { background: var(--rose); }
+    .divider-dot span:nth-child(3) { background: var(--brown-light); opacity: 0.4; }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 6px;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--sand);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      background: var(--cream);
+      transition: border-color 0.2s, box-shadow 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 3px rgba(168,197,181,0.2);
+      background: var(--white);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--brown);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover { background: var(--brown-light); }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .or-divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+    .or-divider::before,
+    .or-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--sand);
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 13px;
+      background: var(--white);
+      color: var(--text);
+      border: 1.5px solid var(--sand);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-google:hover {
+      background: var(--cream);
+      border-color: var(--brown-light);
+    }
+
+    .google-icon {
+      width: 18px; height: 18px;
+    }
+
+    .toggle-link {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .toggle-link a {
+      color: var(--brown);
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .toggle-link a:hover { text-decoration: underline; }
+
+    .message {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.error {
+      background: #FFF0EE;
+      color: #C0392B;
+      border: 1px solid #F5C6C2;
+      display: block;
+    }
+
+    .message.success {
+      background: #EFF7F3;
+      color: #1E7E4A;
+      border: 1px solid #B8DEC9;
+      display: block;
+    }
+
+    .loading {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Forgot password */
+    .forgot {
+      text-align: right;
+      margin-top: -8px;
+      margin-bottom: 16px;
+    }
+    .forgot a {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .forgot a:hover { color: var(--brown); }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <span class="brand-name">itsbrendacleto</span>
+    <span class="brand-tagline">Inglês para a Vida Real</span>
+  </div>
+
+  <div class="divider-dot">
+    <span></span><span></span><span></span>
+  </div>
+
+  <div id="message" class="message"></div>
+
+  <!-- LOGIN FORM -->
+  <div id="loginForm">
+    <h2>Bem-vindo(a) de volta</h2>
+    <p class="subtitle">Acesse sua conta para continuar aprendendo.</p>
+
+    <div class="form-group">
+      <label for="loginEmail">E-mail</label>
+      <input type="email" id="loginEmail" placeholder="seu@email.com" />
+    </div>
+
+    <div class="form-group">
+      <label for="loginPassword">Senha</label>
+      <input type="password" id="loginPassword" placeholder="••••••••" />
+    </div>
+
+    <div class="forgot">
+      <a id="forgotLink">Esqueci minha senha</a>
+    </div>
+
+    <button class="btn-primary" id="loginBtn">Entrar</button>
+
+    <div class="toggle-link">
+      Não tem conta? <a id="goToRegister">Criar conta</a>
+    </div>
+  </div>
+
+  <!-- REGISTER FORM -->
+  <div id="registerForm" style="display:none;">
+    <h2>Criar conta</h2>
+    <p class="subtitle">Preencha os dados para começar.</p>
+
+    <div class="form-group">
+      <label for="registerName">Seu nome</label>
+      <input type="text" id="registerName" placeholder="Como você se chama?" />
+    </div>
+
+    <div class="form-group">
+      <label for="registerEmail">E-mail</label>
+      <input type="email" id="registerEmail" placeholder="seu@email.com" />
+    </div>
+
+    <div class="form-group">
+      <label for="registerPassword">Senha</label>
+      <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" />
+    </div>
+
+    <button class="btn-primary" id="registerBtn">Criar minha conta</button>
+
+    <div class="toggle-link">
+      Já tem conta? <a id="goToLogin">Entrar</a>
+    </div>
+  </div>
+
+  <!-- FORGOT PASSWORD FORM -->
+  <div id="forgotForm" style="display:none;">
+    <h2>Recuperar senha</h2>
+    <p class="subtitle">Enviaremos um link para seu e-mail.</p>
+
+    <div class="form-group">
+      <label for="forgotEmail">E-mail</label>
+      <input type="email" id="forgotEmail" placeholder="seu@email.com" />
+    </div>
+
+    <button class="btn-primary" id="forgotBtn">Enviar link</button>
+
+    <div class="toggle-link">
+      Lembrou a senha? <a id="goToLoginFromForgot">Voltar</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ─── Supabase config ───────────────────────────────────────────────
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  // ─── DOM refs ──────────────────────────────────────────────────────
+  const loginForm    = document.getElementById('loginForm');
+  const registerForm = document.getElementById('registerForm');
+  const forgotForm   = document.getElementById('forgotForm');
+  const msgBox       = document.getElementById('message');
+
+  function showMsg(text, type) {
+    msgBox.textContent = text;
+    msgBox.className = 'message ' + type;
+  }
+
+  function clearMsg() {
+    msgBox.className = 'message';
+    msgBox.textContent = '';
+  }
+
+  function showForm(form) {
+    clearMsg();
+    loginForm.style.display    = 'none';
+    registerForm.style.display = 'none';
+    forgotForm.style.display   = 'none';
+    form.style.display         = 'block';
+  }
+
+  // ─── Navigation ────────────────────────────────────────────────────
+  document.getElementById('goToRegister').addEventListener('click', () => showForm(registerForm));
+  document.getElementById('goToLogin').addEventListener('click', () => showForm(loginForm));
+  document.getElementById('forgotLink').addEventListener('click', () => showForm(forgotForm));
+  document.getElementById('goToLoginFromForgot').addEventListener('click', () => showForm(loginForm));
+
+  // ─── Login ─────────────────────────────────────────────────────────
+  document.getElementById('loginBtn').addEventListener('click', async () => {
+    const email    = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const btn      = document.getElementById('loginBtn');
+
+    if (!email || !password) { showMsg('Preencha e-mail e senha.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Entrando...';
+
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showMsg('E-mail ou senha incorretos. Tente novamente.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+      return;
+    }
+
+    await redirect(data.user);
+  });
+
+  // ─── Register ──────────────────────────────────────────────────────
+  document.getElementById('registerBtn').addEventListener('click', async () => {
+    const name     = document.getElementById('registerName').value.trim();
+    const email    = document.getElementById('registerEmail').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const btn      = document.getElementById('registerBtn');
+
+    if (!name || !email || !password) { showMsg('Preencha todos os campos.', 'error'); return; }
+    if (password.length < 6) { showMsg('A senha deve ter pelo menos 6 caracteres.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Criando conta...';
+
+    const { data, error } = await sb.auth.signUp({ email, password });
+
+    if (error) {
+      showMsg('Erro ao criar conta: ' + error.message, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Criar minha conta';
+      return;
+    }
+
+    // Salva o nome no perfil
+    if (data.user) {
+      await sb.from('profiles').upsert({
+        id: data.user.id,
+        full_name: name,
+        role: 'adulto'
+      });
+    }
+
+    showMsg('Conta criada! Verifique seu e-mail para confirmar.', 'success');
+    btn.disabled = false;
+    btn.textContent = 'Criar minha conta';
+  });
+
+  // ─── Forgot password ───────────────────────────────────────────────
+  document.getElementById('forgotBtn').addEventListener('click', async () => {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const btn   = document.getElementById('forgotBtn');
+
+    if (!email) { showMsg('Digite seu e-mail.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Enviando...';
+
+    const { error } = await sb.auth.resetPasswordForEmail(email);
+
+    if (error) {
+      showMsg('Erro ao enviar e-mail. Tente novamente.', 'error');
+    } else {
+      showMsg('Link enviado! Verifique seu e-mail.', 'success');
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Enviar link';
+  });
+
+  // ─── Redirect by role ──────────────────────────────────────────────
+  async function redirect(user) {
+    // 1. Tenta user_metadata (mais rápido, não depende de RLS)
+    let role = user.user_metadata?.role || null;
+
+    // 2. Se não tiver, busca no banco
+    if (!role) {
+      for (let i = 0; i < 3; i++) {
+        const { data } = await sb.from('profiles').select('role').eq('id', user.id).maybeSingle();
+        if (data?.role) { role = data.role; break; }
+        await new Promise(r => setTimeout(r, 600));
+      }
+    }
+
+    role = role || 'adulto';
+    console.log('Role final:', role, '| metadata:', user.user_metadata);
+
+    if (role === 'professora') {
+      window.location.href = 'painel-professora.html';
+    } else if (role === 'kids') {
+      window.location.href = 'home-kids.html';
+    } else {
+      window.location.href = 'home-adulto.html';
+    }
+  }
+
+  // Escuta login bem-sucedido
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await redirect(session.user);
+    }
+  });
+</script>
+</body>
+</html>

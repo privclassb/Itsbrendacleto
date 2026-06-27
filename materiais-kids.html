@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materiais | itsbrendacleto Kids</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1; --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0; --text: #3D2B1F; --white: #FFFFFF; --radius: 20px; }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--white); padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: var(--cream); border: 2px solid #EEE; border-radius: 12px; padding: 7px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; color: var(--text); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--rose); }
+    .header-title { font-size: 16px; font-weight: 900; color: var(--text); }
+
+    .hero { background: linear-gradient(135deg, #7ECBA1, #C3B1E1); padding: 28px 24px; text-align: center; }
+    .hero-icon { font-size: 48px; margin-bottom: 8px; }
+    .hero-title { font-size: 24px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+    .hero-sub { font-size: 13px; font-weight: 700; color: rgba(61,43,31,0.65); }
+
+    main { padding: 24px 20px; max-width: 600px; margin: 0 auto; }
+
+    .material-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 3px solid transparent;
+    }
+    .material-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+    .material-card.mint { border-color: var(--mint); }
+    .material-card.rose { border-color: var(--rose); }
+    .material-card.yellow { border-color: var(--yellow); }
+    .material-card.lavender { border-color: var(--lavender); }
+
+    .material-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; flex-shrink: 0;
+    }
+    .material-icon.mint { background: #F0FFF7; }
+    .material-icon.rose { background: #FFF0F7; }
+    .material-icon.yellow { background: #FFFBF0; }
+    .material-icon.lavender { background: #F5F0FF; }
+
+    .material-info { flex: 1; }
+    .material-title { font-size: 15px; font-weight: 900; color: var(--text); margin-bottom: 2px; }
+    .material-sub { font-size: 12px; font-weight: 600; color: #AAA; }
+    .material-arrow { font-size: 20px; color: #DDD; }
+
+    .unavailable {
+      opacity: 0.5;
+      pointer-events: none;
+      cursor: default;
+    }
+    .coming-tag {
+      background: #F0F0F0;
+      border-radius: 99px;
+      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 800;
+      color: #AAA;
+      text-transform: uppercase;
+    }
+
+    .loading-card { text-align: center; padding: 40px; color: #AAA; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-kids.html" class="btn-back">← Voltar</a>
+  <div class="header-title">📁 Materiais</div>
+</header>
+
+<div class="hero">
+  <div class="hero-icon">📚</div>
+  <div class="hero-title">Seus Materiais</div>
+  <div class="hero-sub">Tudo que você precisa para aprender!</div>
+</div>
+
+<main id="mainContent">
+  <div class="loading-card">Carregando...</div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  const CATEGORIES = [
+    { key: 'kids-materiais',     icon: '📖', label: 'Material digital',  sub: 'Slides e atividades',      color: 'mint' },
+    { key: 'kids-gravacoes',     icon: '🎥', label: 'Gravações das aulas', sub: 'Assista quando quiser',   color: 'rose' },
+
+  ];
+
+  async function init() {
+    // Session already verified before init()
+
+    const { data: links } = await sb.from('material_links').select('*').in('category', CATEGORIES.map(c => c.key));
+    const linkMap = {};
+    (links || []).forEach(l => { linkMap[l.category] = l.url; });
+
+    const main = document.getElementById('mainContent');
+    main.innerHTML = CATEGORIES.map(cat => {
+      const url = linkMap[cat.key];
+      const hasUrl = url && url.trim() !== '';
+      return `
+        <a href="${hasUrl ? url : '#'}" target="${hasUrl ? '_blank' : '_self'}" 
+           class="material-card ${cat.color} ${!hasUrl ? 'unavailable' : ''}">
+          <div class="material-icon ${cat.color}">${cat.icon}</div>
+          <div class="material-info">
+            <div class="material-title">${cat.label}</div>
+            <div class="material-sub">${hasUrl ? cat.sub : 'Em breve...'}</div>
+          </div>
+          <div class="material-arrow">${hasUrl ? '›' : '⏳'}</div>
+        </a>
+      `;
+    }).join('');
+  }
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

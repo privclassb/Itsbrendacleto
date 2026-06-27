@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Área | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream:  #FAF7F2;
+      --sand:   #EDE8DF;
+      --brown:  #5C4033;
+      --brown-light: #8B6355;
+      --mint:   #A8C5B5;
+      --rose:   #E8A598;
+      --text:   #2C1F1A;
+      --muted:  #7A6560;
+      --white:  #FFFFFF;
+      --radius: 16px;
+      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header {
+      background: var(--brown);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-right { display: flex; align-items: center; gap: 14px; }
+    .streak-pill {
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 5px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .btn-logout {
+      background: none;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: white; color: white; }
+
+    .hero {
+      background: var(--white);
+      border-bottom: 1px solid var(--sand);
+      padding: 36px 28px 32px;
+    }
+    .hero-inner { max-width: 720px; margin: 0 auto; }
+    .hero-greeting { font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: 34px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
+    .hero-sub { font-size: 15px; color: var(--muted); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+    .stat-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; text-align: center; box-shadow: var(--shadow); }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--brown); display: block; }
+    .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    /* Level section */
+    .level-section { margin-bottom: 32px; }
+
+    .level-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      background: var(--white);
+      box-shadow: var(--shadow);
+    }
+
+    .level-badge {
+      background: var(--brown);
+      color: var(--white);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+
+    .level-badge.review {
+      background: var(--sand);
+      color: var(--muted);
+    }
+
+    .level-badge.locked-badge {
+      background: #EEE;
+      color: #BBB;
+    }
+
+    .level-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: var(--text);
+      font-weight: 400;
+      flex: 1;
+    }
+
+    .level-progress-text {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+
+    .lesson-item {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-decoration: none;
+      transition: transform 0.15s, box-shadow 0.15s;
+      border: 1.5px solid transparent;
+    }
+    .lesson-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(92,64,51,0.12); border-color: var(--sand); }
+    .lesson-item.completed { border-color: var(--mint); }
+    .lesson-item.locked { opacity: 0.45; pointer-events: none; }
+    .lesson-item.review-item { opacity: 0.75; }
+
+    .lesson-dot {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      border: 2px solid var(--sand);
+    }
+    .lesson-dot.done { background: var(--mint); border-color: var(--mint); }
+
+    .lesson-info { flex: 1; }
+    .lesson-number { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .lesson-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .lesson-arrow { font-size: 18px; color: var(--sand); }
+
+    .teacher-strip {
+      background: var(--brown);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .teacher-avatar { width: 46px; height: 46px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .teacher-label { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .teacher-name { font-size: 16px; font-weight: 600; color: var(--white); }
+
+    .badges-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); }
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; }
+    .badges-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .badge-chip {
+      display: flex; align-items: center; gap: 6px;
+      background: var(--cream); border: 1.5px solid var(--sand);
+      border-radius: 99px; padding: 6px 12px;
+      font-size: 13px; font-weight: 500; color: var(--text);
+    }
+    .badge-chip.earned { background: #EFF7F3; border-color: var(--mint); color: #1E5C3A; }
+
+    .coming-soon {
+      text-align: center;
+      padding: 28px;
+      color: var(--muted);
+      font-size: 14px;
+      background: var(--white);
+      border-radius: var(--radius);
+      border: 2px dashed var(--sand);
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 12px;font-family:DM Sans,sans-serif;font-size:13px;color:rgba(255,255,255,0.8);text-decoration:none;">← Voltar</a>
+  <div class="header-brand">itsbrendacleto</div>
+  <div class="header-right">
+    <div class="streak-pill">🔥 <span id="streakCount">0</span> dias</div>
+    <button class="btn-logout" id="logoutBtn">Sair</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-greeting">Welcome back</div>
+    <div class="hero-name" id="heroName">Carregando...</div>
+    <div class="hero-sub" id="heroSub">Continue de onde parou. Cada aula te aproxima da fluência. 💪</div>
+  </div>
+</div>
+
+<main>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <span class="stat-value" id="statAulas">0</span>
+      <div class="stat-label">Aulas</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value" id="statStreak">0</span>
+      <div class="stat-label">Sequência</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value" id="statBadges">0</span>
+      <div class="stat-label">Badges</div>
+    </div>
+  </div>
+
+  <!-- Aulas por level — gerado dinamicamente -->
+  <div id="lessonsContainer"></div>
+
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  // Estrutura de aulas por level — adicione novas aulas aqui
+  const LEVELS = [
+    {
+      level: 1,
+      title: 'Level 1',
+      lessons: [
+        { id: 'adulto-l1-a1', number: 'Aula 1', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'adulto-l1-a2', number: 'Aula 2', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'adulto-l1-a3', number: 'Aula 3', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    },
+    {
+      level: 2,
+      title: 'Level 2',
+      lessons: [
+        { id: 'adulto-l2-a1', number: 'Aula 1', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'adulto-l2-a2', number: 'Aula 2', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    },
+    {
+      level: 3,
+      title: 'Level 3',
+      lessons: [
+        { id: 'adulto-l3-a1', number: 'Aula 1', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'adulto-l3-a2', number: 'Aula 2', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    }
+  ];
+
+  async function init() {
+    // Session already verified before init()
+
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    const name = profile?.full_name || user.email.split('@')[0];
+    const userLevel = profile?.level || 1;
+
+    document.getElementById('heroName').textContent = name + '.';
+    document.getElementById('heroSub').textContent = 'Você está no Level ' + userLevel + '. Continue assim! 💪';
+
+    // Progresso
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
+    const completed = (progress || []).map(p => p.lesson_id);
+    document.getElementById('statAulas').textContent = completed.length;
+
+    // Renderiza levels
+    renderLevels(userLevel, completed);
+
+    // Badges
+    const { data: badges } = await sb.from('badges').select('badge_name').eq('user_id', user.id);
+    const earnedBadges = (badges || []).map(b => b.badge_name);
+    const badgeMap = { 'primeira-aula': 'b1', 'quiz-perfeito': 'b2', '7-dias': 'b3', 'conversacao': 'b4' };
+    earnedBadges.forEach(b => {
+      const id = badgeMap[b];
+      if (id) document.getElementById(id)?.classList.add('earned');
+    });
+    document.getElementById('statBadges').textContent = earnedBadges.length;
+
+    // Streak
+    const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
+    const s = streak?.current_streak || 0;
+    document.getElementById('streakCount').textContent = s;
+    document.getElementById('statStreak').textContent = s;
+    await updateStreak(user.id);
+  }
+
+  function renderLevels(userLevel, completed) {
+    const container = document.getElementById('lessonsContainer');
+    container.innerHTML = '';
+
+    LEVELS.forEach(levelData => {
+      const isCurrentLevel = levelData.level === userLevel;
+      const isPastLevel = levelData.level < userLevel;
+      const isNextLevel = levelData.level > userLevel;
+
+      const section = document.createElement('div');
+      section.className = 'level-section';
+
+      // Header do level
+      let badgeClass = isCurrentLevel ? '' : isPastLevel ? 'review' : 'locked-badge';
+      let badgeText = isCurrentLevel ? 'Seu nível atual' : isPastLevel ? 'Revisão' : 'Bloqueado';
+      let completedCount = levelData.lessons.filter(l => completed.includes(l.id)).length;
+
+      section.innerHTML = `
+        <div class="level-header">
+          <span class="level-badge ${badgeClass}">${badgeText}</span>
+          <span class="level-title">${levelData.title}</span>
+          ${!isNextLevel ? `<span class="level-progress-text">${completedCount}/${levelData.lessons.length} aulas</span>` : ''}
+        </div>
+        <div class="lesson-list" id="list-level-${levelData.level}"></div>
+      `;
+
+      container.appendChild(section);
+
+      const list = document.getElementById('list-level-' + levelData.level);
+
+      if (isNextLevel) {
+        list.innerHTML = `<div class="coming-soon">🔒 Complete o ${levelData.level === userLevel + 1 ? 'Level ' + (levelData.level - 1) : 'nível anterior'} para desbloquear</div>`;
+        return;
+      }
+
+      levelData.lessons.forEach(lesson => {
+        const isDone = completed.includes(lesson.id);
+
+        if (!lesson.ready) {
+          const item = document.createElement('div');
+          item.className = 'lesson-item';
+          item.style.opacity = '0.45';
+          item.style.pointerEvents = 'none';
+          item.innerHTML = `
+            <div class="lesson-dot">⏳</div>
+            <div class="lesson-info">
+              <div class="lesson-number">${lesson.number} · ${levelData.title}</div>
+              <div class="lesson-title" style="color:#BBB">Em breve...</div>
+            </div>
+            <div class="lesson-arrow" style="color:#DDD">›</div>
+          `;
+          list.appendChild(item);
+          return;
+        }
+
+        const item = document.createElement('a');
+        item.href = lesson.href;
+        item.className = 'lesson-item' + (isDone ? ' completed' : '') + (isPastLevel ? ' review-item' : '');
+        item.innerHTML = `
+          <div class="lesson-dot ${isDone ? 'done' : ''}">${isDone ? '✅' : lesson.emoji}</div>
+          <div class="lesson-info">
+            <div class="lesson-number">${lesson.number} · ${levelData.title}</div>
+            <div class="lesson-title">${lesson.title}</div>
+          </div>
+          <div class="lesson-arrow">›</div>
+        `;
+        list.appendChild(item);
+      });
+    });
+  }
+
+  async function updateStreak(userId) {
+    const today = new Date().toISOString().split('T')[0];
+    const { data: streak } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
+    if (!streak) {
+      await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 });
+      document.getElementById('streakCount').textContent = 1;
+      document.getElementById('statStreak').textContent = 1;
+      return;
+    }
+    const diff = Math.floor((new Date(today) - new Date(streak.last_access)) / 86400000);
+    if (diff === 0) return;
+    const newStreak = diff === 1 ? streak.current_streak + 1 : 1;
+    await sb.from('streaks').update({ last_access: today, current_streak: newStreak }).eq('user_id', userId);
+    document.getElementById('streakCount').textContent = newStreak;
+    document.getElementById('statStreak').textContent = newStreak;
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

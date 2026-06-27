@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Área — Kids | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1;
+      --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0;
+      --text: #3D2B1F; --white: #FFFFFF; --radius: 20px;
+    }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header {
+      background: var(--white); padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .header-brand { font-size: 18px; font-weight: 900; color: var(--text); }
+    .header-brand span { color: #F9A8C9; }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .streak-badge { background: var(--yellow); border-radius: 20px; padding: 6px 12px; font-size: 13px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 4px; }
+    .btn-logout { background: none; border: 2px solid #EEE; border-radius: 10px; padding: 6px 12px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 700; color: #999; cursor: pointer; transition: all 0.2s; }
+    .btn-logout:hover { border-color: var(--rose); color: var(--text); }
+
+    .hero { background: linear-gradient(135deg, #FFD97D 0%, #F9A8C9 50%, #C3B1E1 100%); padding: 32px 24px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: '⭐🌟✨'; position: absolute; top: 10px; left: 10px; font-size: 20px; opacity: 0.4; letter-spacing: 8px; }
+    .hero::after { content: '🎉🎊🎈'; position: absolute; bottom: 10px; right: 10px; font-size: 20px; opacity: 0.4; letter-spacing: 8px; }
+    .hero-greeting { font-size: 14px; font-weight: 700; color: rgba(61,43,31,0.7); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .hero-name { font-size: 32px; font-weight: 900; color: var(--text); margin-bottom: 4px; }
+    .hero-mission { display: inline-block; background: rgba(255,255,255,0.5); border-radius: 20px; padding: 4px 14px; font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+    .hero-sub { font-size: 15px; color: rgba(61,43,31,0.75); font-weight: 600; }
+
+    main { padding: 28px 20px; max-width: 700px; margin: 0 auto; }
+
+    /* Mission section */
+    .mission-section { margin-bottom: 28px; }
+
+    .mission-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 18px; border-radius: var(--radius);
+      background: var(--white); box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      margin-bottom: 14px;
+    }
+
+    .mission-badge {
+      border-radius: 12px; padding: 5px 12px;
+      font-size: 12px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .mission-badge.current { background: var(--rose); color: var(--text); }
+    .mission-badge.review  { background: var(--lavender); color: var(--text); opacity: 0.7; }
+    .mission-badge.locked  { background: #EEE; color: #BBB; }
+
+    .mission-title { font-size: 18px; font-weight: 900; color: var(--text); flex: 1; }
+    .mission-progress { font-size: 12px; font-weight: 700; color: #AAA; }
+
+    .lessons-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .lesson-card {
+      background: var(--white); border-radius: var(--radius);
+      padding: 20px 16px; box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+      border: 3px solid transparent; text-decoration: none;
+      display: block; position: relative; overflow: hidden;
+    }
+    .lesson-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.10); }
+    .lesson-card.completed { border-color: var(--mint); }
+    .lesson-card.locked { opacity: 0.45; cursor: not-allowed; pointer-events: none; }
+    .lesson-card.review-card { opacity: 0.8; }
+
+    .lesson-card-accent { height: 6px; border-radius: 99px; margin-bottom: 14px; }
+    .accent-rose { background: var(--rose); }
+    .accent-mint { background: var(--mint); }
+    .accent-lavender { background: var(--lavender); }
+    .accent-yellow { background: var(--yellow); }
+    .accent-sky { background: var(--sky); }
+
+    .lesson-emoji { font-size: 32px; margin-bottom: 8px; display: block; }
+    .lesson-number { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #AAA; margin-bottom: 2px; }
+    .lesson-title { font-size: 15px; font-weight: 800; color: var(--text); line-height: 1.3; }
+    .lesson-status { position: absolute; top: 14px; right: 14px; font-size: 16px; }
+
+    .coming-soon-kids {
+      grid-column: 1 / -1;
+      text-align: center; padding: 24px;
+      background: var(--white); border-radius: var(--radius);
+      border: 3px dashed #EEE;
+      font-size: 14px; font-weight: 700; color: #BBB;
+    }
+
+    .badges-section { background: var(--white); border-radius: var(--radius); padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.05); margin-bottom: 24px; }
+    .section-title { font-size: 18px; font-weight: 900; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .badges-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+    .badge-item { text-align: center; width: 70px; }
+    .badge-icon { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--yellow), var(--rose)); display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .badge-icon.locked-badge { background: #EEE; filter: grayscale(1); }
+    .badge-name { font-size: 10px; font-weight: 800; color: var(--text); line-height: 1.2; }
+
+    .coming-soon-card { cursor: default; pointer-events: none; }
+    .btn-materiais {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--white);
+      border: 3px solid var(--lavender);
+      border-radius: var(--radius);
+      padding: 16px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text);
+      text-decoration: none;
+      margin-bottom: 20px;
+      transition: all 0.2s;
+    }
+    .btn-materiais:hover { background: var(--lavender); }
+    .teacher-card { background: linear-gradient(135deg, #C3B1E1, #90C9F9); border-radius: var(--radius); padding: 20px; text-align: center; margin-bottom: 28px; }
+    .teacher-avatar { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.4); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .teacher-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(61,43,31,0.6); margin-bottom: 2px; }
+    .teacher-name { font-size: 16px; font-weight: 900; color: var(--text); }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-kids.html" style="background:var(--cream);border:2px solid #EEE;border-radius:12px;padding:6px 12px;font-family:Nunito,sans-serif;font-size:13px;font-weight:800;color:#3D2B1F;text-decoration:none;">← Voltar</a>
+  <div class="header-brand">its<span>brenda</span>cleto</div>
+  <div class="header-right">
+    <div class="streak-badge">🔥 <span id="streakCount">0</span> dias</div>
+    <button class="btn-logout" id="logoutBtn">Sair</button>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-greeting">Hello!</div>
+  <div class="hero-name" id="heroName">Carregando...</div>
+  <div class="hero-mission" id="heroMission">Mission 1</div>
+  <div class="hero-sub">Prontos para aprender inglês hoje? 🌟</div>
+</div>
+
+<main>
+
+  <div id="missionsContainer"></div>
+
+
+
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  const ACCENT_COLORS = ['accent-rose','accent-mint','accent-lavender','accent-yellow','accent-sky'];
+
+  const MISSIONS = [
+    {
+      mission: 1,
+      title: 'Mission 1',
+      lessons: [
+        { id: 'kids-m1-a1', number: 'Aula 1', title: 'Hi! My name is...', emoji: '👋', href: 'planner-kids-1.html', ready: true },
+        { id: 'kids-m1-a2', number: 'Aula 2', title: "Let's Talk!", emoji: '😊', href: 'planner-kids-2.html', ready: true },
+        { id: 'kids-m1-a3', number: 'Aula 3', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'kids-m1-a4', number: 'Aula 4', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    },
+    {
+      mission: 2,
+      title: 'Mission 2',
+      lessons: [
+        { id: 'kids-m2-a1', number: 'Aula 1', title: '', emoji: '✨', href: '', ready: false },
+        { id: 'kids-m2-a2', number: 'Aula 2', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    },
+    {
+      mission: 3,
+      title: 'Mission 3',
+      lessons: [
+        { id: 'kids-m3-a1', number: 'Aula 1', title: '', emoji: '✨', href: '', ready: false },
+      ]
+    }
+  ];
+
+  async function init() {
+    // Session already verified before init()
+
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    const name = profile?.full_name || user.email.split('@')[0];
+    const userMission = profile?.level || 1;
+
+    document.getElementById('heroName').textContent = name + '! 👋';
+    document.getElementById('heroMission').textContent = '🗺️ Mission ' + userMission;
+
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
+    const completed = (progress || []).map(p => p.lesson_id);
+
+    renderMissions(userMission, completed);
+
+    const { data: badges } = await sb.from('badges').select('badge_name').eq('user_id', user.id);
+    const earnedBadges = (badges || []).map(b => b.badge_name);
+    const badgeMap = { 'primeira-aula': 'kb1', 'alfabeto': 'kb2', 'feelings': 'kb3', 'quiz-mestre': 'kb4' };
+    earnedBadges.forEach(b => {
+      const id = badgeMap[b];
+      if (id) document.getElementById(id)?.classList.remove('locked-badge');
+    });
+
+    const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
+    document.getElementById('streakCount').textContent = streak?.current_streak || 0;
+    await updateStreak(user.id);
+  }
+
+  function renderMissions(userMission, completed) {
+    const container = document.getElementById('missionsContainer');
+    container.innerHTML = '';
+
+    MISSIONS.forEach(missionData => {
+      const isCurrent = missionData.mission === userMission;
+      const isPast    = missionData.mission < userMission;
+      const isNext    = missionData.mission > userMission;
+
+      const section = document.createElement('div');
+      section.className = 'mission-section';
+
+      let badgeClass = isCurrent ? 'current' : isPast ? 'review' : 'locked';
+      let badgeText  = isCurrent ? '🗺️ Sua missão' : isPast ? '⭐ Revisão' : '🔒 Bloqueado';
+      let doneCount  = missionData.lessons.filter(l => completed.includes(l.id)).length;
+
+      section.innerHTML = `
+        <div class="mission-header">
+          <span class="mission-badge ${badgeClass}">${badgeText}</span>
+          <span class="mission-title">${missionData.title}</span>
+          ${!isNext ? `<span class="mission-progress">${doneCount}/${missionData.lessons.length}</span>` : ''}
+        </div>
+        <div class="lessons-grid" id="grid-mission-${missionData.mission}"></div>
+      `;
+      container.appendChild(section);
+
+      const grid = document.getElementById('grid-mission-' + missionData.mission);
+
+      if (isNext) {
+        grid.innerHTML = `<div class="coming-soon-kids">🔒 Complete a Mission ${missionData.mission - 1} para desbloquear!</div>`;
+        return;
+      }
+
+      missionData.lessons.forEach((lesson, idx) => {
+        const isDone = completed.includes(lesson.id);
+        const accent = ACCENT_COLORS[idx % ACCENT_COLORS.length];
+
+        if (!lesson.ready) {
+          const card = document.createElement('div');
+          card.className = 'lesson-card coming-soon-card';
+          card.innerHTML = `
+            <div class="lesson-card-accent ${accent}" style="opacity:0.3"></div>
+            <span class="lesson-emoji" style="opacity:0.4">🔜</span>
+            <div class="lesson-number" style="opacity:0.4">${lesson.number}</div>
+            <div class="lesson-title" style="color:#CCC;font-size:13px">Em breve...</div>
+            <span class="lesson-status" style="opacity:0.3">⏳</span>
+          `;
+          grid.appendChild(card);
+          return;
+        }
+
+        const card = document.createElement('a');
+        card.href = lesson.href;
+        card.className = 'lesson-card' + (isDone ? ' completed' : '') + (isPast ? ' review-card' : '');
+        card.innerHTML = `
+          <div class="lesson-card-accent ${accent}"></div>
+          <span class="lesson-emoji">${lesson.emoji}</span>
+          <div class="lesson-number">${lesson.number}</div>
+          <div class="lesson-title">${lesson.title}</div>
+          <span class="lesson-status">${isDone ? '✅' : '▶️'}</span>
+        `;
+        grid.appendChild(card);
+      });
+    });
+  }
+
+  async function updateStreak(userId) {
+    const today = new Date().toISOString().split('T')[0];
+    const { data: streak } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
+    if (!streak) {
+      await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 });
+      document.getElementById('streakCount').textContent = 1;
+      return;
+    }
+    const diff = Math.floor((new Date(today) - new Date(streak.last_access)) / 86400000);
+    if (diff === 0) return;
+    const newStreak = diff === 1 ? streak.current_streak + 1 : 1;
+    await sb.from('streaks').update({ last_access: today, current_streak: newStreak }).eq('user_id', userId);
+    document.getElementById('streakCount').textContent = newStreak;
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel da Professora | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:  #FAF7F2;
+      --sand:   #EDE8DF;
+      --brown:  #5C4033;
+      --brown-light: #8B6355;
+      --mint:   #A8C5B5;
+      --rose:   #E8A598;
+      --lavender: #C3B1E1;
+      --text:   #2C1F1A;
+      --muted:  #7A6560;
+      --white:  #FFFFFF;
+      --radius: 14px;
+      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--brown);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--white);
+    }
+
+    .header-tag {
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .btn-logout {
+      background: none;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: white; color: white; }
+
+    /* ── Welcome strip ── */
+    .welcome-strip {
+      background: var(--white);
+      border-bottom: 1px solid var(--sand);
+      padding: 28px 28px 24px;
+    }
+
+    .welcome-strip h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .welcome-strip p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    /* ── Main ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    /* ── Overview cards ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .overview-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .overview-value {
+      font-family: 'DM Serif Display', serif;
+      font-size: 36px;
+      color: var(--brown);
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .overview-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Filter tabs ── */
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .tab {
+      padding: 7px 16px;
+      border-radius: 99px;
+      border: 1.5px solid var(--sand);
+      background: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--brown);
+      border-color: var(--brown);
+      color: var(--white);
+    }
+
+    .tab:hover:not(.active) {
+      border-color: var(--brown-light);
+      color: var(--text);
+    }
+
+    /* ── Section title ── */
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    /* ── Student table ── */
+    .student-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .student-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .student-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--sand);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+      font-weight: 700;
+      color: var(--brown);
+    }
+
+    .student-info { flex: 1; min-width: 0; }
+
+    .student-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .student-meta {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .student-stats {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .stat-chip {
+      text-align: center;
+    }
+
+    .stat-chip-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: block;
+    }
+
+    .stat-chip-label {
+      font-size: 10px;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .role-tag {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .role-tag.kids    { background: #FFF0F5; color: #C0456A; }
+    .role-tag.adulto  { background: #EFF7F3; color: #1E5C3A; }
+
+    /* ── Empty state ── */
+    .empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty p { font-size: 15px; }
+
+    /* ── Add student button ── */
+    .btn-add {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--brown);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 20px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-bottom: 28px;
+    }
+
+    .btn-add:hover { background: var(--brown-light); }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      display: none;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 32px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    .modal h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: var(--text);
+      margin-bottom: 20px;
+      font-weight: 400;
+    }
+
+    .form-group { margin-bottom: 16px; }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--sand);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--cream);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus { border-color: var(--mint); }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-cancel {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: 1.5px solid var(--sand);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-save {
+      flex: 2;
+      padding: 12px;
+      background: var(--brown);
+      border: none;
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--white);
+      cursor: pointer;
+    }
+
+    .msg {
+      font-size: 13px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+    .msg.ok  { background: #EFF7F3; color: #1E5C3A; display: block; }
+    .msg.err { background: #FFF0EE; color: #C0392B; display: block; }
+
+    .teacher-avatar-wrap { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+    .teacher-avatar-img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3); }
+    .teacher-avatar-placeholder { width: 56px; height: 56px; border-radius: 50%; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; font-size: 24px; border: 3px solid rgba(255,255,255,0.3); }
+    .teacher-photo-btn { position: absolute; bottom: 0; right: 0; width: 20px; height: 20px; background: var(--mint); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 9px; cursor: pointer; color: white; }
+    #teacherAvatarInput { display: none; }
+
+    /* Links Management */
+    .links-section { margin-top: 32px; }
+    .links-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .links-card-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .link-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
+    .link-label { font-size: 13px; font-weight: 600; color: var(--text); width: 130px; flex-shrink: 0; }
+    .link-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
+    .link-input:focus { border-color: var(--mint); }
+    .btn-save-link { padding: 10px 16px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: white; cursor: pointer; white-space: nowrap; }
+    .btn-save-link:hover { background: var(--brown-light); }
+    .save-ok { color: var(--mint); font-size: 18px; display: none; }
+
+    /* Student folders */
+    .folder-list { margin-bottom: 14px; }
+    .folder-row { display: flex; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+    .folder-row:last-child { border-bottom: none; }
+    .folder-student { font-size: 13px; font-weight: 600; color: var(--text); width: 120px; flex-shrink: 0; }
+    .folder-name { font-size: 13px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .btn-del { background: #FFF0EE; border: none; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #C0392B; cursor: pointer; }
+
+    .add-folder-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .add-folder-form select, .add-folder-form input { padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
+    .add-folder-form select:focus, .add-folder-form input:focus { border-color: var(--mint); }
+    .btn-add-folder { grid-column: 1 / -1; padding: 12px; background: var(--mint); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); cursor: pointer; }
+
+    /* Relatórios */
+    .reports-section { margin-top: 32px; }
+    .report-form { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .report-form-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .form-row { margin-bottom: 14px; }
+    .form-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
+    .form-input:focus { border-color: var(--mint); }
+    .form-textarea { width: 100%; padding: 12px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; resize: vertical; min-height: 140px; line-height: 1.6; }
+    .form-textarea:focus { border-color: var(--mint); }
+    .form-select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
+    .form-actions { display: flex; gap: 10px; margin-top: 18px; }
+    .btn-draft { flex: 1; padding: 12px; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .btn-draft:hover { border-color: var(--brown); color: var(--brown); }
+    .btn-publish { flex: 1; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; transition: all 0.2s; }
+    .btn-publish:hover { background: var(--brown-light); }
+
+    /* Lista de relatórios existentes */
+    .report-list { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
+    .report-list-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .report-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .report-row:last-child { border-bottom: none; }
+    .report-row-info { flex: 1; }
+    .report-row-student { font-size: 14px; font-weight: 600; color: var(--text); }
+    .report-row-title { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .report-status { font-size: 11px; font-weight: 600; border-radius: 99px; padding: 3px 10px; }
+    .report-status.published { background: #EFF7F3; color: #1E5C3A; }
+    .report-status.draft { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
+    .btn-report-action { padding: 6px 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
+    .btn-toggle { background: var(--cream); color: var(--brown); border: 1.5px solid var(--sand); }
+    .btn-toggle:hover { border-color: var(--brown); }
+    .btn-delete { background: #FFF0EE; color: #C0392B; margin-left: 4px; }
+    .empty-reports { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
+
+    /* Modal adicionar aluno */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 6px; }
+    .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+    .modal-row { margin-bottom: 14px; }
+    .modal-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
+    .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
+    .modal-input:focus { border-color: var(--mint); }
+    .modal-select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-modal-cancel { flex: 1; padding: 12px; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: var(--muted); cursor: pointer; }
+    .btn-modal-save { flex: 2; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
+    .btn-modal-save:hover { background: var(--brown-light); }
+    .btn-modal-save:disabled { opacity: 0.6; cursor: not-allowed; }
+    .modal-error { background: #FFF0EE; border: 1px solid #F5C6C2; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #C0392B; margin-bottom: 14px; display: none; }
+    .modal-success { background: #EFF7F3; border: 1px solid #A8C5B5; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #1E5C3A; margin-bottom: 14px; display: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-brand">itsbrendacleto</div>
+    <div class="header-tag">Professora</div>
+  </div>
+  <button class="btn-logout" id="logoutBtn">Sair</button>
+</header>
+
+<div class="welcome-strip">
+  <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+    <div class="teacher-avatar-wrap">
+      <div class="teacher-avatar-placeholder" id="teacherAvatarPlaceholder">👩‍🏫</div>
+      <img class="teacher-avatar-img" id="teacherAvatarImg" style="display:none;" />
+      <label for="teacherAvatarInput" class="teacher-photo-btn" title="Trocar foto">✏️</label>
+      <input type="file" id="teacherAvatarInput" accept="image/*" />
+    </div>
+    <div>
+      <h1>Olá, <span id="teacherName">Professora</span> 👋</h1>
+      <p>Aqui está o resumo dos seus alunos hoje.</p>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- Overview -->
+  <div class="overview-grid">
+    <div class="overview-card">
+      <span class="overview-value" id="totalAlunos">—</span>
+      <div class="overview-label">Alunos ativos</div>
+    </div>
+    <div class="overview-card">
+      <span class="overview-value" id="totalKids">—</span>
+      <div class="overview-label">Alunos kids</div>
+    </div>
+    <div class="overview-card">
+      <span class="overview-value" id="totalAdultos">—</span>
+      <div class="overview-label">Alunos adultos</div>
+    </div>
+  </div>
+
+  <!-- Add student (só Brenda) -->
+  <button class="btn-add" id="addStudentBtn" onclick="openAddStudent()" style="display:none;">
+    + Adicionar aluno
+  </button>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <button class="tab active" data-filter="todos">Todos</button>
+    <button class="tab" data-filter="kids">Kids</button>
+    <button class="tab" data-filter="adulto">Adultos</button>
+  </div>
+
+  <!-- Student list -->
+  <div class="section-title">Seus alunos</div>
+  <div class="student-list" id="studentList">
+    <div class="empty">
+      <div class="empty-icon">👥</div>
+      <p>Carregando alunos...</p>
+    </div>
+  </div>
+
+  <!-- Links Management - só Brenda vê -->
+  <div class="links-section" id="linksSection" style="display:none;">
+
+    <!-- Links globais -->
+    <div class="links-card">
+      <div class="links-card-title">🔗 Links de materiais</div>
+
+      <div class="link-row">
+        <span class="link-label">Kids — Material</span>
+        <input class="link-input" id="link-kids-materiais" placeholder="https://drive.google.com/..." />
+        <button class="btn-save-link" onclick="saveLink('kids-materiais', 'Material Kids')">Salvar</button>
+        <span class="save-ok" id="ok-kids-materiais">✓</span>
+      </div>
+
+      <div style="border-top:1px solid var(--sand);margin:16px 0;"></div>
+
+      <div class="link-row">
+        <span class="link-label">Adulto — Material</span>
+        <input class="link-input" id="link-adulto-materiais" placeholder="https://drive.google.com/..." />
+        <button class="btn-save-link" onclick="saveLink('adulto-materiais', 'Material Adulto')">Salvar</button>
+        <span class="save-ok" id="ok-adulto-materiais">✓</span>
+      </div>
+
+      <div class="link-row">
+        <span class="link-label">Adulto — Aulões</span>
+        <input class="link-input" id="link-adulto-auloes" placeholder="https://drive.google.com/..." />
+        <button class="btn-save-link" onclick="saveLink('adulto-auloes', 'Aulões')">Salvar</button>
+        <span class="save-ok" id="ok-adulto-auloes">✓</span>
+      </div>
+
+    </div>
+
+    <!-- Subpastas por aluno -->
+    <div class="links-card">
+      <div class="links-card-title">📂 Pastas por aluno <span style="font-size:12px;font-weight:400;color:var(--muted);">(materiais, gravações, etc.)</span></div>
+      <div class="folder-list" id="folderList">Carregando...</div>
+
+      <div class="add-folder-form">
+        <select id="folderStudent">
+          <option value="">Selecione o aluno...</option>
+        </select>
+        <input type="text" id="folderLabel" placeholder="Nome da pasta (ex: Módulo 1)" />
+        <input type="text" id="folderUrl" placeholder="Link do Drive..." style="grid-column:1/-1;" />
+        <button class="btn-add-folder" onclick="addFolder()">+ Adicionar pasta</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Relatórios - todas as professoras -->
+  <div class="reports-section" id="reportsSection">
+
+    <div class="report-form">
+      <div class="report-form-title">📊 Novo relatório</div>
+
+      <div class="form-row">
+        <label class="form-label">Aluno</label>
+        <select class="form-select" id="reportStudent">
+          <option value="">Selecione o aluno...</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Título</label>
+        <input type="text" class="form-input" id="reportTitle" placeholder="Ex: Relatório de Maio" />
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Período</label>
+        <input type="text" class="form-input" id="reportPeriod" placeholder="Ex: Maio 2025" />
+      </div>
+
+      <div class="form-row">
+        <label class="form-label">Conteúdo</label>
+        <textarea class="form-textarea" id="reportContent" placeholder="Escreva o relatório do aluno aqui..."></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-draft" onclick="saveReport(false)">💾 Salvar rascunho</button>
+        <button class="btn-publish" onclick="saveReport(true)">✅ Publicar para o aluno</button>
+      </div>
+    </div>
+
+    <div class="report-list">
+      <div class="report-list-title">Relatórios enviados</div>
+      <div id="reportsList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- Modal: Add student -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h3>Adicionar aluno</h3>
+
+    <div class="form-group">
+      <label>Nome completo</label>
+      <input type="text" id="newName" placeholder="Nome do aluno" />
+    </div>
+
+    <div class="form-group">
+      <label>E-mail</label>
+      <input type="email" id="newEmail" placeholder="email@exemplo.com" />
+    </div>
+
+    <div class="form-group">
+      <label>Turma</label>
+      <select id="newRole">
+        <option value="adulto">Adulto</option>
+        <option value="kids">Kids</option>
+      </select>
+    </div>
+
+    <div id="modalMsg" class="msg"></div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" id="cancelBtn">Cancelar</button>
+      <button class="btn-save" id="saveBtn">Convidar aluno</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  // Professoras conhecidas
+  const TEACHERS = {
+    'brenda':   { name: 'Brenda Cleto',   role: 'professora', seeAll: true  },
+    'nathalia': { name: 'Nathalia Rozado', role: 'professora', seeAll: false },
+    'carolina': { name: 'Carolina Motta',  role: 'professora', seeAll: false }
+  };
+
+  let allStudents = [];
+  let currentFilter = 'todos';
+  let isBrenda = false;
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = 'index.html'; return;
+    }
+    const finalSession = session;
+
+    const user = finalSession.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+
+    if (!profile) {
+      // Profile not loaded yet - don't redirect
+      console.warn('Profile not found for user:', user.id);
+    }
+    if (profile && profile.role !== 'professora') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    const name = profile.full_name || user.email.split('@')[0];
+    document.getElementById('teacherName').textContent = name;
+
+    // Brenda vê todos; outras professoras veem só seus alunos
+    isBrenda = name.toLowerCase().includes('brenda');
+
+    // Só Brenda vê o botão de adicionar aluno
+    currentUserIsBrenda = isBrenda;
+    if (isBrenda) {
+      document.getElementById('addStudentBtn').style.display = 'inline-flex';
+    }
+
+    await loadStudents(user.id, isBrenda);
+    await loadTeacherAvatar(user.id);
+    currentUserIsBrenda = isBrenda;
+    if (isBrenda) {
+      document.getElementById('linksSection').style.display = 'block';
+      await loadLinks();
+      await loadFolders();
+      await loadStudentsForSelect();
+    }
+    // Relatórios — todas as professoras
+    await loadStudentsForReports(user.id, isBrenda);
+    await loadReports(user.id, isBrenda);
+  }
+
+  async function loadStudents(teacherId, seeAll) {
+    let query = sb.from('profiles').select('*').in('role', ['kids', 'adulto']);
+
+    if (!seeAll) {
+      query = query.eq('teacher_id', teacherId);
+    }
+
+    const { data: students, error } = await query.order('full_name');
+
+    if (error || !students) {
+      renderEmpty('Erro ao carregar alunos.');
+      return;
+    }
+
+    allStudents = students;
+    updateOverview(students);
+    renderStudents(students);
+  }
+
+  function updateOverview(students) {
+    document.getElementById('totalAlunos').textContent  = students.length;
+    document.getElementById('totalKids').textContent    = students.filter(s => s.role === 'kids').length;
+    document.getElementById('totalAdultos').textContent = students.filter(s => s.role === 'adulto').length;
+  }
+
+  function renderStudents(students) {
+    const list = document.getElementById('studentList');
+
+    const filtered = currentFilter === 'todos'
+      ? students
+      : students.filter(s => s.role === currentFilter);
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty">
+          <div class="empty-icon">🎓</div>
+          <p>Nenhum aluno encontrado.</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(s => {
+      const initials = (s.full_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+      const roleLabel = s.role === 'kids' ? 'kids' : 'adulto';
+      const lastSeen = s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : '—';
+
+      return `
+        <div class="student-card">
+          <div class="student-avatar">${initials}</div>
+          <div class="student-info">
+            <div class="student-name">${s.full_name || 'Sem nome'}</div>
+            <div class="student-meta">
+              <span class="role-tag ${roleLabel}">${roleLabel}</span>
+              &nbsp;· Desde ${lastSeen}
+            </div>
+          </div>
+          <div class="student-stats">
+            <div class="stat-chip">
+              <span class="stat-chip-value">—</span>
+              <span class="stat-chip-label">Aulas</span>
+            </div>
+            <div class="stat-chip">
+              <span class="stat-chip-value">—</span>
+              <span class="stat-chip-label">Streak</span>
+            </div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function renderEmpty(msg) {
+    document.getElementById('studentList').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">📭</div>
+        <p>${msg}</p>
+      </div>`;
+  }
+
+  // Filter tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentFilter = tab.dataset.filter;
+      renderStudents(allStudents);
+    });
+  });
+
+  // Modal
+  document.getElementById('addStudentBtn').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.add('open');
+    document.getElementById('modalMsg').className = 'msg';
+    document.getElementById('modalMsg').textContent = '';
+  });
+
+  document.getElementById('cancelBtn').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.remove('open');
+  });
+
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+  });
+
+  // Save student
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const name  = document.getElementById('newName').value.trim();
+    const email = document.getElementById('newEmail').value.trim();
+    const role  = document.getElementById('newRole').value;
+    const msg   = document.getElementById('modalMsg');
+    const btn   = document.getElementById('saveBtn');
+
+    if (!name || !email) {
+      msg.className = 'msg err';
+      msg.textContent = 'Preencha nome e e-mail.';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Enviando...';
+
+    // Cria o usuário via Auth (convite — o aluno receberá e-mail para definir senha)
+    const { data, error } = await sb.auth.admin?.inviteUserByEmail
+      ? await sb.auth.admin.inviteUserByEmail(email)
+      : { data: null, error: { message: 'Convite não disponível no plano free — oriente o aluno a criar a própria conta.' } };
+
+    if (error) {
+      msg.className = 'msg err';
+      msg.textContent = error.message;
+      btn.disabled = false;
+      btn.textContent = 'Convidar aluno';
+      return;
+    }
+
+    msg.className = 'msg ok';
+    msg.textContent = 'Convite enviado para ' + email + '!';
+    btn.disabled = false;
+    btn.textContent = 'Convidar aluno';
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+
+  // ── Adicionar aluno ──────────────────────────────────────────────────
+  async function openAddStudent() {
+    // Load teachers into select
+    const { data: teachers } = await sb.from('profiles').select('id, full_name').eq('role', 'professora').order('full_name');
+    const select = document.getElementById('newStudentTeacher');
+    while (select.options.length > 1) select.remove(1);
+    (teachers || []).forEach(t => {
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.full_name;
+      select.appendChild(opt);
+    });
+    
+    document.getElementById('modalAddStudent').classList.add('open');
+    document.getElementById('addStudentError').style.display = 'none';
+    document.getElementById('addStudentSuccess').style.display = 'none';
+    document.getElementById('newStudentName').value = '';
+    document.getElementById('newStudentEmail').value = '';
+    document.getElementById('newStudentPassword').value = '';
+  }
+
+  function closeAddStudent() {
+    document.getElementById('modalAddStudent').classList.remove('open');
+  }
+
+  async function createStudent() {
+    const name = document.getElementById('newStudentName').value.trim();
+    const email = document.getElementById('newStudentEmail').value.trim();
+    const password = document.getElementById('newStudentPassword').value.trim();
+    const role = document.getElementById('newStudentRole').value;
+    const teacherId = document.getElementById('newStudentTeacher').value;
+
+    const errEl = document.getElementById('addStudentError');
+    const sucEl = document.getElementById('addStudentSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!name || !email || !password || !teacherId) {
+      errEl.textContent = 'Preencha todos os campos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 6) {
+      errEl.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveStudent');
+    btn.disabled = true;
+    btn.textContent = 'Criando...';
+
+    try {
+      // Create user in Supabase Auth using admin signup
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: name, role, teacher_id: teacherId }
+        }
+      });
+
+      if (error) throw error;
+
+      // Update profile with teacher_id and correct role (trigger creates base profile)
+      if (data.user) {
+        // Wait a moment for trigger to create profile
+        await new Promise(r => setTimeout(r, 1000));
+        
+        await sb.from('profiles').upsert({
+          id: data.user.id,
+          full_name: name,
+          role,
+          teacher_id: teacherId,
+          level: 1
+        });
+
+        // Also update user metadata role for redirect
+        await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+            'apikey': 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj'
+          },
+          body: JSON.stringify({ data: { role, full_name: name } })
+        });
+      }
+
+      sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!';
+      sucEl.style.display = 'block';
+      
+      // Reload students list
+      const { data: { session } } = await sb.auth.getSession();
+      const isBrenda = currentUserIsBrenda;
+      await loadStudents(session.user.id, isBrenda);
+      await loadStudentsForReports(session.user.id, isBrenda);
+      await loadStudentsForSelect();
+
+      setTimeout(closeAddStudent, 2000);
+
+    } catch(err) {
+      errEl.textContent = 'Erro: ' + (err.message || 'Tente novamente.');
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Criar aluno';
+    }
+  }
+
+  // Track if Brenda for use in createStudent
+  let currentUserIsBrenda = false;
+
+
+  async function loadTeacherAvatar(userId) {
+    const { data: profile } = await sb.from('profiles').select('avatar_url').eq('id', userId).maybeSingle();
+    if (profile?.avatar_url) {
+      document.getElementById('teacherAvatarImg').src = profile.avatar_url;
+      document.getElementById('teacherAvatarImg').style.display = 'block';
+      document.getElementById('teacherAvatarPlaceholder').style.display = 'none';
+    }
+  }
+
+  document.getElementById('teacherAvatarInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    try {
+      const ext = file.name.split('.').pop();
+      const path = 'avatars/' + session.user.id + '.' + ext;
+      await sb.storage.from('Avatars').upload(path, file, { upsert: true });
+      const { data } = sb.storage.from('Avatars').getPublicUrl(path);
+      await sb.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', session.user.id);
+      document.getElementById('teacherAvatarImg').src = data.publicUrl;
+      document.getElementById('teacherAvatarImg').style.display = 'block';
+      document.getElementById('teacherAvatarPlaceholder').style.display = 'none';
+    } catch (err) {
+      alert('Erro ao fazer upload!');
+    }
+  });
+
+</script>
+
+<!-- Modal Adicionar Aluno -->
+<div class="modal-overlay" id="modalAddStudent">
+  <div class="modal-box">
+    <div class="modal-title">Novo aluno</div>
+    <div class="modal-sub">O aluno receberá acesso imediato com essas credenciais.</div>
+
+    <div class="modal-error" id="addStudentError"></div>
+    <div class="modal-success" id="addStudentSuccess"></div>
+
+    <div class="modal-row">
+      <label class="modal-label">Nome completo</label>
+      <input type="text" class="modal-input" id="newStudentName" placeholder="Nome do aluno" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">E-mail</label>
+      <input type="email" class="modal-input" id="newStudentEmail" placeholder="email@exemplo.com" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Senha provisória</label>
+      <input type="text" class="modal-input" id="newStudentPassword" placeholder="Mínimo 6 caracteres" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Tipo de aluno</label>
+      <select class="modal-select" id="newStudentRole">
+        <option value="adulto">Adulto</option>
+        <option value="kids">Kids</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Professora responsável</label>
+      <select class="modal-select" id="newStudentTeacher">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeAddStudent()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveStudent" onclick="createStudent()">Criar aluno</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>

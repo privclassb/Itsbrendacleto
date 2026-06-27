@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033;
+      --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598;
+      --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF;
+      --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .btn-logout { background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.7); cursor: pointer; }
+    .btn-logout:hover { border-color: white; color: white; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-top { display: flex; align-items: center; gap: 16px; margin-bottom: 14px; }
+
+    /* Avatar */
+    .avatar-wrap { position: relative; width: 64px; height: 64px; flex-shrink: 0; }
+    .avatar-img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid var(--sand); display: none; }
+    .avatar-placeholder { width: 64px; height: 64px; border-radius: 50%; background: var(--sand); display: flex; align-items: center; justify-content: center; font-size: 28px; border: 3px solid var(--sand); }
+    .avatar-edit { position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; background: var(--brown); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; color: white; }
+    #avatarInput { display: none; }
+
+    .hero-text { flex: 1; }
+    .hero-greeting { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px; }
+    .hero-name { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); font-weight: 400; }
+
+    .hero-chips { display: flex; gap: 10px; flex-wrap: wrap; }
+    .hero-chip { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 6px; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 24px 20px; }
+
+    /* Teacher */
+    .teacher-strip { background: var(--brown); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+    .teacher-avatar-wrap { width: 44px; height: 44px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .teacher-avatar-img { width: 44px; height: 44px; object-fit: cover; border-radius: 50%; display: none; }
+    .teacher-label { font-size: 11px; color: rgba(255,255,255,0.6); font-weight: 500; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
+    .teacher-name { font-size: 15px; font-weight: 600; color: var(--white); }
+
+    /* Menu 3 colunas */
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+    .menu-card { background: var(--white); border-radius: var(--radius); padding: 16px 10px; box-shadow: var(--shadow); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: 1.5px solid var(--sand); text-align: center; }
+    .menu-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(92,64,51,0.12); border-color: var(--brown-light); }
+    .menu-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--cream); }
+    .menu-title { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    /* Progress */
+    .progress-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); }
+    .progress-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
+    .progress-bar { height: 8px; background: var(--sand); border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--mint), #90C9F9); border-radius: 99px; transition: width 0.8s ease; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-brand">itsbrendacleto</div>
+  <button class="btn-logout" id="logoutBtn">Sair</button>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="avatar-wrap">
+        <div class="avatar-placeholder" id="avatarPlaceholder">👤</div>
+        <img class="avatar-img" id="avatarImg" />
+        <label for="avatarInput" class="avatar-edit">✏️</label>
+        <input type="file" id="avatarInput" accept="image/*" />
+      </div>
+      <div class="hero-text">
+        <div class="hero-greeting">Welcome back</div>
+        <div class="hero-name" id="heroName">...</div>
+      </div>
+    </div>
+    <div class="hero-chips">
+      <div class="hero-chip">📖 <span id="heroLevel">Level 1</span></div>
+      <div class="hero-chip">🔥 <span id="heroStreak">0</span> dias</div>
+      <div class="hero-chip">✅ <span id="heroAulas">0</span> aulas</div>
+      <div class="hero-chip">🏆 <span id="heroBadges">0</span> badges</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="teacher-strip">
+    <div class="teacher-avatar-wrap" id="teacherAvatarWrap">
+      <span id="teacherEmoji">👩‍🏫</span>
+      <img class="teacher-avatar-img" id="teacherAvatarImg" />
+    </div>
+    <div>
+      <div class="teacher-label">Sua professora</div>
+      <div class="teacher-name" id="teacherName">...</div>
+    </div>
+  </div>
+
+  <div class="menu-grid">
+    <a href="dashboard-adulto.html" class="menu-card">
+      <div class="menu-icon">🎯</div>
+      <div class="menu-title">Atividades</div>
+    </a>
+    <a href="materiais-adulto.html" class="menu-card">
+      <div class="menu-icon">📁</div>
+      <div class="menu-title">Materiais</div>
+    </a>
+    <a href="conquistas-adulto.html" class="menu-card">
+      <div class="menu-icon">🏆</div>
+      <div class="menu-title">Conquistas</div>
+    </a>
+    <a href="frase-adulto.html" class="menu-card">
+      <div class="menu-icon">💬</div>
+      <div class="menu-title">Frase do dia</div>
+    </a>
+    <a href="relatorios-adulto.html" class="menu-card">
+      <div class="menu-icon">📊</div>
+      <div class="menu-title">Relatórios</div>
+    </a>
+    <a href="dicionario.html" class="menu-card">
+      <div class="menu-icon">📖</div>
+      <div class="menu-title">Dicionário</div>
+    </a>
+  </div>
+
+  <div class="progress-card">
+    <div class="progress-title">Seu progresso</div>
+    <div class="progress-label">
+      <span id="progressLabel">Level 1</span>
+      <span id="progressText">0 aulas</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SURL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SKEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const sb = supabase.createClient(SURL, SKEY, {
+    auth: {
+      persistSession: true,
+      storageKey: 'itsbrendacleto-auth',
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+    }
+  });
+
+  async function init() {
+    // Session already verified before init()
+    const user = session.user;
+
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    if (profile?.role === 'professora') { window.location.href = 'painel-professora.html'; return; }
+    if (profile?.role === 'kids') { window.location.href = 'home-kids.html'; return; }
+
+    const name = profile?.full_name || user.email.split('@')[0];
+    const level = profile?.level || 1;
+    document.getElementById('heroName').textContent = name + '.';
+    document.getElementById('heroLevel').textContent = 'Level ' + level;
+    document.getElementById('progressLabel').textContent = 'Level ' + level;
+
+    // Aulas
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
+    const aulas = (progress || []).length;
+    document.getElementById('heroAulas').textContent = aulas;
+    document.getElementById('progressText').textContent = aulas + ' aulas';
+    document.getElementById('progressFill').style.width = Math.min(aulas * 10, 100) + '%';
+
+    // Badges
+    const { data: badges } = await sb.from('badges').select('id').eq('user_id', user.id);
+    document.getElementById('heroBadges').textContent = (badges || []).length;
+
+    // Streak
+    const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
+    document.getElementById('heroStreak').textContent = streak?.current_streak || 0;
+    await updateStreak(user.id);
+
+    // Avatar do aluno
+    if (profile?.avatar_url) showAvatar(profile.avatar_url);
+
+    // Foto da professora
+    if (profile?.teacher_id) {
+      const { data: teacher } = await sb.from('profiles').select('full_name, avatar_url').eq('id', profile.teacher_id).maybeSingle();
+      if (teacher?.full_name) document.getElementById('teacherName').textContent = teacher.full_name;
+      if (teacher?.avatar_url) {
+        document.getElementById('teacherAvatarImg').src = teacher.avatar_url + '?t=' + Date.now();
+        document.getElementById('teacherAvatarImg').style.display = 'block';
+        document.getElementById('teacherEmoji').style.display = 'none';
+      }
+    } else {
+      document.getElementById('teacherName').textContent = 'Brenda Cleto';
+    }
+  }
+
+  function showAvatar(url) {
+    const img = document.getElementById('avatarImg');
+    img.src = url + '?t=' + Date.now();
+    img.style.display = 'block';
+    document.getElementById('avatarPlaceholder').style.display = 'none';
+  }
+
+  document.getElementById('avatarInput').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    const userId = session.user.id;
+    try {
+      const ext = file.name.split('.').pop().toLowerCase().replace(/[^a-z]/g, '') || 'jpg';
+      const path = userId + '_' + Date.now() + '.' + ext;
+      const { error: upErr } = await sb.storage.from('Avatars').upload(path, file, { upsert: true });
+      if (upErr) { alert('Erro upload: ' + upErr.message); return; }
+      const { data: urlData } = sb.storage.from('Avatars').getPublicUrl(path);
+      const { error: updErr } = await sb.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', userId);
+      if (updErr) { alert('Erro ao salvar: ' + updErr.message); return; }
+      showAvatar(urlData.publicUrl);
+    } catch(err) { alert('Erro: ' + err.message); }
+  });
+
+  async function updateStreak(userId) {
+    const today = new Date().toISOString().split('T')[0];
+    const { data: s } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
+    if (!s) { await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 }); document.getElementById('heroStreak').textContent = 1; return; }
+    const diff = Math.floor((new Date(today) - new Date(s.last_access)) / 86400000);
+    if (diff === 0) return;
+    const newS = diff === 1 ? s.current_streak + 1 : 1;
+    await sb.from('streaks').update({ last_access: today, current_streak: newS }).eq('user_id', userId);
+    document.getElementById('heroStreak').textContent = newS;
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async function() {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  // Simple reliable auth check
+  (async () => {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      await init();
+    } else {
+      window.location.href = 'index.html';
+    }
+  })();
+</script>
+</body>
+</html>
