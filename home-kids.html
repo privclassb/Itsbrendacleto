@@ -233,14 +233,14 @@
     window.location.href = 'index.html';
   });
 
-  // Simple reliable auth check
+  // Auth with retry for slow session loading
   (async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      await init();
-    } else {
-      window.location.href = 'index.html';
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
     }
+    window.location.href = 'index.html';
   })();
 </script>
 </body>

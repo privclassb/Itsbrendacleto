@@ -882,12 +882,17 @@
   });
 
   (async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      await init();
-    } else {
-      window.location.href = 'index.html';
+    // Try up to 5 times with increasing delays
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) {
+        await init();
+        return;
+      }
+      await new Promise(r => setTimeout(r, 500 * (i + 1)));
     }
+    // Only redirect if truly no session after all attempts
+    window.location.href = 'index.html';
   })();
 
   // ── Adicionar aluno ──────────────────────────────────────────────────

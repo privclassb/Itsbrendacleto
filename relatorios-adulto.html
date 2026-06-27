@@ -142,14 +142,14 @@
   document.getElementById('modalClose').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('open'));
   document.getElementById('modalOverlay').addEventListener('click', e => { if (e.target === document.getElementById('modalOverlay')) document.getElementById('modalOverlay').classList.remove('open'); });
 
-  // Simple reliable auth check
+  // Auth with retry for slow session loading
   (async () => {
-    const { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      await init();
-    } else {
-      window.location.href = 'index.html';
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
     }
+    window.location.href = 'index.html';
   })();
 </script>
 </body>
