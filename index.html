@@ -496,7 +496,7 @@
 
     const { data: checkData } = await sb.auth.getSession();
     logStep('Login: getSession() logo em seguida => ' + (checkData && checkData.session ? 'PRESENTE' : 'AUSENTE'));
-    logStep('Login: localStorage[itsbrendacleto-auth] existe? ' + (window.localStorage.getItem('itsbrendacleto-auth') ? 'SIM' : 'NAO'));
+    logStep('Login: chave de sessão no localStorage? ' + (Object.keys(window.localStorage).some(k => k.includes('auth-token')) ? 'SIM' : 'NAO'));
 
     await redirect(data.user);
   });
@@ -576,7 +576,7 @@
     role = role || 'adulto';
     console.log('Role final:', role, '| metadata:', user.user_metadata);
 
-    logStep('redirect: role=' + role + ' | localStorage antes de navegar: ' + (window.localStorage.getItem('itsbrendacleto-auth') ? 'SIM' : 'NAO'));
+    logStep('redirect: role=' + role + ' | chave de sessão antes de navegar: ' + (Object.keys(window.localStorage).some(k => k.includes('auth-token')) ? 'SIM' : 'NAO'));
 
     if (role === 'professora') {
       window.location.href = 'painel-professora.html';

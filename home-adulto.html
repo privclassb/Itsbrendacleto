@@ -150,7 +150,6 @@
   const sb = supabase.createClient(SURL, SKEY, {
     auth: {
       persistSession: true,
-      storageKey: 'itsbrendacleto-auth',
       storage: window.localStorage,
       autoRefreshToken: true,
       detectSessionInUrl: false,
