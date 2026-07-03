@@ -475,9 +475,17 @@
     btn.innerHTML = '<span class="loading"></span>Entrando...';
 
     sessionStorage.removeItem('debugLog');
+    try {
+      window.localStorage.setItem('teste-manual', 'ola-' + Date.now());
+      const lido = window.localStorage.getItem('teste-manual');
+      logStep('Teste manual localStorage: escreveu e leu = ' + lido);
+    } catch (e) {
+      logStep('Teste manual localStorage: ERRO AO GRAVAR = ' + e.message);
+    }
     logStep('Login: chamando signInWithPassword()');
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     logStep('Login: retornou. error=' + (error ? error.message : 'nenhum') + ' | data.session=' + (data && data.session ? 'PRESENTE' : 'AUSENTE'));
+    logStep('Login: localStorage TODAS AS CHAVES = ' + JSON.stringify(Object.keys(window.localStorage)));
 
     if (error) {
       showMsg('E-mail ou senha incorretos. Tente novamente.', 'error');
