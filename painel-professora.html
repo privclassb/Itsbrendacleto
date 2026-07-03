@@ -1214,7 +1214,29 @@
       teacherRow.style.display = 'none';
     }
 
+    // Verifica se já existe responsável cadastrado pra esse aluno
+    const { data: existingGuardian } = await sb.from('profiles').select('id, full_name').eq('guardian_of', studentId).eq('role', 'responsavel').maybeSingle();
+    document.getElementById('editCreateGuardian').checked = false;
+    document.getElementById('editGuardianFields').style.display = 'none';
+    document.getElementById('editGuardianName').value = '';
+    document.getElementById('editGuardianEmail').value = '';
+    document.getElementById('editGuardianPassword').value = '';
+
+    if (existingGuardian) {
+      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável já cadastrado: ' + (existingGuardian.full_name || 'Sem nome');
+      document.getElementById('editGuardianExistingRow').style.display = 'block';
+      document.getElementById('editGuardianCheckboxRow').style.display = 'none';
+    } else {
+      document.getElementById('editGuardianExistingRow').style.display = 'none';
+      document.getElementById('editGuardianCheckboxRow').style.display = 'block';
+    }
+
     document.getElementById('modalEditStudent').classList.add('open');
+  }
+
+  function toggleEditGuardianFields() {
+    const checked = document.getElementById('editCreateGuardian').checked;
+    document.getElementById('editGuardianFields').style.display = checked ? 'block' : 'none';
   }
 
   function closeEditStudent() {
@@ -1229,8 +1251,23 @@
     const errEl = document.getElementById('editStudentError');
     const btn = document.getElementById('btnSaveStudentEdit');
 
+    const wantsGuardian = document.getElementById('editCreateGuardian').checked;
+    const guardianName = document.getElementById('editGuardianName').value.trim();
+    const guardianEmail = document.getElementById('editGuardianEmail').value.trim();
+    const guardianPassword = document.getElementById('editGuardianPassword').value.trim();
+
     if (!name) {
       errEl.textContent = 'Preencha o nome do aluno.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (wantsGuardian && (!guardianName || !guardianEmail || !guardianPassword)) {
+      errEl.textContent = 'Preencha nome, e-mail e senha do responsável.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (wantsGuardian && guardianPassword.length < 6) {
+      errEl.textContent = 'A senha do responsável precisa ter pelo menos 6 caracteres.';
       errEl.style.display = 'block';
       return;
     }
@@ -1246,14 +1283,63 @@
 
     const { error } = await sb.from('profiles').update(updates).eq('id', id);
 
-    btn.disabled = false;
-    btn.textContent = 'Salvar alterações';
-
     if (error) {
+      btn.disabled = false;
+      btn.textContent = 'Salvar alterações';
       errEl.textContent = 'Erro ao salvar: ' + error.message;
       errEl.style.display = 'block';
       return;
     }
+
+    if (wantsGuardian) {
+      // Guarda a sessão da professora: criar um novo usuário troca a sessão ativa do navegador
+      const { data: { session: adminSession } } = await sb.auth.getSession();
+
+      const { data: gData, error: gError } = await sb.auth.signUp({
+        email: guardianEmail,
+        password: guardianPassword,
+        options: {
+          data: { full_name: guardianName, role: 'responsavel' }
+        }
+      });
+
+      if (!gError && gData.user) {
+        await new Promise(r => setTimeout(r, 1000));
+
+        await sb.from('profiles').upsert({
+          id: gData.user.id,
+          full_name: guardianName,
+          role: 'responsavel',
+          guardian_of: id
+        });
+
+        await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+            'apikey': 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj'
+          },
+          body: JSON.stringify({ data: { role: 'responsavel', full_name: guardianName } })
+        });
+      }
+
+      // Restaura a sessão da professora
+      if (adminSession) {
+        await sb.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+      }
+
+      if (gError) {
+        btn.disabled = false;
+        btn.textContent = 'Salvar alterações';
+        errEl.textContent = 'Aluno atualizado, mas houve erro ao criar o responsável: ' + gError.message;
+        errEl.style.display = 'block';
+        return;
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Salvar alterações';
 
     closeEditStudent();
     const { data: { session } } = await sb.auth.getSession();
@@ -1581,6 +1667,34 @@
       <select class="modal-select" id="editStudentTeacher">
         <option value="">Selecione...</option>
       </select>
+    </div>
+
+    <div class="modal-row modal-checkbox-row" id="editGuardianExistingRow" style="display:none;">
+      <span id="editGuardianExistingText"></span>
+    </div>
+
+    <div class="modal-row modal-checkbox-row" id="editGuardianCheckboxRow" style="display:none;">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="editCreateGuardian" onchange="toggleEditGuardianFields()" />
+        Cadastrar responsável (acesso a relatórios e progresso)
+      </label>
+    </div>
+
+    <div id="editGuardianFields" style="display:none;">
+      <div class="modal-row">
+        <label class="modal-label">Nome do responsável</label>
+        <input type="text" class="modal-input" id="editGuardianName" placeholder="Nome do responsável" />
+      </div>
+
+      <div class="modal-row">
+        <label class="modal-label">E-mail do responsável</label>
+        <input type="email" class="modal-input" id="editGuardianEmail" placeholder="email@exemplo.com" />
+      </div>
+
+      <div class="modal-row">
+        <label class="modal-label">Senha provisória do responsável</label>
+        <input type="text" class="modal-input" id="editGuardianPassword" placeholder="Mínimo 6 caracteres" />
+      </div>
     </div>
 
     <div class="modal-actions">
