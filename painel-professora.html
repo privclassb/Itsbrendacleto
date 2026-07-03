@@ -1018,6 +1018,194 @@
     }
   }
 
+  function studentNameById(id) {
+    return (allStudents.find(s => s.id === id) || {}).full_name || 'Aluno';
+  }
+
+  // ---- Links de materiais (só Brenda) ----
+
+  async function loadLinks() {
+    const categories = ['kids-materiais', 'adulto-materiais', 'adulto-auloes'];
+    const { data: links, error } = await sb.from('material_links').select('*').in('category', categories);
+    if (error || !links) return;
+
+    links.forEach(link => {
+      const input = document.getElementById('link-' + link.category);
+      if (input) input.value = link.url || '';
+    });
+  }
+
+  async function saveLink(category, label) {
+    const input = document.getElementById('link-' + category);
+    const url = input.value.trim();
+    if (!url) return;
+
+    const { error } = await sb.from('material_links')
+      .upsert({ category, label, url }, { onConflict: 'category' });
+
+    if (error) {
+      alert('Erro ao salvar link: ' + error.message);
+      return;
+    }
+
+    const ok = document.getElementById('ok-' + category);
+    if (ok) {
+      ok.style.display = 'inline';
+      setTimeout(() => { ok.style.display = 'none'; }, 2000);
+    }
+  }
+
+  // ---- Pastas por aluno (só Brenda) ----
+
+  function loadStudentsForSelect() {
+    const sel = document.getElementById('folderStudent');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione o aluno...</option>' +
+      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+  }
+
+  async function loadFolders() {
+    const listEl = document.getElementById('folderList');
+    const { data: folders, error } = await sb.from('student_folders').select('*');
+
+    if (error) {
+      listEl.innerHTML = 'Erro ao carregar pastas.';
+      return;
+    }
+    if (!folders || folders.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma pasta cadastrada ainda.</div>';
+      return;
+    }
+
+    listEl.innerHTML = folders.map(f => `
+      <div class="folder-row">
+        <span class="folder-student">${studentNameById(f.student_id)}</span>
+        <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
+        <button class="btn-del" onclick="deleteFolder('${f.id}')">✕</button>
+      </div>`).join('');
+  }
+
+  async function addFolder() {
+    const studentId = document.getElementById('folderStudent').value;
+    const label = document.getElementById('folderLabel').value.trim();
+    const url = document.getElementById('folderUrl').value.trim();
+
+    if (!studentId || !label || !url) {
+      alert('Selecione o aluno e preencha nome e link da pasta.');
+      return;
+    }
+
+    const { error } = await sb.from('student_folders').insert({ student_id: studentId, label, url });
+
+    if (error) {
+      alert('Erro ao adicionar pasta: ' + error.message);
+      return;
+    }
+
+    document.getElementById('folderLabel').value = '';
+    document.getElementById('folderUrl').value = '';
+    document.getElementById('folderStudent').value = '';
+
+    await loadFolders();
+  }
+
+  async function deleteFolder(id) {
+    if (!confirm('Remover esta pasta?')) return;
+    const { error } = await sb.from('student_folders').delete().eq('id', id);
+    if (error) { alert('Erro ao remover pasta.'); return; }
+    await loadFolders();
+  }
+
+  // ---- Relatórios (todas as professoras) ----
+
+  function loadStudentsForReports() {
+    const sel = document.getElementById('reportStudent');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione o aluno...</option>' +
+      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+  }
+
+  async function loadReports(teacherId, seeAll) {
+    const listEl = document.getElementById('reportsList');
+    let query = sb.from('reports').select('*').order('created_at', { ascending: false });
+    if (!seeAll) query = query.eq('created_by', teacherId);
+
+    const { data: reports, error } = await query;
+
+    if (error) {
+      listEl.innerHTML = '<div class="empty-reports">Erro ao carregar relatórios.</div>';
+      return;
+    }
+    if (!reports || reports.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório criado ainda.</div>';
+      return;
+    }
+
+    listEl.innerHTML = reports.map(r => {
+      const period = r.period ? ' · ' + r.period : '';
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${studentNameById(r.student_id)}</div>
+            <div class="report-row-title">${r.title}${period}</div>
+          </div>
+          <span class="report-status ${r.is_published ? 'published' : 'draft'}">${r.is_published ? 'Publicado' : 'Rascunho'}</span>
+          <button class="btn-report-action btn-toggle" onclick="toggleReportStatus('${r.id}', ${!r.is_published})">${r.is_published ? 'Tornar rascunho' : 'Publicar'}</button>
+          <button class="btn-report-action btn-delete" onclick="deleteReport('${r.id}')">Excluir</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function saveReport(publish) {
+    const studentId = document.getElementById('reportStudent').value;
+    const title = document.getElementById('reportTitle').value.trim();
+    const period = document.getElementById('reportPeriod').value.trim();
+    const content = document.getElementById('reportContent').value.trim();
+
+    if (!studentId || !title || !content) {
+      alert('Selecione o aluno e preencha título e conteúdo.');
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+
+    const { error } = await sb.from('reports').insert({
+      student_id: studentId,
+      title,
+      period: period || null,
+      content,
+      is_published: publish,
+      created_by: session.user.id
+    });
+
+    if (error) {
+      alert('Erro ao salvar relatório: ' + error.message);
+      return;
+    }
+
+    document.getElementById('reportStudent').value = '';
+    document.getElementById('reportTitle').value = '';
+    document.getElementById('reportPeriod').value = '';
+    document.getElementById('reportContent').value = '';
+
+    await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
+  async function toggleReportStatus(id, newStatus) {
+    const { error } = await sb.from('reports').update({ is_published: newStatus }).eq('id', id);
+    if (error) { alert('Erro ao atualizar relatório.'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteReport(id) {
+    if (!confirm('Excluir este relatório?')) return;
+    const { error } = await sb.from('reports').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir relatório.'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
   document.getElementById('teacherAvatarInput').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
