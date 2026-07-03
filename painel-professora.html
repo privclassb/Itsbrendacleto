@@ -6,72 +6,6 @@
   <title>Painel da Professora | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    // TEMPORÁRIO: mostra qualquer erro de JS direto na tela para diagnóstico
-    function showDebugError(msg) {
-      let box = document.getElementById('debugErrorBox');
-      if (!box) {
-        box = document.createElement('div');
-        box.id = 'debugErrorBox';
-        box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0392b;color:#fff;padding:12px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:45vh;overflow:auto;';
-        document.documentElement.appendChild(box);
-      }
-      const line = document.createElement('div');
-      line.style.marginBottom = '6px';
-      line.textContent = msg;
-      box.appendChild(line);
-    }
-    window.addEventListener('error', (e) => {
-      showDebugError('ERRO: ' + e.message + ' (' + (e.filename || '') + ':' + e.lineno + ')');
-    });
-    window.addEventListener('unhandledrejection', (e) => {
-      const reason = e.reason;
-      showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
-    });
-
-    // TEMPORÁRIO: log de progresso visível na tela (persistido em sessionStorage
-    // para sobreviver à navegação entre páginas), para achar onde o carregamento trava.
-    // Começa recolhido (faixinha fina) para não cobrir botões da página.
-    let debugLogExpanded = false;
-    function renderLogBox(logs) {
-      let box = document.getElementById('debugStepBox');
-      if (!box) {
-        box = document.createElement('div');
-        box.id = 'debugStepBox';
-        box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;font-family:monospace;font-size:11px;';
-        document.documentElement.appendChild(box);
-      }
-      box.innerHTML = '';
-      const header = document.createElement('div');
-      header.style.cssText = 'padding:6px 12px;background:#0f1c22;color:#7CFC00;cursor:pointer;';
-      header.textContent = '🪲 debug log (' + logs.length + ') — toque para ' + (debugLogExpanded ? 'esconder' : 'ver');
-      header.addEventListener('click', () => {
-        debugLogExpanded = !debugLogExpanded;
-        renderLogBox(logs);
-      });
-      box.appendChild(header);
-      if (debugLogExpanded) {
-        const body = document.createElement('div');
-        body.style.cssText = 'padding:10px;color:#7CFC00;white-space:pre-wrap;word-break:break-word;max-height:35vh;overflow:auto;';
-        logs.forEach((l) => {
-          const line = document.createElement('div');
-          line.textContent = l;
-          body.appendChild(line);
-        });
-        box.appendChild(body);
-      }
-    }
-    function logStep(msg) {
-      let logs = [];
-      try { logs = JSON.parse(sessionStorage.getItem('debugLog') || '[]'); } catch (e) {}
-      const t = new Date();
-      const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
-      logs.push(ts + ' | ' + location.pathname.split('/').pop() + ' | ' + msg);
-      try { sessionStorage.setItem('debugLog', JSON.stringify(logs)); } catch (e) {}
-      renderLogBox(logs);
-    }
-    try { renderLogBox(JSON.parse(sessionStorage.getItem('debugLog') || '[]')); } catch (e) {}
-  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -757,18 +691,14 @@
   let isBrenda = false;
 
   async function init() {
-    logStep('init: chamando getSession()');
     const { data: { session } } = await sb.auth.getSession();
-    logStep('init: getSession() retornou, session=' + (session ? 'OK' : 'NULA'));
     if (!session) {
       window.location.href = 'index.html'; return;
     }
     const finalSession = session;
 
     const user = finalSession.user;
-    logStep('init: buscando profile de ' + user.id);
-    const { data: profile, error: profileErr } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
-    logStep('init: profile retornou, error=' + (profileErr ? JSON.stringify(profileErr) : 'nenhum'));
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
 
     if (!profile) {
       // Profile not loaded yet - don't redirect
@@ -791,23 +721,18 @@
       document.getElementById('addStudentBtn').style.display = 'inline-flex';
     }
 
-    logStep('init: chamando loadStudents');
     await loadStudents(user.id, isBrenda);
-    logStep('init: loadStudents concluiu');
     await loadTeacherAvatar(user.id);
-    logStep('init: loadTeacherAvatar concluiu');
     currentUserIsBrenda = isBrenda;
     if (isBrenda) {
       document.getElementById('linksSection').style.display = 'block';
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
-      logStep('init: links/folders concluiu');
     }
     // Relatórios — todas as professoras
     await loadStudentsForReports(user.id, isBrenda);
     await loadReports(user.id, isBrenda);
-    logStep('init: TUDO CONCLUÍDO');
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -952,29 +877,21 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
-    logStep('Sair: clique registrado, chamando signOut()');
     await sb.auth.signOut();
-    logStep('Sair: signOut() concluiu, redirecionando');
     window.location.href = 'index.html';
   });
-  logStep('Script principal: listeners anexados, botão Sair pronto');
 
   (async () => {
-    logStep('IIFE: iniciado');
     // Try up to 5 times with increasing delays
     for (let i = 0; i < 5; i++) {
-      logStep('IIFE: tentativa ' + (i + 1) + ' - chamando getSession()');
       const { data: { session } } = await sb.auth.getSession();
-      logStep('IIFE: tentativa ' + (i + 1) + ' - getSession() retornou, session=' + (session ? 'OK' : 'NULA'));
       if (session) {
-        logStep('IIFE: chamando init()');
         await init();
         return;
       }
       await new Promise(r => setTimeout(r, 500 * (i + 1)));
     }
     // Only redirect if truly no session after all attempts
-    logStep('IIFE: sem sessão após 5 tentativas, redirecionando para index.html');
     window.location.href = 'index.html';
   })();
 
