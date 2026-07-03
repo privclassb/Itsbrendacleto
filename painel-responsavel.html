@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Área do Responsável | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream:  #FAF7F2;
+      --sand:   #EDE8DF;
+      --brown:  #5C4033;
+      --brown-light: #8B6355;
+      --mint:   #A8C5B5;
+      --rose:   #E8A598;
+      --lavender: #C3B1E1;
+      --text:   #2C1F1A;
+      --muted:  #7A6560;
+      --white:  #FFFFFF;
+      --radius: 14px;
+      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+    }
+
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header {
+      background: var(--brown);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-tag {
+      background: rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.8);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .btn-logout {
+      background: none;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+    }
+    .btn-logout:hover { border-color: white; color: white; }
+
+    .welcome-strip {
+      background: var(--white);
+      border-bottom: 1px solid var(--sand);
+      padding: 28px 28px 24px;
+    }
+    .welcome-strip h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 26px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+    .welcome-strip p { font-size: 14px; color: var(--muted); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+
+    .section-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 20px;
+      color: var(--text);
+      font-weight: 400;
+      margin-bottom: 16px;
+    }
+
+    .card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 28px; }
+
+    /* Progresso */
+    .progress-summary { display: flex; gap: 12px; margin-bottom: 18px; }
+    .progress-summary-chip { flex: 1; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
+    .progress-summary-value { display: block; font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); }
+    .progress-summary-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .progress-activity-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); font-size: 13px; color: var(--text); }
+    .progress-activity-row:last-child { border-bottom: none; }
+    .progress-activity-date { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+
+    /* Relatórios */
+    .report-row { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--sand); cursor: pointer; }
+    .report-row:last-child { border-bottom: none; }
+    .report-row:hover { background: var(--cream); }
+    .report-row-info { flex: 1; }
+    .report-row-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .report-row-period { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .report-row-date { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+
+    .empty-msg { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
+
+    /* Financeiro (placeholder) */
+    .coming-soon { text-align: center; padding: 20px; color: var(--muted); font-size: 14px; background: var(--cream); border-radius: 12px; }
+
+    /* Modal de relatório */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal-period { display: inline-block; background: var(--lavender); color: var(--text); border-radius: 99px; padding: 4px 14px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 12px; }
+    .modal-content { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
+    .btn-modal-close { width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
+    .btn-modal-close:hover { background: var(--brown-light); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-brand">itsbrendacleto</div>
+    <div class="header-tag">Responsável</div>
+  </div>
+  <button class="btn-logout" id="logoutBtn">Sair</button>
+</header>
+
+<div class="welcome-strip">
+  <h1 id="welcomeTitle">Olá! 👋</h1>
+  <p id="welcomeSub">Aqui está o acompanhamento do seu filho(a).</p>
+</div>
+
+<main>
+  <div class="section-title">📊 Progresso</div>
+  <div class="card">
+    <div class="progress-summary">
+      <div class="progress-summary-chip">
+        <span class="progress-summary-value" id="progressStreak">0</span>
+        <span class="progress-summary-label">Streak</span>
+      </div>
+      <div class="progress-summary-chip">
+        <span class="progress-summary-value" id="progressBadgeCount">0</span>
+        <span class="progress-summary-label">Badges</span>
+      </div>
+    </div>
+    <div id="progressActivitiesList"></div>
+  </div>
+
+  <div class="section-title">📁 Relatórios</div>
+  <div class="card" id="reportsCard">
+    <div class="empty-msg">Carregando...</div>
+  </div>
+
+  <div class="section-title">💳 Financeiro</div>
+  <div class="card">
+    <div class="coming-soon">Em breve: 2ª via de boleto e histórico de pagamento.</div>
+  </div>
+</main>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-period" id="modalPeriod"></div>
+    <div class="modal-title" id="modalTitle"></div>
+    <div class="modal-content" id="modalContent"></div>
+    <button class="btn-modal-close" id="modalClose">Fechar</button>
+  </div>
+</div>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  // Nomes amigáveis para as atividades registradas em lesson_progress
+  const ACTIVITY_LABELS = {
+    'kids-m1-a1': 'Aula 1 completa',
+    'kids-m1-a2': 'Aula 2 completa',
+    'kids-l1-a1-vocab': 'Aula 1 · Vocabulário',
+    'kids-l1-a1-alphabet': 'Aula 1 · Alfabeto',
+    'kids-l1-a1-spelling': 'Aula 1 · Soletração',
+    'kids-l1-a1-quiz': 'Aula 1 · Quiz',
+    'kids-l1-a1-memory': 'Aula 1 · Jogo da memória',
+    'kids-l1-a2-feelings': 'Aula 2 · Sentimentos',
+    'kids-l1-a2-hangman': 'Aula 2 · Forca',
+    'kids-l1-a2-catch': 'Aula 2 · Catch',
+    'kids-l1-a2-speech': 'Aula 2 · Pronúncia',
+    'kids-l1-a2-quiz': 'Aula 2 · Quiz',
+  };
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+
+    if (!profile || !profile.guardian_of) {
+      document.getElementById('welcomeSub').textContent = 'Nenhum aluno vinculado a esta conta ainda.';
+      return;
+    }
+
+    const { data: student } = await sb.from('profiles').select('*').eq('id', profile.guardian_of).maybeSingle();
+
+    document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Responsável') + '! 👋';
+    document.getElementById('welcomeSub').textContent = student
+      ? 'Acompanhamento de ' + (student.full_name || 'seu filho(a)') + '.'
+      : 'Aluno vinculado não encontrado.';
+
+    if (!student) return;
+
+    await loadProgress(student.id);
+    await loadReports(student.id);
+  }
+
+  async function loadProgress(studentId) {
+    const [{ data: progressRows }, { data: streakRow }, { data: badgeRows }] = await Promise.all([
+      sb.from('lesson_progress').select('lesson_id, completed_at, score, score_total').eq('user_id', studentId),
+      sb.from('streaks').select('current_streak').eq('user_id', studentId).maybeSingle(),
+      sb.from('badges').select('badge_name').eq('user_id', studentId)
+    ]);
+
+    document.getElementById('progressStreak').textContent = streakRow?.current_streak || 0;
+    document.getElementById('progressBadgeCount').textContent = (badgeRows || []).length;
+
+    const sorted = [...(progressRows || [])].sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+    const listEl = document.getElementById('progressActivitiesList');
+
+    if (sorted.length === 0) {
+      listEl.innerHTML = '<div class="empty-msg">Nenhuma atividade concluída ainda.</div>';
+      return;
+    }
+
+    listEl.innerHTML = sorted.map(a => {
+      const label = ACTIVITY_LABELS[a.lesson_id] || a.lesson_id;
+      const date = a.completed_at ? new Date(a.completed_at).toLocaleDateString('pt-BR') : '';
+      const scoreText = (a.score != null && a.score_total != null) ? ` · ${a.score}/${a.score_total} acertos` : '';
+      return `
+        <div class="progress-activity-row">
+          <span>${label}${scoreText}</span>
+          <span class="progress-activity-date">${date}</span>
+        </div>`;
+    }).join('');
+  }
+
+  async function loadReports(studentId) {
+    const { data: reports } = await sb.from('reports')
+      .select('*').eq('student_id', studentId).eq('is_published', true)
+      .order('created_at', { ascending: false });
+
+    // Marca como lidos (some o selo "novo" no menu de login futuro)
+    const readIds = JSON.parse(localStorage.getItem('read_reports') || '[]');
+    const allIds = (reports || []).map(r => r.id);
+    localStorage.setItem('read_reports', JSON.stringify([...new Set([...readIds, ...allIds])]));
+
+    const card = document.getElementById('reportsCard');
+
+    if (!reports || reports.length === 0) {
+      card.innerHTML = '<div class="empty-msg">Nenhum relatório publicado ainda.</div>';
+      return;
+    }
+
+    card.innerHTML = reports.map(r => {
+      const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+      return `
+        <div class="report-row" onclick="openReport('${r.title}', '${r.period || ''}', \`${(r.content || '').replace(/`/g, "'")}\`)">
+          <div class="report-row-info">
+            <div class="report-row-title">${r.title}</div>
+            ${r.period ? `<div class="report-row-period">${r.period}</div>` : ''}
+          </div>
+          <div class="report-row-date">${date}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function openReport(title, period, content) {
+    document.getElementById('modalTitle').textContent = title;
+    document.getElementById('modalPeriod').textContent = period || '';
+    document.getElementById('modalPeriod').style.display = period ? 'inline-block' : 'none';
+    document.getElementById('modalContent').textContent = content;
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+
+  document.getElementById('modalClose').addEventListener('click', () => {
+    document.getElementById('modalOverlay').classList.remove('open');
+  });
+  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open');
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(); return; }
+      await new Promise(r => setTimeout(r, 500 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

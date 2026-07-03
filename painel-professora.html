@@ -487,6 +487,8 @@
     .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 6px; }
     .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
     .modal-row { margin-bottom: 14px; }
+    .modal-checkbox-row { background: var(--cream); border-radius: 10px; padding: 12px 14px; }
+    .modal-checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
     .modal-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
     .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
     .modal-input:focus { border-color: var(--mint); }
@@ -1015,10 +1017,24 @@
     document.getElementById('newStudentName').value = '';
     document.getElementById('newStudentEmail').value = '';
     document.getElementById('newStudentPassword').value = '';
+    document.getElementById('createGuardian').checked = false;
+    document.getElementById('guardianName').value = '';
+    document.getElementById('guardianEmail').value = '';
+    document.getElementById('guardianPassword').value = '';
+    document.getElementById('guardianFields').style.display = 'none';
   }
 
   function closeAddStudent() {
     document.getElementById('modalAddStudent').classList.remove('open');
+  }
+
+  function toggleGuardianFields() {
+    const checked = document.getElementById('createGuardian').checked;
+    document.getElementById('guardianFields').style.display = checked ? 'block' : 'none';
+    if (checked) {
+      const guardianPwd = document.getElementById('guardianPassword');
+      if (!guardianPwd.value) guardianPwd.value = document.getElementById('newStudentPassword').value;
+    }
   }
 
   async function createStudent() {
@@ -1027,6 +1043,11 @@
     const password = document.getElementById('newStudentPassword').value.trim();
     const role = document.getElementById('newStudentRole').value;
     const teacherId = document.getElementById('newStudentTeacher').value;
+
+    const wantsGuardian = document.getElementById('createGuardian').checked;
+    const guardianName = document.getElementById('guardianName').value.trim();
+    const guardianEmail = document.getElementById('guardianEmail').value.trim();
+    const guardianPassword = (document.getElementById('guardianPassword').value.trim()) || password;
 
     const errEl = document.getElementById('addStudentError');
     const sucEl = document.getElementById('addStudentSuccess');
@@ -1043,12 +1064,25 @@
       errEl.style.display = 'block';
       return;
     }
+    if (wantsGuardian && (!guardianName || !guardianEmail)) {
+      errEl.textContent = 'Preencha nome e e-mail do responsável.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (wantsGuardian && guardianPassword.length < 6) {
+      errEl.textContent = 'A senha do responsável precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
 
     const btn = document.getElementById('btnSaveStudent');
     btn.disabled = true;
     btn.textContent = 'Criando...';
 
     try {
+      // Guarda a sessão da professora: criar novos usuários troca a sessão ativa do navegador
+      const { data: { session: adminSession } } = await sb.auth.getSession();
+
       // Create user in Supabase Auth using admin signup
       const { data, error } = await sb.auth.signUp({
         email,
@@ -1064,7 +1098,7 @@
       if (data.user) {
         // Wait a moment for trigger to create profile
         await new Promise(r => setTimeout(r, 1000));
-        
+
         await sb.from('profiles').upsert({
           id: data.user.id,
           full_name: name,
@@ -1085,9 +1119,53 @@
         });
       }
 
-      sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!';
+      // Restaura a sessão da professora antes de continuar
+      if (adminSession) {
+        await sb.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+      }
+
+      let guardianCreated = false;
+      if (wantsGuardian && data.user) {
+        const { data: gData, error: gError } = await sb.auth.signUp({
+          email: guardianEmail,
+          password: guardianPassword,
+          options: {
+            data: { full_name: guardianName, role: 'responsavel' }
+          }
+        });
+
+        if (!gError && gData.user) {
+          await new Promise(r => setTimeout(r, 1000));
+
+          await sb.from('profiles').upsert({
+            id: gData.user.id,
+            full_name: guardianName,
+            role: 'responsavel',
+            guardian_of: data.user.id
+          });
+
+          await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+              'apikey': 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj'
+            },
+            body: JSON.stringify({ data: { role: 'responsavel', full_name: guardianName } })
+          });
+
+          guardianCreated = true;
+        }
+
+        // Restaura a sessão da professora de novo
+        if (adminSession) {
+          await sb.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+        }
+      }
+
+      sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '');
       sucEl.style.display = 'block';
-      
+
       // Reload students list
       const { data: { session } } = await sb.auth.getSession();
       const isBrenda = currentUserIsBrenda;
@@ -1437,6 +1515,30 @@
       <select class="modal-select" id="newStudentTeacher">
         <option value="">Selecione...</option>
       </select>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="createGuardian" onchange="toggleGuardianFields()" />
+        Cadastrar responsável (acesso a relatórios e progresso)
+      </label>
+    </div>
+
+    <div id="guardianFields" style="display:none;">
+      <div class="modal-row">
+        <label class="modal-label">Nome do responsável</label>
+        <input type="text" class="modal-input" id="guardianName" placeholder="Nome do responsável" />
+      </div>
+
+      <div class="modal-row">
+        <label class="modal-label">E-mail do responsável</label>
+        <input type="email" class="modal-input" id="guardianEmail" placeholder="email@exemplo.com" />
+      </div>
+
+      <div class="modal-row">
+        <label class="modal-label">Senha provisória do responsável</label>
+        <input type="text" class="modal-input" id="guardianPassword" placeholder="Mínimo 6 caracteres" />
+      </div>
     </div>
 
     <div class="modal-actions">
