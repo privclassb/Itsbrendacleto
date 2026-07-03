@@ -50,7 +50,8 @@
 
     /* Menu 3 colunas */
     .menu-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-    .menu-card { background: var(--white); border-radius: var(--radius); padding: 16px 10px; box-shadow: var(--shadow); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: 1.5px solid var(--sand); text-align: center; }
+    .menu-card { position: relative; background: var(--white); border-radius: var(--radius); padding: 16px 10px; box-shadow: var(--shadow); text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: 1.5px solid var(--sand); text-align: center; }
+    .menu-badge { position: absolute; top: -6px; right: -6px; background: #E8555F; color: white; font-size: 11px; font-weight: 800; min-width: 20px; height: 20px; border-radius: 10px; display: flex; align-items: center; justify-content: center; padding: 0 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
     .menu-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(92,64,51,0.12); border-color: var(--brown-light); }
     .menu-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: var(--cream); }
     .menu-title { font-size: 13px; font-weight: 600; color: var(--text); }
@@ -122,7 +123,7 @@
       <div class="menu-icon">💬</div>
       <div class="menu-title">Frase do dia</div>
     </a>
-    <a href="relatorios-adulto.html" class="menu-card">
+    <a href="relatorios-adulto.html" class="menu-card" id="reportsMenuCard">
       <div class="menu-icon">📊</div>
       <div class="menu-title">Relatórios</div>
     </a>
@@ -186,6 +187,17 @@
     const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
     document.getElementById('heroStreak').textContent = streak?.current_streak || 0;
     await updateStreak(user.id);
+
+    // Notificação de relatórios novos
+    const { data: reports } = await sb.from('reports').select('id').eq('student_id', user.id).eq('is_published', true);
+    const readIds = JSON.parse(localStorage.getItem('read_reports') || '[]');
+    const unreadCount = (reports || []).filter(function(r) { return !readIds.includes(r.id); }).length;
+    if (unreadCount > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'menu-badge';
+      badge.textContent = unreadCount;
+      document.getElementById('reportsMenuCard').appendChild(badge);
+    }
 
     // Avatar do aluno
     if (profile?.avatar_url) showAvatar(profile.avatar_url);
