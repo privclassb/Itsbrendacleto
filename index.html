@@ -28,21 +28,36 @@
       const reason = e.reason;
       showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
     });
-    // Log persistido em sessionStorage para sobreviver à navegação entre páginas
+    // Log persistido em sessionStorage para sobreviver à navegação entre páginas.
+    // Começa recolhido (faixinha fina) para não cobrir botões da página.
+    let debugLogExpanded = false;
     function renderLogBox(logs) {
       let box = document.getElementById('debugStepBox');
       if (!box) {
         box = document.createElement('div');
         box.id = 'debugStepBox';
-        box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;color:#7CFC00;padding:10px;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;';
+        box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;font-family:monospace;font-size:11px;';
         document.documentElement.appendChild(box);
       }
       box.innerHTML = '';
-      logs.forEach((l) => {
-        const line = document.createElement('div');
-        line.textContent = l;
-        box.appendChild(line);
+      const header = document.createElement('div');
+      header.style.cssText = 'padding:6px 12px;background:#0f1c22;color:#7CFC00;cursor:pointer;';
+      header.textContent = '🪲 debug log (' + logs.length + ') — toque para ' + (debugLogExpanded ? 'esconder' : 'ver');
+      header.addEventListener('click', () => {
+        debugLogExpanded = !debugLogExpanded;
+        renderLogBox(logs);
       });
+      box.appendChild(header);
+      if (debugLogExpanded) {
+        const body = document.createElement('div');
+        body.style.cssText = 'padding:10px;color:#7CFC00;white-space:pre-wrap;word-break:break-word;max-height:35vh;overflow:auto;';
+        logs.forEach((l) => {
+          const line = document.createElement('div');
+          line.textContent = l;
+          body.appendChild(line);
+        });
+        box.appendChild(body);
+      }
     }
     function logStep(msg) {
       let logs = [];
