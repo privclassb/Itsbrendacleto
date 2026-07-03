@@ -1161,13 +1161,12 @@
         // Wait a moment for trigger to create profile
         await new Promise(r => setTimeout(r, 1000));
 
-        const { error: upsertErr } = await sb.from('profiles').upsert({
-          id: data.user.id,
+        const { error: upsertErr } = await sb.from('profiles').update({
           full_name: name,
           role,
           teacher_id: teacherId,
           level: 1
-        });
+        }).eq('id', data.user.id);
         studentUpsertError = upsertErr;
 
         // Also update user metadata role for redirect
@@ -1206,12 +1205,11 @@
           }
           await new Promise(r => setTimeout(r, 1000));
 
-          const { error: upsertError } = await sb.from('profiles').upsert({
-            id: gData.user.id,
+          const { error: upsertError } = await sb.from('profiles').update({
             full_name: guardianName,
             role: 'responsavel',
             guardian_of: data.user.id
-          });
+          }).eq('id', gData.user.id);
 
           await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
             method: 'PUT',
@@ -1393,12 +1391,11 @@
         }
         await new Promise(r => setTimeout(r, 1000));
 
-        const { error: upsertError } = await sb.from('profiles').upsert({
-          id: gData.user.id,
+        const { error: upsertError } = await sb.from('profiles').update({
           full_name: guardianName,
           role: 'responsavel',
           guardian_of: id
-        });
+        }).eq('id', gData.user.id);
         if (upsertError) linkError = upsertError;
 
         await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
