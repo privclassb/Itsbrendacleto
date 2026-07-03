@@ -28,6 +28,22 @@
       const reason = e.reason;
       showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
     });
+
+    // TEMPORÁRIO: log de progresso visível na tela, para achar em qual passo o carregamento trava
+    function logStep(msg) {
+      let box = document.getElementById('debugStepBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'debugStepBox';
+        box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;color:#7CFC00;padding:10px;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;';
+        document.documentElement.appendChild(box);
+      }
+      const line = document.createElement('div');
+      const t = new Date();
+      const ts = String(t.getMinutes()).padStart(2,'0') + ':' + String(t.getSeconds()).padStart(2,'0');
+      line.textContent = ts + ' | ' + msg;
+      box.appendChild(line);
+    }
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -715,14 +731,18 @@
   let isBrenda = false;
 
   async function init() {
+    logStep('init: chamando getSession()');
     const { data: { session } } = await sb.auth.getSession();
+    logStep('init: getSession() retornou, session=' + (session ? 'OK' : 'NULA'));
     if (!session) {
       window.location.href = 'index.html'; return;
     }
     const finalSession = session;
 
     const user = finalSession.user;
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    logStep('init: buscando profile de ' + user.id);
+    const { data: profile, error: profileErr } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    logStep('init: profile retornou, error=' + (profileErr ? JSON.stringify(profileErr) : 'nenhum'));
 
     if (!profile) {
       // Profile not loaded yet - don't redirect
@@ -745,18 +765,23 @@
       document.getElementById('addStudentBtn').style.display = 'inline-flex';
     }
 
+    logStep('init: chamando loadStudents');
     await loadStudents(user.id, isBrenda);
+    logStep('init: loadStudents concluiu');
     await loadTeacherAvatar(user.id);
+    logStep('init: loadTeacherAvatar concluiu');
     currentUserIsBrenda = isBrenda;
     if (isBrenda) {
       document.getElementById('linksSection').style.display = 'block';
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
+      logStep('init: links/folders concluiu');
     }
     // Relatórios — todas as professoras
     await loadStudentsForReports(user.id, isBrenda);
     await loadReports(user.id, isBrenda);
+    logStep('init: TUDO CONCLUÍDO');
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -901,21 +926,29 @@
   });
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
+    logStep('Sair: clique registrado, chamando signOut()');
     await sb.auth.signOut();
+    logStep('Sair: signOut() concluiu, redirecionando');
     window.location.href = 'index.html';
   });
+  logStep('Script principal: listeners anexados, botão Sair pronto');
 
   (async () => {
+    logStep('IIFE: iniciado');
     // Try up to 5 times with increasing delays
     for (let i = 0; i < 5; i++) {
+      logStep('IIFE: tentativa ' + (i + 1) + ' - chamando getSession()');
       const { data: { session } } = await sb.auth.getSession();
+      logStep('IIFE: tentativa ' + (i + 1) + ' - getSession() retornou, session=' + (session ? 'OK' : 'NULA'));
       if (session) {
+        logStep('IIFE: chamando init()');
         await init();
         return;
       }
       await new Promise(r => setTimeout(r, 500 * (i + 1)));
     }
     // Only redirect if truly no session after all attempts
+    logStep('IIFE: sem sessão após 5 tentativas, redirecionando para index.html');
     window.location.href = 'index.html';
   })();
 
