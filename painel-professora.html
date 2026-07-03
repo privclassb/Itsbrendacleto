@@ -1125,6 +1125,7 @@
       }
 
       let guardianCreated = false;
+      let guardianErrorMsg = '';
       if (wantsGuardian && data.user) {
         const { data: gData, error: gError } = await sb.auth.signUp({
           email: guardianEmail,
@@ -1155,6 +1156,8 @@
           });
 
           guardianCreated = true;
+        } else if (gError) {
+          guardianErrorMsg = gError.message || gError.status || JSON.stringify(gError);
         }
 
         // Restaura a sessão da professora de novo
@@ -1163,7 +1166,11 @@
         }
       }
 
-      sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '');
+      if (guardianErrorMsg) {
+        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso! ⚠️ Erro ao criar responsável: ' + guardianErrorMsg;
+      } else {
+        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '');
+      }
       sucEl.style.display = 'block';
 
       // Reload students list
@@ -1332,7 +1339,7 @@
       if (gError) {
         btn.disabled = false;
         btn.textContent = 'Salvar alterações';
-        errEl.textContent = 'Aluno atualizado, mas houve erro ao criar o responsável: ' + gError.message;
+        errEl.textContent = 'Aluno atualizado, mas houve erro ao criar o responsável: ' + (gError.message || gError.status || JSON.stringify(gError));
         errEl.style.display = 'block';
         return;
       }
