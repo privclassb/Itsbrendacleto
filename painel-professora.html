@@ -193,7 +193,10 @@
       display: flex;
       align-items: center;
       gap: 14px;
+      cursor: pointer;
+      transition: box-shadow 0.2s;
     }
+    .student-card:hover { box-shadow: 0 4px 20px rgba(92,64,51,0.14); }
 
     .student-avatar {
       width: 42px; height: 42px;
@@ -491,6 +494,13 @@
     .modal-checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.4; }
     .modal-checkbox-label input[type="checkbox"] { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
     .modal-checkbox-label span { flex: 1; }
+
+    /* Detalhes do aluno (somente leitura) */
+    .detail-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .detail-row:last-child { border-bottom: none; }
+    .detail-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-value { font-size: 14px; color: var(--text); font-weight: 500; text-align: right; }
+    .detail-actions { display: flex; gap: 10px; margin-top: 20px; }
     .modal-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
     .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
     .modal-input:focus { border-color: var(--mint); }
@@ -856,6 +866,50 @@
     document.getElementById('modalProgress').classList.remove('open');
   }
 
+  async function viewStudentDetails(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    if (!student) return;
+
+    document.getElementById('detailsStudentName').textContent = student.full_name || 'Aluno';
+
+    let teacherName = '—';
+    if (student.teacher_id) {
+      const { data: teacher } = await sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle();
+      teacherName = teacher?.full_name || '—';
+    }
+
+    const { data: guardian } = await sb.from('profiles').select('full_name').eq('guardian_of', studentId).eq('role', 'responsavel').maybeSingle();
+
+    const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
+    const createdAt = student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : '—';
+
+    const rows = [
+      ['Nome completo', student.full_name || '—'],
+      ['Turma', roleLabel],
+      ['Nível', student.level || 1],
+      ['Professora responsável', teacherName],
+      ['Cadastrado em', createdAt],
+      ['Responsável vinculado', guardian?.full_name || 'Nenhum cadastrado']
+    ];
+
+    document.getElementById('detailsList').innerHTML = rows.map(([label, value]) => `
+      <div class="detail-row">
+        <span class="detail-label">${label}</span>
+        <span class="detail-value">${value}</span>
+      </div>`).join('');
+
+    document.getElementById('btnDetailsEdit').onclick = () => {
+      closeStudentDetails();
+      editStudent(studentId);
+    };
+
+    document.getElementById('modalStudentDetails').classList.add('open');
+  }
+
+  function closeStudentDetails() {
+    document.getElementById('modalStudentDetails').classList.remove('open');
+  }
+
   function updateOverview(students) {
     document.getElementById('totalAlunos').textContent  = students.length;
     document.getElementById('totalKids').textContent    = students.filter(s => s.role === 'kids').length;
@@ -885,7 +939,7 @@
       const progress = progressByStudent[s.id] || { activities: [], streak: 0 };
 
       return `
-        <div class="student-card">
+        <div class="student-card" onclick="viewStudentDetails('${s.id}')">
           <div class="student-avatar">${initials}</div>
           <div class="student-info">
             <div class="student-name">${s.full_name || 'Sem nome'}</div>
@@ -904,8 +958,8 @@
               <span class="stat-chip-label">Streak</span>
             </div>
           </div>
-          <button class="btn-edit-student" onclick="viewProgress('${s.id}')" title="Ver progresso">📊</button>
-          <button class="btn-edit-student" onclick="editStudent('${s.id}')" title="Editar aluno">✏️</button>
+          <button class="btn-edit-student" onclick="event.stopPropagation(); viewProgress('${s.id}')" title="Ver progresso">📊</button>
+          <button class="btn-edit-student" onclick="event.stopPropagation(); editStudent('${s.id}')" title="Editar aluno">✏️</button>
         </div>`;
     }).join('');
   }
@@ -1734,6 +1788,21 @@
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeProgress()" style="flex:1;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalhes do aluno -->
+<div class="modal-overlay" id="modalStudentDetails">
+  <div class="modal-box">
+    <div class="modal-title" id="detailsStudentName">Detalhes do aluno</div>
+    <div class="modal-sub">Confira os dados cadastrados.</div>
+
+    <div id="detailsList"></div>
+
+    <div class="detail-actions">
+      <button class="btn-modal-cancel" onclick="closeStudentDetails()" style="flex:1;">Fechar</button>
+      <button class="btn-modal-save" id="btnDetailsEdit" style="flex:1;">Editar</button>
     </div>
   </div>
 </div>
