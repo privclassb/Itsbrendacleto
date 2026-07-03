@@ -459,6 +459,7 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span>Entrando...';
 
+    sessionStorage.removeItem('debugLog');
     logStep('Login: chamando signInWithPassword()');
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     logStep('Login: retornou. error=' + (error ? error.message : 'nenhum') + ' | data.session=' + (data && data.session ? 'PRESENTE' : 'AUSENTE'));
