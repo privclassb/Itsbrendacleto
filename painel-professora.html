@@ -29,8 +29,9 @@
       showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
     });
 
-    // TEMPORÁRIO: log de progresso visível na tela, para achar em qual passo o carregamento trava
-    function logStep(msg) {
+    // TEMPORÁRIO: log de progresso visível na tela (persistido em sessionStorage
+    // para sobreviver à navegação entre páginas), para achar onde o carregamento trava
+    function renderLogBox(logs) {
       let box = document.getElementById('debugStepBox');
       if (!box) {
         box = document.createElement('div');
@@ -38,12 +39,23 @@
         box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;color:#7CFC00;padding:10px;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;';
         document.documentElement.appendChild(box);
       }
-      const line = document.createElement('div');
-      const t = new Date();
-      const ts = String(t.getMinutes()).padStart(2,'0') + ':' + String(t.getSeconds()).padStart(2,'0');
-      line.textContent = ts + ' | ' + msg;
-      box.appendChild(line);
+      box.innerHTML = '';
+      logs.forEach((l) => {
+        const line = document.createElement('div');
+        line.textContent = l;
+        box.appendChild(line);
+      });
     }
+    function logStep(msg) {
+      let logs = [];
+      try { logs = JSON.parse(sessionStorage.getItem('debugLog') || '[]'); } catch (e) {}
+      const t = new Date();
+      const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+      logs.push(ts + ' | ' + location.pathname.split('/').pop() + ' | ' + msg);
+      try { sessionStorage.setItem('debugLog', JSON.stringify(logs)); } catch (e) {}
+      renderLogBox(logs);
+    }
+    try { renderLogBox(JSON.parse(sessionStorage.getItem('debugLog') || '[]')); } catch (e) {}
   </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

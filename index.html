@@ -6,6 +6,55 @@
   <title>itsbrendacleto — Inglês para a Vida Real</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // TEMPORÁRIO: diagnóstico visível na tela (sem depender de DevTools)
+    function showDebugError(msg) {
+      let box = document.getElementById('debugErrorBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'debugErrorBox';
+        box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0392b;color:#fff;padding:12px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:45vh;overflow:auto;';
+        document.documentElement.appendChild(box);
+      }
+      const line = document.createElement('div');
+      line.style.marginBottom = '6px';
+      line.textContent = msg;
+      box.appendChild(line);
+    }
+    window.addEventListener('error', (e) => {
+      showDebugError('ERRO: ' + e.message + ' (' + (e.filename || '') + ':' + e.lineno + ')');
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      const reason = e.reason;
+      showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
+    });
+    // Log persistido em sessionStorage para sobreviver à navegação entre páginas
+    function renderLogBox(logs) {
+      let box = document.getElementById('debugStepBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'debugStepBox';
+        box.style.cssText = 'position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#1b2b34;color:#7CFC00;padding:10px;font-family:monospace;font-size:11px;white-space:pre-wrap;word-break:break-word;max-height:40vh;overflow:auto;';
+        document.documentElement.appendChild(box);
+      }
+      box.innerHTML = '';
+      logs.forEach((l) => {
+        const line = document.createElement('div');
+        line.textContent = l;
+        box.appendChild(line);
+      });
+    }
+    function logStep(msg) {
+      let logs = [];
+      try { logs = JSON.parse(sessionStorage.getItem('debugLog') || '[]'); } catch (e) {}
+      const t = new Date();
+      const ts = String(t.getMinutes()).padStart(2, '0') + ':' + String(t.getSeconds()).padStart(2, '0');
+      logs.push(ts + ' | ' + location.pathname.split('/').pop() + ' | ' + msg);
+      try { sessionStorage.setItem('debugLog', JSON.stringify(logs)); } catch (e) {}
+      renderLogBox(logs);
+    }
+    try { renderLogBox(JSON.parse(sessionStorage.getItem('debugLog') || '[]')); } catch (e) {}
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -410,7 +459,9 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span>Entrando...';
 
+    logStep('Login: chamando signInWithPassword()');
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    logStep('Login: retornou. error=' + (error ? error.message : 'nenhum') + ' | data.session=' + (data && data.session ? 'PRESENTE' : 'AUSENTE'));
 
     if (error) {
       showMsg('E-mail ou senha incorretos. Tente novamente.', 'error');
@@ -418,6 +469,10 @@
       btn.textContent = 'Entrar';
       return;
     }
+
+    const { data: checkData } = await sb.auth.getSession();
+    logStep('Login: getSession() logo em seguida => ' + (checkData && checkData.session ? 'PRESENTE' : 'AUSENTE'));
+    logStep('Login: localStorage[itsbrendacleto-auth] existe? ' + (window.localStorage.getItem('itsbrendacleto-auth') ? 'SIM' : 'NAO'));
 
     await redirect(data.user);
   });
@@ -496,6 +551,8 @@
 
     role = role || 'adulto';
     console.log('Role final:', role, '| metadata:', user.user_metadata);
+
+    logStep('redirect: role=' + role + ' | localStorage antes de navegar: ' + (window.localStorage.getItem('itsbrendacleto-auth') ? 'SIM' : 'NAO'));
 
     if (role === 'professora') {
       window.location.href = 'painel-professora.html';
