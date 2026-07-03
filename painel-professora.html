@@ -470,6 +470,16 @@
     .btn-delete { background: #FFF0EE; color: #C0392B; margin-left: 4px; }
     .empty-reports { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
 
+    /* Progresso do aluno */
+    .progress-summary { display: flex; gap: 12px; margin-bottom: 18px; }
+    .progress-summary-chip { flex: 1; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
+    .progress-summary-value { display: block; font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); }
+    .progress-summary-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .progress-activities-list { max-height: 40vh; overflow-y: auto; }
+    .progress-activity-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); font-size: 13px; color: var(--text); }
+    .progress-activity-row:last-child { border-bottom: none; }
+    .progress-activity-date { font-size: 12px; color: var(--muted); flex-shrink: 0; }
+
     /* Modal adicionar aluno */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
@@ -763,8 +773,83 @@
     }
 
     allStudents = students;
+    await loadStudentsProgress(students.map(s => s.id));
     updateOverview(students);
     renderStudents(students);
+  }
+
+  // Nomes amigáveis para as atividades registradas em lesson_progress
+  const ACTIVITY_LABELS = {
+    'kids-m1-a1': 'Aula 1 completa',
+    'kids-m1-a2': 'Aula 2 completa',
+    'kids-l1-a1-vocab': 'Aula 1 · Vocabulário',
+    'kids-l1-a1-alphabet': 'Aula 1 · Alfabeto',
+    'kids-l1-a1-spelling': 'Aula 1 · Soletração',
+    'kids-l1-a1-quiz': 'Aula 1 · Quiz',
+    'kids-l1-a1-memory': 'Aula 1 · Jogo da memória',
+    'kids-l1-a2-feelings': 'Aula 2 · Sentimentos',
+    'kids-l1-a2-hangman': 'Aula 2 · Forca',
+    'kids-l1-a2-catch': 'Aula 2 · Catch',
+    'kids-l1-a2-speech': 'Aula 2 · Pronúncia',
+    'kids-l1-a2-quiz': 'Aula 2 · Quiz',
+  };
+
+  let progressByStudent = {};
+
+  async function loadStudentsProgress(studentIds) {
+    progressByStudent = {};
+    studentIds.forEach(id => { progressByStudent[id] = { activities: [], streak: 0, badges: [] }; });
+    if (studentIds.length === 0) return;
+
+    const [{ data: progressRows }, { data: streakRows }, { data: badgeRows }] = await Promise.all([
+      sb.from('lesson_progress').select('user_id, lesson_id, completed_at').in('user_id', studentIds),
+      sb.from('streaks').select('user_id, current_streak').in('user_id', studentIds),
+      sb.from('badges').select('user_id, badge_name, earned_at').in('user_id', studentIds)
+    ]);
+
+    (progressRows || []).forEach(p => {
+      if (progressByStudent[p.user_id]) progressByStudent[p.user_id].activities.push(p);
+    });
+    (streakRows || []).forEach(s => {
+      if (progressByStudent[s.user_id]) progressByStudent[s.user_id].streak = s.current_streak || 0;
+    });
+    (badgeRows || []).forEach(b => {
+      if (progressByStudent[b.user_id]) progressByStudent[b.user_id].badges.push(b);
+    });
+  }
+
+  function viewProgress(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    const progress = progressByStudent[studentId] || { activities: [], streak: 0, badges: [] };
+    if (!student) return;
+
+    document.getElementById('progressStudentName').textContent = student.full_name || 'Aluno';
+    document.getElementById('progressStreak').textContent = progress.streak;
+    document.getElementById('progressBadgeCount').textContent = progress.badges.length;
+
+    const sorted = [...progress.activities].sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
+    const listEl = document.getElementById('progressActivitiesList');
+
+    if (sorted.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma atividade concluída ainda.</div>';
+    } else {
+      listEl.innerHTML = sorted.map(a => {
+        const label = ACTIVITY_LABELS[a.lesson_id] || a.lesson_id;
+        const date = a.completed_at ? new Date(a.completed_at).toLocaleDateString('pt-BR') : '';
+        const scoreText = (a.score != null && a.score_total != null) ? ` · ${a.score}/${a.score_total} acertos` : '';
+        return `
+          <div class="progress-activity-row">
+            <span>${label}${scoreText}</span>
+            <span class="progress-activity-date">${date}</span>
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('modalProgress').classList.add('open');
+  }
+
+  function closeProgress() {
+    document.getElementById('modalProgress').classList.remove('open');
   }
 
   function updateOverview(students) {
@@ -793,6 +878,7 @@
       const initials = (s.full_name || '?').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
       const roleLabel = s.role === 'kids' ? 'kids' : 'adulto';
       const lastSeen = s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : '—';
+      const progress = progressByStudent[s.id] || { activities: [], streak: 0 };
 
       return `
         <div class="student-card">
@@ -806,14 +892,15 @@
           </div>
           <div class="student-stats">
             <div class="stat-chip">
-              <span class="stat-chip-value">—</span>
+              <span class="stat-chip-value">${progress.activities.length}</span>
               <span class="stat-chip-label">Aulas</span>
             </div>
             <div class="stat-chip">
-              <span class="stat-chip-value">—</span>
+              <span class="stat-chip-value">${progress.streak}</span>
               <span class="stat-chip-label">Streak</span>
             </div>
           </div>
+          <button class="btn-edit-student" onclick="viewProgress('${s.id}')" title="Ver progresso">📊</button>
           <button class="btn-edit-student" onclick="editStudent('${s.id}')" title="Editar aluno">✏️</button>
         </div>`;
     }).join('');
@@ -1397,6 +1484,31 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeEditStudent()">Cancelar</button>
       <button class="btn-modal-save" id="btnSaveStudentEdit" onclick="saveStudentEdit()">Salvar alterações</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Progresso do aluno -->
+<div class="modal-overlay" id="modalProgress">
+  <div class="modal-box">
+    <div class="modal-title" id="progressStudentName">Progresso</div>
+    <div class="modal-sub">Atividades concluídas e desempenho.</div>
+
+    <div class="progress-summary">
+      <div class="progress-summary-chip">
+        <span class="progress-summary-value" id="progressStreak">0</span>
+        <span class="progress-summary-label">Streak</span>
+      </div>
+      <div class="progress-summary-chip">
+        <span class="progress-summary-value" id="progressBadgeCount">0</span>
+        <span class="progress-summary-label">Badges</span>
+      </div>
+    </div>
+
+    <div class="progress-activities-list" id="progressActivitiesList"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeProgress()" style="flex:1;">Fechar</button>
     </div>
   </div>
 </div>
