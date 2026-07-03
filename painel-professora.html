@@ -488,7 +488,9 @@
     .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
     .modal-row { margin-bottom: 14px; }
     .modal-checkbox-row { background: var(--cream); border-radius: 10px; padding: 12px 14px; }
-    .modal-checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
+    .modal-checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.4; }
+    .modal-checkbox-label input[type="checkbox"] { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
+    .modal-checkbox-label span { flex: 1; }
     .modal-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
     .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
     .modal-input:focus { border-color: var(--mint); }
@@ -1613,7 +1615,7 @@
     <div class="modal-row modal-checkbox-row">
       <label class="modal-checkbox-label">
         <input type="checkbox" id="createGuardian" onchange="toggleGuardianFields()" />
-        Cadastrar responsável (acesso a relatórios e progresso)
+        <span>Cadastrar responsável (acesso a relatórios e progresso)</span>
       </label>
     </div>
 
@@ -1683,7 +1685,7 @@
     <div class="modal-row modal-checkbox-row" id="editGuardianCheckboxRow" style="display:none;">
       <label class="modal-checkbox-label">
         <input type="checkbox" id="editCreateGuardian" onchange="toggleEditGuardianFields()" />
-        Cadastrar responsável (acesso a relatórios e progresso)
+        <span>Cadastrar responsável (acesso a relatórios e progresso)</span>
       </label>
     </div>
 
