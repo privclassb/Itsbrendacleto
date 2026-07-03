@@ -1194,7 +1194,7 @@
         if (!gError && gData.user) {
           await new Promise(r => setTimeout(r, 1000));
 
-          await sb.from('profiles').upsert({
+          const { error: upsertError } = await sb.from('profiles').upsert({
             id: gData.user.id,
             full_name: guardianName,
             role: 'responsavel',
@@ -1211,7 +1211,11 @@
             body: JSON.stringify({ data: { role: 'responsavel', full_name: guardianName } })
           });
 
-          guardianCreated = true;
+          if (upsertError) {
+            guardianErrorMsg = 'vínculo não salvo: ' + (upsertError.message || upsertError.code || JSON.stringify(upsertError));
+          } else {
+            guardianCreated = true;
+          }
         } else if (gError) {
           guardianErrorMsg = gError.message || gError.status || JSON.stringify(gError);
         }
@@ -1366,15 +1370,17 @@
         }
       });
 
+      let linkError = null;
       if (!gError && gData.user) {
         await new Promise(r => setTimeout(r, 1000));
 
-        await sb.from('profiles').upsert({
+        const { error: upsertError } = await sb.from('profiles').upsert({
           id: gData.user.id,
           full_name: guardianName,
           role: 'responsavel',
           guardian_of: id
         });
+        if (upsertError) linkError = upsertError;
 
         await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
           method: 'PUT',
@@ -1396,6 +1402,14 @@
         btn.disabled = false;
         btn.textContent = 'Salvar alterações';
         errEl.textContent = 'Aluno atualizado, mas houve erro ao criar o responsável: ' + (gError.message || gError.status || JSON.stringify(gError));
+        errEl.style.display = 'block';
+        return;
+      }
+
+      if (linkError) {
+        btn.disabled = false;
+        btn.textContent = 'Salvar alterações';
+        errEl.textContent = 'Responsável criado, mas houve erro ao vincular ao aluno: ' + (linkError.message || linkError.code || JSON.stringify(linkError));
         errEl.style.display = 'block';
         return;
       }
