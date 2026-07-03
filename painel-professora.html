@@ -232,6 +232,19 @@
       flex-shrink: 0;
     }
 
+    .btn-edit-student {
+      background: var(--cream);
+      border: 1.5px solid var(--sand);
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 14px;
+      color: var(--brown);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .btn-edit-student:hover { border-color: var(--brown); background: var(--sand); }
+
     .stat-chip {
       text-align: center;
     }
@@ -801,6 +814,7 @@
               <span class="stat-chip-label">Streak</span>
             </div>
           </div>
+          <button class="btn-edit-student" onclick="editStudent('${s.id}')" title="Editar aluno">✏️</button>
         </div>`;
     }).join('');
   }
@@ -1008,6 +1022,78 @@
   // Track if Brenda for use in createStudent
   let currentUserIsBrenda = false;
 
+  async function editStudent(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    if (!student) return;
+
+    document.getElementById('editStudentId').value = student.id;
+    document.getElementById('editStudentName').value = student.full_name || '';
+    document.getElementById('editStudentRole').value = student.role === 'kids' ? 'kids' : 'adulto';
+    document.getElementById('editStudentLevel').value = student.level || 1;
+    document.getElementById('editStudentError').style.display = 'none';
+
+    const teacherRow = document.getElementById('editStudentTeacherRow');
+    if (currentUserIsBrenda) {
+      const { data: teachers } = await sb.from('profiles').select('id, full_name').eq('role', 'professora').order('full_name');
+      const select = document.getElementById('editStudentTeacher');
+      while (select.options.length > 1) select.remove(1);
+      (teachers || []).forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.full_name;
+        select.appendChild(opt);
+      });
+      select.value = student.teacher_id || '';
+      teacherRow.style.display = 'block';
+    } else {
+      teacherRow.style.display = 'none';
+    }
+
+    document.getElementById('modalEditStudent').classList.add('open');
+  }
+
+  function closeEditStudent() {
+    document.getElementById('modalEditStudent').classList.remove('open');
+  }
+
+  async function saveStudentEdit() {
+    const id = document.getElementById('editStudentId').value;
+    const name = document.getElementById('editStudentName').value.trim();
+    const role = document.getElementById('editStudentRole').value;
+    const level = parseInt(document.getElementById('editStudentLevel').value, 10) || 1;
+    const errEl = document.getElementById('editStudentError');
+    const btn = document.getElementById('btnSaveStudentEdit');
+
+    if (!name) {
+      errEl.textContent = 'Preencha o nome do aluno.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const updates = { full_name: name, role, level };
+    if (currentUserIsBrenda) {
+      const teacherId = document.getElementById('editStudentTeacher').value;
+      updates.teacher_id = teacherId || null;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    const { error } = await sb.from('profiles').update(updates).eq('id', id);
+
+    btn.disabled = false;
+    btn.textContent = 'Salvar alterações';
+
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeEditStudent();
+    const { data: { session } } = await sb.auth.getSession();
+    await loadStudents(session.user.id, currentUserIsBrenda);
+  }
 
   async function loadTeacherAvatar(userId) {
     const { data: profile } = await sb.from('profiles').select('avatar_url').eq('id', userId).maybeSingle();
@@ -1269,6 +1355,48 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeAddStudent()">Cancelar</button>
       <button class="btn-modal-save" id="btnSaveStudent" onclick="createStudent()">Criar aluno</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar aluno -->
+<div class="modal-overlay" id="modalEditStudent">
+  <div class="modal-box">
+    <div class="modal-title">Editar aluno</div>
+    <div class="modal-sub">Ajuste os dados do cadastro.</div>
+
+    <div class="modal-error" id="editStudentError"></div>
+
+    <input type="hidden" id="editStudentId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Nome completo</label>
+      <input type="text" class="modal-input" id="editStudentName" placeholder="Nome do aluno" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Turma</label>
+      <select class="modal-select" id="editStudentRole">
+        <option value="adulto">Adulto</option>
+        <option value="kids">Kids</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Nível</label>
+      <input type="number" min="1" class="modal-input" id="editStudentLevel" placeholder="1" />
+    </div>
+
+    <div class="modal-row" id="editStudentTeacherRow" style="display:none;">
+      <label class="modal-label">Professora responsável</label>
+      <select class="modal-select" id="editStudentTeacher">
+        <option value="">Selecione...</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeEditStudent()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveStudentEdit" onclick="saveStudentEdit()">Salvar alterações</button>
     </div>
   </div>
 </div>
