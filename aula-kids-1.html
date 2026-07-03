@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aula 1 · Hi! My name is... · itsbrendacleto Kids</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
   :root {
@@ -263,6 +264,32 @@
 <div class="footer">Feito com 💛 por <strong>itsbrendacleto</strong> · Kids Edition</div>
 
 <script>
+// ── Supabase (salva o placar do quiz) ──────────────────────────────────────
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', {
+  auth: {
+    persistSession: true,
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    lock: async function(_name, _acquireTimeout, fn) { return fn(); }
+  }
+});
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({
+      user_id: session.user.id,
+      lesson_id: lessonId,
+      score: score,
+      score_total: total,
+      completed_at: new Date().toISOString()
+    });
+  } catch (e) { /* silencioso: não atrapalha a experiência do aluno */ }
+}
+
 // ── DATA ──────────────────────────────────────────────────────────────────
 var FC = [
   {em:'👋', en:'Hello',              pt:'Olá',                   au:'Hello'},
@@ -512,6 +539,7 @@ function nextQ() {
     document.getElementById('qres-t').textContent  = p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';
     document.getElementById('qres-s').textContent  = 'Você acertou '+qScore+' de '+QUIZ.length+' perguntas!';
     document.getElementById('qres').classList.add('on');
+    saveQuizScore('kids-l1-a1-quiz', qScore, QUIZ.length);
   } else { renderQ(); }
 }
 

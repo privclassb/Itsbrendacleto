@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Aula 2 · Let's Talk! · itsbrendacleto Kids</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
   :root{--cream:#FDF6EE;--sand:#F0E4D0;--brown:#8B5943;--brown-dk:#5C3320;--rose:#F2A7C3;--rose-lt:#FDEAF3;--sky:#A8D8EA;--sky-lt:#E8F7FC;--mint:#A8E6CF;--mint-lt:#E8FAF2;--lav:#C9A8E8;--lav-lt:#F2ECFC;--sun:#FFD97D;--sun-lt:#FFFBEC;--coral:#FFB3A7;--coral-lt:#FFF0EE;--white:#FFFFFF;--text:#3A2A1E;--text-md:#7A5C4A;--r:18px;--rs:12px;}
@@ -327,6 +328,15 @@
 <div class="footer">Feito com 💛 por <strong>itsbrendacleto</strong> · Kids Edition</div>
 
 <script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { /* silencioso */ }
+}
 var FC=[{em:'😄',en:"I'm happy",pt:'Estou feliz',au:'I am happy'},{em:'😢',en:"I'm sad",pt:'Estou triste',au:'I am sad'},{em:'😴',en:"I'm tired",pt:'Estou cansado',au:'I am tired'},{em:'🤩',en:"I'm excited",pt:'Estou animado',au:'I am excited'},{em:'😠',en:"I'm angry",pt:'Estou com raiva',au:'I am angry'},{em:'😨',en:"I'm scared",pt:'Estou com medo',au:'I am scared'},{em:'🤒',en:"I'm sick",pt:'Estou doente',au:'I am sick'},{em:'🍕',en:"I'm hungry",pt:'Estou com fome',au:'I am hungry'},{em:'😊',en:"I'm fine",pt:'Estou bem',au:'I am fine'},{em:'😎',en:"I'm good",pt:'Estou ótimo',au:'I am good'}];
 var HM_WORDS=[{word:'HAPPY',em:'😄',hint:'When you smile a lot!'},{word:'SAD',em:'😢',hint:'When you want to cry...'},{word:'ANGRY',em:'😠',hint:'When you are very mad!'},{word:'TIRED',em:'😴',hint:'When you need to sleep...'},{word:'SCARED',em:'😨',hint:'When something frightens you!'},{word:'EXCITED',em:'🤩',hint:'When something amazing is coming!'},{word:'SICK',em:'🤒',hint:'When you feel unwell...'},{word:'HUNGRY',em:'🍕',hint:'When your tummy growls!'},{word:'FINE',em:'😊',hint:'When everything is OK!'},{word:'GOOD',em:'😎',hint:'When you feel great!'}];
 var CATCH_DATA=[{feeling:'happy',right:'😄',wrong:['😢','😠','😴','😨','🤒']},{feeling:'sad',right:'😢',wrong:['😄','😎','🤩','🍕','😊']},{feeling:'angry',right:'😠',wrong:['😴','😢','😨','😊','🤒']},{feeling:'tired',right:'😴',wrong:['😄','😠','🤩','🍕','😎']},{feeling:'excited',right:'🤩',wrong:['😢','😠','😴','😨','🤒']},{feeling:'scared',right:'😨',wrong:['😄','😊','😎','🍕','🤩']}];
@@ -379,7 +389,7 @@ var qC=0,qS=0,qD=false;
 function initQuiz(){qC=0;qS=0;qD=false;document.getElementById('qres').classList.remove('on');document.getElementById('quiz-area').innerHTML='';renderQ();}
 function renderQ(){var q=QUIZ[qC],tot=QUIZ.length;document.getElementById('qpf').style.width=(qC/tot*100)+'%';document.getElementById('qpl').textContent=qC+' / '+tot;var area=document.getElementById('quiz-area');area.innerHTML='<div class="qq"><span class="qq-em">'+q.em+'</span><div class="qq-txt">'+q.q+'</div></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div><div class="qnav"><button class="btn-nx" id="qnx">'+(qC+1<tot?'Próxima ➡️':'Ver resultado 🏆')+'</button></div>';var opts=document.getElementById('qopts');q.opts.forEach(function(o,i){var b=document.createElement('button');b.className='qopt';b.textContent=o;b.addEventListener('click',function(){ansQ(i);});opts.appendChild(b);});document.getElementById('qnx').addEventListener('click',nxtQ);qD=false;}
 function ansQ(ch){if(qD)return;qD=true;var q=QUIZ[qC];var bs=document.querySelectorAll('.qopt');bs.forEach(function(b){b.disabled=true;});bs[q.c].classList.add('ok');var fb=document.getElementById('qfb');if(ch===q.c){qS++;fb.textContent='🎉 Correto! Muito bem!';fb.className='qfb on ok';}else{bs[ch].classList.add('fail');fb.textContent='😅 Quase! A resposta é: '+q.opts[q.c];fb.className='qfb on fail';}document.getElementById('qnx').style.display='inline-block';}
-function nxtQ(){qC++;if(qC>=QUIZ.length){document.getElementById('quiz-area').innerHTML='';document.getElementById('qpf').style.width='100%';document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;var p=qS/QUIZ.length;document.getElementById('qres-em').textContent=p===1?'🏆':p>=.6?'🌟':'💪';document.getElementById('qres-t').textContent=p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';document.getElementById('qres-s').textContent='Você acertou '+qS+' de '+QUIZ.length+' perguntas!';document.getElementById('qres').classList.add('on');}else{renderQ();}}
+function nxtQ(){qC++;if(qC>=QUIZ.length){document.getElementById('quiz-area').innerHTML='';document.getElementById('qpf').style.width='100%';document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;var p=qS/QUIZ.length;document.getElementById('qres-em').textContent=p===1?'🏆':p>=.6?'🌟':'💪';document.getElementById('qres-t').textContent=p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';document.getElementById('qres-s').textContent='Você acertou '+qS+' de '+QUIZ.length+' perguntas!';document.getElementById('qres').classList.add('on');saveQuizScore('kids-l1-a2-quiz',qS,QUIZ.length);}else{renderQ();}}
 
 /* MISSION */
 function initMission(){var ul=document.getElementById('msn-steps');ul.innerHTML='';MISSION.forEach(function(s,i){var li=document.createElement('div');li.className='mstep';li.innerHTML='<div class="stchk" id="st'+i+'"></div><div class="stxt">'+s+'</div>';li.querySelector('.stchk').addEventListener('click',function(){this.classList.toggle('on');});ul.appendChild(li);});}
