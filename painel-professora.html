@@ -698,7 +698,7 @@
     const finalSession = session;
 
     const user = finalSession.user;
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).single();
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
 
     if (!profile) {
       // Profile not loaded yet - don't redirect
@@ -709,7 +709,7 @@
       return;
     }
 
-    const name = profile.full_name || user.email.split('@')[0];
+    const name = (profile && profile.full_name) || user.email.split('@')[0];
     document.getElementById('teacherName').textContent = name;
 
     // Brenda vê todos; outras professoras veem só seus alunos
