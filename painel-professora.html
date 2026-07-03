@@ -6,6 +6,29 @@
   <title>Painel da Professora | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // TEMPORÁRIO: mostra qualquer erro de JS direto na tela para diagnóstico
+    function showDebugError(msg) {
+      let box = document.getElementById('debugErrorBox');
+      if (!box) {
+        box = document.createElement('div');
+        box.id = 'debugErrorBox';
+        box.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#c0392b;color:#fff;padding:12px;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-word;max-height:45vh;overflow:auto;';
+        document.documentElement.appendChild(box);
+      }
+      const line = document.createElement('div');
+      line.style.marginBottom = '6px';
+      line.textContent = msg;
+      box.appendChild(line);
+    }
+    window.addEventListener('error', (e) => {
+      showDebugError('ERRO: ' + e.message + ' (' + (e.filename || '') + ':' + e.lineno + ')');
+    });
+    window.addEventListener('unhandledrejection', (e) => {
+      const reason = e.reason;
+      showDebugError('ERRO (promise): ' + (reason && reason.message ? reason.message : String(reason)));
+    });
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
