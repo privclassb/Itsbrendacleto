@@ -800,8 +800,53 @@
 
   <!-- Financeiro -->
   <div class="reports-section panel-section" id="financeiroSection">
+
+    <div class="overview-grid" id="financeSummaryGrid" style="grid-template-columns:repeat(5, 1fr);">
+      <div class="overview-card">
+        <span class="overview-value" id="finEntradasPrevistas" style="font-size:22px;">—</span>
+        <div class="overview-label">Entradas previstas</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="finEntradasConfirmadas" style="font-size:22px;">—</span>
+        <div class="overview-label">Entradas confirmadas</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="finSaidasPrevistas" style="font-size:22px;">—</span>
+        <div class="overview-label">Saídas previstas</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="finSaidasConfirmadas" style="font-size:22px;">—</span>
+        <div class="overview-label">Saídas confirmadas</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="finLucro" style="font-size:22px;">—</span>
+        <div class="overview-label">Lucro confirmado</div>
+      </div>
+    </div>
+
+    <div class="report-form">
+      <div class="report-form-title">Filtros</div>
+      <div class="form-row" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <select class="form-select" id="financeFilterStudent" style="flex:2;min-width:180px;">
+          <option value="">Todos os alunos</option>
+        </select>
+        <input type="date" class="form-input" id="financeFilterFrom" style="flex:1;min-width:130px;" />
+        <input type="date" class="form-input" id="financeFilterTo" style="flex:1;min-width:130px;" />
+      </div>
+      <div class="form-row" style="display:flex;gap:16px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowEntradas" checked onchange="loadFinanceiro()" /> Entradas</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowSaidas" checked onchange="loadFinanceiro()" /> Saídas</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowPagos" checked onchange="loadFinanceiro()" /> Pagos</label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowPendentes" checked onchange="loadFinanceiro()" /> Pendentes</label>
+      </div>
+      <div class="form-actions">
+        <button class="btn-draft" onclick="loadFinanceiro()" style="flex:1;">🔍 Aplicar filtros</button>
+        <button class="btn-publish" onclick="openLancamento()" style="flex:1;">+ Novo lançamento</button>
+      </div>
+    </div>
+
     <div class="report-list">
-      <div class="report-list-title">💰 Financeiro</div>
+      <div class="report-list-title">Lançamentos</div>
       <div id="financeiroList"><div class="empty-reports">Carregando...</div></div>
     </div>
   </div>
@@ -934,7 +979,7 @@
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
     document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
     await loadClassLogs(user.id, isBrenda);
-    loadFinanceiro();
+    await loadFinanceiro();
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -1052,17 +1097,17 @@
     // Financeiro
     const fee = (student.monthly_fee != null) ? ('R$ ' + Number(student.monthly_fee).toFixed(2)) : '—';
     document.getElementById('profileFinanceInfo').innerHTML = `
-      <div class="detail-row"><span class="detail-label">Mensalidade</span><span class="detail-value">${fee}</span></div>
+      <div class="detail-row"><span class="detail-label">Parcela mensal</span><span class="detail-value">${fee}</span></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${PAYMENT_STATUS_LABEL[student.payment_status || 'em_dia']}</span></div>`;
 
-    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('paid_at', { ascending: false }).limit(5);
+    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: false }).limit(5);
     const paymentsListEl = document.getElementById('profilePaymentsList');
     if (!payments || payments.length === 0) {
       paymentsListEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>';
     } else {
       paymentsListEl.innerHTML = payments.map(p => {
-        const date = new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR');
-        return `<div class="detail-row"><span class="detail-label">${date}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
+        const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
+        return `<div class="detail-row"><span class="detail-label">${date}${p.paid ? '' : ' · Pendente'}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
       }).join('');
     }
 
@@ -2118,26 +2163,172 @@
   const PAYMENT_STATUS_LABEL = { em_dia: 'Em dia', pendente: 'Pendente', atrasado: 'Atrasado' };
   const PAYMENT_STATUS_CLASS = { em_dia: 'published', pendente: 'draft', atrasado: 'draft' };
 
-  function loadFinanceiro() {
+  async function loadFinanceiro() {
     const listEl = document.getElementById('financeiroList');
-    if (allStudents.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum aluno cadastrado ainda.</div>'; return; }
 
-    listEl.innerHTML = allStudents.map(s => {
-      const turma = allTurmas.find(t => t.id === s.turma_id);
-      const status = s.payment_status || 'em_dia';
-      const fee = (s.monthly_fee != null) ? ('R$ ' + Number(s.monthly_fee).toFixed(2)) : '—';
-      const start = s.contract_start ? new Date(s.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
-      const end = s.contract_end ? new Date(s.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const filterSelect = document.getElementById('financeFilterStudent');
+    const currentFilterValue = filterSelect.value;
+    filterSelect.innerHTML = '<option value="">Todos os alunos</option>' +
+      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+    filterSelect.value = currentFilterValue;
+
+    const studentIds = allStudents.map(s => s.id);
+    let query = sb.from('payments').select('*');
+    if (!currentUserIsBrenda) {
+      query = query.in('student_id', studentIds.length ? studentIds : ['00000000-0000-0000-0000-000000000000']);
+    }
+    const { data: payments, error } = await query;
+
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar financeiro.</div>'; return; }
+
+    const filterStudent = filterSelect.value;
+    const filterFrom = document.getElementById('financeFilterFrom').value;
+    const filterTo = document.getElementById('financeFilterTo').value;
+    const showEntradas = document.getElementById('financeShowEntradas').checked;
+    const showSaidas = document.getElementById('financeShowSaidas').checked;
+    const showPagos = document.getElementById('financeShowPagos').checked;
+    const showPendentes = document.getElementById('financeShowPendentes').checked;
+
+    const inRange = (p) => {
+      if (filterStudent && p.student_id !== filterStudent) return false;
+      if (filterFrom && (!p.due_date || p.due_date < filterFrom)) return false;
+      if (filterTo && (!p.due_date || p.due_date > filterTo)) return false;
+      return true;
+    };
+
+    const baseForSummary = (payments || []).filter(inRange);
+    const entradasPrevistas = baseForSummary.filter(p => p.type === 'entrada').reduce((sum, p) => sum + Number(p.amount), 0);
+    const entradasConfirmadas = baseForSummary.filter(p => p.type === 'entrada' && p.paid).reduce((sum, p) => sum + Number(p.amount), 0);
+    const saidasPrevistas = baseForSummary.filter(p => p.type === 'saida').reduce((sum, p) => sum + Number(p.amount), 0);
+    const saidasConfirmadas = baseForSummary.filter(p => p.type === 'saida' && p.paid).reduce((sum, p) => sum + Number(p.amount), 0);
+
+    document.getElementById('finEntradasPrevistas').textContent = 'R$ ' + entradasPrevistas.toFixed(2);
+    document.getElementById('finEntradasConfirmadas').textContent = 'R$ ' + entradasConfirmadas.toFixed(2);
+    document.getElementById('finSaidasPrevistas').textContent = 'R$ ' + saidasPrevistas.toFixed(2);
+    document.getElementById('finSaidasConfirmadas').textContent = 'R$ ' + saidasConfirmadas.toFixed(2);
+    document.getElementById('finLucro').textContent = 'R$ ' + (entradasConfirmadas - saidasConfirmadas).toFixed(2);
+
+    let filtered = baseForSummary.filter(p =>
+      ((p.type === 'entrada' && showEntradas) || (p.type === 'saida' && showSaidas)) &&
+      ((p.paid && showPagos) || (!p.paid && showPendentes))
+    );
+
+    if (filtered.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum lançamento encontrado.</div>'; return; }
+
+    filtered.sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
+
+    listEl.innerHTML = filtered.map(p => {
+      const student = allStudents.find(s => s.id === p.student_id);
+      const dueDate = p.due_date ? new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const paidDate = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const sign = p.type === 'saida' ? '-' : '';
+      const color = p.type === 'saida' ? '#C0392B' : '#1E5C3A';
+      const statusLabel = p.paid ? 'Pago' : 'Pendente';
+      const who = student ? student.full_name : (p.type === 'saida' ? 'Empresa' : '');
       return `
         <div class="report-row">
           <div class="report-row-info">
-            <div class="report-row-student">${s.full_name || 'Sem nome'}${turma ? ' · ' + turma.name : ''}</div>
-            <div class="report-row-title">${fee}/mês · Contrato: ${start} – ${end}</div>
+            <div class="report-row-student">${p.description}${who ? ' — ' + who : ''}</div>
+            <div class="report-row-title">Agendado: ${dueDate} · Pago: ${paidDate} · ${statusLabel}${p.payment_method ? ' · ' + p.payment_method : ''}</div>
           </div>
-          <span class="report-status ${PAYMENT_STATUS_CLASS[status]}">${PAYMENT_STATUS_LABEL[status]}</span>
-          <button class="btn-report-action btn-toggle" onclick="openPayments('${s.id}')">Pagamentos</button>
+          <span class="report-row-student" style="color:${color};">${sign}R$ ${Number(p.amount).toFixed(2)}</span>
+          <button class="btn-report-action btn-toggle" onclick="openLancamento('${p.id}')">Editar</button>
         </div>`;
     }).join('');
+  }
+
+  async function openLancamento(id) {
+    document.getElementById('lancamentoError').style.display = 'none';
+    const sel = document.getElementById('lancamentoStudent');
+    sel.innerHTML = '<option value="">Nenhum</option>' +
+      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+    document.getElementById('btnDeleteLancamento').style.display = id ? 'inline-block' : 'none';
+
+    if (id) {
+      const { data: p } = await sb.from('payments').select('*').eq('id', id).maybeSingle();
+      if (!p) return;
+      document.getElementById('lancamentoTitle').textContent = 'Editar lançamento';
+      document.getElementById('lancamentoId').value = p.id;
+      document.getElementById('lancamentoType').value = p.type;
+      document.getElementById('lancamentoStudent').value = p.student_id || '';
+      document.getElementById('lancamentoDescription').value = p.description || '';
+      document.getElementById('lancamentoAmount').value = p.amount;
+      document.getElementById('lancamentoMethod').value = p.payment_method || 'Boleto';
+      document.getElementById('lancamentoDueDate').value = p.due_date || '';
+      document.getElementById('lancamentoPaidDate').value = p.paid_at || '';
+      document.getElementById('lancamentoPaid').checked = !!p.paid;
+    } else {
+      document.getElementById('lancamentoTitle').textContent = 'Novo lançamento';
+      document.getElementById('lancamentoId').value = '';
+      document.getElementById('lancamentoType').value = 'entrada';
+      document.getElementById('lancamentoStudent').value = '';
+      document.getElementById('lancamentoDescription').value = 'Parcela mensal';
+      document.getElementById('lancamentoAmount').value = '';
+      document.getElementById('lancamentoMethod').value = 'Boleto';
+      document.getElementById('lancamentoDueDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('lancamentoPaidDate').value = '';
+      document.getElementById('lancamentoPaid').checked = false;
+    }
+
+    document.getElementById('modalLancamento').classList.add('open');
+  }
+
+  function closeLancamento() {
+    document.getElementById('modalLancamento').classList.remove('open');
+  }
+
+  function toggleLancamentoPaidDate() {
+    const checked = document.getElementById('lancamentoPaid').checked;
+    const dateInput = document.getElementById('lancamentoPaidDate');
+    if (checked && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+  }
+
+  async function saveLancamento() {
+    const id = document.getElementById('lancamentoId').value;
+    const type = document.getElementById('lancamentoType').value;
+    const studentId = document.getElementById('lancamentoStudent').value || null;
+    const description = document.getElementById('lancamentoDescription').value.trim() || 'Parcela mensal';
+    const amount = parseFloat(document.getElementById('lancamentoAmount').value);
+    const method = document.getElementById('lancamentoMethod').value;
+    const dueDate = document.getElementById('lancamentoDueDate').value || null;
+    const paid = document.getElementById('lancamentoPaid').checked;
+    const paidDate = paid ? (document.getElementById('lancamentoPaidDate').value || new Date().toISOString().slice(0, 10)) : null;
+
+    const errEl = document.getElementById('lancamentoError');
+    if (!amount || amount <= 0) {
+      errEl.textContent = 'Informe um valor válido.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const payload = {
+      type, student_id: studentId, description, amount,
+      payment_method: method, due_date: dueDate, paid, paid_at: paidDate
+    };
+
+    const { error } = id
+      ? await sb.from('payments').update(payload).eq('id', id)
+      : await sb.from('payments').insert({ ...payload, created_by: session.user.id });
+
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeLancamento();
+    await loadFinanceiro();
+  }
+
+  async function deleteLancamento() {
+    const id = document.getElementById('lancamentoId').value;
+    if (!id) return;
+    if (!confirm('Excluir este lançamento?')) return;
+    const { error } = await sb.from('payments').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir: ' + error.message); return; }
+    closeLancamento();
+    await loadFinanceiro();
   }
 
   async function openPayments(studentId) {
@@ -2155,14 +2346,14 @@
   }
 
   async function loadPayments(studentId) {
-    const { data: payments, error } = await sb.from('payments').select('*').eq('student_id', studentId).order('paid_at', { ascending: false });
+    const { data: payments, error } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: false });
     const listEl = document.getElementById('paymentsList');
 
     if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar pagamentos.</div>'; return; }
     if (!payments || payments.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>'; return; }
 
     listEl.innerHTML = payments.map(p => {
-      const date = new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR');
+      const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
       return `
         <div class="report-row">
           <div class="report-row-info">
@@ -2183,7 +2374,9 @@
 
     const { data: { session } } = await sb.auth.getSession();
     const { error } = await sb.from('payments').insert({
-      student_id: studentId, amount, paid_at: paidAt, created_by: session.user.id
+      student_id: studentId, amount, paid_at: paidAt, due_date: paidAt,
+      paid: true, type: 'entrada', description: 'Parcela mensal',
+      created_by: session.user.id
     });
 
     if (error) { alert('Erro ao registrar pagamento: ' + error.message); return; }
@@ -2278,7 +2471,7 @@
 
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
-        <label class="modal-label">Mensalidade (R$)</label>
+        <label class="modal-label">Parcela mensal (R$)</label>
         <input type="number" step="0.01" min="0" class="modal-input" id="newStudentFee" placeholder="0,00" />
       </div>
       <div style="flex:1;">
@@ -2377,7 +2570,7 @@
 
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
-        <label class="modal-label">Mensalidade (R$)</label>
+        <label class="modal-label">Parcela mensal (R$)</label>
         <input type="number" step="0.01" min="0" class="modal-input" id="editStudentFee" placeholder="0,00" />
       </div>
       <div style="flex:1;">
@@ -2477,6 +2670,76 @@
 </div>
 
 <!-- Modal: Pagamentos -->
+<!-- Modal: Lançamento financeiro (entrada ou saída) -->
+<div class="modal-overlay" id="modalLancamento">
+  <div class="modal-box">
+    <div class="modal-title" id="lancamentoTitle">Novo lançamento</div>
+    <input type="hidden" id="lancamentoId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Tipo</label>
+      <select class="modal-select" id="lancamentoType">
+        <option value="entrada">Entrada</option>
+        <option value="saida">Saída</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Aluno (opcional para saídas)</label>
+      <select class="modal-select" id="lancamentoStudent">
+        <option value="">Nenhum</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Descrição</label>
+      <input type="text" class="modal-input" id="lancamentoDescription" placeholder="Ex: Parcela mensal" />
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Valor (R$)</label>
+        <input type="number" step="0.01" min="0" class="modal-input" id="lancamentoAmount" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Forma de pagamento</label>
+        <select class="modal-select" id="lancamentoMethod">
+          <option value="Boleto">Boleto</option>
+          <option value="Pix">Pix</option>
+          <option value="Cartão">Cartão</option>
+          <option value="Dinheiro">Dinheiro</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Data agendada</label>
+        <input type="date" class="modal-input" id="lancamentoDueDate" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Data de pagamento</label>
+        <input type="date" class="modal-input" id="lancamentoPaidDate" />
+      </div>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="lancamentoPaid" onchange="toggleLancamentoPaidDate()" />
+        <span>Pago?</span>
+      </label>
+    </div>
+
+    <div class="modal-error" id="lancamentoError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeLancamento()">Cancelar</button>
+      <button class="btn-modal-save" id="btnDeleteLancamento" style="background:#C0392B;display:none;" onclick="deleteLancamento()">Excluir</button>
+      <button class="btn-modal-save" onclick="saveLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="modalPayments">
   <div class="modal-box">
     <div class="modal-title" id="paymentsStudentName">Pagamentos</div>
