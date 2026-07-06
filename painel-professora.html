@@ -732,7 +732,7 @@
 
   <!-- Turmas -->
   <div class="reports-section panel-section" id="turmasSection">
-    <div class="report-form">
+    <div class="report-form" id="novaTurmaForm" style="display:none;">
       <div class="report-form-title">🏫 Nova turma</div>
       <div class="form-row">
         <label class="form-label">Nome da turma</label>
@@ -967,6 +967,7 @@
     if (isBrenda) {
       document.getElementById('navMateriais').style.display = 'inline-flex';
       document.getElementById('navFinanceiro').style.display = 'inline-flex';
+      document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
@@ -1059,6 +1060,9 @@
     document.getElementById('profileOptionsMenu').classList.remove('open');
     document.getElementById('profileFinanceSection').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionPaymentBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileOptionEditBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileOptionDeleteBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const turma = allTurmas.find(t => t.id === student.turma_id);
@@ -1091,7 +1095,7 @@
       ['Nível', student.level || 1],
       ['Turma', turma ? turma.name : 'Nenhuma'],
       ['Professora responsável', teacherName],
-      ['Contrato', contractStart + ' – ' + contractEnd],
+      ...(currentUserIsBrenda ? [['Contrato', contractStart + ' – ' + contractEnd]] : []),
       ['Cadastrado em', createdAt],
       ['Responsável vinculado', guardian?.full_name || 'Nenhum cadastrado']
     ];
@@ -1235,7 +1239,10 @@
       const progress = progressByStudent[s.id] || { activities: [], streak: 0 };
 
       const inactiveStyle = s.active === false ? 'opacity:0.5;' : '';
-      const lateWarning = s.payment_status === 'atrasado' ? ' ⚠️' : '';
+      const lateWarning = (currentUserIsBrenda && s.payment_status === 'atrasado') ? ' ⚠️' : '';
+      const editBtn = currentUserIsBrenda
+        ? `<button class="btn-edit-student" onclick="event.stopPropagation(); editStudent('${s.id}')" title="Editar aluno">✏️</button>`
+        : '';
 
       return `
         <div class="student-card" style="${inactiveStyle}" onclick="openStudentProfile('${s.id}')">
@@ -1257,7 +1264,7 @@
               <span class="stat-chip-label">Streak</span>
             </div>
           </div>
-          <button class="btn-edit-student" onclick="event.stopPropagation(); editStudent('${s.id}')" title="Editar aluno">✏️</button>
+          ${editBtn}
         </div>`;
     }).join('');
   }
@@ -2002,14 +2009,17 @@
 
     listEl.innerHTML = allTurmas.map(t => {
       const count = allStudents.filter(s => s.turma_id === t.id).length;
+      const actions = currentUserIsBrenda
+        ? `<button class="btn-report-action btn-toggle" onclick="openTurmaStudents('${t.id}')">+ Alunos</button>
+           <button class="btn-report-action btn-delete" onclick="deleteTurma('${t.id}')">Excluir</button>`
+        : '';
       return `
         <div class="report-row">
           <div class="report-row-info">
             <div class="report-row-student">${t.name}</div>
             <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s)</div>
           </div>
-          <button class="btn-report-action btn-toggle" onclick="openTurmaStudents('${t.id}')">+ Alunos</button>
-          <button class="btn-report-action btn-delete" onclick="deleteTurma('${t.id}')">Excluir</button>
+          ${actions}
         </div>`;
     }).join('');
   }
@@ -2658,11 +2668,11 @@
       <div class="profile-options-wrap">
         <button class="btn-modal-cancel" onclick="toggleProfileOptions()">Opções ▾</button>
         <div class="profile-options-menu" id="profileOptionsMenu">
-          <button class="profile-option-btn" onclick="profileOptionEdit()">✏️ Editar cadastro</button>
+          <button class="profile-option-btn" id="profileOptionEditBtn" onclick="profileOptionEdit()">✏️ Editar cadastro</button>
           <button class="profile-option-btn" onclick="profileOptionLogClass()">📝 Registrar aula</button>
           <button class="profile-option-btn" id="profileOptionPaymentBtn" onclick="profileOptionPayment()">💰 Registrar pagamento</button>
           <button class="profile-option-btn" id="profileToggleActiveBtn" onclick="profileOptionToggleActive()">🚫 Inativar aluno</button>
-          <button class="profile-option-btn danger" onclick="profileOptionDelete()">🗑️ Excluir aluno</button>
+          <button class="profile-option-btn danger" id="profileOptionDeleteBtn" onclick="profileOptionDelete()">🗑️ Excluir aluno</button>
         </div>
       </div>
     </div>
