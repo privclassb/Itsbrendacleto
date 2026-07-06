@@ -1470,8 +1470,11 @@
     const url = input.value.trim();
     if (!url) return;
 
-    const { error } = await sb.from('material_links')
-      .upsert({ category, label, url }, { onConflict: 'category' });
+    const { data: existing } = await sb.from('material_links').select('id').eq('category', category).maybeSingle();
+
+    const { error } = existing
+      ? await sb.from('material_links').update({ label, url }).eq('id', existing.id)
+      : await sb.from('material_links').insert({ category, label, url });
 
     if (error) {
       alert('Erro ao salvar link: ' + error.message);
