@@ -165,7 +165,7 @@
   let userId = null;
   let checkedItems = new Set();
 
-  async function init() {
+  async function init(session) {
     // Session already verified before init()
     userId = session.user.id;
     const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', 'kids-l1-a2-%');
@@ -220,7 +220,7 @@
   (async () => {
     for (let i = 0; i < 5; i++) {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) { await init(); return; }
+      if (session) { await init(session); return; }
       await new Promise(r => setTimeout(r, 400 * (i + 1)));
     }
     window.location.href = 'index.html';

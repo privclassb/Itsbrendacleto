@@ -157,7 +157,7 @@
     '30-dias':        'streak30'
   };
 
-  async function init() {
+  async function init(session) {
     // Session already verified before init()
     const user = session.user;
 
@@ -196,7 +196,7 @@
   (async () => {
     for (let i = 0; i < 5; i++) {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) { await init(); return; }
+      if (session) { await init(session); return; }
       await new Promise(r => setTimeout(r, 400 * (i + 1)));
     }
     window.location.href = 'index.html';
