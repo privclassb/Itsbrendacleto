@@ -525,6 +525,28 @@
     .detail-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .detail-value { font-size: 14px; color: var(--text); font-weight: 500; text-align: right; }
     .detail-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* Perfil unificado do aluno */
+    .profile-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+    .profile-options-wrap { position: relative; flex-shrink: 0; }
+    .profile-options-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 6px);
+      background: var(--white); border: 1.5px solid var(--sand); border-radius: 12px;
+      box-shadow: var(--shadow); min-width: 210px; z-index: 50; overflow: hidden;
+    }
+    .profile-options-menu.open { display: block; }
+    .profile-option-btn {
+      display: block; width: 100%; text-align: left; padding: 11px 16px; border: none; background: none;
+      font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer;
+      border-bottom: 1px solid var(--sand);
+    }
+    .profile-option-btn:last-child { border-bottom: none; }
+    .profile-option-btn:hover { background: var(--cream); }
+    .profile-option-btn.danger { color: #C0392B; }
+    .profile-warning { background: #FFF0EE; color: #C0392B; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+    .profile-inactive-badge { background: var(--muted); color: var(--white); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-left: 8px; }
+    .profile-section { margin-top: 22px; }
+    .profile-section-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); font-weight: 400; margin-bottom: 10px; }
     .modal-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: block; }
     .modal-input { width: 100%; padding: 11px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
     .modal-input:focus { border-color: var(--mint); }
@@ -753,6 +775,16 @@
         <input type="date" class="form-input" id="classLogDate" />
       </div>
       <div class="form-row">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="classLogStatus">
+          <option value="realizada">Realizada</option>
+          <option value="pendente">Pendente</option>
+          <option value="cancelada">Cancelada</option>
+          <option value="cancelada_falta">Cancelada por falta</option>
+          <option value="reagendada">Reagendada</option>
+        </select>
+      </div>
+      <div class="form-row">
         <label class="form-label">Conteúdo trabalhado</label>
         <textarea class="form-textarea" id="classLogContent" placeholder="O que foi visto na aula..."></textarea>
       </div>
@@ -965,82 +997,162 @@
     });
   }
 
-  function viewProgress(studentId) {
+  const CLASS_STATUS_LABEL = {
+    realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
+    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada'
+  };
+
+  let currentProfileStudentId = null;
+
+  async function openStudentProfile(studentId) {
     const student = allStudents.find(s => s.id === studentId);
-    const progress = progressByStudent[studentId] || { activities: [], streak: 0, badges: [] };
     if (!student) return;
+    currentProfileStudentId = studentId;
 
-    document.getElementById('progressStudentName').textContent = student.full_name || 'Aluno';
-    document.getElementById('progressStreak').textContent = progress.streak;
-    document.getElementById('progressBadgeCount').textContent = progress.badges.length;
+    document.getElementById('profileOptionsMenu').classList.remove('open');
 
-    const sorted = [...progress.activities].sort((a, b) => new Date(b.completed_at) - new Date(a.completed_at));
-    const listEl = document.getElementById('progressActivitiesList');
+    const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
+    const turma = allTurmas.find(t => t.id === student.turma_id);
 
-    if (sorted.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhuma atividade concluída ainda.</div>';
+    document.getElementById('profileStudentName').childNodes[0].textContent = (student.full_name || 'Aluno') + ' ';
+    document.getElementById('profileStudentMeta').textContent = roleLabel + (turma ? ' · ' + turma.name : '');
+    document.getElementById('profileInactiveBadge').style.display = (student.active === false) ? 'inline-block' : 'none';
+    document.getElementById('profileToggleActiveBtn').textContent = (student.active === false) ? '✅ Reativar aluno' : '🚫 Inativar aluno';
+
+    const warningEl = document.getElementById('profileWarning');
+    if (student.payment_status === 'atrasado') {
+      warningEl.textContent = '⚠️ Este aluno possui pagamento em atraso.';
+      warningEl.style.display = 'block';
     } else {
-      listEl.innerHTML = sorted.map(a => {
-        const label = ACTIVITY_LABELS[a.lesson_id] || a.lesson_id;
-        const date = a.completed_at ? new Date(a.completed_at).toLocaleDateString('pt-BR') : '';
-        const scoreText = (a.score != null && a.score_total != null) ? ` · ${a.score}/${a.score_total} acertos` : '';
-        return `
-          <div class="progress-activity-row">
-            <span>${label}${scoreText}</span>
-            <span class="progress-activity-date">${date}</span>
-          </div>`;
-      }).join('');
+      warningEl.style.display = 'none';
     }
 
-    document.getElementById('modalProgress').classList.add('open');
-  }
-
-  function closeProgress() {
-    document.getElementById('modalProgress').classList.remove('open');
-  }
-
-  async function viewStudentDetails(studentId) {
-    const student = allStudents.find(s => s.id === studentId);
-    if (!student) return;
-
-    document.getElementById('detailsStudentName').textContent = student.full_name || 'Aluno';
-
+    // Dados
     let teacherName = '—';
     if (student.teacher_id) {
       const { data: teacher } = await sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle();
       teacherName = teacher?.full_name || '—';
     }
-
     const { data: guardian } = await sb.from('profiles').select('full_name').eq('guardian_of', studentId).eq('role', 'responsavel').maybeSingle();
-
-    const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const createdAt = student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : '—';
+    const contractStart = student.contract_start ? new Date(student.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const contractEnd = student.contract_end ? new Date(student.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
 
-    const rows = [
-      ['Nome completo', student.full_name || '—'],
-      ['Turma', roleLabel],
+    const dataRows = [
       ['Nível', student.level || 1],
+      ['Turma', turma ? turma.name : 'Nenhuma'],
       ['Professora responsável', teacherName],
+      ['Contrato', contractStart + ' – ' + contractEnd],
       ['Cadastrado em', createdAt],
       ['Responsável vinculado', guardian?.full_name || 'Nenhum cadastrado']
     ];
+    document.getElementById('profileDataList').innerHTML = dataRows.map(([label, value]) => `
+      <div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`).join('');
 
-    document.getElementById('detailsList').innerHTML = rows.map(([label, value]) => `
-      <div class="detail-row">
-        <span class="detail-label">${label}</span>
-        <span class="detail-value">${value}</span>
-      </div>`).join('');
+    // Financeiro
+    const fee = (student.monthly_fee != null) ? ('R$ ' + Number(student.monthly_fee).toFixed(2)) : '—';
+    document.getElementById('profileFinanceInfo').innerHTML = `
+      <div class="detail-row"><span class="detail-label">Mensalidade</span><span class="detail-value">${fee}</span></div>
+      <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${PAYMENT_STATUS_LABEL[student.payment_status || 'em_dia']}</span></div>`;
 
-    document.getElementById('btnDetailsEdit').onclick = () => {
-      closeStudentDetails();
-      editStudent(studentId);
-    };
+    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('paid_at', { ascending: false }).limit(5);
+    const paymentsListEl = document.getElementById('profilePaymentsList');
+    if (!payments || payments.length === 0) {
+      paymentsListEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>';
+    } else {
+      paymentsListEl.innerHTML = payments.map(p => {
+        const date = new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR');
+        return `<div class="detail-row"><span class="detail-label">${date}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
+      }).join('');
+    }
 
-    document.getElementById('modalStudentDetails').classList.add('open');
+    // Aulas
+    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: false }).limit(10);
+    classQuery = turma
+      ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
+      : classQuery.eq('student_id', studentId);
+    const { data: logs } = await classQuery;
+    const logsListEl = document.getElementById('profileClassLogsList');
+    if (!logs || logs.length === 0) {
+      logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
+    } else {
+      logsListEl.innerHTML = logs.map(l => {
+        const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+        return `
+          <div class="detail-row">
+            <span class="detail-label">${date} · ${statusLabel}</span>
+            <span class="detail-value">${l.content || '—'}</span>
+          </div>`;
+      }).join('');
+    }
+
+    // Progresso
+    const progress = progressByStudent[studentId] || { activities: [], streak: 0, badges: [] };
+    document.getElementById('profileProgressInfo').innerHTML = `
+      <div class="detail-row"><span class="detail-label">Streak</span><span class="detail-value">${progress.streak} dias</span></div>
+      <div class="detail-row"><span class="detail-label">Badges</span><span class="detail-value">${progress.badges.length}</span></div>
+      <div class="detail-row"><span class="detail-label">Atividades concluídas</span><span class="detail-value">${progress.activities.length}</span></div>`;
+
+    document.getElementById('modalStudentProfile').classList.add('open');
   }
 
-  function closeStudentDetails() {
-    document.getElementById('modalStudentDetails').classList.remove('open');
+  function closeStudentProfile() {
+    document.getElementById('modalStudentProfile').classList.remove('open');
+    document.getElementById('profileOptionsMenu').classList.remove('open');
+  }
+
+  function toggleProfileOptions() {
+    document.getElementById('profileOptionsMenu').classList.toggle('open');
+  }
+
+  function profileOptionEdit() {
+    const id = currentProfileStudentId;
+    closeStudentProfile();
+    editStudent(id);
+  }
+
+  function profileOptionLogClass() {
+    const id = currentProfileStudentId;
+    closeStudentProfile();
+    showTab('aulas');
+    document.getElementById('classLogTurma').value = '';
+    document.getElementById('classLogStudent').value = id;
+  }
+
+  function profileOptionPayment() {
+    const id = currentProfileStudentId;
+    closeStudentProfile();
+    openPayments(id);
+  }
+
+  async function profileOptionToggleActive() {
+    const student = allStudents.find(s => s.id === currentProfileStudentId);
+    if (!student) return;
+    const newActive = student.active === false;
+    if (!confirm('Tem certeza que deseja ' + (newActive ? 'reativar' : 'inativar') + ' este aluno?')) return;
+
+    const { error } = await sb.from('profiles').update({ active: newActive }).eq('id', student.id);
+    if (error) { alert('Erro: ' + error.message); return; }
+
+    const { data: { session } } = await sb.auth.getSession();
+    await loadStudents(session.user.id, currentUserIsBrenda);
+    openStudentProfile(student.id);
+  }
+
+  async function profileOptionDelete() {
+    const student = allStudents.find(s => s.id === currentProfileStudentId);
+    if (!student) return;
+    if (!confirm('Excluir definitivamente o cadastro de ' + student.full_name + '? O login do aluno deixará de funcionar no site, mas a conta de autenticação em si só é removida pelo painel do Supabase.')) return;
+    if (!confirm('Tem certeza mesmo? Essa ação não pode ser desfeita.')) return;
+
+    const { error } = await sb.from('profiles').delete().eq('id', student.id);
+    if (error) { alert('Erro ao excluir: ' + error.message); return; }
+
+    closeStudentProfile();
+    const { data: { session } } = await sb.auth.getSession();
+    await loadStudents(session.user.id, currentUserIsBrenda);
+    loadFinanceiro();
   }
 
   function updateOverview(students) {
@@ -1071,11 +1183,14 @@
       const lastSeen = s.created_at ? new Date(s.created_at).toLocaleDateString('pt-BR') : '—';
       const progress = progressByStudent[s.id] || { activities: [], streak: 0 };
 
+      const inactiveStyle = s.active === false ? 'opacity:0.5;' : '';
+      const lateWarning = s.payment_status === 'atrasado' ? ' ⚠️' : '';
+
       return `
-        <div class="student-card" onclick="viewStudentDetails('${s.id}')">
+        <div class="student-card" style="${inactiveStyle}" onclick="openStudentProfile('${s.id}')">
           <div class="student-avatar">${initials}</div>
           <div class="student-info">
-            <div class="student-name">${s.full_name || 'Sem nome'}</div>
+            <div class="student-name">${s.full_name || 'Sem nome'}${lateWarning}</div>
             <div class="student-meta">
               <span class="role-tag ${roleLabel}">${roleLabel}</span>
               &nbsp;· Desde ${lastSeen}
@@ -1091,7 +1206,6 @@
               <span class="stat-chip-label">Streak</span>
             </div>
           </div>
-          <button class="btn-edit-student" onclick="event.stopPropagation(); viewProgress('${s.id}')" title="Ver progresso">📊</button>
           <button class="btn-edit-student" onclick="event.stopPropagation(); editStudent('${s.id}')" title="Editar aluno">✏️</button>
         </div>`;
     }).join('');
@@ -1951,11 +2065,12 @@
       const student = allStudents.find(s => s.id === l.student_id);
       const who = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
       const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
       return `
         <div class="report-row">
           <div class="report-row-info">
             <div class="report-row-student">${who}</div>
-            <div class="report-row-title">${date}${l.content ? ' · ' + l.content : ''}</div>
+            <div class="report-row-title">${date} · ${statusLabel}${l.content ? ' · ' + l.content : ''}</div>
           </div>
           <button class="btn-report-action btn-delete" onclick="deleteClassLog('${l.id}')">Excluir</button>
         </div>`;
@@ -1966,6 +2081,7 @@
     const turmaId = document.getElementById('classLogTurma').value || null;
     const studentId = document.getElementById('classLogStudent').value || null;
     const date = document.getElementById('classLogDate').value || new Date().toISOString().slice(0, 10);
+    const status = document.getElementById('classLogStatus').value;
     const content = document.getElementById('classLogContent').value.trim();
 
     if (!turmaId && !studentId) {
@@ -1978,6 +2094,7 @@
       turma_id: turmaId,
       student_id: turmaId ? null : studentId,
       class_date: date,
+      status,
       content,
       created_by: session.user.id
     });
@@ -2309,41 +2426,52 @@
 </div>
 
 <!-- Modal: Progresso do aluno -->
-<div class="modal-overlay" id="modalProgress">
-  <div class="modal-box">
-    <div class="modal-title" id="progressStudentName">Progresso</div>
-    <div class="modal-sub">Atividades concluídas e desempenho.</div>
+<!-- Modal: Perfil unificado do aluno -->
+<div class="modal-overlay" id="modalStudentProfile">
+  <div class="modal-box" style="max-width:640px;">
 
-    <div class="progress-summary">
-      <div class="progress-summary-chip">
-        <span class="progress-summary-value" id="progressStreak">0</span>
-        <span class="progress-summary-label">Streak</span>
+    <div class="profile-header">
+      <div>
+        <div class="modal-title" id="profileStudentName">Aluno<span class="profile-inactive-badge" id="profileInactiveBadge" style="display:none;">Inativo</span></div>
+        <div class="modal-sub" id="profileStudentMeta" style="margin-bottom:0;"></div>
       </div>
-      <div class="progress-summary-chip">
-        <span class="progress-summary-value" id="progressBadgeCount">0</span>
-        <span class="progress-summary-label">Badges</span>
+      <div class="profile-options-wrap">
+        <button class="btn-modal-cancel" onclick="toggleProfileOptions()">Opções ▾</button>
+        <div class="profile-options-menu" id="profileOptionsMenu">
+          <button class="profile-option-btn" onclick="profileOptionEdit()">✏️ Editar cadastro</button>
+          <button class="profile-option-btn" onclick="profileOptionLogClass()">📝 Registrar aula</button>
+          <button class="profile-option-btn" onclick="profileOptionPayment()">💰 Registrar pagamento</button>
+          <button class="profile-option-btn" id="profileToggleActiveBtn" onclick="profileOptionToggleActive()">🚫 Inativar aluno</button>
+          <button class="profile-option-btn danger" onclick="profileOptionDelete()">🗑️ Excluir aluno</button>
+        </div>
       </div>
     </div>
 
-    <div class="progress-activities-list" id="progressActivitiesList"></div>
+    <div class="profile-warning" id="profileWarning" style="display:none;"></div>
 
-    <div class="modal-actions">
-      <button class="btn-modal-cancel" onclick="closeProgress()" style="flex:1;">Fechar</button>
+    <div class="profile-section" style="margin-top:16px;">
+      <div class="profile-section-title">Dados</div>
+      <div id="profileDataList"></div>
     </div>
-  </div>
-</div>
 
-<!-- Modal: Detalhes do aluno -->
-<div class="modal-overlay" id="modalStudentDetails">
-  <div class="modal-box">
-    <div class="modal-title" id="detailsStudentName">Detalhes do aluno</div>
-    <div class="modal-sub">Confira os dados cadastrados.</div>
+    <div class="profile-section">
+      <div class="profile-section-title">Financeiro</div>
+      <div id="profileFinanceInfo"></div>
+      <div id="profilePaymentsList" style="margin-top:8px;"></div>
+    </div>
 
-    <div id="detailsList"></div>
+    <div class="profile-section">
+      <div class="profile-section-title">Aulas registradas</div>
+      <div id="profileClassLogsList"></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">Progresso (gamificação)</div>
+      <div id="profileProgressInfo"></div>
+    </div>
 
     <div class="detail-actions">
-      <button class="btn-modal-cancel" onclick="closeStudentDetails()" style="flex:1;">Fechar</button>
-      <button class="btn-modal-save" id="btnDetailsEdit" style="flex:1;">Editar</button>
+      <button class="btn-modal-cancel" onclick="closeStudentProfile()" style="flex:1;">Fechar</button>
     </div>
   </div>
 </div>
