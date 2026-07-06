@@ -106,35 +106,49 @@
     }
   });
 
-  const CATEGORIES = [
-    { key: 'kids-materiais',     icon: '📖', label: 'Material digital',  sub: 'Slides e atividades',      color: 'mint' },
-    { key: 'kids-gravacoes',     icon: '🎥', label: 'Gravações das aulas', sub: 'Assista quando quiser',   color: 'rose' },
-
-  ];
-
   async function init() {
-    // Session already verified before init()
+    const { data: { session } } = await sb.auth.getSession();
+    const studentId = session.user.id;
 
-    const { data: links } = await sb.from('material_links').select('*').in('category', CATEGORIES.map(c => c.key));
-    const linkMap = {};
-    (links || []).forEach(l => { linkMap[l.category] = l.url; });
+    const { data: links } = await sb.from('material_links').select('*').eq('category', 'kids-materiais');
+    const materialUrl = links && links[0] ? links[0].url : null;
+
+    const { data: folders } = await sb.from('student_folders').select('*').eq('student_id', studentId);
 
     const main = document.getElementById('mainContent');
-    main.innerHTML = CATEGORIES.map(cat => {
-      const url = linkMap[cat.key];
-      const hasUrl = url && url.trim() !== '';
-      return `
-        <a href="${hasUrl ? url : '#'}" target="${hasUrl ? '_blank' : '_self'}" 
-           class="material-card ${cat.color} ${!hasUrl ? 'unavailable' : ''}">
-          <div class="material-icon ${cat.color}">${cat.icon}</div>
+
+    const materialCard = `
+      <a href="${materialUrl || '#'}" target="${materialUrl ? '_blank' : '_self'}"
+         class="material-card mint ${!materialUrl ? 'unavailable' : ''}">
+        <div class="material-icon mint">📖</div>
+        <div class="material-info">
+          <div class="material-title">Material digital</div>
+          <div class="material-sub">${materialUrl ? 'Slides e atividades' : 'Em breve...'}</div>
+        </div>
+        <div class="material-arrow">${materialUrl ? '›' : '⏳'}</div>
+      </a>`;
+
+    const gravacoesHtml = (folders && folders.length > 0)
+      ? folders.map(f => `
+        <a href="${f.url}" target="_blank" class="material-card rose">
+          <div class="material-icon rose">🎥</div>
           <div class="material-info">
-            <div class="material-title">${cat.label}</div>
-            <div class="material-sub">${hasUrl ? cat.sub : 'Em breve...'}</div>
+            <div class="material-title">${f.label || 'Gravação das aulas'}</div>
+            <div class="material-sub">Assista quando quiser</div>
           </div>
-          <div class="material-arrow">${hasUrl ? '›' : '⏳'}</div>
-        </a>
-      `;
-    }).join('');
+          <div class="material-arrow">›</div>
+        </a>`).join('')
+      : `
+        <div class="material-card rose unavailable">
+          <div class="material-icon rose">🎥</div>
+          <div class="material-info">
+            <div class="material-title">Gravações das aulas</div>
+            <div class="material-sub">Em breve...</div>
+          </div>
+          <div class="material-arrow">⏳</div>
+        </div>`;
+
+    main.innerHTML = materialCard + gravacoesHtml;
   }
 
   // Auth with retry for slow session loading
