@@ -104,6 +104,30 @@
       padding: 28px 20px;
     }
 
+    /* ── Navegação por abas ── */
+    .panel-nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .nav-btn {
+      padding: 9px 18px;
+      border-radius: 99px;
+      border: 1.5px solid var(--sand);
+      background: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
+    .nav-btn:hover:not(.active) { border-color: var(--brown-light); color: var(--text); }
+    .panel-section { display: none; }
+    .panel-section.active { display: block; }
+
     /* ── Overview cards ── */
     .overview-grid {
       display: grid;
@@ -541,45 +565,60 @@
 
 <main>
 
-  <!-- Overview -->
-  <div class="overview-grid">
-    <div class="overview-card">
-      <span class="overview-value" id="totalAlunos">—</span>
-      <div class="overview-label">Alunos ativos</div>
-    </div>
-    <div class="overview-card">
-      <span class="overview-value" id="totalKids">—</span>
-      <div class="overview-label">Alunos kids</div>
-    </div>
-    <div class="overview-card">
-      <span class="overview-value" id="totalAdultos">—</span>
-      <div class="overview-label">Alunos adultos</div>
-    </div>
+  <!-- Navegação por abas -->
+  <div class="panel-nav">
+    <button class="nav-btn active" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
+    <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">🏫 Turmas</button>
+    <button class="nav-btn" data-tab="aulas" onclick="showTab('aulas')">📝 Aulas</button>
+    <button class="nav-btn" data-tab="financeiro" onclick="showTab('financeiro')">💰 Financeiro</button>
+    <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
+    <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">🔗 Materiais</button>
   </div>
 
-  <!-- Add student (só Brenda) -->
-  <button class="btn-add" id="addStudentBtn" onclick="openAddStudent()" style="display:none;">
-    + Adicionar aluno
-  </button>
+  <!-- Aba: Alunos -->
+  <div class="panel-section active" id="alunosSection">
 
-  <!-- Filter tabs -->
-  <div class="filter-tabs">
-    <button class="tab active" data-filter="todos">Todos</button>
-    <button class="tab" data-filter="kids">Kids</button>
-    <button class="tab" data-filter="adulto">Adultos</button>
-  </div>
-
-  <!-- Student list -->
-  <div class="section-title">Seus alunos</div>
-  <div class="student-list" id="studentList">
-    <div class="empty">
-      <div class="empty-icon">👥</div>
-      <p>Carregando alunos...</p>
+    <!-- Overview -->
+    <div class="overview-grid">
+      <div class="overview-card">
+        <span class="overview-value" id="totalAlunos">—</span>
+        <div class="overview-label">Alunos ativos</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="totalKids">—</span>
+        <div class="overview-label">Alunos kids</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="totalAdultos">—</span>
+        <div class="overview-label">Alunos adultos</div>
+      </div>
     </div>
+
+    <!-- Add student (só Brenda) -->
+    <button class="btn-add" id="addStudentBtn" onclick="openAddStudent()" style="display:none;">
+      + Adicionar aluno
+    </button>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      <button class="tab active" data-filter="todos">Todos</button>
+      <button class="tab" data-filter="kids">Kids</button>
+      <button class="tab" data-filter="adulto">Adultos</button>
+    </div>
+
+    <!-- Student list -->
+    <div class="section-title">Seus alunos</div>
+    <div class="student-list" id="studentList">
+      <div class="empty">
+        <div class="empty-icon">👥</div>
+        <p>Carregando alunos...</p>
+      </div>
+    </div>
+
   </div>
 
   <!-- Links Management - só Brenda vê -->
-  <div class="links-section" id="linksSection" style="display:none;">
+  <div class="links-section panel-section" id="linksSection">
 
     <!-- Links globais -->
     <div class="links-card">
@@ -628,7 +667,7 @@
   </div>
 
   <!-- Relatórios - todas as professoras -->
-  <div class="reports-section" id="reportsSection">
+  <div class="reports-section panel-section" id="reportsSection">
 
     <div class="report-form">
       <div class="report-form-title">📊 Novo relatório</div>
@@ -669,7 +708,7 @@
   </div>
 
   <!-- Turmas -->
-  <div class="reports-section" id="turmasSection">
+  <div class="reports-section panel-section" id="turmasSection">
     <div class="report-form">
       <div class="report-form-title">🏫 Nova turma</div>
       <div class="form-row">
@@ -694,7 +733,7 @@
   </div>
 
   <!-- Registro de aulas -->
-  <div class="reports-section" id="classLogSection">
+  <div class="reports-section panel-section" id="classLogSection">
     <div class="report-form">
       <div class="report-form-title">📝 Registrar aula</div>
       <div class="form-row">
@@ -728,7 +767,7 @@
   </div>
 
   <!-- Financeiro -->
-  <div class="reports-section" id="financeiroSection">
+  <div class="reports-section panel-section" id="financeiroSection">
     <div class="report-list">
       <div class="report-list-title">💰 Financeiro</div>
       <div id="financeiroList"><div class="empty-reports">Carregando...</div></div>
@@ -794,6 +833,25 @@
   let currentFilter = 'todos';
   let isBrenda = false;
 
+  const TAB_SECTIONS = {
+    alunos: 'alunosSection',
+    materiais: 'linksSection',
+    relatorios: 'reportsSection',
+    turmas: 'turmasSection',
+    aulas: 'classLogSection',
+    financeiro: 'financeiroSection'
+  };
+
+  function showTab(tab) {
+    Object.entries(TAB_SECTIONS).forEach(([key, id]) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('active', key === tab);
+    });
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+  }
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
     if (!session) {
@@ -829,7 +887,7 @@
     await loadTeacherAvatar(user.id);
     currentUserIsBrenda = isBrenda;
     if (isBrenda) {
-      document.getElementById('linksSection').style.display = 'block';
+      document.getElementById('navMateriais').style.display = 'inline-flex';
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
@@ -1785,6 +1843,7 @@
             <div class="report-row-student">${t.name}</div>
             <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s)</div>
           </div>
+          <button class="btn-report-action btn-toggle" onclick="openTurmaStudents('${t.id}')">+ Alunos</button>
           <button class="btn-report-action btn-delete" onclick="deleteTurma('${t.id}')">Excluir</button>
         </div>`;
     }).join('');
@@ -1812,6 +1871,60 @@
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+  }
+
+  function openTurmaStudents(turmaId) {
+    const turma = allTurmas.find(t => t.id === turmaId);
+    if (!turma) return;
+
+    document.getElementById('turmaStudentsId').value = turmaId;
+    document.getElementById('turmaStudentsName').textContent = 'Alunos — ' + turma.name;
+
+    const matching = allStudents.filter(s => s.role === turma.student_type);
+    const listEl = document.getElementById('turmaStudentsList');
+
+    if (matching.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum aluno ' + (turma.student_type === 'kids' ? 'kids' : 'adulto') + ' cadastrado ainda.</div>';
+    } else {
+      listEl.innerHTML = matching.map(s => `
+        <label style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--sand);">
+          <input type="checkbox" value="${s.id}" ${s.turma_id === turmaId ? 'checked' : ''} />
+          <span>${s.full_name || 'Sem nome'}</span>
+        </label>`).join('');
+    }
+
+    document.getElementById('modalTurmaStudents').classList.add('open');
+  }
+
+  function closeTurmaStudents() {
+    document.getElementById('modalTurmaStudents').classList.remove('open');
+  }
+
+  async function saveTurmaStudents() {
+    const turmaId = document.getElementById('turmaStudentsId').value;
+    const checkboxes = document.querySelectorAll('#turmaStudentsList input[type="checkbox"]');
+    const btn = document.getElementById('btnSaveTurmaStudents');
+
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    for (const cb of checkboxes) {
+      const studentId = cb.value;
+      const student = allStudents.find(s => s.id === studentId);
+      const isInTurma = student && student.turma_id === turmaId;
+      if (cb.checked !== isInTurma) {
+        await sb.from('profiles').update({ turma_id: cb.checked ? turmaId : null }).eq('id', studentId);
+      }
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Salvar';
+
+    const { data: { session } } = await sb.auth.getSession();
+    await loadStudents(session.user.id, currentUserIsBrenda);
+    await loadTurmas(session.user.id, currentUserIsBrenda);
+    loadFinanceiro();
+    closeTurmaStudents();
   }
 
   // ---- Registro de aulas ----
@@ -2260,6 +2373,21 @@
     <div style="margin-top:18px;">
       <div class="report-list-title" style="font-size:15px;">Histórico</div>
       <div id="paymentsList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Alunos da turma -->
+<div class="modal-overlay" id="modalTurmaStudents">
+  <div class="modal-box">
+    <div class="modal-title" id="turmaStudentsName">Alunos da turma</div>
+    <input type="hidden" id="turmaStudentsId" />
+
+    <div id="turmaStudentsList" style="max-height:320px;overflow-y:auto;margin:12px 0;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeTurmaStudents()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveTurmaStudents" onclick="saveTurmaStudents()">Salvar</button>
     </div>
   </div>
 </div>
