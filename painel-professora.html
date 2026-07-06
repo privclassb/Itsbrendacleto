@@ -389,6 +389,7 @@
     }
 
     input:focus, select:focus { border-color: var(--mint); }
+    input[type="checkbox"] { width: 18px; height: 18px; padding: 0; flex-shrink: 0; }
 
     .modal-actions {
       display: flex;
@@ -2243,6 +2244,7 @@
     sel.innerHTML = '<option value="">Nenhum</option>' +
       allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
     document.getElementById('btnDeleteLancamento').style.display = id ? 'inline-block' : 'none';
+    document.getElementById('lancamentoRepeatRow').style.display = id ? 'none' : 'block';
 
     if (id) {
       const { data: p } = await sb.from('payments').select('*').eq('id', id).maybeSingle();
@@ -2268,6 +2270,7 @@
       document.getElementById('lancamentoDueDate').value = new Date().toISOString().slice(0, 10);
       document.getElementById('lancamentoPaidDate').value = '';
       document.getElementById('lancamentoPaid').checked = false;
+      document.getElementById('lancamentoRepeat').value = '1';
     }
 
     document.getElementById('modalLancamento').classList.add('open');
@@ -2293,6 +2296,7 @@
     const dueDate = document.getElementById('lancamentoDueDate').value || null;
     const paid = document.getElementById('lancamentoPaid').checked;
     const paidDate = paid ? (document.getElementById('lancamentoPaidDate').value || new Date().toISOString().slice(0, 10)) : null;
+    const repeatMonths = id ? 1 : (parseInt(document.getElementById('lancamentoRepeat').value, 10) || 1);
 
     const errEl = document.getElementById('lancamentoError');
     if (!amount || amount <= 0) {
@@ -2302,14 +2306,32 @@
     }
 
     const { data: { session } } = await sb.auth.getSession();
-    const payload = {
-      type, student_id: studentId, description, amount,
-      payment_method: method, due_date: dueDate, paid, paid_at: paidDate
-    };
 
-    const { error } = id
-      ? await sb.from('payments').update(payload).eq('id', id)
-      : await sb.from('payments').insert({ ...payload, created_by: session.user.id });
+    let error;
+    if (!id && repeatMonths > 1) {
+      const baseDate = dueDate ? new Date(dueDate + 'T00:00:00') : new Date();
+      const entries = [];
+      for (let i = 0; i < repeatMonths; i++) {
+        const d = new Date(baseDate);
+        d.setMonth(d.getMonth() + i);
+        entries.push({
+          type, student_id: studentId, description, amount,
+          payment_method: method, due_date: d.toISOString().slice(0, 10),
+          paid: i === 0 ? paid : false,
+          paid_at: i === 0 ? paidDate : null,
+          created_by: session.user.id
+        });
+      }
+      ({ error } = await sb.from('payments').insert(entries));
+    } else {
+      const payload = {
+        type, student_id: studentId, description, amount,
+        payment_method: method, due_date: dueDate, paid, paid_at: paidDate
+      };
+      ({ error } = id
+        ? await sb.from('payments').update(payload).eq('id', id)
+        : await sb.from('payments').insert({ ...payload, created_by: session.user.id }));
+    }
 
     if (error) {
       errEl.textContent = 'Erro ao salvar: ' + error.message;
@@ -2728,6 +2750,12 @@
         <input type="checkbox" id="lancamentoPaid" onchange="toggleLancamentoPaidDate()" />
         <span>Pago?</span>
       </label>
+    </div>
+
+    <div class="modal-row" id="lancamentoRepeatRow">
+      <label class="modal-label">Repetir por quantos meses?</label>
+      <input type="number" min="1" max="36" class="modal-input" id="lancamentoRepeat" placeholder="1" />
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">Cria uma parcela por mês a partir da data agendada (útil para lançar um contrato anual de uma vez). Só a primeira parcela usa o status "Pago?" acima; as demais ficam pendentes.</div>
     </div>
 
     <div class="modal-error" id="lancamentoError" style="display:none;"></div>
