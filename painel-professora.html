@@ -668,6 +668,73 @@
 
   </div>
 
+  <!-- Turmas -->
+  <div class="reports-section" id="turmasSection">
+    <div class="report-form">
+      <div class="report-form-title">🏫 Nova turma</div>
+      <div class="form-row">
+        <label class="form-label">Nome da turma</label>
+        <input type="text" class="form-input" id="turmaName" placeholder="Ex: Kids Terça 18h" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" id="turmaType">
+          <option value="kids">Kids</option>
+          <option value="adulto">Adulto</option>
+        </select>
+      </div>
+      <div class="form-actions">
+        <button class="btn-publish" onclick="createTurma()" style="flex:1;">+ Criar turma</button>
+      </div>
+    </div>
+    <div class="report-list">
+      <div class="report-list-title">Turmas cadastradas</div>
+      <div id="turmasList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- Registro de aulas -->
+  <div class="reports-section" id="classLogSection">
+    <div class="report-form">
+      <div class="report-form-title">📝 Registrar aula</div>
+      <div class="form-row">
+        <label class="form-label">Turma (aula em grupo)</label>
+        <select class="form-select" id="classLogTurma">
+          <option value="">Nenhuma (aula individual)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Aluno (se a aula não for de turma)</label>
+        <select class="form-select" id="classLogStudent">
+          <option value="">Selecione o aluno...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Data</label>
+        <input type="date" class="form-input" id="classLogDate" />
+      </div>
+      <div class="form-row">
+        <label class="form-label">Conteúdo trabalhado</label>
+        <textarea class="form-textarea" id="classLogContent" placeholder="O que foi visto na aula..."></textarea>
+      </div>
+      <div class="form-actions">
+        <button class="btn-publish" onclick="saveClassLog()" style="flex:1;">✅ Registrar aula</button>
+      </div>
+    </div>
+    <div class="report-list">
+      <div class="report-list-title">Aulas registradas</div>
+      <div id="classLogList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
+  <!-- Financeiro -->
+  <div class="reports-section" id="financeiroSection">
+    <div class="report-list">
+      <div class="report-list-title">💰 Financeiro</div>
+      <div id="financeiroList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
 </main>
 
 <!-- Modal: Add student -->
@@ -770,6 +837,14 @@
     // Relatórios — todas as professoras
     await loadStudentsForReports(user.id, isBrenda);
     await loadReports(user.id, isBrenda);
+
+    // Turmas, registro de aulas e financeiro — todas as professoras
+    await loadTurmas(user.id, isBrenda);
+    populateClassLogStudentSelect();
+    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+    document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
+    await loadClassLogs(user.id, isBrenda);
+    loadFinanceiro();
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -1055,6 +1130,16 @@
   })();
 
   // ── Adicionar aluno ──────────────────────────────────────────────────
+  let allTurmas = [];
+
+  async function populateTurmaSelect(selectId, selectedValue, placeholder) {
+    const select = document.getElementById(selectId);
+    if (!select) return;
+    select.innerHTML = `<option value="">${placeholder || 'Nenhuma'}</option>` +
+      allTurmas.map(t => `<option value="${t.id}">${t.name} (${t.student_type === 'kids' ? 'kids' : 'adulto'})</option>`).join('');
+    if (selectedValue) select.value = selectedValue;
+  }
+
   async function openAddStudent() {
     // Load teachers into select
     const { data: teachers } = await sb.from('profiles').select('id, full_name').eq('role', 'professora').order('full_name');
@@ -1066,13 +1151,19 @@
       opt.textContent = t.full_name;
       select.appendChild(opt);
     });
-    
+
+    await populateTurmaSelect('newStudentTurma');
+
     document.getElementById('modalAddStudent').classList.add('open');
     document.getElementById('addStudentError').style.display = 'none';
     document.getElementById('addStudentSuccess').style.display = 'none';
     document.getElementById('newStudentName').value = '';
     document.getElementById('newStudentEmail').value = '';
     document.getElementById('newStudentPassword').value = '';
+    document.getElementById('newStudentContractStart').value = '';
+    document.getElementById('newStudentContractEnd').value = '';
+    document.getElementById('newStudentFee').value = '';
+    document.getElementById('newStudentPaymentStatus').value = 'em_dia';
     document.getElementById('createGuardian').checked = false;
     document.getElementById('guardianName').value = '';
     document.getElementById('guardianEmail').value = '';
@@ -1099,6 +1190,12 @@
     const password = document.getElementById('newStudentPassword').value.trim();
     const role = document.getElementById('newStudentRole').value;
     const teacherId = document.getElementById('newStudentTeacher').value;
+    const turmaId = document.getElementById('newStudentTurma').value || null;
+    const contractStart = document.getElementById('newStudentContractStart').value || null;
+    const contractEnd = document.getElementById('newStudentContractEnd').value || null;
+    const feeRaw = document.getElementById('newStudentFee').value;
+    const monthlyFee = feeRaw ? parseFloat(feeRaw) : null;
+    const paymentStatus = document.getElementById('newStudentPaymentStatus').value;
 
     const wantsGuardian = document.getElementById('createGuardian').checked;
     const guardianName = document.getElementById('guardianName').value.trim();
@@ -1165,7 +1262,12 @@
           full_name: name,
           role,
           teacher_id: teacherId,
-          level: 1
+          level: 1,
+          turma_id: turmaId,
+          contract_start: contractStart,
+          contract_end: contractEnd,
+          monthly_fee: monthlyFee,
+          payment_status: paymentStatus
         }).eq('id', data.user.id);
         studentUpsertError = upsertErr;
 
@@ -1251,6 +1353,8 @@
       await loadStudents(session.user.id, isBrenda);
       await loadStudentsForReports(session.user.id, isBrenda);
       await loadStudentsForSelect();
+      populateClassLogStudentSelect();
+      loadFinanceiro();
 
       setTimeout(closeAddStudent, 2000);
 
@@ -1275,6 +1379,11 @@
     document.getElementById('editStudentRole').value = student.role === 'kids' ? 'kids' : 'adulto';
     document.getElementById('editStudentLevel').value = student.level || 1;
     document.getElementById('editStudentError').style.display = 'none';
+    document.getElementById('editStudentContractStart').value = student.contract_start || '';
+    document.getElementById('editStudentContractEnd').value = student.contract_end || '';
+    document.getElementById('editStudentFee').value = student.monthly_fee || '';
+    document.getElementById('editStudentPaymentStatus').value = student.payment_status || 'em_dia';
+    await populateTurmaSelect('editStudentTurma', student.turma_id || '');
 
     const teacherRow = document.getElementById('editStudentTeacherRow');
     if (currentUserIsBrenda) {
@@ -1351,7 +1460,21 @@
       return;
     }
 
-    const updates = { full_name: name, role, level };
+    const turmaId = document.getElementById('editStudentTurma').value || null;
+    const contractStart = document.getElementById('editStudentContractStart').value || null;
+    const contractEnd = document.getElementById('editStudentContractEnd').value || null;
+    const feeRaw = document.getElementById('editStudentFee').value;
+    const monthlyFee = feeRaw ? parseFloat(feeRaw) : null;
+    const paymentStatus = document.getElementById('editStudentPaymentStatus').value;
+
+    const updates = {
+      full_name: name, role, level,
+      turma_id: turmaId,
+      contract_start: contractStart,
+      contract_end: contractEnd,
+      monthly_fee: monthlyFee,
+      payment_status: paymentStatus
+    };
     if (currentUserIsBrenda) {
       const teacherId = document.getElementById('editStudentTeacher').value;
       updates.teacher_id = teacherId || null;
@@ -1437,6 +1560,8 @@
     closeEditStudent();
     const { data: { session } } = await sb.auth.getSession();
     await loadStudents(session.user.id, currentUserIsBrenda);
+    populateClassLogStudentSelect();
+    loadFinanceiro();
   }
 
   async function loadTeacherAvatar(userId) {
@@ -1639,6 +1764,210 @@
     await loadReports(session.user.id, currentUserIsBrenda);
   }
 
+  // ---- Turmas ----
+
+  async function loadTurmas(teacherId, seeAll) {
+    let query = sb.from('turmas').select('*').order('name');
+    if (!seeAll) query = query.eq('teacher_id', teacherId);
+
+    const { data: turmas, error } = await query;
+    allTurmas = (error || !turmas) ? [] : turmas;
+
+    const listEl = document.getElementById('turmasList');
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar turmas.</div>'; return; }
+    if (allTurmas.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma turma cadastrada ainda.</div>'; return; }
+
+    listEl.innerHTML = allTurmas.map(t => {
+      const count = allStudents.filter(s => s.turma_id === t.id).length;
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${t.name}</div>
+            <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s)</div>
+          </div>
+          <button class="btn-report-action btn-delete" onclick="deleteTurma('${t.id}')">Excluir</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function createTurma() {
+    const name = document.getElementById('turmaName').value.trim();
+    const studentType = document.getElementById('turmaType').value;
+    if (!name) { alert('Digite o nome da turma.'); return; }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const { error } = await sb.from('turmas').insert({ name, student_type: studentType, teacher_id: session.user.id });
+
+    if (error) { alert('Erro ao criar turma: ' + error.message); return; }
+
+    document.getElementById('turmaName').value = '';
+    await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+  }
+
+  async function deleteTurma(id) {
+    if (!confirm('Excluir esta turma? Os alunos vinculados a ela ficarão sem turma.')) return;
+    const { error } = await sb.from('turmas').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir turma.'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+  }
+
+  // ---- Registro de aulas ----
+
+  function populateClassLogStudentSelect() {
+    const sel = document.getElementById('classLogStudent');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione o aluno...</option>' +
+      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+  }
+
+  async function loadClassLogs(teacherId, seeAll) {
+    let query = sb.from('class_logs').select('*').order('class_date', { ascending: false });
+    if (!seeAll) query = query.eq('created_by', teacherId);
+
+    const { data: logs, error } = await query;
+    const listEl = document.getElementById('classLogList');
+
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas.</div>'; return; }
+    if (!logs || logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>'; return; }
+
+    listEl.innerHTML = logs.map(l => {
+      const turma = allTurmas.find(t => t.id === l.turma_id);
+      const student = allStudents.find(s => s.id === l.student_id);
+      const who = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${who}</div>
+            <div class="report-row-title">${date}${l.content ? ' · ' + l.content : ''}</div>
+          </div>
+          <button class="btn-report-action btn-delete" onclick="deleteClassLog('${l.id}')">Excluir</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function saveClassLog() {
+    const turmaId = document.getElementById('classLogTurma').value || null;
+    const studentId = document.getElementById('classLogStudent').value || null;
+    const date = document.getElementById('classLogDate').value || new Date().toISOString().slice(0, 10);
+    const content = document.getElementById('classLogContent').value.trim();
+
+    if (!turmaId && !studentId) {
+      alert('Selecione uma turma ou um aluno.');
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const { error } = await sb.from('class_logs').insert({
+      turma_id: turmaId,
+      student_id: turmaId ? null : studentId,
+      class_date: date,
+      content,
+      created_by: session.user.id
+    });
+
+    if (error) { alert('Erro ao registrar aula: ' + error.message); return; }
+
+    document.getElementById('classLogContent').value = '';
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteClassLog(id) {
+    if (!confirm('Excluir este registro de aula?')) return;
+    const { error } = await sb.from('class_logs').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir registro.'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+  }
+
+  // ---- Financeiro ----
+
+  const PAYMENT_STATUS_LABEL = { em_dia: 'Em dia', pendente: 'Pendente', atrasado: 'Atrasado' };
+  const PAYMENT_STATUS_CLASS = { em_dia: 'published', pendente: 'draft', atrasado: 'draft' };
+
+  function loadFinanceiro() {
+    const listEl = document.getElementById('financeiroList');
+    if (allStudents.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum aluno cadastrado ainda.</div>'; return; }
+
+    listEl.innerHTML = allStudents.map(s => {
+      const turma = allTurmas.find(t => t.id === s.turma_id);
+      const status = s.payment_status || 'em_dia';
+      const fee = (s.monthly_fee != null) ? ('R$ ' + Number(s.monthly_fee).toFixed(2)) : '—';
+      const start = s.contract_start ? new Date(s.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const end = s.contract_end ? new Date(s.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${s.full_name || 'Sem nome'}${turma ? ' · ' + turma.name : ''}</div>
+            <div class="report-row-title">${fee}/mês · Contrato: ${start} – ${end}</div>
+          </div>
+          <span class="report-status ${PAYMENT_STATUS_CLASS[status]}">${PAYMENT_STATUS_LABEL[status]}</span>
+          <button class="btn-report-action btn-toggle" onclick="openPayments('${s.id}')">Pagamentos</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function openPayments(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    document.getElementById('paymentsStudentId').value = studentId;
+    document.getElementById('paymentsStudentName').textContent = 'Pagamentos — ' + (student ? student.full_name : '');
+    document.getElementById('newPaymentAmount').value = student && student.monthly_fee != null ? student.monthly_fee : '';
+    document.getElementById('newPaymentDate').value = new Date().toISOString().slice(0, 10);
+    await loadPayments(studentId);
+    document.getElementById('modalPayments').classList.add('open');
+  }
+
+  function closePaymentsModal() {
+    document.getElementById('modalPayments').classList.remove('open');
+  }
+
+  async function loadPayments(studentId) {
+    const { data: payments, error } = await sb.from('payments').select('*').eq('student_id', studentId).order('paid_at', { ascending: false });
+    const listEl = document.getElementById('paymentsList');
+
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar pagamentos.</div>'; return; }
+    if (!payments || payments.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>'; return; }
+
+    listEl.innerHTML = payments.map(p => {
+      const date = new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR');
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">R$ ${Number(p.amount).toFixed(2)}</div>
+            <div class="report-row-title">${date}</div>
+          </div>
+          <button class="btn-report-action btn-delete" onclick="deletePayment('${p.id}', '${studentId}')">Excluir</button>
+        </div>`;
+    }).join('');
+  }
+
+  async function addPayment() {
+    const studentId = document.getElementById('paymentsStudentId').value;
+    const amount = parseFloat(document.getElementById('newPaymentAmount').value);
+    const paidAt = document.getElementById('newPaymentDate').value;
+
+    if (!amount || !paidAt) { alert('Preencha valor e data.'); return; }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const { error } = await sb.from('payments').insert({
+      student_id: studentId, amount, paid_at: paidAt, created_by: session.user.id
+    });
+
+    if (error) { alert('Erro ao registrar pagamento: ' + error.message); return; }
+
+    await loadPayments(studentId);
+  }
+
+  async function deletePayment(id, studentId) {
+    if (!confirm('Excluir este pagamento?')) return;
+    const { error } = await sb.from('payments').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir pagamento.'); return; }
+    await loadPayments(studentId);
+  }
+
   document.getElementById('teacherAvatarInput').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1699,6 +2028,39 @@
       </select>
     </div>
 
+    <div class="modal-row">
+      <label class="modal-label">Turma</label>
+      <select class="modal-select" id="newStudentTurma">
+        <option value="">Nenhuma</option>
+      </select>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Início do contrato</label>
+        <input type="date" class="modal-input" id="newStudentContractStart" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Fim do contrato</label>
+        <input type="date" class="modal-input" id="newStudentContractEnd" />
+      </div>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Mensalidade (R$)</label>
+        <input type="number" step="0.01" min="0" class="modal-input" id="newStudentFee" placeholder="0,00" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Status de pagamento</label>
+        <select class="modal-select" id="newStudentPaymentStatus">
+          <option value="em_dia">Em dia</option>
+          <option value="pendente">Pendente</option>
+          <option value="atrasado">Atrasado</option>
+        </select>
+      </div>
+    </div>
+
     <div class="modal-row modal-checkbox-row">
       <label class="modal-checkbox-label">
         <input type="checkbox" id="createGuardian" onchange="toggleGuardianFields()" />
@@ -1746,7 +2108,7 @@
     </div>
 
     <div class="modal-row">
-      <label class="modal-label">Turma</label>
+      <label class="modal-label">Tipo de aluno</label>
       <select class="modal-select" id="editStudentRole">
         <option value="adulto">Adulto</option>
         <option value="kids">Kids</option>
@@ -1763,6 +2125,39 @@
       <select class="modal-select" id="editStudentTeacher">
         <option value="">Selecione...</option>
       </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Turma</label>
+      <select class="modal-select" id="editStudentTurma">
+        <option value="">Nenhuma</option>
+      </select>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Início do contrato</label>
+        <input type="date" class="modal-input" id="editStudentContractStart" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Fim do contrato</label>
+        <input type="date" class="modal-input" id="editStudentContractEnd" />
+      </div>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Mensalidade (R$)</label>
+        <input type="number" step="0.01" min="0" class="modal-input" id="editStudentFee" placeholder="0,00" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Status de pagamento</label>
+        <select class="modal-select" id="editStudentPaymentStatus">
+          <option value="em_dia">Em dia</option>
+          <option value="pendente">Pendente</option>
+          <option value="atrasado">Atrasado</option>
+        </select>
+      </div>
     </div>
 
     <div class="modal-row modal-checkbox-row" id="editGuardianExistingRow" style="display:none;">
@@ -1836,6 +2231,35 @@
     <div class="detail-actions">
       <button class="btn-modal-cancel" onclick="closeStudentDetails()" style="flex:1;">Fechar</button>
       <button class="btn-modal-save" id="btnDetailsEdit" style="flex:1;">Editar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Pagamentos -->
+<div class="modal-overlay" id="modalPayments">
+  <div class="modal-box">
+    <div class="modal-title" id="paymentsStudentName">Pagamentos</div>
+    <input type="hidden" id="paymentsStudentId" />
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Valor (R$)</label>
+        <input type="number" step="0.01" min="0" class="modal-input" id="newPaymentAmount" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Data</label>
+        <input type="date" class="modal-input" id="newPaymentDate" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closePaymentsModal()">Fechar</button>
+      <button class="btn-modal-save" onclick="addPayment()">+ Registrar pagamento</button>
+    </div>
+
+    <div style="margin-top:18px;">
+      <div class="report-list-title" style="font-size:15px;">Histórico</div>
+      <div id="paymentsList"><div class="empty-reports">Carregando...</div></div>
     </div>
   </div>
 </div>
