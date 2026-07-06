@@ -446,11 +446,15 @@
 
     // Salva o nome no perfil
     if (data.user) {
-      await sb.from('profiles').upsert({
-        id: data.user.id,
+      // Aguarda o gatilho on_auth_user_created criar a linha em profiles
+      await new Promise(r => setTimeout(r, 1000));
+
+      const { error: profileErr } = await sb.from('profiles').update({
         full_name: name,
         role: 'adulto'
-      });
+      }).eq('id', data.user.id);
+
+      if (profileErr) console.warn('Erro ao salvar nome do perfil:', profileErr);
     }
 
     showMsg('Conta criada! Verifique seu e-mail para confirmar.', 'success');
