@@ -593,7 +593,7 @@
     <button class="nav-btn active" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">🏫 Turmas</button>
     <button class="nav-btn" data-tab="aulas" onclick="showTab('aulas')">📝 Aulas</button>
-    <button class="nav-btn" data-tab="financeiro" onclick="showTab('financeiro')">💰 Financeiro</button>
+    <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">💰 Financeiro</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">🔗 Materiais</button>
   </div>
@@ -966,6 +966,7 @@
     currentUserIsBrenda = isBrenda;
     if (isBrenda) {
       document.getElementById('navMateriais').style.display = 'inline-flex';
+      document.getElementById('navFinanceiro').style.display = 'inline-flex';
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
@@ -980,7 +981,7 @@
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
     document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
     await loadClassLogs(user.id, isBrenda);
-    await loadFinanceiro();
+    if (isBrenda) await loadFinanceiro();
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -1056,6 +1057,8 @@
     currentProfileStudentId = studentId;
 
     document.getElementById('profileOptionsMenu').classList.remove('open');
+    document.getElementById('profileFinanceSection').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileOptionPaymentBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const turma = allTurmas.find(t => t.id === student.turma_id);
@@ -1095,7 +1098,8 @@
     document.getElementById('profileDataList').innerHTML = dataRows.map(([label, value]) => `
       <div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`).join('');
 
-    // Financeiro
+    // Financeiro (só Brenda)
+    if (currentUserIsBrenda) {
     const fee = (student.monthly_fee != null) ? ('R$ ' + Number(student.monthly_fee).toFixed(2)) : '—';
     document.getElementById('profileFinanceInfo').innerHTML = `
       <div class="detail-row"><span class="detail-label">Parcela mensal</span><span class="detail-value">${fee}</span></div>
@@ -1110,6 +1114,7 @@
         const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
         return `<div class="detail-row"><span class="detail-label">${date}${p.paid ? '' : ' · Pendente'}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
       }).join('');
+    }
     }
 
     // Aulas
@@ -2655,7 +2660,7 @@
         <div class="profile-options-menu" id="profileOptionsMenu">
           <button class="profile-option-btn" onclick="profileOptionEdit()">✏️ Editar cadastro</button>
           <button class="profile-option-btn" onclick="profileOptionLogClass()">📝 Registrar aula</button>
-          <button class="profile-option-btn" onclick="profileOptionPayment()">💰 Registrar pagamento</button>
+          <button class="profile-option-btn" id="profileOptionPaymentBtn" onclick="profileOptionPayment()">💰 Registrar pagamento</button>
           <button class="profile-option-btn" id="profileToggleActiveBtn" onclick="profileOptionToggleActive()">🚫 Inativar aluno</button>
           <button class="profile-option-btn danger" onclick="profileOptionDelete()">🗑️ Excluir aluno</button>
         </div>
@@ -2669,7 +2674,7 @@
       <div id="profileDataList"></div>
     </div>
 
-    <div class="profile-section">
+    <div class="profile-section" id="profileFinanceSection">
       <div class="profile-section-title">Financeiro</div>
       <div id="profileFinanceInfo"></div>
       <div id="profilePaymentsList" style="margin-top:8px;"></div>
