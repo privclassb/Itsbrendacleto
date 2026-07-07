@@ -498,6 +498,17 @@
     .btn-delete { background: #FFF0EE; color: #C0392B; margin-left: 4px; }
     .empty-reports { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
 
+    /* Ícone de status do lançamento financeiro */
+    .fin-status-icon {
+      width: 30px; height: 30px; border-radius: 50%; border: none; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 800; cursor: pointer; transition: transform 0.15s;
+    }
+    .fin-status-icon:hover { transform: scale(1.1); }
+    .fin-status-icon.paid { background: #1E5C3A; color: white; }
+    .fin-status-icon.overdue { background: #C0392B; color: white; }
+    .fin-status-icon.pending { background: var(--sand); color: var(--muted); border: 1.5px solid #DDD4C7; }
+
     /* Progresso do aluno */
     .progress-summary { display: flex; gap: 12px; margin-bottom: 18px; }
     .progress-summary-chip { flex: 1; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
@@ -2233,24 +2244,40 @@
 
     filtered.sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
 
+    const today = new Date().toISOString().slice(0, 10);
+
     listEl.innerHTML = filtered.map(p => {
       const student = allStudents.find(s => s.id === p.student_id);
       const dueDate = p.due_date ? new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
       const paidDate = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
       const sign = p.type === 'saida' ? '-' : '';
       const color = p.type === 'saida' ? '#C0392B' : '#1E5C3A';
-      const statusLabel = p.paid ? 'Pago' : 'Pendente';
       const who = student ? student.full_name : (p.type === 'saida' ? 'Empresa' : '');
+
+      const overdue = !p.paid && p.due_date && p.due_date < today;
+      const statusClass = p.paid ? 'paid' : (overdue ? 'overdue' : 'pending');
+      const icon = p.paid ? '✓' : (overdue ? '!' : '');
+      const statusLabel = p.paid ? 'Pago' : (overdue ? 'Atrasado' : 'Pendente');
+      const iconTitle = p.paid ? 'Marcar como pendente' : 'Marcar como pago';
+
       return `
         <div class="report-row">
+          <button class="fin-status-icon ${statusClass}" onclick="toggleLancamentoPaid('${p.id}', ${!p.paid})" title="${iconTitle}">${icon}</button>
           <div class="report-row-info">
             <div class="report-row-student">${p.description}${who ? ' — ' + who : ''}</div>
-            <div class="report-row-title">Agendado: ${dueDate} · Pago: ${paidDate} · ${statusLabel}${p.payment_method ? ' · ' + p.payment_method : ''}</div>
+            <div class="report-row-title">Agendado: ${dueDate}${p.paid ? ' · Pago: ' + paidDate : ' · ' + statusLabel}${p.payment_method ? ' · ' + p.payment_method : ''}</div>
           </div>
           <span class="report-row-student" style="color:${color};">${sign}R$ ${Number(p.amount).toFixed(2)}</span>
           <button class="btn-report-action btn-toggle" onclick="openLancamento('${p.id}')">Editar</button>
         </div>`;
     }).join('');
+  }
+
+  async function toggleLancamentoPaid(id, newPaid) {
+    const updates = { paid: newPaid, paid_at: newPaid ? new Date().toISOString().slice(0, 10) : null };
+    const { error } = await sb.from('payments').update(updates).eq('id', id);
+    if (error) { alert('Erro ao atualizar: ' + error.message); return; }
+    await loadFinanceiro();
   }
 
   async function openLancamento(id) {
