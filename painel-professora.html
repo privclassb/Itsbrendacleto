@@ -2235,6 +2235,7 @@
             <div class="report-row-student">${who}</div>
             <div class="report-row-title">${date}${time ? ' · ' + time : ''} · ${statusLabel}${l.content ? ' · ' + l.content : ''}</div>
           </div>
+          <button class="btn-report-action btn-toggle" onclick="openClassLogEdit('${l.id}')">Editar</button>
           <button class="btn-report-action btn-delete" onclick="deleteClassLog('${l.id}')">Excluir</button>
         </div>`;
     }).join('');
@@ -2349,26 +2350,17 @@
       const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
       const time = formatTimeRange(l) || 'sem horário';
       const isDone = l.status === 'realizada';
-      const nextStatus = isDone ? 'pendente' : 'realizada';
       const badgeClass = isDone ? 'published' : 'draft';
       const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
       return `
-        <div class="report-row">
+        <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${who}</div>
             <div class="report-row-title">${time}</div>
           </div>
-          <span class="report-status ${badgeClass}" style="cursor:pointer;" onclick="toggleClassLogStatus('${l.id}', '${nextStatus}')" title="Clique pra marcar como ${CLASS_STATUS_LABEL[nextStatus]}">${statusLabel}</span>
+          <span class="report-status ${badgeClass}">${statusLabel}</span>
         </div>`;
     }).join('');
-  }
-
-  async function toggleClassLogStatus(id, newStatus) {
-    const { error } = await sb.from('class_logs').update({ status: newStatus }).eq('id', id);
-    if (error) { alert('Erro ao atualizar aula: ' + error.message); return; }
-    const { data: { session } } = await sb.auth.getSession();
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
   }
 
   async function deleteClassLog(id) {
@@ -2376,6 +2368,73 @@
     const { error } = await sb.from('class_logs').delete().eq('id', id);
     if (error) { alert('Erro ao excluir registro.'); return; }
     const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  async function openClassLogEdit(id) {
+    const { data: l } = await sb.from('class_logs').select('*').eq('id', id).maybeSingle();
+    if (!l) return;
+
+    document.getElementById('classLogEditError').style.display = 'none';
+    document.getElementById('classLogEditId').value = l.id;
+
+    const turma = allTurmas.find(t => t.id === l.turma_id);
+    const student = allStudents.find(s => s.id === l.student_id);
+    document.getElementById('classLogEditWho').textContent = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
+
+    document.getElementById('classLogEditDate').value = l.class_date || '';
+    document.getElementById('classLogEditStartTime').value = l.start_time ? l.start_time.slice(0, 5) : '';
+    document.getElementById('classLogEditEndTime').value = l.end_time ? l.end_time.slice(0, 5) : '';
+    document.getElementById('classLogEditStatus').value = l.status || 'realizada';
+    document.getElementById('classLogEditContent').value = l.content || '';
+
+    document.getElementById('modalClassLogEdit').classList.add('open');
+  }
+
+  function closeClassLogEdit() {
+    document.getElementById('modalClassLogEdit').classList.remove('open');
+  }
+
+  async function saveClassLogEdit() {
+    const id = document.getElementById('classLogEditId').value;
+    const updates = {
+      class_date: document.getElementById('classLogEditDate').value,
+      start_time: document.getElementById('classLogEditStartTime').value || null,
+      end_time: document.getElementById('classLogEditEndTime').value || null,
+      status: document.getElementById('classLogEditStatus').value,
+      content: document.getElementById('classLogEditContent').value.trim()
+    };
+
+    const errEl = document.getElementById('classLogEditError');
+    if (!updates.class_date) {
+      errEl.textContent = 'Informe a data da aula.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { error } = await sb.from('class_logs').update(updates).eq('id', id);
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeClassLogEdit();
+    const { data: { session } } = await sb.auth.getSession();
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteClassLogFromModal() {
+    const id = document.getElementById('classLogEditId').value;
+    if (!id) return;
+    if (!confirm('Excluir este registro de aula?')) return;
+    const { error } = await sb.from('class_logs').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir registro.'); return; }
+    closeClassLogEdit();
+    const { data: { session } } = await sb.auth.getSession();
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
     await loadClassLogs(session.user.id, currentUserIsBrenda);
   }
 
@@ -3028,6 +3087,55 @@
     <div style="margin-top:18px;">
       <div class="report-list-title" style="font-size:15px;">Histórico</div>
       <div id="paymentsList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar aula -->
+<div class="modal-overlay" id="modalClassLogEdit">
+  <div class="modal-box">
+    <div class="modal-title">Editar aula</div>
+    <div class="modal-sub" id="classLogEditWho"></div>
+    <input type="hidden" id="classLogEditId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Data</label>
+      <input type="date" class="modal-input" id="classLogEditDate" />
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Horário início</label>
+        <input type="time" class="modal-input" id="classLogEditStartTime" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Horário fim</label>
+        <input type="time" class="modal-input" id="classLogEditEndTime" />
+      </div>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Status</label>
+      <select class="modal-select" id="classLogEditStatus">
+        <option value="realizada">Realizada</option>
+        <option value="pendente">Pendente</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="reagendada">Reagendada</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Anotações / conteúdo trabalhado</label>
+      <textarea class="modal-input" id="classLogEditContent" style="min-height:110px;resize:vertical;" placeholder="O que foi visto na aula..."></textarea>
+    </div>
+
+    <div class="modal-error" id="classLogEditError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeClassLogEdit()">Cancelar</button>
+      <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteClassLogFromModal()">Excluir</button>
+      <button class="btn-modal-save" onclick="saveClassLogEdit()">Salvar</button>
     </div>
   </div>
 </div>
