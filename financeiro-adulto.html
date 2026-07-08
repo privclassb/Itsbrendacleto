@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financeiro | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .summary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .summary-card { background: var(--white); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); text-align: center; }
+    .summary-value { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--brown); display: block; }
+    .summary-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 28px; }
+
+    .pay-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .pay-row:last-child { border-bottom: none; }
+    .pay-info { flex: 1; min-width: 0; }
+    .pay-desc { font-size: 14px; font-weight: 600; color: var(--text); }
+    .pay-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .pay-amount { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); flex-shrink: 0; }
+    .pay-status { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .pay-status.paid { background: #1E5C3A; color: white; }
+    .pay-status.overdue { background: #C0392B; color: white; }
+    .pay-status.pending { background: var(--sand); color: var(--muted); border: 1.5px solid #DDD4C7; }
+
+    .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Financeiro</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Suas parcelas</div>
+    <div class="hero-title">Financeiro 💳</div>
+  </div>
+</div>
+
+<main>
+  <div class="summary-row">
+    <div class="summary-card">
+      <span class="summary-value" id="summaryPaid">—</span>
+      <div class="summary-label">Pagas</div>
+    </div>
+    <div class="summary-card">
+      <span class="summary-value" id="summaryPending">—</span>
+      <div class="summary-label">Em aberto</div>
+    </div>
+  </div>
+
+  <div class="section-title">Histórico de pagamentos</div>
+  <div class="card">
+    <div id="paymentsList"><div class="empty-msg">Carregando...</div></div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  function renderPaymentsInto(listEl, summaryPaidEl, summaryPendingEl, payments) {
+    if (!payments || payments.length === 0) {
+      listEl.innerHTML = '<div class="empty-msg">Nenhum lançamento encontrado ainda.</div>';
+      if (summaryPaidEl) summaryPaidEl.textContent = 'R$ 0,00';
+      if (summaryPendingEl) summaryPendingEl.textContent = 'R$ 0,00';
+      return;
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    let totalPaid = 0, totalPending = 0;
+
+    const sorted = [...payments].sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
+
+    listEl.innerHTML = sorted.map(p => {
+      const overdue = !p.paid && p.due_date && p.due_date < today;
+      const statusClass = p.paid ? 'paid' : (overdue ? 'overdue' : 'pending');
+      const icon = p.paid ? '✓' : (overdue ? '!' : '○');
+      const dueDate = p.due_date ? new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const paidDate = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : null;
+      const amount = 'R$ ' + Number(p.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      if (p.paid) totalPaid += Number(p.amount || 0);
+      else totalPending += Number(p.amount || 0);
+
+      return `
+        <div class="pay-row">
+          <div class="pay-status ${statusClass}">${icon}</div>
+          <div class="pay-info">
+            <div class="pay-desc">${p.description || 'Parcela mensal'}</div>
+            <div class="pay-date">${p.paid ? 'Pago em ' + paidDate : (overdue ? 'Venceu em ' + dueDate : 'Vence em ' + dueDate)}</div>
+          </div>
+          <div class="pay-amount">${amount}</div>
+        </div>`;
+    }).join('');
+
+    if (summaryPaidEl) summaryPaidEl.textContent = 'R$ ' + totalPaid.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    if (summaryPendingEl) summaryPendingEl.textContent = 'R$ ' + totalPending.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+  }
+
+  async function init(session) {
+    const user = session.user;
+    const { data: payments } = await sb.from('payments').select('*').eq('student_id', user.id).eq('type', 'entrada');
+    renderPaymentsInto(
+      document.getElementById('paymentsList'),
+      document.getElementById('summaryPaid'),
+      document.getElementById('summaryPending'),
+      payments
+    );
+  }
+
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

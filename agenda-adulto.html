@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minha Agenda | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 28px; }
+
+    .agenda-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .agenda-row:last-child { border-bottom: none; }
+    .agenda-date { font-weight: 700; color: var(--text); font-size: 14px; text-transform: capitalize; }
+    .agenda-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .agenda-status { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 99px; flex-shrink: 0; }
+    .agenda-status.pendente { background: var(--sand); color: var(--muted); }
+    .agenda-status.realizada { background: #E8F8EF; color: #1E5C3A; }
+    .agenda-status.cancelada, .agenda-status.cancelada_falta { background: #FFF0EE; color: #C0392B; }
+    .agenda-status.reagendada { background: #FFF8E5; color: #A9740C; }
+
+    .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Minha Agenda</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Suas aulas</div>
+    <div class="hero-title">Agenda 📅</div>
+  </div>
+</div>
+
+<main>
+  <div class="section-title">Próximas aulas</div>
+  <div class="card">
+    <div id="upcomingList"><div class="empty-msg">Carregando...</div></div>
+  </div>
+
+  <div class="section-title">Histórico</div>
+  <div class="card">
+    <div id="historyList"><div class="empty-msg">Carregando...</div></div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  const CLASS_STATUS_LABEL = {
+    realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
+    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada'
+  };
+
+  function renderRow(l) {
+    const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' });
+    const time = l.start_time ? l.start_time.slice(0, 5) + (l.end_time ? '–' + l.end_time.slice(0, 5) : '') : 'sem horário';
+    const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+    return `
+      <div class="agenda-row">
+        <div>
+          <div class="agenda-date">${date}</div>
+          <div class="agenda-time">${time}</div>
+        </div>
+        <span class="agenda-status ${l.status}">${statusLabel}</span>
+      </div>`;
+  }
+
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('turma_id').eq('id', user.id).maybeSingle();
+    const today = new Date().toISOString().slice(0, 10);
+
+    let query = sb.from('class_logs').select('class_date, start_time, end_time, status');
+    query = profile?.turma_id
+      ? query.or(`student_id.eq.${user.id},turma_id.eq.${profile.turma_id}`)
+      : query.eq('student_id', user.id);
+
+    const { data: logs } = await query.order('class_date', { ascending: false }).order('start_time', { ascending: false });
+    const all = logs || [];
+
+    const upcoming = all.filter(l => l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada'))
+      .sort((a, b) => (a.class_date + (a.start_time || '')).localeCompare(b.class_date + (b.start_time || '')));
+    const history = all.filter(l => !(l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada')));
+
+    const upcomingEl = document.getElementById('upcomingList');
+    const historyEl = document.getElementById('historyList');
+
+    upcomingEl.innerHTML = upcoming.length
+      ? upcoming.map(renderRow).join('')
+      : '<div class="empty-msg">Nenhuma aula agendada.</div>';
+
+    historyEl.innerHTML = history.length
+      ? history.map(renderRow).join('')
+      : '<div class="empty-msg">Nenhuma aula no histórico ainda.</div>';
+  }
+
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

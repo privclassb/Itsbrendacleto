@@ -106,8 +106,29 @@
 
     .empty-msg { text-align: center; padding: 24px; color: var(--muted); font-size: 14px; }
 
-    /* Financeiro (placeholder) */
-    .coming-soon { text-align: center; padding: 20px; color: var(--muted); font-size: 14px; background: var(--cream); border-radius: 12px; }
+    /* Agenda */
+    .agenda-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .agenda-row:last-child { border-bottom: none; }
+    .agenda-date { font-weight: 700; color: var(--text); font-size: 14px; text-transform: capitalize; }
+    .agenda-time { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .agenda-status { font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 99px; flex-shrink: 0; }
+    .agenda-status.pendente { background: var(--sand); color: var(--muted); }
+    .agenda-status.realizada { background: #E8F8EF; color: #1E5C3A; }
+    .agenda-status.cancelada, .agenda-status.cancelada_falta { background: #FFF0EE; color: #C0392B; }
+    .agenda-status.reagendada { background: #FFF8E5; color: #A9740C; }
+    .agenda-subtitle { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0 8px; }
+
+    /* Financeiro */
+    .pay-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
+    .pay-row:last-child { border-bottom: none; }
+    .pay-info { flex: 1; min-width: 0; }
+    .pay-desc { font-size: 14px; font-weight: 600; color: var(--text); }
+    .pay-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .pay-amount { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); flex-shrink: 0; }
+    .pay-status { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+    .pay-status.paid { background: #1E5C3A; color: white; }
+    .pay-status.overdue { background: #C0392B; color: white; }
+    .pay-status.pending { background: var(--sand); color: var(--muted); border: 1.5px solid #DDD4C7; }
 
     /* Modal de relatório */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
@@ -169,6 +190,14 @@
     <div id="progressActivitiesList"></div>
   </div>
 
+  <div class="section-title">📅 Agenda de aulas</div>
+  <div class="card">
+    <div class="agenda-subtitle">Próximas</div>
+    <div id="agendaUpcomingList"><div class="empty-msg">Carregando...</div></div>
+    <div class="agenda-subtitle" style="margin-top:16px;">Histórico</div>
+    <div id="agendaHistoryList"><div class="empty-msg">Carregando...</div></div>
+  </div>
+
   <div class="section-title">📁 Relatórios</div>
   <div class="card" id="reportsCard">
     <div class="empty-msg">Carregando...</div>
@@ -176,7 +205,7 @@
 
   <div class="section-title">💳 Financeiro</div>
   <div class="card">
-    <div class="coming-soon">Em breve: 2ª via de boleto e histórico de pagamento.</div>
+    <div id="paymentsList"><div class="empty-msg">Carregando...</div></div>
   </div>
 </main>
 
@@ -245,7 +274,80 @@
     if (!student) return;
 
     await loadProgress(student.id);
+    await loadAgenda(student.id, student.turma_id);
     await loadReports(student.id);
+    await loadFinance(student.id);
+  }
+
+  const CLASS_STATUS_LABEL = {
+    realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
+    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada'
+  };
+
+  async function loadAgenda(studentId, turmaId) {
+    const today = new Date().toISOString().slice(0, 10);
+    let query = sb.from('class_logs').select('class_date, start_time, end_time, status');
+    query = turmaId
+      ? query.or(`student_id.eq.${studentId},turma_id.eq.${turmaId}`)
+      : query.eq('student_id', studentId);
+
+    const { data: logs } = await query.order('class_date', { ascending: false }).order('start_time', { ascending: false });
+    const all = logs || [];
+
+    const upcoming = all.filter(l => l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada'))
+      .sort((a, b) => (a.class_date + (a.start_time || '')).localeCompare(b.class_date + (b.start_time || '')));
+    const history = all.filter(l => !(l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada')));
+
+    const renderRow = (l) => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+      const time = l.start_time ? l.start_time.slice(0, 5) + (l.end_time ? '–' + l.end_time.slice(0, 5) : '') : 'sem horário';
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      return `
+        <div class="agenda-row">
+          <div>
+            <div class="agenda-date">${date}</div>
+            <div class="agenda-time">${time}</div>
+          </div>
+          <span class="agenda-status ${l.status}">${statusLabel}</span>
+        </div>`;
+    };
+
+    document.getElementById('agendaUpcomingList').innerHTML = upcoming.length
+      ? upcoming.map(renderRow).join('') : '<div class="empty-msg">Nenhuma aula agendada.</div>';
+    document.getElementById('agendaHistoryList').innerHTML = history.length
+      ? history.map(renderRow).join('') : '<div class="empty-msg">Nenhuma aula no histórico ainda.</div>';
+  }
+
+  async function loadFinance(studentId) {
+    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).eq('type', 'entrada');
+    const listEl = document.getElementById('paymentsList');
+
+    if (!payments || payments.length === 0) {
+      listEl.innerHTML = '<div class="empty-msg">Nenhum lançamento encontrado ainda.</div>';
+      return;
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    const sorted = [...payments].sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
+
+    listEl.innerHTML = sorted.map(p => {
+      const overdue = !p.paid && p.due_date && p.due_date < today;
+      const statusClass = p.paid ? 'paid' : (overdue ? 'overdue' : 'pending');
+      const icon = p.paid ? '✓' : (overdue ? '!' : '○');
+      const dueDate = p.due_date ? new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const paidDate = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : null;
+      const amount = 'R$ ' + Number(p.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+      return `
+        <div class="pay-row">
+          <div class="pay-status ${statusClass}">${icon}</div>
+          <div class="pay-info">
+            <div class="pay-desc">${p.description || 'Parcela mensal'}</div>
+            <div class="pay-date">${p.paid ? 'Pago em ' + paidDate : (overdue ? 'Venceu em ' + dueDate : 'Vence em ' + dueDate)}</div>
+          </div>
+          <div class="pay-amount">${amount}</div>
+        </div>`;
+    }).join('');
   }
 
   async function loadProgress(studentId) {
