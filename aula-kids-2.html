@@ -335,7 +335,7 @@ async function saveQuizScore(lessonId, score, total) {
     var session = data && data.session;
     if (!session) return;
     await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
-  } catch (e) { /* silencioso */ }
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
 }
 var FC=[{em:'😄',en:"I'm happy",pt:'Estou feliz',au:'I am happy'},{em:'😢',en:"I'm sad",pt:'Estou triste',au:'I am sad'},{em:'😴',en:"I'm tired",pt:'Estou cansado',au:'I am tired'},{em:'🤩',en:"I'm excited",pt:'Estou animado',au:'I am excited'},{em:'😠',en:"I'm angry",pt:'Estou com raiva',au:'I am angry'},{em:'😨',en:"I'm scared",pt:'Estou com medo',au:'I am scared'},{em:'🤒',en:"I'm sick",pt:'Estou doente',au:'I am sick'},{em:'🍕',en:"I'm hungry",pt:'Estou com fome',au:'I am hungry'},{em:'😊',en:"I'm fine",pt:'Estou bem',au:'I am fine'},{em:'😎',en:"I'm good",pt:'Estou ótimo',au:'I am good'}];
 var HM_WORDS=[{word:'HAPPY',em:'😄',hint:'When you smile a lot!'},{word:'SAD',em:'😢',hint:'When you want to cry...'},{word:'ANGRY',em:'😠',hint:'When you are very mad!'},{word:'TIRED',em:'😴',hint:'When you need to sleep...'},{word:'SCARED',em:'😨',hint:'When something frightens you!'},{word:'EXCITED',em:'🤩',hint:'When something amazing is coming!'},{word:'SICK',em:'🤒',hint:'When you feel unwell...'},{word:'HUNGRY',em:'🍕',hint:'When your tummy growls!'},{word:'FINE',em:'😊',hint:'When everything is OK!'},{word:'GOOD',em:'😎',hint:'When you feel great!'}];
