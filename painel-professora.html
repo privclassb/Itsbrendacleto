@@ -492,6 +492,8 @@
     .report-status { font-size: 11px; font-weight: 600; border-radius: 99px; padding: 3px 10px; }
     .report-status.published { background: #EFF7F3; color: #1E5C3A; }
     .report-status.draft { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
+    .report-status.birthday { background: #FDEDEB; color: #B0503E; }
+    .report-status.contract-alert { background: #FFF8E5; color: #A9740C; }
     .btn-report-action { padding: 6px 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-toggle { background: var(--cream); color: var(--brown); border: 1.5px solid var(--sand); }
     .btn-toggle:hover { border-color: var(--brown); }
@@ -628,6 +630,12 @@
 
   <!-- Aba: Alunos -->
   <div class="panel-section active" id="alunosSection">
+
+    <!-- Notificações -->
+    <div class="report-list" style="margin-bottom:24px;display:none;" id="notificacoesCard">
+      <div class="report-list-title">🔔 Notificações</div>
+      <div id="notificacoesList"></div>
+    </div>
 
     <!-- Aulas de hoje -->
     <div class="report-list" style="margin-bottom:24px;">
@@ -1110,6 +1118,58 @@
     await loadStudentsProgress(students.map(s => s.id));
     updateOverview(students);
     renderStudents(students);
+    renderNotifications(students);
+  }
+
+  function renderNotifications(students) {
+    const card = document.getElementById('notificacoesCard');
+    const listEl = document.getElementById('notificacoesList');
+
+    const today = new Date();
+    const todayMonth = today.getMonth() + 1;
+    const todayDay = today.getDate();
+    const todayYear = today.getFullYear();
+
+    const birthdays = students.filter(s => {
+      if (!s.birth_date) return false;
+      const d = new Date(s.birth_date + 'T00:00:00');
+      return (d.getMonth() + 1) === todayMonth && d.getDate() === todayDay;
+    });
+
+    const contractsEnding = currentUserIsBrenda ? students.filter(s => {
+      if (!s.contract_end) return false;
+      const d = new Date(s.contract_end + 'T00:00:00');
+      return (d.getMonth() + 1) === todayMonth && d.getFullYear() === todayYear;
+    }) : [];
+
+    if (birthdays.length === 0 && contractsEnding.length === 0) {
+      card.style.display = 'none';
+      return;
+    }
+    card.style.display = 'block';
+
+    const birthdayRows = birthdays.map(s => `
+      <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${s.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+          <div class="report-row-title">Aniversário hoje 🎉</div>
+        </div>
+        <span class="report-status birthday">🎂 Hoje</span>
+      </div>`).join('');
+
+    const contractRows = contractsEnding.map(s => {
+      const endDate = new Date(s.contract_end + 'T00:00:00').toLocaleDateString('pt-BR');
+      return `
+      <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${s.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+          <div class="report-row-title">Contrato termina em ${endDate}</div>
+        </div>
+        <span class="report-status contract-alert">📄 Contrato</span>
+      </div>`;
+    }).join('');
+
+    listEl.innerHTML = birthdayRows + contractRows;
   }
 
   // Nomes amigáveis para as atividades registradas em lesson_progress
@@ -1537,6 +1597,7 @@
     const role = document.getElementById('newStudentRole').value;
     const teacherId = document.getElementById('newStudentTeacher').value;
     const turmaId = document.getElementById('newStudentTurma').value || null;
+    const birthDate = document.getElementById('newStudentBirthDate').value || null;
     const contractStart = document.getElementById('newStudentContractStart').value || null;
     const contractEnd = document.getElementById('newStudentContractEnd').value || null;
     const feeRaw = document.getElementById('newStudentFee').value;
@@ -1610,6 +1671,7 @@
           teacher_id: teacherId,
           level: 1,
           turma_id: turmaId,
+          birth_date: birthDate,
           contract_start: contractStart,
           contract_end: contractEnd,
           monthly_fee: monthlyFee,
@@ -1725,6 +1787,7 @@
     document.getElementById('editStudentRole').value = student.role === 'kids' ? 'kids' : 'adulto';
     document.getElementById('editStudentLevel').value = student.level || 1;
     document.getElementById('editStudentError').style.display = 'none';
+    document.getElementById('editStudentBirthDate').value = student.birth_date || '';
     document.getElementById('editStudentContractStart').value = student.contract_start || '';
     document.getElementById('editStudentContractEnd').value = student.contract_end || '';
     document.getElementById('editStudentFee').value = student.monthly_fee || '';
@@ -1838,6 +1901,7 @@
     }
 
     const turmaId = document.getElementById('editStudentTurma').value || null;
+    const birthDate = document.getElementById('editStudentBirthDate').value || null;
     const contractStart = document.getElementById('editStudentContractStart').value || null;
     const contractEnd = document.getElementById('editStudentContractEnd').value || null;
     const feeRaw = document.getElementById('editStudentFee').value;
@@ -1847,6 +1911,7 @@
     const updates = {
       full_name: name, role, level,
       turma_id: turmaId,
+      birth_date: birthDate,
       contract_start: contractStart,
       contract_end: contractEnd,
       monthly_fee: monthlyFee,
@@ -2842,6 +2907,11 @@
       </select>
     </div>
 
+    <div class="modal-row">
+      <label class="modal-label">Data de nascimento</label>
+      <input type="date" class="modal-input" id="newStudentBirthDate" />
+    </div>
+
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
         <label class="modal-label">Início do contrato</label>
@@ -2939,6 +3009,11 @@
       <select class="modal-select" id="editStudentTurma">
         <option value="">Nenhuma</option>
       </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Data de nascimento</label>
+      <input type="date" class="modal-input" id="editStudentBirthDate" />
     </div>
 
     <div class="modal-row" style="display:flex;gap:10px;">
