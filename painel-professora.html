@@ -1238,6 +1238,7 @@
     document.getElementById('profileProgressInfo').innerHTML = `
       <div class="detail-row"><span class="detail-label">Streak</span><span class="detail-value">${progress.streak} dias</span></div>
       <div class="detail-row"><span class="detail-label">Badges</span><span class="detail-value">${progress.badges.length}</span></div>
+      <div class="detail-row"><span class="detail-label">Aulas completas</span><span class="detail-value">${countCompletedAulas(student, progress.activities)}</span></div>
       <div class="detail-row"><span class="detail-label">Atividades concluídas</span><span class="detail-value">${progress.activities.length}</span></div>`;
 
     document.getElementById('modalStudentProfile').classList.add('open');
@@ -1307,6 +1308,13 @@
     document.getElementById('totalAdultos').textContent = students.filter(s => s.role === 'adulto').length;
   }
 
+  function countCompletedAulas(student, activities) {
+    if (student.role === 'kids') {
+      return activities.filter(a => /^kids-m\d+-a\d+$/.test(a.lesson_id)).length;
+    }
+    return activities.length;
+  }
+
   function renderStudents(students) {
     const list = document.getElementById('studentList');
 
@@ -1347,7 +1355,7 @@
           </div>
           <div class="student-stats">
             <div class="stat-chip">
-              <span class="stat-chip-value">${progress.activities.length}</span>
+              <span class="stat-chip-value">${countCompletedAulas(s, progress.activities)}</span>
               <span class="stat-chip-label">Aulas</span>
             </div>
             <div class="stat-chip">
