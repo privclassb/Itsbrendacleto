@@ -62,6 +62,17 @@
     .progress-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 8px; }
     .progress-bar { height: 8px; background: var(--sand); border-radius: 99px; overflow: hidden; }
     .progress-fill { height: 100%; background: linear-gradient(90deg, var(--mint), #90C9F9); border-radius: 99px; transition: width 0.8s ease; }
+
+    .agenda-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .agenda-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 12px; }
+    .agenda-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sand); font-size: 13px; }
+    .agenda-row:last-child { border-bottom: none; }
+    .agenda-date { font-weight: 600; color: var(--text); text-transform: capitalize; }
+    .agenda-status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; flex-shrink: 0; }
+    .agenda-status.pendente { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
+    .agenda-status.realizada { background: #EFF7F3; color: #1E5C3A; }
+    .agenda-status.cancelada, .agenda-status.cancelada_falta { background: #FFF0EE; color: #C0392B; }
+    .agenda-status.reagendada { background: #FFF8E5; color: #A9740C; }
   </style>
 </head>
 <body>
@@ -104,6 +115,11 @@
       <div class="teacher-label">Sua professora</div>
       <div class="teacher-name" id="teacherName">...</div>
     </div>
+  </div>
+
+  <div class="agenda-card" id="agendaCard" style="display:none;">
+    <div class="agenda-title">📅 Próximas aulas</div>
+    <div id="agendaList"></div>
   </div>
 
   <div class="menu-grid">
@@ -202,6 +218,9 @@
     // Avatar do aluno
     if (profile?.avatar_url) showAvatar(profile.avatar_url);
 
+    // Próximas aulas
+    await loadAgenda(user.id, profile?.turma_id);
+
     // Foto da professora
     if (profile?.teacher_id) {
       const { data: teacher } = await sb.from('profiles').select('full_name, avatar_url').eq('id', profile.teacher_id).maybeSingle();
@@ -214,6 +233,34 @@
     } else {
       document.getElementById('teacherName').textContent = 'Brenda Cleto';
     }
+  }
+
+  const CLASS_STATUS_LABEL = {
+    realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
+    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada'
+  };
+
+  async function loadAgenda(userId, turmaId) {
+    const today = new Date().toISOString().slice(0, 10);
+    let query = sb.from('class_logs').select('class_date, start_time, end_time, status')
+      .gte('class_date', today).order('class_date', { ascending: true }).order('start_time', { ascending: true }).limit(5);
+    query = turmaId ? query.or(`student_id.eq.${userId},turma_id.eq.${turmaId}`) : query.eq('student_id', userId);
+
+    const { data: logs } = await query;
+    const card = document.getElementById('agendaCard');
+    if (!logs || logs.length === 0) { card.style.display = 'none'; return; }
+
+    card.style.display = 'block';
+    document.getElementById('agendaList').innerHTML = logs.map(l => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+      const time = l.start_time ? l.start_time.slice(0, 5) + (l.end_time ? '–' + l.end_time.slice(0, 5) : '') : '';
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      return `
+        <div class="agenda-row">
+          <span class="agenda-date">${date}${time ? ' · ' + time : ''}</span>
+          <span class="agenda-status ${l.status}">${statusLabel}</span>
+        </div>`;
+    }).join('');
   }
 
   function showAvatar(url) {
