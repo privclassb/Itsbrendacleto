@@ -530,6 +530,7 @@
     .modal-checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text); cursor: pointer; line-height: 1.4; }
     .modal-checkbox-label input[type="checkbox"] { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
     .modal-checkbox-label span { flex: 1; }
+    .modal-hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
 
     /* Detalhes do aluno (somente leitura) */
     .detail-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
@@ -1176,7 +1177,7 @@
       const { data: teacher } = await sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle();
       teacherName = teacher?.full_name || '—';
     }
-    const { data: guardian } = await sb.from('profiles').select('full_name').eq('guardian_of', studentId).eq('role', 'responsavel').maybeSingle();
+    const { data: guardian } = await sb.from('profiles').select('full_name').eq('guardian_of', studentId).maybeSingle();
     const createdAt = student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : '—';
     const contractStart = student.contract_start ? new Date(student.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
     const contractEnd = student.contract_end ? new Date(student.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
@@ -1731,29 +1732,52 @@
       teacherRow.style.display = 'none';
     }
 
-    // Verifica se já existe responsável cadastrado pra esse aluno
-    const { data: existingGuardian } = await sb.from('profiles').select('id, full_name').eq('guardian_of', studentId).eq('role', 'responsavel').maybeSingle();
-    document.getElementById('editCreateGuardian').checked = false;
+    // Verifica se já existe responsável vinculado a esse aluno (conta própria ou vinculada)
+    const { data: existingGuardian } = await sb.from('profiles').select('id, full_name, role').eq('guardian_of', studentId).maybeSingle();
+    document.getElementById('editGuardianType').value = 'none';
     document.getElementById('editGuardianFields').style.display = 'none';
+    document.getElementById('editGuardianExistingFields').style.display = 'none';
     document.getElementById('editGuardianName').value = '';
     document.getElementById('editGuardianEmail').value = '';
     document.getElementById('editGuardianPassword').value = '';
 
     if (existingGuardian) {
-      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável já cadastrado: ' + (existingGuardian.full_name || 'Sem nome');
+      const tipo = existingGuardian.role === 'responsavel' ? 'login separado' : 'mesmo login que a própria conta';
+      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável já vinculado: ' + (existingGuardian.full_name || 'Sem nome') + ' (' + tipo + ')';
       document.getElementById('editGuardianExistingRow').style.display = 'block';
-      document.getElementById('editGuardianCheckboxRow').style.display = 'none';
+      document.getElementById('editGuardianTypeRow').style.display = 'none';
     } else {
       document.getElementById('editGuardianExistingRow').style.display = 'none';
-      document.getElementById('editGuardianCheckboxRow').style.display = 'block';
+      document.getElementById('editGuardianTypeRow').style.display = 'block';
+      await populateGuardianExistingSelect(studentId);
     }
 
     document.getElementById('modalEditStudent').classList.add('open');
   }
 
+  async function populateGuardianExistingSelect(studentId) {
+    const select = document.getElementById('editGuardianExistingSelect');
+    while (select.options.length > 1) select.remove(1);
+
+    const { data: candidates } = await sb.from('profiles')
+      .select('id, full_name, role')
+      .neq('id', studentId)
+      .neq('role', 'kids')
+      .order('full_name');
+
+    (candidates || []).forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      const roleLabel = c.role === 'adulto' ? 'aluno adulto' : (c.role === 'professora' ? 'professora' : c.role);
+      opt.textContent = (c.full_name || 'Sem nome') + ' (' + roleLabel + ')';
+      select.appendChild(opt);
+    });
+  }
+
   function toggleEditGuardianFields() {
-    const checked = document.getElementById('editCreateGuardian').checked;
-    document.getElementById('editGuardianFields').style.display = checked ? 'block' : 'none';
+    const tipo = document.getElementById('editGuardianType').value;
+    document.getElementById('editGuardianFields').style.display = (tipo === 'new') ? 'block' : 'none';
+    document.getElementById('editGuardianExistingFields').style.display = (tipo === 'existing') ? 'block' : 'none';
   }
 
   function closeEditStudent() {
@@ -1768,10 +1792,13 @@
     const errEl = document.getElementById('editStudentError');
     const btn = document.getElementById('btnSaveStudentEdit');
 
-    const wantsGuardian = document.getElementById('editCreateGuardian').checked;
+    const guardianType = document.getElementById('editGuardianType').value;
+    const wantsGuardian = guardianType === 'new';
+    const wantsExistingGuardian = guardianType === 'existing';
     const guardianName = document.getElementById('editGuardianName').value.trim();
     const guardianEmail = document.getElementById('editGuardianEmail').value.trim();
     const guardianPassword = document.getElementById('editGuardianPassword').value.trim();
+    const existingGuardianId = document.getElementById('editGuardianExistingSelect').value;
 
     if (!name) {
       errEl.textContent = 'Preencha o nome do aluno.';
@@ -1785,6 +1812,11 @@
     }
     if (wantsGuardian && guardianPassword.length < 6) {
       errEl.textContent = 'A senha do responsável precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (wantsExistingGuardian && !existingGuardianId) {
+      errEl.textContent = 'Selecione a conta que vai ser vinculada como responsável.';
       errEl.style.display = 'block';
       return;
     }
@@ -1878,6 +1910,17 @@
         btn.disabled = false;
         btn.textContent = 'Salvar alterações';
         errEl.textContent = 'Responsável criado, mas houve erro ao vincular ao aluno: ' + (linkError.message || linkError.code || JSON.stringify(linkError));
+        errEl.style.display = 'block';
+        return;
+      }
+    }
+
+    if (wantsExistingGuardian) {
+      const { error: linkExistingError } = await sb.from('profiles').update({ guardian_of: id }).eq('id', existingGuardianId);
+      if (linkExistingError) {
+        btn.disabled = false;
+        btn.textContent = 'Salvar alterações';
+        errEl.textContent = 'Aluno atualizado, mas houve erro ao vincular a conta de responsável: ' + (linkExistingError.message || linkExistingError.code || JSON.stringify(linkExistingError));
         errEl.style.display = 'block';
         return;
       }
@@ -2912,11 +2955,13 @@
       <span id="editGuardianExistingText"></span>
     </div>
 
-    <div class="modal-row modal-checkbox-row" id="editGuardianCheckboxRow" style="display:none;">
-      <label class="modal-checkbox-label">
-        <input type="checkbox" id="editCreateGuardian" onchange="toggleEditGuardianFields()" />
-        <span>Cadastrar responsável (acesso a relatórios e progresso)</span>
-      </label>
+    <div class="modal-row" id="editGuardianTypeRow" style="display:none;">
+      <label class="modal-label">Responsável</label>
+      <select class="modal-select" id="editGuardianType" onchange="toggleEditGuardianFields()">
+        <option value="none">Nenhum</option>
+        <option value="new">Cadastrar novo responsável (login separado)</option>
+        <option value="existing">Vincular uma conta já existente (mesmo login)</option>
+      </select>
     </div>
 
     <div id="editGuardianFields" style="display:none;">
@@ -2933,6 +2978,16 @@
       <div class="modal-row">
         <label class="modal-label">Senha provisória do responsável</label>
         <input type="text" class="modal-input" id="editGuardianPassword" placeholder="Mínimo 6 caracteres" />
+      </div>
+    </div>
+
+    <div id="editGuardianExistingFields" style="display:none;">
+      <div class="modal-row">
+        <label class="modal-label">Conta a vincular</label>
+        <select class="modal-select" id="editGuardianExistingSelect">
+          <option value="">Selecione...</option>
+        </select>
+        <div class="modal-hint">Essa pessoa vai continuar usando o e-mail e a senha que já tem. Ao entrar, vai poder escolher entre a própria área e a de responsável.</div>
       </div>
     </div>
 

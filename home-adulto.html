@@ -79,7 +79,10 @@
 
 <header>
   <div class="header-brand">itsbrendacleto</div>
-  <button class="btn-logout" id="logoutBtn">Sair</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="btn-logout" id="switchProfileBtn" style="display:none;">🔄 Trocar perfil</button>
+    <button class="btn-logout" id="logoutBtn">Sair</button>
+  </div>
 </header>
 
 <div class="hero">
@@ -218,6 +221,11 @@
     // Avatar do aluno
     if (profile?.avatar_url) showAvatar(profile.avatar_url);
 
+    // Troca de perfil (contas com login compartilhado com área de responsável)
+    if (profile?.guardian_of) {
+      document.getElementById('switchProfileBtn').style.display = 'inline-block';
+    }
+
     // Próximas aulas
     await loadAgenda(user.id, profile?.turma_id);
 
@@ -302,6 +310,10 @@
   document.getElementById('logoutBtn').addEventListener('click', async function() {
     await sb.auth.signOut();
     window.location.href = 'index.html';
+  });
+
+  document.getElementById('switchProfileBtn').addEventListener('click', function() {
+    window.location.href = 'index.html?switch=1';
   });
 
   // Auth with retry for slow session loading

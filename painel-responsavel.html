@@ -127,7 +127,10 @@
     <div class="header-brand">itsbrendacleto</div>
     <div class="header-tag">Responsável</div>
   </div>
-  <button class="btn-logout" id="logoutBtn">Sair</button>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button class="btn-logout" id="switchProfileBtn" style="display:none;">🔄 Trocar perfil</button>
+    <button class="btn-logout" id="logoutBtn">Sair</button>
+  </div>
 </header>
 
 <div class="welcome-strip">
@@ -219,6 +222,11 @@
       ? 'Acompanhamento de ' + (student.full_name || 'seu filho(a)') + '.'
       : 'Aluno vinculado não encontrado.';
 
+    // Contas com login compartilhado (ex: aluna adulta que também é responsável) podem trocar de perfil
+    if (profile.role !== 'responsavel') {
+      document.getElementById('switchProfileBtn').style.display = 'inline-block';
+    }
+
     if (!student) return;
 
     await loadProgress(student.id);
@@ -305,6 +313,10 @@
   document.getElementById('logoutBtn').addEventListener('click', async () => {
     await sb.auth.signOut();
     window.location.href = 'index.html';
+  });
+
+  document.getElementById('switchProfileBtn').addEventListener('click', () => {
+    window.location.href = 'index.html?switch=1';
   });
 
   (async () => {
