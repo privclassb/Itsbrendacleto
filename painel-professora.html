@@ -612,6 +612,12 @@
   <!-- Aba: Alunos -->
   <div class="panel-section active" id="alunosSection">
 
+    <!-- Aulas de hoje -->
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">📅 Aulas de hoje</div>
+      <div id="aulasHojeList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
     <!-- Overview -->
     <div class="overview-grid">
       <div class="overview-card">
@@ -786,6 +792,16 @@
         <label class="form-label">Data</label>
         <input type="date" class="form-input" id="classLogDate" />
       </div>
+      <div class="form-row" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label class="form-label">Horário início</label>
+          <input type="time" class="form-input" id="classLogStartTime" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Horário fim</label>
+          <input type="time" class="form-input" id="classLogEndTime" />
+        </div>
+      </div>
       <div class="form-row">
         <label class="form-label">Status</label>
         <select class="form-select" id="classLogStatus">
@@ -804,6 +820,59 @@
         <button class="btn-publish" onclick="saveClassLog()" style="flex:1;">✅ Registrar aula</button>
       </div>
     </div>
+
+    <div class="report-form">
+      <div class="report-form-title">📅 Agendar aulas do contrato</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Gera uma aula por semana no mesmo dia/horário, dentro do período informado — útil pra já deixar cadastrado o contrato inteiro do aluno.</div>
+      <div class="form-row">
+        <label class="form-label">Turma (aula em grupo)</label>
+        <select class="form-select" id="scheduleTurma">
+          <option value="">Nenhuma (aula individual)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Aluno (se a aula não for de turma)</label>
+        <select class="form-select" id="scheduleStudent" onchange="prefillScheduleFromContract()">
+          <option value="">Selecione o aluno...</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Dia da semana</label>
+        <select class="form-select" id="scheduleWeekday">
+          <option value="1">Segunda-feira</option>
+          <option value="2">Terça-feira</option>
+          <option value="3">Quarta-feira</option>
+          <option value="4">Quinta-feira</option>
+          <option value="5">Sexta-feira</option>
+          <option value="6">Sábado</option>
+          <option value="0">Domingo</option>
+        </select>
+      </div>
+      <div class="form-row" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label class="form-label">Horário início</label>
+          <input type="time" class="form-input" id="scheduleStartTime" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Horário fim</label>
+          <input type="time" class="form-input" id="scheduleEndTime" />
+        </div>
+      </div>
+      <div class="form-row" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label class="form-label">Data início</label>
+          <input type="date" class="form-input" id="scheduleFrom" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label">Data fim (fim do contrato)</label>
+          <input type="date" class="form-input" id="scheduleTo" />
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-publish" onclick="generateScheduledClasses()" style="flex:1;">📅 Gerar aulas</button>
+      </div>
+    </div>
+
     <div class="report-list">
       <div class="report-list-title">Aulas registradas</div>
       <div id="classLogList"><div class="empty-reports">Carregando...</div></div>
@@ -991,9 +1060,19 @@
     await loadTurmas(user.id, isBrenda);
     populateClassLogStudentSelect();
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
     document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('scheduleFrom').value = new Date().toISOString().slice(0, 10);
     await loadClassLogs(user.id, isBrenda);
-    if (isBrenda) await loadFinanceiro();
+    await loadAulasHoje(user.id, isBrenda);
+    if (isBrenda) {
+      const now = new Date();
+      const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+      const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      document.getElementById('financeFilterFrom').value = firstDay.toISOString().slice(0, 10);
+      document.getElementById('financeFilterTo').value = lastDay.toISOString().slice(0, 10);
+      await loadFinanceiro();
+    }
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -1144,10 +1223,11 @@
     } else {
       logsListEl.innerHTML = logs.map(l => {
         const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+        const time = formatTimeRange(l);
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
         return `
           <div class="detail-row">
-            <span class="detail-label">${date} · ${statusLabel}</span>
+            <span class="detail-label">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
             <span class="detail-value">${l.content || '—'}</span>
           </div>`;
       }).join('');
@@ -2048,6 +2128,7 @@
     document.getElementById('turmaName').value = '';
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
   }
 
   async function deleteTurma(id) {
@@ -2057,6 +2138,7 @@
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
   }
 
   function openTurmaStudents(turmaId) {
@@ -2116,10 +2198,18 @@
   // ---- Registro de aulas ----
 
   function populateClassLogStudentSelect() {
-    const sel = document.getElementById('classLogStudent');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Selecione o aluno...</option>' +
+    const options = '<option value="">Selecione o aluno...</option>' +
       allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
+    ['classLogStudent', 'scheduleStudent'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (sel) sel.innerHTML = options;
+    });
+  }
+
+  function formatTimeRange(l) {
+    if (!l.start_time) return '';
+    const end = l.end_time ? '–' + l.end_time.slice(0, 5) : '';
+    return l.start_time.slice(0, 5) + end;
   }
 
   async function loadClassLogs(teacherId, seeAll) {
@@ -2137,12 +2227,13 @@
       const student = allStudents.find(s => s.id === l.student_id);
       const who = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
       const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = formatTimeRange(l);
       const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
       return `
         <div class="report-row">
           <div class="report-row-info">
             <div class="report-row-student">${who}</div>
-            <div class="report-row-title">${date} · ${statusLabel}${l.content ? ' · ' + l.content : ''}</div>
+            <div class="report-row-title">${date}${time ? ' · ' + time : ''} · ${statusLabel}${l.content ? ' · ' + l.content : ''}</div>
           </div>
           <button class="btn-report-action btn-delete" onclick="deleteClassLog('${l.id}')">Excluir</button>
         </div>`;
@@ -2153,6 +2244,8 @@
     const turmaId = document.getElementById('classLogTurma').value || null;
     const studentId = document.getElementById('classLogStudent').value || null;
     const date = document.getElementById('classLogDate').value || new Date().toISOString().slice(0, 10);
+    const startTime = document.getElementById('classLogStartTime').value || null;
+    const endTime = document.getElementById('classLogEndTime').value || null;
     const status = document.getElementById('classLogStatus').value;
     const content = document.getElementById('classLogContent').value.trim();
 
@@ -2166,6 +2259,8 @@
       turma_id: turmaId,
       student_id: turmaId ? null : studentId,
       class_date: date,
+      start_time: startTime,
+      end_time: endTime,
       status,
       content,
       created_by: session.user.id
@@ -2174,6 +2269,105 @@
     if (error) { alert('Erro ao registrar aula: ' + error.message); return; }
 
     document.getElementById('classLogContent').value = '';
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  function prefillScheduleFromContract() {
+    if (!currentUserIsBrenda) return;
+    const studentId = document.getElementById('scheduleStudent').value;
+    const student = allStudents.find(s => s.id === studentId);
+    if (!student) return;
+    const fromEl = document.getElementById('scheduleFrom');
+    const toEl = document.getElementById('scheduleTo');
+    if (student.contract_start && !fromEl.value) fromEl.value = student.contract_start;
+    if (student.contract_end) toEl.value = student.contract_end;
+  }
+
+  async function generateScheduledClasses() {
+    const turmaId = document.getElementById('scheduleTurma').value || null;
+    const studentId = document.getElementById('scheduleStudent').value || null;
+    const weekday = parseInt(document.getElementById('scheduleWeekday').value, 10);
+    const startTime = document.getElementById('scheduleStartTime').value || null;
+    const endTime = document.getElementById('scheduleEndTime').value || null;
+    const from = document.getElementById('scheduleFrom').value;
+    const to = document.getElementById('scheduleTo').value;
+
+    if (!turmaId && !studentId) { alert('Selecione uma turma ou um aluno.'); return; }
+    if (!from || !to) { alert('Preencha a data início e a data fim.'); return; }
+
+    const start = new Date(from + 'T00:00:00');
+    const end = new Date(to + 'T00:00:00');
+    if (end < start) { alert('A data fim precisa ser depois da data início.'); return; }
+
+    // Avança até o primeiro dia que bate com o dia da semana escolhido
+    const d = new Date(start);
+    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
+
+    const dates = [];
+    while (d <= end) {
+      dates.push(d.toISOString().slice(0, 10));
+      d.setDate(d.getDate() + 7);
+    }
+
+    if (dates.length === 0) { alert('Nenhuma data encontrada nesse período pro dia da semana escolhido.'); return; }
+    if (!confirm(`Isso vai criar ${dates.length} aula(s), uma por semana. Confirmar?`)) return;
+
+    const { data: { session } } = await sb.auth.getSession();
+    const entries = dates.map(class_date => ({
+      turma_id: turmaId,
+      student_id: turmaId ? null : studentId,
+      class_date,
+      start_time: startTime,
+      end_time: endTime,
+      status: 'pendente',
+      created_by: session.user.id
+    }));
+
+    const { error } = await sb.from('class_logs').insert(entries);
+    if (error) { alert('Erro ao gerar aulas: ' + error.message); return; }
+
+    alert(dates.length + ' aula(s) agendada(s) com sucesso!');
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  async function loadAulasHoje(teacherId, seeAll) {
+    const today = new Date().toISOString().slice(0, 10);
+    let query = sb.from('class_logs').select('*').eq('class_date', today).order('start_time', { ascending: true });
+    if (!seeAll) query = query.eq('created_by', teacherId);
+
+    const { data: logs, error } = await query;
+    const listEl = document.getElementById('aulasHojeList');
+
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas de hoje.</div>'; return; }
+    if (!logs || logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula agendada para hoje.</div>'; return; }
+
+    listEl.innerHTML = logs.map(l => {
+      const turma = allTurmas.find(t => t.id === l.turma_id);
+      const student = allStudents.find(s => s.id === l.student_id);
+      const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+      const time = formatTimeRange(l) || 'sem horário';
+      const isDone = l.status === 'realizada';
+      const nextStatus = isDone ? 'pendente' : 'realizada';
+      const badgeClass = isDone ? 'published' : 'draft';
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${who}</div>
+            <div class="report-row-title">${time}</div>
+          </div>
+          <span class="report-status ${badgeClass}" style="cursor:pointer;" onclick="toggleClassLogStatus('${l.id}', '${nextStatus}')" title="Clique pra marcar como ${CLASS_STATUS_LABEL[nextStatus]}">${statusLabel}</span>
+        </div>`;
+    }).join('');
+  }
+
+  async function toggleClassLogStatus(id, newStatus) {
+    const { error } = await sb.from('class_logs').update({ status: newStatus }).eq('id', id);
+    if (error) { alert('Erro ao atualizar aula: ' + error.message); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
     await loadClassLogs(session.user.id, currentUserIsBrenda);
   }
 
