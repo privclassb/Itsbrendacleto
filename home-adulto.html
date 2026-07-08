@@ -150,6 +150,10 @@
       <div class="menu-icon">📖</div>
       <div class="menu-title">Dicionário</div>
     </a>
+    <a href="comunidade.html" class="menu-card">
+      <div class="menu-icon">👥</div>
+      <div class="menu-title">Comunidade</div>
+    </a>
   </div>
 
   <div class="progress-card">
@@ -298,6 +302,7 @@
 
   async function updateStreak(userId) {
     const today = new Date().toISOString().split('T')[0];
+    await sb.from('daily_activity_log').upsert({ user_id: userId, activity_date: today }, { onConflict: 'user_id,activity_date', ignoreDuplicates: true });
     const { data: s } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
     if (!s) { await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 }); document.getElementById('heroStreak').textContent = 1; return; }
     const diff = Math.floor((new Date(today) - new Date(s.last_access)) / 86400000);

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Comunidade | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 28px; }
+
+    /* Ranking */
+    .rank-note { font-size: 12px; color: var(--muted); margin-bottom: 16px; }
+    .rank-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+    .rank-item:last-child { border-bottom: none; }
+    .rank-item.rank-you { background: rgba(168,197,181,0.15); border-radius: 10px; padding: 10px 8px; }
+    .rank-position { width: 28px; text-align: center; font-size: 16px; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+    .rank-avatar { flex-shrink: 0; }
+    .rank-avatar-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+    .rank-avatar-fallback { width: 40px; height: 40px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; }
+    .rank-info { flex: 1; min-width: 0; }
+    .rank-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .rank-breakdown { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .rank-points { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--brown); flex-shrink: 0; text-align: right; }
+    .rank-points span { display: block; font-family: 'DM Sans', sans-serif; font-size: 10px; color: var(--muted); font-weight: 500; }
+    #myRankNote { display: none; margin-top: 14px; padding: 10px 14px; background: var(--cream); border-radius: 10px; font-size: 13px; color: var(--text); font-weight: 600; text-align: center; }
+
+    /* Composer */
+    .composer-row { display: flex; gap: 10px; align-items: flex-start; }
+    .composer-avatar-fallback { width: 40px; height: 40px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+    .composer-avatar-img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .composer-body { flex: 1; }
+    #postContent { width: 100%; min-height: 64px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); resize: vertical; outline: none; }
+    #postContent:focus { border-color: var(--mint); background: var(--white); }
+    .composer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+    #postImageInput { display: none; }
+    .post-photo-btn { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 8px; padding: 7px 14px; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; }
+    .post-photo-btn:hover { border-color: var(--brown-light); }
+    .btn-publish { background: var(--brown); color: var(--white); border: none; border-radius: 8px; padding: 9px 20px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-publish:hover { background: var(--brown-light); }
+    .btn-publish:disabled { opacity: 0.6; cursor: not-allowed; }
+    #postImagePreview { display: none; max-width: 100%; max-height: 220px; border-radius: 10px; margin-top: 10px; object-fit: cover; }
+
+    /* Post feed */
+    .post-card { background: var(--white); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); margin-bottom: 16px; }
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .post-author { font-size: 14px; font-weight: 600; color: var(--text); }
+    .post-time { font-size: 11px; color: var(--muted); margin-top: 1px; }
+    .post-delete-btn { margin-left: auto; background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 4px 6px; }
+    .post-delete-btn:hover { color: #C0392B; }
+    .post-content { font-size: 14px; color: var(--text); line-height: 1.6; white-space: pre-wrap; margin-bottom: 10px; }
+    .post-image { width: 100%; max-height: 380px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; display: block; }
+    .post-actions { display: flex; gap: 16px; border-top: 1px solid var(--sand); padding-top: 10px; }
+    .post-action-btn { background: none; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .post-action-btn:hover { color: var(--text); }
+    .post-action-btn.liked { color: var(--rose); }
+
+    .comments-box { display: none; margin-top: 12px; border-top: 1px solid var(--sand); padding-top: 12px; }
+    .comment-item { display: flex; align-items: baseline; gap: 6px; padding: 6px 0; font-size: 13px; }
+    .comment-author { font-weight: 600; color: var(--text); flex-shrink: 0; }
+    .comment-text { color: var(--text); flex: 1; word-break: break-word; }
+    .comment-delete { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; flex-shrink: 0; }
+    .comment-delete:hover { color: #C0392B; }
+    .comment-input-row { display: flex; gap: 8px; margin-top: 8px; }
+    .comment-input { flex: 1; border: 1.5px solid var(--sand); border-radius: 8px; padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; background: var(--cream); }
+    .comment-input:focus { border-color: var(--mint); background: var(--white); }
+    .comment-send-btn { background: var(--brown); color: var(--white); border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+    .empty-msg-sm { text-align: center; padding: 10px; color: var(--muted); font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
+  <div class="header-title">Comunidade</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Juntos no aprendizado</div>
+    <div class="hero-title">Comunidade 👥</div>
+  </div>
+</div>
+
+<main>
+  <div class="section-title">🏆 Ranking do mês</div>
+  <div class="card">
+    <div class="rank-note" id="rankingMonthLabel"></div>
+    <div id="rankingList"><div class="empty-msg">Carregando...</div></div>
+    <div id="myRankNote"></div>
+  </div>
+
+  <div class="section-title">📝 Mural</div>
+  <div class="card">
+    <div class="composer-row">
+      <div id="composerAvatar" class="composer-avatar-fallback">?</div>
+      <div class="composer-body">
+        <textarea id="postContent" placeholder="Compartilhe seus estudos, uma dica ou uma conquista..."></textarea>
+        <img id="postImagePreview" />
+        <div class="composer-actions">
+          <div>
+            <input type="file" id="postImageInput" accept="image/*" />
+            <label for="postImageInput" class="post-photo-btn">📷 Foto</label>
+          </div>
+          <button class="btn-publish" id="publishPostBtn" onclick="createPost()">Publicar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="postsList"><div class="empty-msg">Carregando...</div></div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  let CURRENT_USER_ID = null;
+  let CURRENT_USER_NAME = '';
+  let IS_BRENDA = false;
+  let likedPostIds = new Set();
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function initials(name) {
+    return (name || '?').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if (!profile || profile.role === 'kids' || profile.role === 'responsavel') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    CURRENT_USER_ID = user.id;
+    CURRENT_USER_NAME = profile.full_name || user.email.split('@')[0];
+    IS_BRENDA = CURRENT_USER_NAME.toLowerCase().includes('brenda');
+
+    document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'home-adulto.html';
+
+    const composerAvatar = document.getElementById('composerAvatar');
+    if (profile.avatar_url) {
+      composerAvatar.outerHTML = `<img id="composerAvatar" class="composer-avatar-img" src="${profile.avatar_url}" />`;
+    } else {
+      composerAvatar.textContent = initials(CURRENT_USER_NAME);
+    }
+
+    await loadRanking();
+    await loadPosts();
+  }
+
+  async function loadRanking() {
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+    document.getElementById('rankingMonthLabel').textContent = 'Pontuação de ' + now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + ' · atividades, dias ativos e presença em aula';
+
+    const { data: students } = await sb.from('profiles').select('id, full_name, avatar_url, turma_id').eq('role', 'adulto');
+    if (!students || students.length === 0) {
+      document.getElementById('rankingList').innerHTML = '<div class="empty-msg">Ninguém no ranking ainda.</div>';
+      return;
+    }
+    const ids = students.map(s => s.id);
+
+    const [{ data: activities }, { data: activeDays }, { data: classes }] = await Promise.all([
+      sb.from('lesson_progress').select('user_id, lesson_id, completed_at').in('user_id', ids).gte('completed_at', monthStart).lte('completed_at', monthEnd + 'T23:59:59'),
+      sb.from('daily_activity_log').select('user_id, activity_date').in('user_id', ids).gte('activity_date', monthStart).lte('activity_date', monthEnd),
+      sb.from('class_logs').select('student_id, turma_id, class_date, status').eq('status', 'realizada').gte('class_date', monthStart).lte('class_date', monthEnd)
+    ]);
+
+    const scoreMap = {};
+    students.forEach(s => { scoreMap[s.id] = { activities: 0, activeDays: 0, classes: 0 }; });
+
+    (activities || []).forEach(a => {
+      if (/^adulto-l\d+-a\d+$/.test(a.lesson_id) && scoreMap[a.user_id]) scoreMap[a.user_id].activities++;
+    });
+    (activeDays || []).forEach(d => { if (scoreMap[d.user_id]) scoreMap[d.user_id].activeDays++; });
+    (classes || []).forEach(c => {
+      if (c.student_id && scoreMap[c.student_id]) {
+        scoreMap[c.student_id].classes++;
+      } else if (c.turma_id) {
+        students.filter(s => s.turma_id === c.turma_id).forEach(s => scoreMap[s.id].classes++);
+      }
+    });
+
+    const ranked = students.map(s => {
+      const sc = scoreMap[s.id];
+      const points = sc.activities * 10 + sc.activeDays * 5 + sc.classes * 15;
+      return Object.assign({}, s, sc, { points });
+    }).sort((a, b) => b.points - a.points);
+
+    renderRanking(ranked);
+  }
+
+  function renderRanking(ranked) {
+    const list = document.getElementById('rankingList');
+    if (!ranked.length || ranked.every(r => r.points === 0)) {
+      list.innerHTML = '<div class="empty-msg">Ainda não há atividade este mês. Complete aulas, mantenha sua sequência e participe das aulas para aparecer aqui! 🚀</div>';
+      document.getElementById('myRankNote').style.display = 'none';
+      return;
+    }
+
+    const top = ranked.slice(0, 15);
+    const medals = ['🥇', '🥈', '🥉'];
+    list.innerHTML = top.map((r, i) => {
+      const isMe = r.id === CURRENT_USER_ID;
+      const avatar = r.avatar_url
+        ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
+        : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
+      return `
+        <div class="rank-item ${isMe ? 'rank-you' : ''}">
+          <div class="rank-position">${medals[i] || (i + 1)}</div>
+          <div class="rank-avatar">${avatar}</div>
+          <div class="rank-info">
+            <div class="rank-name">${escapeHtml(r.full_name || 'Aluno')}${isMe ? ' (você)' : ''}</div>
+            <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${r.classes} aulas</div>
+          </div>
+          <div class="rank-points">${r.points}<span>pts</span></div>
+        </div>`;
+    }).join('');
+
+    const myRank = ranked.findIndex(r => r.id === CURRENT_USER_ID);
+    const myRankEl = document.getElementById('myRankNote');
+    if (myRank >= 15) {
+      myRankEl.style.display = 'block';
+      myRankEl.textContent = 'Sua posição: #' + (myRank + 1) + ' · ' + ranked[myRank].points + ' pontos';
+    } else {
+      myRankEl.style.display = 'none';
+    }
+  }
+
+  async function loadPosts() {
+    const { data: posts } = await sb.from('community_posts').select('*').order('created_at', { ascending: false }).limit(50);
+    const listEl = document.getElementById('postsList');
+
+    if (!posts || posts.length === 0) {
+      listEl.innerHTML = '<div class="empty-msg">Nenhum post ainda. Seja a primeira pessoa a compartilhar! ✨</div>';
+      return;
+    }
+
+    const postIds = posts.map(p => p.id);
+    const authorIds = [...new Set(posts.map(p => p.author_id))];
+
+    const [{ data: authors }, { data: likes }, { data: comments }] = await Promise.all([
+      sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds),
+      sb.from('community_likes').select('post_id, user_id').in('post_id', postIds),
+      sb.from('community_comments').select('id, post_id').in('post_id', postIds)
+    ]);
+
+    const authorMap = {};
+    (authors || []).forEach(a => { authorMap[a.id] = a; });
+
+    const likesByPost = {};
+    likedPostIds = new Set();
+    (likes || []).forEach(l => {
+      likesByPost[l.post_id] = (likesByPost[l.post_id] || 0) + 1;
+      if (l.user_id === CURRENT_USER_ID) likedPostIds.add(l.post_id);
+    });
+
+    const commentCountByPost = {};
+    (comments || []).forEach(c => { commentCountByPost[c.post_id] = (commentCountByPost[c.post_id] || 0) + 1; });
+
+    listEl.innerHTML = posts.map(p => {
+      const author = authorMap[p.author_id];
+      const authorName = author?.full_name || 'Aluno';
+      const avatar = author?.avatar_url
+        ? `<img class="rank-avatar-img" src="${author.avatar_url}" />`
+        : `<div class="rank-avatar-fallback">${initials(authorName)}</div>`;
+      const time = new Date(p.created_at).toLocaleDateString('pt-BR') + ' às ' + new Date(p.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const canDelete = p.author_id === CURRENT_USER_ID || IS_BRENDA;
+      const isLiked = likedPostIds.has(p.id);
+      const likeCount = likesByPost[p.id] || 0;
+      const commentCount = commentCountByPost[p.id] || 0;
+
+      return `
+        <div class="post-card">
+          <div class="post-header">
+            ${avatar}
+            <div>
+              <div class="post-author">${escapeHtml(authorName)}</div>
+              <div class="post-time">${time}</div>
+            </div>
+            ${canDelete ? `<button class="post-delete-btn" onclick="deletePost('${p.id}')" title="Excluir post">🗑</button>` : ''}
+          </div>
+          ${p.content ? `<div class="post-content">${escapeHtml(p.content)}</div>` : ''}
+          ${p.image_url ? `<img class="post-image" src="${p.image_url}" />` : ''}
+          <div class="post-actions">
+            <button class="post-action-btn ${isLiked ? 'liked' : ''}" id="likeBtn-${p.id}" onclick="toggleLike('${p.id}')">
+              ${isLiked ? '❤️' : '🤍'} <span id="likeCount-${p.id}">${likeCount}</span>
+            </button>
+            <button class="post-action-btn" onclick="toggleComments('${p.id}')">
+              💬 <span id="commentCount-${p.id}">${commentCount}</span> comentários
+            </button>
+          </div>
+          <div class="comments-box" id="comments-${p.id}"></div>
+        </div>`;
+    }).join('');
+  }
+
+  async function toggleLike(postId) {
+    const btn = document.getElementById('likeBtn-' + postId);
+    const countEl = document.getElementById('likeCount-' + postId);
+    const isLiked = likedPostIds.has(postId);
+
+    if (isLiked) {
+      await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', CURRENT_USER_ID);
+      likedPostIds.delete(postId);
+    } else {
+      await sb.from('community_likes').insert({ post_id: postId, user_id: CURRENT_USER_ID });
+      likedPostIds.add(postId);
+    }
+
+    const nowLiked = likedPostIds.has(postId);
+    btn.classList.toggle('liked', nowLiked);
+    const current = parseInt(countEl.textContent, 10) || 0;
+    const next = nowLiked ? current + 1 : Math.max(0, current - 1);
+    countEl.textContent = next;
+    btn.innerHTML = (nowLiked ? '❤️' : '🤍') + ` <span id="likeCount-${postId}">${next}</span>`;
+  }
+
+  async function toggleComments(postId) {
+    const box = document.getElementById('comments-' + postId);
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    await loadCommentsForPost(postId);
+  }
+
+  async function loadCommentsForPost(postId) {
+    const box = document.getElementById('comments-' + postId);
+    box.innerHTML = '<div class="empty-msg-sm">Carregando...</div>';
+
+    const { data: comments } = await sb.from('community_comments').select('*').eq('post_id', postId).order('created_at', { ascending: true });
+    const authorIds = [...new Set((comments || []).map(c => c.author_id))];
+    const { data: authors } = authorIds.length
+      ? await sb.from('profiles').select('id, full_name').in('id', authorIds)
+      : { data: [] };
+    const authorMap = {};
+    (authors || []).forEach(a => { authorMap[a.id] = a; });
+
+    const listHtml = (comments || []).map(c => {
+      const canDelete = c.author_id === CURRENT_USER_ID || IS_BRENDA;
+      return `
+        <div class="comment-item">
+          <span class="comment-author">${escapeHtml(authorMap[c.author_id]?.full_name || 'Aluno')}:</span>
+          <span class="comment-text">${escapeHtml(c.content)}</span>
+          ${canDelete ? `<button class="comment-delete" onclick="deleteComment('${c.id}','${postId}')">🗑</button>` : ''}
+        </div>`;
+    }).join('');
+
+    box.innerHTML = `
+      <div class="comments-list">${listHtml || '<div class="empty-msg-sm">Nenhum comentário ainda.</div>'}</div>
+      <div class="comment-input-row">
+        <input type="text" class="comment-input" id="commentInput-${postId}" placeholder="Escreva um comentário..." />
+        <button class="comment-send-btn" onclick="addComment('${postId}')">Enviar</button>
+      </div>`;
+
+    const input = document.getElementById('commentInput-' + postId);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') addComment(postId); });
+  }
+
+  async function addComment(postId) {
+    const input = document.getElementById('commentInput-' + postId);
+    const text = input.value.trim();
+    if (!text) return;
+
+    await sb.from('community_comments').insert({ post_id: postId, author_id: CURRENT_USER_ID, content: text });
+    input.value = '';
+    await loadCommentsForPost(postId);
+
+    const badge = document.getElementById('commentCount-' + postId);
+    if (badge) badge.textContent = (parseInt(badge.textContent, 10) || 0) + 1;
+  }
+
+  async function deleteComment(commentId, postId) {
+    if (!confirm('Excluir este comentário?')) return;
+    await sb.from('community_comments').delete().eq('id', commentId);
+    await loadCommentsForPost(postId);
+
+    const badge = document.getElementById('commentCount-' + postId);
+    if (badge) badge.textContent = Math.max(0, (parseInt(badge.textContent, 10) || 1) - 1);
+  }
+
+  document.getElementById('postImageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('postImagePreview');
+    if (!file) { preview.style.display = 'none'; preview.src = ''; return; }
+    const reader = new FileReader();
+    reader.onload = function(ev) { preview.src = ev.target.result; preview.style.display = 'block'; };
+    reader.readAsDataURL(file);
+  });
+
+  async function createPost() {
+    const textarea = document.getElementById('postContent');
+    const fileInput = document.getElementById('postImageInput');
+    const content = textarea.value.trim();
+    const file = fileInput.files[0];
+
+    if (!content && !file) { alert('Escreva algo ou anexe uma foto para publicar.'); return; }
+
+    const btn = document.getElementById('publishPostBtn');
+    btn.disabled = true;
+    btn.textContent = 'Publicando...';
+
+    try {
+      let imageUrl = null;
+      if (file) {
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
+        const path = 'posts/' + CURRENT_USER_ID + '_' + Date.now() + '.' + ext;
+        const { error: upErr } = await sb.storage.from('Avatars').upload(path, file);
+        if (upErr) throw upErr;
+        const { data: urlData } = sb.storage.from('Avatars').getPublicUrl(path);
+        imageUrl = urlData.publicUrl;
+      }
+
+      const { error } = await sb.from('community_posts').insert({
+        author_id: CURRENT_USER_ID,
+        content,
+        image_url: imageUrl
+      });
+      if (error) throw error;
+
+      textarea.value = '';
+      fileInput.value = '';
+      document.getElementById('postImagePreview').style.display = 'none';
+      await loadPosts();
+    } catch (err) {
+      alert('Erro ao publicar: ' + (err.message || err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Publicar';
+    }
+  }
+
+  async function deletePost(postId) {
+    if (!confirm('Excluir este post? Os comentários e curtidas também serão apagados.')) return;
+    await sb.from('community_posts').delete().eq('id', postId);
+    await loadPosts();
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>
