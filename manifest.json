@@ -1,0 +1,16 @@
+{
+  "name": "itsbrendacleto",
+  "short_name": "itsbrendacleto",
+  "description": "Inglês para a vida real — aulas, materiais e acompanhamento.",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#FAF7F2",
+  "theme_color": "#5C4033",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
