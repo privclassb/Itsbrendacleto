@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 3 · Around the World! · itsbrendacleto Kids</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+  :root{--cream:#FDF6EE;--sand:#F0E4D0;--brown:#8B5943;--brown-dk:#5C3320;--rose:#F2A7C3;--rose-lt:#FDEAF3;--sky:#A8D8EA;--sky-lt:#E8F7FC;--mint:#A8E6CF;--mint-lt:#E8FAF2;--lav:#C9A8E8;--lav-lt:#F2ECFC;--sun:#FFD97D;--sun-lt:#FFFBEC;--coral:#FFB3A7;--coral-lt:#FFF0EE;--white:#FFFFFF;--text:#3A2A1E;--text-md:#7A5C4A;--r:18px;--rs:12px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+  .header{background:linear-gradient(135deg,var(--brown-dk),var(--brown));padding:28px 20px 32px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(242,167,195,.22),transparent 50%),radial-gradient(circle at 10% 80%,rgba(168,216,234,.18),transparent 50%);}
+  .brand{font-family:'Nunito',sans-serif;font-weight:900;font-size:.8rem;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;position:relative;margin-bottom:10px;}
+  .brand span{color:var(--rose);}
+  .h-emoji{font-size:3rem;display:block;position:relative;margin-bottom:6px;}
+  .h-num{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;position:relative;}
+  .h-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.5rem,5vw,2rem);color:#fff;line-height:1.15;position:relative;margin-top:4px;}
+  .h-title em{color:var(--rose);font-style:normal;}
+  .h-desc{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:8px;position:relative;}
+  .pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;position:relative;}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:.72rem;padding:5px 12px;border-radius:20px;cursor:pointer;transition:background .2s;}
+  .pill:hover,.pill.on{background:var(--rose);border-color:var(--rose);}
+  .main{padding:20px 16px 40px;max-width:600px;margin:0 auto;}
+  .sec{background:#fff;border-radius:var(--r);box-shadow:0 4px 20px rgba(139,89,67,.09);margin-bottom:16px;overflow:hidden;display:none;}
+  .sec.on{display:block;}
+  .ch{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--sand);}
+  .ci{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .ci.rose{background:var(--rose-lt);}.ci.lav{background:var(--lav-lt);}.ci.mint{background:var(--mint-lt);}.ci.sun{background:var(--sun-lt);}.ci.sky{background:var(--sky-lt);}.ci.coral{background:var(--coral-lt);}
+  .ct{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--brown-dk);}
+  .cs{font-size:.78rem;color:var(--text-md);margin-top:1px;}
+  .cb{padding:18px 20px;}
+
+  /* FLASHCARDS */
+  .fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;}
+  .fc{perspective:600px;cursor:pointer;height:120px;}
+  .fc-in{width:100%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;}
+  .fc.flip .fc-in{transform:rotateY(180deg);}
+  .fc-f,.fc-b{position:absolute;inset:0;border-radius:var(--rs);backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;border:2px solid transparent;}
+  .fc-f{background:var(--rose-lt);border-color:var(--rose);}
+  .fc-b{background:var(--sky-lt);border-color:var(--sky);transform:rotateY(180deg);}
+  .fc-flag{font-size:1.8rem;margin-bottom:4px;}
+  .fc-en{font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;color:var(--brown-dk);line-height:1.2;}
+  .fc-nat{font-size:.72rem;color:var(--text-md);margin-top:2px;font-style:italic;}
+  .fc-tap{font-size:.6rem;color:var(--text-md);opacity:.7;margin-top:4px;}
+  .abtn{background:var(--rose);border:none;cursor:pointer;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.75rem;margin-top:4px;transition:transform .15s;}
+  .abtn:hover{transform:scale(1.18);}
+
+  /* FLAG QUIZ */
+  .fq-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .fq-prog-row{display:flex;align-items:center;gap:10px;width:100%;}
+  .fq-pbar{flex:1;height:8px;background:var(--sand);border-radius:20px;overflow:hidden;}
+  .fq-pfill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--rose),var(--lav));transition:width .4s;}
+  .fq-plbl{font-size:.74rem;color:var(--text-md);font-weight:700;white-space:nowrap;}
+  .fq-score-box{background:var(--sun-lt);border:2px solid var(--sun);border-radius:var(--rs);padding:8px 16px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;color:var(--brown-dk);}
+  .fq-flag{font-size:5rem;text-align:center;line-height:1;margin:4px 0;}
+  .fq-question{font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--brown-dk);text-align:center;}
+  .fq-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%;}
+  .fq-opt{background:#fff;border:2px solid var(--sand);border-radius:var(--rs);padding:11px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;color:var(--text);text-align:center;transition:all .18s;}
+  .fq-opt:hover{border-color:var(--lav);background:var(--lav-lt);}
+  .fq-opt.ok{border-color:var(--mint);background:var(--mint-lt);color:#2E7D5E;}
+  .fq-opt.fail{border-color:var(--coral);background:var(--coral-lt);color:#b03025;}
+  .fq-opt:disabled{cursor:default;}
+  .fq-fb{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;padding:10px;border-radius:var(--rs);text-align:center;display:none;width:100%;}
+  .fq-fb.show{display:block;}.fq-fb.ok{background:var(--mint-lt);color:#2E7D5E;}.fq-fb.fail{background:var(--coral-lt);color:#b03025;}
+  .fq-next{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:10px 24px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;cursor:pointer;display:none;}
+  .fq-result{text-align:center;padding:16px;display:none;width:100%;}
+  .fq-result.show{display:block;}
+  .fq-res-em{font-size:2.8rem;display:block;margin-bottom:8px;}
+  .fq-res-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.2rem;color:var(--brown-dk);}
+  .fq-res-s{color:var(--text-md);font-size:.85rem;margin-top:5px;}
+  .btn-retry{background:var(--sand);color:var(--brown-dk);border:none;border-radius:var(--rs);padding:9px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.84rem;cursor:pointer;margin-top:14px;}
+
+  /* COUNTRY MATCHER */
+  .matcher-intro{font-size:.83rem;color:var(--text-md);margin-bottom:14px;text-align:center;line-height:1.5;}
+  .matcher-score{font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;color:var(--brown-dk);text-align:center;margin-bottom:12px;}
+  .matcher-board{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+  .matcher-col{display:flex;flex-direction:column;gap:8px;}
+  .matcher-col-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.8rem;color:var(--text-md);text-align:center;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+  .drag-item{background:var(--rose-lt);border:2px solid var(--rose);border-radius:var(--rs);padding:10px 8px;text-align:center;cursor:pointer;font-size:1.4rem;transition:transform .15s,box-shadow .15s;user-select:none;min-height:52px;display:flex;align-items:center;justify-content:center;}
+  .drag-item:hover{transform:scale(1.05);}
+  .drag-item.dragging{background:var(--lav);border-color:var(--lav);transform:scale(1.08);box-shadow:0 6px 16px rgba(201,168,232,.5);}
+  .drag-item.matched{background:var(--mint-lt);border-color:var(--mint);cursor:default;}
+  .drag-item.wrong-shake{animation:shake .4s ease;}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .drop-zone{background:var(--lav-lt);border:2.5px dashed var(--lav);border-radius:var(--rs);padding:10px 8px;text-align:center;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:background .2s,border-color .2s;}
+  .drop-zone.over{background:var(--lav);border-color:var(--lav);}
+  .drop-zone.matched{background:var(--mint-lt);border-color:var(--mint);border-style:solid;}
+  .drop-zone-name{font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;color:var(--brown-dk);}
+  .drop-zone-nat{font-size:.7rem;color:var(--text-md);}
+  .drop-zone-flag{font-size:1.3rem;}
+  .matcher-win{background:var(--mint-lt);border:2px solid var(--mint);border-radius:var(--rs);padding:14px;text-align:center;display:none;margin-top:4px;}
+  .matcher-win.show{display:block;}
+  .matcher-win-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#2E7D5E;}
+  .btn-sm{background:var(--sand);border:none;border-radius:10px;padding:6px 14px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;color:var(--text-md);transition:background .2s;}
+  .btn-sm:hover{background:var(--rose-lt);color:var(--brown);}
+
+  /* SPEECH */
+  .sp-wrap{display:flex;flex-direction:column;align-items:center;gap:14px;}
+  .sp-prompt{background:var(--mint-lt);border:2px solid var(--mint);border-radius:var(--rs);padding:14px 18px;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.95rem;color:var(--brown-dk);width:100%;}
+  .sp-ex{font-size:.82rem;color:var(--text-md);font-weight:400;margin-top:6px;line-height:1.6;}
+  .sp-steps{display:flex;flex-direction:column;gap:6px;width:100%;}
+  .sp-step{background:var(--white);border:2px solid var(--sand);border-radius:var(--rs);padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--text);}
+  .sp-step-num{width:24px;height:24px;border-radius:50%;background:var(--lav);color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .sp-step.done{border-color:var(--mint);background:var(--mint-lt);}
+  .sp-step.done .sp-step-num{background:var(--mint);}
+  .mic-btn{background:linear-gradient(135deg,var(--rose),var(--lav));border:none;border-radius:50%;width:80px;height:80px;font-size:2rem;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 4px 16px rgba(242,167,195,.5);}
+  .mic-btn:hover{transform:scale(1.08);}
+  .mic-btn.go{animation:mpulse 1s infinite;background:linear-gradient(135deg,#e0405a,var(--lav));}
+  @keyframes mpulse{0%,100%{box-shadow:0 4px 16px rgba(242,167,195,.5)}50%{box-shadow:0 4px 28px rgba(242,167,195,.9)}}
+  .mic-lbl{font-size:.8rem;color:var(--text-md);font-family:'Nunito',sans-serif;font-weight:700;}
+  .sp-transcript{min-height:26px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.9rem;color:var(--text-md);text-align:center;font-style:italic;}
+  .sp-fb{border-radius:var(--rs);padding:12px 16px;text-align:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;display:none;width:100%;}
+  .sp-fb.show{display:block;}
+  .sp-fb.ok{background:var(--mint-lt);color:#2E7D5E;}
+  .sp-fb.fail{background:var(--coral-lt);color:#b03025;}
+  .sp-tip{font-size:.76rem;color:var(--text-md);text-align:center;background:var(--sun-lt);border:1px solid var(--sun);border-radius:10px;padding:8px 12px;width:100%;}
+
+  /* QUIZ */
+  .qprow{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .qpbar{flex:1;height:8px;background:var(--sand);border-radius:20px;overflow:hidden;}
+  .qpfill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--lav),var(--rose));transition:width .4s;}
+  .qplbl{font-size:.74rem;color:var(--text-md);font-weight:700;white-space:nowrap;}
+  .qq{background:var(--lav-lt);border:2px solid var(--lav);border-radius:var(--rs);padding:14px;text-align:center;margin-bottom:12px;}
+  .qq-em{font-size:2rem;display:block;margin-bottom:4px;}
+  .qq-txt{font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem;color:var(--brown-dk);}
+  .qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .qopt{background:#fff;border:2px solid var(--sand);border-radius:var(--rs);padding:10px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--text);text-align:center;transition:all .18s;line-height:1.25;}
+  .qopt:hover{border-color:var(--lav);background:var(--lav-lt);}
+  .qopt.ok{border-color:var(--mint);background:var(--mint-lt);color:#2E7D5E;}
+  .qopt.fail{border-color:var(--coral);background:var(--coral-lt);color:#b03025;}
+  .qopt:disabled{cursor:default;}
+  .qfb{text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;padding:9px;border-radius:var(--rs);margin-bottom:10px;display:none;}
+  .qfb.on{display:block;}.qfb.ok{background:var(--mint-lt);color:#2E7D5E;}.qfb.fail{background:var(--coral-lt);color:#b03025;}
+  .qnav{display:flex;justify-content:center;}
+  .btn-nx{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:9px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;display:none;}
+  .qres{text-align:center;padding:14px;display:none;}
+  .qres.on{display:block;}
+  .qres-em{font-size:2.8rem;display:block;margin-bottom:6px;}
+  .qres-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);}
+  .qres-s{color:var(--text-md);font-size:.83rem;margin-top:4px;}
+  .btn-rt{background:var(--sand);color:var(--brown-dk);border:none;border-radius:var(--rs);padding:8px 18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;margin-top:12px;}
+
+  /* BADGE */
+  .badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .4s;}
+  .badge-overlay.show{opacity:1;pointer-events:all;}
+  .badge-card{background:linear-gradient(160deg,#FFF9EC,#FFF0F8);border-radius:28px;padding:28px 22px 24px;max-width:310px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(92,51,32,.35);border:3px solid var(--sun);position:relative;overflow:hidden;animation:badgePop .5s cubic-bezier(.34,1.56,.64,1);}
+  .badge-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:var(--rose-lt);border-radius:50%;opacity:.6;}
+  .badge-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:var(--lav-lt);border-radius:50%;opacity:.6;}
+  @keyframes badgePop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+  .badge-stars{font-size:1.1rem;letter-spacing:4px;margin-bottom:8px;animation:starSpin 3s linear infinite;}
+  @keyframes starSpin{0%,100%{letter-spacing:4px}50%{letter-spacing:8px}}
+  .badge-shield{width:110px;height:110px;margin:0 auto 12px;position:relative;z-index:1;}
+  .badge-shield-bg{width:110px;height:110px;background:linear-gradient(135deg,var(--sun),#FFB347);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,179,71,.5),0 0 0 5px #fff,0 0 0 8px var(--sun);animation:shieldPulse 1.5s ease-in-out infinite;}
+  @keyframes shieldPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .badge-shield-em{font-size:3rem;}
+  .badge-ribbon{background:linear-gradient(90deg,var(--rose),var(--lav));color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 18px;border-radius:20px;display:inline-block;margin-bottom:10px;position:relative;z-index:1;}
+  .badge-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--brown-dk);line-height:1.15;margin-bottom:4px;position:relative;z-index:1;}
+  .badge-lesson{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--text-md);margin-bottom:12px;position:relative;z-index:1;}
+  .badge-divider{border:none;border-top:2px dashed var(--sun);margin:10px 0;position:relative;z-index:1;}
+  .badge-msg{font-size:.82rem;color:var(--text-md);line-height:1.55;margin-bottom:14px;position:relative;z-index:1;}
+  .badge-msg strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .badge-hashtag{font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;color:var(--lav);margin-bottom:16px;position:relative;z-index:1;}
+  .badge-btns{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .badge-btn-share{background:linear-gradient(135deg,var(--rose),var(--lav));color:#fff;border:none;border-radius:var(--rs);padding:12px 20px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;transition:transform .15s;box-shadow:0 4px 12px rgba(201,168,232,.5);}
+  .badge-btn-share:hover{transform:translateY(-2px);}
+  .badge-btn-close{background:transparent;color:var(--text-md);border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;padding:6px;text-decoration:underline;}
+  .badge-confetti{position:fixed;pointer-events:none;animation:confettiFall linear forwards;z-index:1001;}
+  @keyframes confettiFall{0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(.5);opacity:0}}
+
+  /* MISSION */
+  .msn{background:var(--sun-lt);border:2.5px solid var(--sun);border-radius:var(--r);padding:16px;}
+  .msn-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .msn-ico{width:42px;height:42px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .msn-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:.92rem;color:var(--brown-dk);}
+  .msn-w{font-size:.73rem;color:var(--text-md);margin-top:1px;}
+  .msn-steps{display:flex;flex-direction:column;gap:8px;}
+  .mstep{display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;}
+  .stchk{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2.5px solid var(--sun);cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;transition:all .2s;margin-top:1px;}
+  .stchk.on{background:var(--mint);border-color:var(--mint);}
+  .stchk.on::after{content:'✓';font-size:.72rem;color:#fff;font-weight:900;}
+  .stxt{font-size:.83rem;color:var(--text);line-height:1.4;}
+  .stxt strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .msn-rwd{display:flex;align-items:center;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;margin-top:10px;border:1.5px dashed var(--sun);}
+  .rwd-t{font-size:.78rem;color:var(--text-md);line-height:1.35;}
+  .rwd-t strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .footer{text-align:center;padding:22px 16px 30px;font-size:.72rem;color:var(--text-md);border-top:1.5px solid var(--sand);margin-top:8px;}
+  .footer strong{color:var(--brown);}
+  @media(max-width:400px){.qopts,.fq-opts{grid-template-columns:1fr;}.matcher-board{grid-template-columns:1fr;}}
+
+  /* ── PLANNER MODE ── */
+  .btn-voltar {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.3);
+    border: none;
+    border-radius: 0;
+    padding: 10px 20px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    color: #fff;
+    cursor: pointer;
+    text-decoration: none;
+    width: 100%;
+    position: relative;
+    z-index: 9999;
+    pointer-events: all !important;
+  }
+  .btn-voltar:active { background: rgba(0,0,0,0.5); }
+  .planner-mode .pills { display: none; }
+  .planner-mode .btn-voltar { display: block; }
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
+</head>
+<body>
+
+<a class="btn-voltar" id="btnVoltar" href="planner-kids-3.html">← Voltar para a lista</a>
+<div class="header">
+  <div class="brand">its<span>brenda</span>cleto · kids</div>
+  <span class="h-emoji">🌍</span>
+  <div class="h-num">Aula 3 · Bloco 1</div>
+  <div class="h-title"><em>Around</em> the World!</div>
+  <div class="h-desc">Countries · Nationalities · Personal Introduction</div>
+  <div class="pills">
+    <span class="pill on" onclick="show('flashcards',this)">🌍 Countries</span>
+    <span class="pill"   onclick="show('flagquiz',this)">🚩 Flag Quiz</span>
+    <span class="pill"   onclick="show('matcher',this)">🗺️ Matcher</span>
+    <span class="pill"   onclick="show('speech',this)">🎤 Speak It!</span>
+    <span class="pill"   onclick="show('quiz',this)">❓ Quiz</span>
+    <span class="pill"   onclick="show('mission',this)">🎯 Missão</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- FLASHCARDS -->
+  <div class="sec on" id="sec-flashcards">
+    <div class="ch"><div class="ci rose">🌍</div><div><div class="ct">Countries & Nationalities</div><div class="cs">Toque no cartão · 🔊 para ouvir</div></div></div>
+    <div class="cb"><div class="fc-grid" id="fc-grid"></div></div>
+  </div>
+
+  <!-- FLAG QUIZ -->
+  <div class="sec" id="sec-flagquiz">
+    <div class="ch"><div class="ci lav">🚩</div><div><div class="ct">Flag Quiz!</div><div class="cs">Qual é esse país?</div></div></div>
+    <div class="cb">
+      <div class="fq-wrap">
+        <div class="fq-prog-row">
+          <div class="fq-pbar"><div class="fq-pfill" id="fq-pf" style="width:0%"></div></div>
+          <span class="fq-plbl" id="fq-pl">0 / 10</span>
+          <div class="fq-score-box">⭐ <span id="fq-sc">0</span></div>
+        </div>
+        <div class="fq-flag" id="fq-flag"></div>
+        <div class="fq-question" id="fq-q"></div>
+        <div class="fq-opts" id="fq-opts"></div>
+        <div class="fq-fb" id="fq-fb"></div>
+        <button class="fq-next" id="fq-next" onclick="nextFQ()">Próxima ➡️</button>
+        <div class="fq-result" id="fq-result">
+          <span class="fq-res-em" id="fq-res-em"></span>
+          <div class="fq-res-t" id="fq-res-t"></div>
+          <div class="fq-res-s" id="fq-res-s"></div>
+          <button class="btn-retry" onclick="initFQ()">🔄 Jogar de novo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MATCHER -->
+  <div class="sec" id="sec-matcher">
+    <div class="ch"><div class="ci sky">🗺️</div><div><div class="ct">Country Matcher!</div><div class="cs">Toque na bandeira e depois no país correto!</div></div></div>
+    <div class="cb">
+      <div style="background:var(--lav-lt);border:2px solid var(--lav);border-radius:var(--rs);padding:10px 14px;font-size:.82rem;color:var(--text-md);margin-bottom:12px;text-align:center;line-height:1.5">
+  1️⃣ Toque em uma <strong>bandeira</strong> para selecioná-la<br>
+  2️⃣ Depois toque no <strong>país</strong> correspondente!
+</div>
+<div class="matcher-score">Pares: <span id="m-score">0</span> / <span id="m-total">6</span> <button class="btn-sm" onclick="initMatcher()" style="margin-left:8px">🔄 Novo jogo</button></div>
+      <div class="matcher-board">
+        <div class="matcher-col">
+          <div class="matcher-col-title">🚩 Bandeiras</div>
+          <div id="drag-col"></div>
+        </div>
+        <div class="matcher-col">
+          <div class="matcher-col-title">🌍 Países</div>
+          <div id="drop-col"></div>
+        </div>
+      </div>
+      <div class="matcher-win" id="matcher-win">
+        <div class="matcher-win-t">🎉 Perfeito! Você combinou todos os países!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SPEECH -->
+  <div class="sec" id="sec-speech">
+    <div class="ch"><div class="ci mint">🎤</div><div><div class="ct">Speak It!</div><div class="cs">Fale sua apresentação completa em inglês!</div></div></div>
+    <div class="cb">
+      <div class="sp-wrap">
+        <div class="sp-prompt">
+          🎯 Apresente-se em inglês!
+          <div class="sp-ex">
+            "Hi! My name is ___.<br>
+            I am ___ years old.<br>
+            I'm from Brazil. I'm Brazilian!<br>
+            Today I'm ___."
+          </div>
+        </div>
+        <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;color:var(--brown-dk);width:100%">✅ O site vai verificar se você disse:</div>
+        <div class="sp-steps" id="sp-steps"></div>
+        <button class="mic-btn" id="mic-btn" onclick="startSpeech()">🎤</button>
+        <div class="mic-lbl" id="mic-lbl">Toque para falar!</div>
+        <div class="sp-transcript" id="sp-transcript">...</div>
+        <div class="sp-fb" id="sp-fb"></div>
+        <div class="sp-tip">💡 Funciona melhor no <strong>Google Chrome</strong>! Fale devagar e claro 😊</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="sec" id="sec-quiz">
+    <div class="ch"><div class="ci lav">❓</div><div><div class="ct">Quiz</div><div class="cs">Countries, Nationalities & Introduction!</div></div></div>
+    <div class="cb">
+      <div class="qprow"><div class="qpbar"><div class="qpfill" id="qpf" style="width:0%"></div></div><span class="qplbl" id="qpl">0 / 8</span></div>
+      <div id="quiz-area"></div>
+      <div class="qres" id="qres">
+        <span class="qres-em" id="qres-em"></span>
+        <div class="qres-t" id="qres-t"></div>
+        <div class="qres-s" id="qres-s"></div>
+        <button class="btn-rt" onclick="initQuiz()">🔄 Jogar de novo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="sec" id="sec-mission">
+    <div class="ch"><div class="ci sun">🎯</div><div><div class="ct">Missão da Semana</div><div class="cs">Complete todas as etapas!</div></div></div>
+    <div class="cb">
+      <div class="msn">
+        <div class="msn-top"><div class="msn-ico">🎯</div><div><div class="msn-t">Sua missão dessa semana!</div><div class="msn-w">Aula 3 — Around the World!</div></div></div>
+        <div class="msn-steps" id="msn-steps"></div>
+        <div class="msn-rwd"><span style="font-size:1.4rem">⭐</span><div class="rwd-t">Complete tudo e ganhe seu<br><strong>terceiro badge da jornada!</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BADGE -->
+<div class="badge-overlay" id="badge-overlay" onclick="closeBadge(event)">
+  <div class="badge-card">
+    <div class="badge-stars">⭐ ⭐ ⭐</div>
+    <div class="badge-shield"><div class="badge-shield-bg"><span class="badge-shield-em">🌍</span></div></div>
+    <div class="badge-ribbon">itsbrendacleto · Kids</div>
+    <div class="badge-title">Missão<br>Completa! 🎉</div>
+    <div class="badge-lesson">Aula 3 — Around the World!</div>
+    <hr class="badge-divider">
+    <div class="badge-msg">Parabéns! Você completou todas as atividades da Aula 3!<br><strong>Print esse badge e cole na sua coleção! 🖨️</strong></div>
+    <div class="badge-hashtag">#itsbrendacleto #kidsenglish</div>
+    <div class="badge-btns">
+      <button class="badge-btn-share" onclick="shareBadge()">📸 Compartilhar no Instagram!</button>
+      <button class="badge-btn-close" onclick="closeBadge()">fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Feito com 💛 por <strong>itsbrendacleto</strong> · Kids Edition</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+// ── DATA ──────────────────────────────────────────────────────────────────
+var COUNTRIES=[
+  {flag:'🇧🇷',en:'Brazil',nat:'Brazilian',pt:'Brasil'},
+  {flag:'🇺🇸',en:'The USA',nat:'American',pt:'Estados Unidos'},
+  {flag:'🇬🇧',en:'The UK',nat:'British',pt:'Reino Unido'},
+  {flag:'🇯🇵',en:'Japan',nat:'Japanese',pt:'Japão'},
+  {flag:'🇫🇷',en:'France',nat:'French',pt:'França'},
+  {flag:'🇦🇺',en:'Australia',nat:'Australian',pt:'Austrália'},
+  {flag:'🇲🇽',en:'Mexico',nat:'Mexican',pt:'México'},
+  {flag:'🇨🇳',en:'China',nat:'Chinese',pt:'China'},
+  {flag:'🇦🇷',en:'Argentina',nat:'Argentinian',pt:'Argentina'},
+  {flag:'🇮🇹',en:'Italy',nat:'Italian',pt:'Itália'},
+  {flag:'🇪🇸',en:'Spain',nat:'Spanish',pt:'Espanha'},
+  {flag:'🇨🇦',en:'Canada',nat:'Canadian',pt:'Canadá'},
+];
+
+var QUIZ=[
+  {em:'🇫🇷',q:'Qual é a nacionalidade de quem é da França?',opts:['French','Frenchy','Frances','Francian'],c:0},
+  {em:'🌍',q:'Como se diz "De onde você é?" em inglês?',opts:['Where are you?','Where from you?','Where are you from?','From where you?'],c:2},
+  {em:'🇯🇵',q:'Qual é a nacionalidade de quem é do Japão?',opts:['Japanish','Japanesse','Japanese','Japanic'],c:2},
+  {em:'🗣️',q:'Como você diz "Eu sou do Brasil" em inglês?',opts:["I'm from Brazil","I'm Brazil","I am Brazil","From I Brazil"],c:0},
+  {em:'🇬🇧',q:'Qual é a nacionalidade de quem é do UK?',opts:['Ukish','English','British','Ukanian'],c:2},
+  {em:'🌎',q:'Como você completa: "I\'m from Mexico. I\'m ___"?',opts:['Mexicano','Mexican','Mexician','Mexian'],c:1},
+  {em:'🎤',q:'Qual é a ordem correta de uma apresentação?',opts:['Age → Name → Feeling','Name → Age → Feeling → Origin','Origin → Age → Name','Feeling → Name → Origin'],c:1},
+  {em:'🇦🇺',q:'Qual é a nacionalidade de quem é da Austrália?',opts:['Australish','Australier','Australish','Australian'],c:3},
+];
+
+var MISSION=[
+  'Estude os <strong>flashcards</strong> de countries e nationalities.',
+  'Complete o <strong>Flag Quiz</strong> com pelo menos 8 acertos!',
+  'Jogue o <strong>Country Matcher</strong> e combine todos os pares!',
+  'Pratique o <strong>Speak It!</strong> e diga sua apresentação completa.',
+  'Apresente-se em inglês para alguém em casa — <strong>nome, idade, origem e feeling</strong>!',
+];
+
+var SP_CHECKS=[
+  {label:'Nome',        key:'name',  hint:'My name is...'},
+  {label:'Idade',       key:'age',   hint:'I am ... years old'},
+  {label:'Origem',      key:'origin',hint:"I'm from..."},
+  {label:'Como está',   key:'feel',  hint:"Today I'm..."},
+];
+
+// ── AUDIO ──────────────────────────────────────────────────────────────────
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;window.speechSynthesis.speak(u);}
+
+// ── NAV ────────────────────────────────────────────────────────────────────
+var inited={};
+function show(n,pill){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.pill').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('sec-'+n).classList.add('on');
+  pill.classList.add('on');
+  if(!inited[n]){inited[n]=true;({flashcards:initFC,flagquiz:initFQ,matcher:initMatcher,speech:initSpeech,quiz:initQuiz,mission:initMission})[n]();}
+}
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────
+function initFC(){
+  var g=document.getElementById('fc-grid');g.innerHTML='';
+  COUNTRIES.forEach(function(c,i){
+    var d=document.createElement('div');d.className='fc';
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><span class="fc-flag">'+c.flag+'</span><div class="fc-en">'+c.en+'</div><button class="abtn" id="ab'+i+'">🔊</button><div class="fc-tap">toque para ver</div></div><div class="fc-b"><span class="fc-flag">'+c.flag+'</span><div class="fc-en">'+c.nat+'</div><div class="fc-nat">'+c.pt+'</div></div></div>';
+    d.addEventListener('click',function(){d.classList.toggle('flip');});
+    d.querySelector('.abtn').addEventListener('click',function(e){e.stopPropagation();speak(c.en+'. '+c.nat);});
+    g.appendChild(d);
+  });
+}
+
+// ── FLAG QUIZ ──────────────────────────────────────────────────────────────
+var fqQ=[],fqCur=0,fqScore=0,fqDone=false;
+function initFQ(){
+  // Embaralhar e pegar 10
+  fqQ=COUNTRIES.slice().sort(function(){return Math.random()-.5;}).slice(0,10);
+  fqCur=0;fqScore=0;fqDone=false;
+  document.getElementById('fq-result').classList.remove('show');
+  document.getElementById('fq-sc').textContent='0';
+  renderFQ();
+}
+function renderFQ(){
+  var q=fqQ[fqCur],tot=fqQ.length;
+  document.getElementById('fq-pf').style.width=(fqCur/tot*100)+'%';
+  document.getElementById('fq-pl').textContent=fqCur+' / '+tot;
+  document.getElementById('fq-flag').textContent=q.flag;
+  document.getElementById('fq-q').textContent='What country is this?';
+  document.getElementById('fq-fb').className='fq-fb';
+  document.getElementById('fq-next').style.display='none';
+  // 4 opções: correta + 3 erradas
+  var wrong=COUNTRIES.filter(function(c){return c.en!==q.en;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  var opts=[q].concat(wrong).sort(function(){return Math.random()-.5;});
+  var el=document.getElementById('fq-opts');el.innerHTML='';
+  opts.forEach(function(o){
+    var b=document.createElement('button');b.className='fq-opt';
+    b.textContent=o.en;
+    b.addEventListener('click',function(){answerFQ(b,o.en===q.en,q);});
+    el.appendChild(b);
+  });
+  fqDone=false;
+}
+function answerFQ(btn,correct,q){
+  if(fqDone)return;fqDone=true;
+  document.querySelectorAll('.fq-opt').forEach(function(b){b.disabled=true;});
+  var fb=document.getElementById('fq-fb');
+  if(correct){
+    fqScore++;
+    document.getElementById('fq-sc').textContent=fqScore;
+    btn.classList.add('ok');
+    fb.textContent='🎉 Correct! '+q.flag+' '+q.en+'!';
+    fb.className='fq-fb show ok';
+    speak(q.en);
+  } else {
+    btn.classList.add('fail');
+    // Destacar correta
+    document.querySelectorAll('.fq-opt').forEach(function(b){
+      if(b.textContent===q.en)b.classList.add('ok');
+    });
+    fb.textContent='😅 This is '+q.en+'!';
+    fb.className='fq-fb show fail';
+  }
+  document.getElementById('fq-next').style.display='inline-block';
+}
+function nextFQ(){
+  fqCur++;
+  if(fqCur>=fqQ.length){
+    document.getElementById('fq-pf').style.width='100%';
+    document.getElementById('fq-pl').textContent=fqQ.length+' / '+fqQ.length;
+    var p=fqScore/fqQ.length;
+    document.getElementById('fq-res-em').textContent=p===1?'🏆':p>=.7?'🌟':'💪';
+    document.getElementById('fq-res-t').textContent=p===1?'Perfect!':p>=.7?'Great job!':'Keep practicing!';
+    document.getElementById('fq-res-s').textContent='Você acertou '+fqScore+' de '+fqQ.length+'!';
+    document.getElementById('fq-result').classList.add('show');
+    document.getElementById('fq-opts').innerHTML='';
+    document.getElementById('fq-flag').textContent='';
+    document.getElementById('fq-q').textContent='';
+    document.getElementById('fq-next').style.display='none';
+    document.getElementById('fq-fb').className='fq-fb';
+  } else { renderFQ(); }
+}
+
+// ── COUNTRY MATCHER ── tap-to-select ─────────────────────────────────────
+var mMatched=0,mTotal=6,mSet=[],mSelected=null;
+function initMatcher(){
+  mMatched=0;mSelected=null;
+  document.getElementById('matcher-win').classList.remove('show');
+  mSet=COUNTRIES.slice().sort(function(){return Math.random()-.5;}).slice(0,6);
+  document.getElementById('m-score').textContent='0';
+  document.getElementById('m-total').textContent=mTotal;
+  var flags=mSet.slice().sort(function(){return Math.random()-.5;});
+  var names=mSet.slice().sort(function(){return Math.random()-.5;});
+  // Bandeiras (esquerda)
+  var dc=document.getElementById('drag-col');dc.innerHTML='';
+  flags.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='drag-item';d.dataset.country=c.en;
+    d.textContent=c.flag;
+    d.addEventListener('click',function(){selectFlag(d,c);});
+    dc.appendChild(d);
+  });
+  // Países (direita)
+  var drc=document.getElementById('drop-col');drc.innerHTML='';
+  names.forEach(function(c){
+    var z=document.createElement('div');
+    z.className='drop-zone';z.dataset.country=c.en;
+    z.innerHTML='<div class="drop-zone-name">'+c.en+'</div><div class="drop-zone-nat">'+c.nat+'</div>';
+    z.addEventListener('click',function(){tryMatch(z,c);});
+    drc.appendChild(z);
+  });
+}
+function selectFlag(el,c){
+  if(el.classList.contains('matched'))return;
+  // Desselecionar anterior
+  document.querySelectorAll('.drag-item').forEach(function(d){d.classList.remove('dragging');});
+  el.classList.add('dragging');
+  mSelected={el:el,country:c};
+}
+function tryMatch(dropEl,dropCountry){
+  if(!mSelected)return;
+  if(dropEl.classList.contains('matched'))return;
+  if(mSelected.country.en===dropCountry.en){
+    // Acerto!
+    mSelected.el.classList.remove('dragging');
+    mSelected.el.classList.add('matched');
+    dropEl.classList.add('matched');
+    dropEl.innerHTML='<div class="drop-zone-flag">'+mSelected.el.textContent+'</div><div class="drop-zone-name">'+dropCountry.en+'</div><div class="drop-zone-nat">'+dropCountry.nat+'</div>';
+    speak(dropCountry.en+', '+dropCountry.nat);
+    mMatched++;document.getElementById('m-score').textContent=mMatched;
+    mSelected=null;
+    if(mMatched>=mTotal)setTimeout(function(){document.getElementById('matcher-win').classList.add('show');},400);
+  } else {
+    // Erro — shake nos dois
+    mSelected.el.classList.add('wrong-shake');
+    dropEl.classList.add('wrong-shake');
+    setTimeout(function(){
+      mSelected.el.classList.remove('wrong-shake','dragging');
+      dropEl.classList.remove('wrong-shake');
+      mSelected=null;
+    },500);
+  }
+}
+
+// ── SPEECH ─────────────────────────────────────────────────────────────────
+var spFound={name:false,age:false,origin:false,feel:false};
+function initSpeech(){
+  spFound={name:false,age:false,origin:false,feel:false};
+  renderSpSteps();
+}
+function renderSpSteps(){
+  var el=document.getElementById('sp-steps');el.innerHTML='';
+  SP_CHECKS.forEach(function(s){
+    var d=document.createElement('div');
+    d.className='sp-step'+(spFound[s.key]?' done':'');
+    d.innerHTML='<div class="sp-step-num">'+(spFound[s.key]?'✓':'?')+'</div><div><strong>'+s.label+'</strong> — '+s.hint+'</div>';
+    el.appendChild(d);
+  });
+}
+function startSpeech(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  var fb=document.getElementById('sp-fb');
+  if(!SR){fb.textContent='😅 Use o Google Chrome para essa atividade!';fb.className='sp-fb show fail';return;}
+  var rec=new SR();rec.lang='en-US';rec.interimResults=false;rec.maxAlternatives=1;
+  var btn=document.getElementById('mic-btn');var lbl=document.getElementById('mic-lbl');
+  btn.classList.add('go');lbl.textContent='🔴 Ouvindo...';
+  document.getElementById('sp-transcript').textContent='🎤 Fale agora!';
+  fb.className='sp-fb';
+  rec.onresult=function(e){
+    btn.classList.remove('go');lbl.textContent='Toque para falar!';
+    var t=e.results[0][0].transcript.toLowerCase();
+    document.getElementById('sp-transcript').textContent='"'+t+'"';
+    // Verificar cada elemento
+    spFound.name=(t.indexOf('my name is')>=0||t.indexOf("i'm")>=0||t.indexOf('i am')>=0)&&t.indexOf('year')<0;
+    spFound.age=t.indexOf('year')>=0&&(t.indexOf('i am')>=0||t.indexOf("i'm")>=0);
+    spFound.origin=t.indexOf('from')>=0;
+    spFound.feel=(t.indexOf("i'm")>=0||t.indexOf('i am')>=0)&&(t.indexOf('happy')>=0||t.indexOf('good')>=0||t.indexOf('fine')>=0||t.indexOf('tired')>=0||t.indexOf('excited')>=0||t.indexOf('sad')>=0);
+    renderSpSteps();
+    var count=Object.values(spFound).filter(Boolean).length;
+    if(count===4){fb.textContent='🎉 Perfeita apresentação! Amazing!';fb.className='sp-fb show ok';}
+    else if(count>=2){fb.textContent='😊 Quase lá! Faltou: '+(spFound.name?'':'nome ')+(spFound.age?'':'idade ')+(spFound.origin?'':'origem ')+(spFound.feel?'':'feeling');fb.className='sp-fb show fail';}
+    else{fb.textContent='😅 Try again! Fale mais devagar e inclua todos os elementos!';fb.className='sp-fb show fail';}
+  };
+  rec.onerror=function(){btn.classList.remove('go');lbl.textContent='Toque para falar!';fb.textContent='😅 Não consegui ouvir. Tente de novo!';fb.className='sp-fb show fail';};
+  rec.onend=function(){btn.classList.remove('go');lbl.textContent='Toque para falar!';};
+  rec.start();
+}
+
+// ── QUIZ ───────────────────────────────────────────────────────────────────
+var qC=0,qS=0,qD=false;
+function initQuiz(){qC=0;qS=0;qD=false;document.getElementById('qres').classList.remove('on');document.getElementById('quiz-area').innerHTML='';renderQ();}
+function renderQ(){
+  var q=QUIZ[qC],tot=QUIZ.length;
+  document.getElementById('qpf').style.width=(qC/tot*100)+'%';
+  document.getElementById('qpl').textContent=qC+' / '+tot;
+  var area=document.getElementById('quiz-area');
+  area.innerHTML='<div class="qq"><span class="qq-em">'+q.em+'</span><div class="qq-txt">'+q.q+'</div></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div><div class="qnav"><button class="btn-nx" id="qnx">'+(qC+1<tot?'Próxima ➡️':'Ver resultado 🏆')+'</button></div>';
+  var opts=document.getElementById('qopts');
+  q.opts.forEach(function(o,i){var b=document.createElement('button');b.className='qopt';b.textContent=o;b.addEventListener('click',function(){ansQ(i);});opts.appendChild(b);});
+  document.getElementById('qnx').addEventListener('click',nxtQ);
+  qD=false;
+}
+function ansQ(ch){
+  if(qD)return;qD=true;var q=QUIZ[qC];
+  var bs=document.querySelectorAll('.qopt');bs.forEach(function(b){b.disabled=true;});
+  bs[q.c].classList.add('ok');
+  var fb=document.getElementById('qfb');
+  if(ch===q.c){qS++;fb.textContent='🎉 Correto! Muito bem!';fb.className='qfb on ok';}
+  else{bs[ch].classList.add('fail');fb.textContent='😅 A resposta certa é: '+q.opts[q.c];fb.className='qfb on fail';}
+  document.getElementById('qnx').style.display='inline-block';
+}
+function nxtQ(){
+  qC++;
+  if(qC>=QUIZ.length){
+    document.getElementById('quiz-area').innerHTML='';
+    document.getElementById('qpf').style.width='100%';
+    document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;
+    var p=qS/QUIZ.length;
+    document.getElementById('qres-em').textContent=p===1?'🏆':p>=.6?'🌟':'💪';
+    document.getElementById('qres-t').textContent=p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';
+    document.getElementById('qres-s').textContent='Você acertou '+qS+' de '+QUIZ.length+' perguntas!';
+    document.getElementById('qres').classList.add('on');
+    saveQuizScore('kids-l1-a3-quiz',qS,QUIZ.length);
+  } else{renderQ();}
+}
+
+// ── MISSION ────────────────────────────────────────────────────────────────
+function initMission(){
+  var ul=document.getElementById('msn-steps');ul.innerHTML='';
+  MISSION.forEach(function(s,i){
+    var li=document.createElement('div');li.className='mstep';
+    li.innerHTML='<div class="stchk" id="st'+i+'"></div><div class="stxt">'+s+'</div>';
+    li.querySelector('.stchk').addEventListener('click',function(){this.classList.toggle('on');setTimeout(checkMission,100);});
+    ul.appendChild(li);
+  });
+}
+function checkMission(){
+  var steps=document.querySelectorAll('.stchk');
+  var all=true;steps.forEach(function(s){if(!s.classList.contains('on'))all=false;});
+  if(all&&steps.length>0)setTimeout(showBadge,400);
+}
+
+// ── BADGE ──────────────────────────────────────────────────────────────────
+var confettiEmos=['🌟','⭐','✨','🎉','🎊','💫','🌍','🌎'];
+function launchConfetti(){for(var i=0;i<18;i++){setTimeout(function(){var c=document.createElement('div');c.className='badge-confetti';c.textContent=confettiEmos[Math.floor(Math.random()*confettiEmos.length)];c.style.left=Math.random()*100+'vw';c.style.top='-30px';c.style.fontSize=(1+Math.random())+'rem';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},4000);},i*120);}}
+function showBadge(){document.getElementById('badge-overlay').classList.add('show');launchConfetti();}
+function closeBadge(e){if(!e||e.target===document.getElementById('badge-overlay'))document.getElementById('badge-overlay').classList.remove('show');}
+function shareBadge(){var text='Acabei de completar a Aula 3 do @itsbrendacleto Kids! 🌍 Inglês para a Vida Real — desde criança! #itsbrendacleto #kidsenglish';if(navigator.share){navigator.share({title:'itsbrendacleto Kids — Aula 3 Badge',text:text}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText(text).then(function(){alert('Texto copiado! Cole no Instagram 📸');}).catch(function(){alert('Compartilhe: '+text);});}}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+inited['flashcards']=true;
+initFC();
+
+// ── PLANNER MODE ───────────────────────────────────────────────────────────
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fase = params.get('fase');
+  var faseMap = {
+    'flashcards': 'flashcards',
+    'flagquiz':   'flagquiz',
+    'matcher':    'matcher',
+    'speech':     'speech',
+    'quiz':       'quiz'
+  };
+  if (fase && faseMap[fase]) {
+    document.body.classList.add('planner-mode');
+    var nomeFase = faseMap[fase];
+    var pill = document.querySelector('.pill[onclick*="' + nomeFase + '"]');
+    if (pill) show(nomeFase, pill);
+  }
+})();
+</script>
+</body>
+</html>
