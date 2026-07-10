@@ -533,6 +533,8 @@
     .modal-checkbox-label input[type="checkbox"] { flex-shrink: 0; width: 18px; height: 18px; margin: 0; }
     .modal-checkbox-label span { flex: 1; }
     .modal-hint { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+    .btn-sm { background: var(--white); border: 1.5px solid var(--sand); border-radius: 8px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; }
+    .btn-sm:hover { border-color: var(--brown-light); }
 
     /* Detalhes do aluno (somente leitura) */
     .detail-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
@@ -1828,8 +1830,18 @@
       teacherRow.style.display = 'none';
     }
 
+    await refreshGuardianSection(studentId);
+
+    document.getElementById('modalEditStudent').classList.add('open');
+  }
+
+  let currentGuardian = null;
+
+  async function refreshGuardianSection(studentId) {
     // Verifica se já existe responsável vinculado a esse aluno (conta própria ou vinculada)
     const { data: existingGuardian } = await sb.from('profiles').select('id, full_name, role').eq('guardian_of', studentId).maybeSingle();
+    currentGuardian = existingGuardian || null;
+
     document.getElementById('editGuardianType').value = 'none';
     document.getElementById('editGuardianFields').style.display = 'none';
     document.getElementById('editGuardianExistingFields').style.display = 'none';
@@ -1839,7 +1851,7 @@
 
     if (existingGuardian) {
       const tipo = existingGuardian.role === 'responsavel' ? 'login separado' : 'mesmo login que a própria conta';
-      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável já vinculado: ' + (existingGuardian.full_name || 'Sem nome') + ' (' + tipo + ')';
+      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável vinculado: ' + (existingGuardian.full_name || 'Sem nome') + ' (' + tipo + ')';
       document.getElementById('editGuardianExistingRow').style.display = 'block';
       document.getElementById('editGuardianTypeRow').style.display = 'none';
     } else {
@@ -1847,8 +1859,40 @@
       document.getElementById('editGuardianTypeRow').style.display = 'block';
       await populateGuardianExistingSelect(studentId);
     }
+  }
 
-    document.getElementById('modalEditStudent').classList.add('open');
+  async function editGuardianName() {
+    if (!currentGuardian) return;
+    const newName = prompt('Nome do responsável:', currentGuardian.full_name || '');
+    if (newName === null) return;
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+
+    const { error } = await sb.from('profiles').update({ full_name: trimmed }).eq('id', currentGuardian.id);
+    if (error) { alert('Erro ao atualizar nome: ' + error.message); return; }
+
+    const studentId = document.getElementById('editStudentId').value;
+    await refreshGuardianSection(studentId);
+  }
+
+  async function removeGuardianLink() {
+    if (!currentGuardian) return;
+    if (!confirm('Remover o vínculo desse responsável com esse aluno? A conta dele continua existindo, só deixa de aparecer como responsável vinculado.')) return;
+
+    const { error } = await sb.from('profiles').update({ guardian_of: null }).eq('id', currentGuardian.id);
+    if (error) { alert('Erro ao remover vínculo: ' + error.message); return; }
+
+    const studentId = document.getElementById('editStudentId').value;
+    await refreshGuardianSection(studentId);
+  }
+
+  async function switchGuardianLink() {
+    const studentId = document.getElementById('editStudentId').value;
+    document.getElementById('editGuardianExistingRow').style.display = 'none';
+    document.getElementById('editGuardianTypeRow').style.display = 'block';
+    document.getElementById('editGuardianType').value = 'none';
+    toggleEditGuardianFields();
+    await populateGuardianExistingSelect(studentId);
   }
 
   async function populateGuardianExistingSelect(studentId) {
@@ -3172,6 +3216,11 @@
 
     <div class="modal-row modal-checkbox-row" id="editGuardianExistingRow" style="display:none;">
       <span id="editGuardianExistingText"></span>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+        <button type="button" class="btn-sm" onclick="editGuardianName()">✏️ Editar nome</button>
+        <button type="button" class="btn-sm" onclick="switchGuardianLink()">🔄 Trocar vínculo</button>
+        <button type="button" class="btn-sm" onclick="removeGuardianLink()" style="color:#C0392B;">🗑️ Remover vínculo</button>
+      </div>
     </div>
 
     <div class="modal-row" id="editGuardianTypeRow" style="display:none;">
