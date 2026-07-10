@@ -829,13 +829,19 @@
       </div>
       <div class="form-row">
         <label class="form-label">Status</label>
-        <select class="form-select" id="classLogStatus">
+        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta')document.getElementById('classLogNeedsMakeup').checked=true;">
           <option value="realizada">Realizada</option>
           <option value="pendente">Pendente</option>
           <option value="cancelada">Cancelada</option>
           <option value="cancelada_falta">Cancelada por falta</option>
           <option value="reagendada">Reagendada</option>
         </select>
+      </div>
+      <div class="form-row modal-checkbox-row">
+        <label class="modal-checkbox-label">
+          <input type="checkbox" id="classLogNeedsMakeup" />
+          <span>🔄 Aluno precisa repor essa aula</span>
+        </label>
       </div>
       <div class="form-row">
         <label class="form-label">Conteúdo trabalhado</label>
@@ -896,6 +902,14 @@
       <div class="form-actions">
         <button class="btn-publish" onclick="generateScheduledClasses()" style="flex:1;">📅 Gerar aulas</button>
       </div>
+    </div>
+
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">🔄 Reposições</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
+      <div id="reposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
+      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
+      <div id="reposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
     <div class="report-list">
@@ -1298,13 +1312,15 @@
     if (!logs || logs.length === 0) {
       logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
     } else {
+      const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
       logsListEl.innerHTML = logs.map(l => {
         const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
         const time = formatTimeRange(l);
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+        const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
         return `
           <div class="detail-row">
-            <span class="detail-label">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
+            <span class="detail-label">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
             <span class="detail-value">${l.content || '—'}</span>
           </div>`;
       }).join('');
@@ -1537,6 +1553,7 @@
 
   // ── Adicionar aluno ──────────────────────────────────────────────────
   let allTurmas = [];
+  let allClassLogs = [];
 
   async function populateTurmaSelect(selectId, selectedValue, placeholder) {
     const select = document.getElementById(selectId);
@@ -2351,6 +2368,9 @@
     const { data: logs, error } = await query;
     const listEl = document.getElementById('classLogList');
 
+    allClassLogs = logs || [];
+    renderReposicoes(allClassLogs);
+
     if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas.</div>'; return; }
     if (!logs || logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>'; return; }
 
@@ -2373,6 +2393,109 @@
     }).join('');
   }
 
+  function renderReposicoes(logs) {
+    const aReporEl = document.getElementById('reposicoesAReporList');
+    const feitasEl = document.getElementById('reposicoesFeitasList');
+    if (!aReporEl || !feitasEl) return;
+
+    const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
+    const aRepor = logs.filter(l => l.needs_makeup && !linkedOriginalIds.has(l.id));
+    const reagendadas = logs.filter(l => l.makeup_for_id);
+
+    const whoOf = (l) => {
+      const turma = allTurmas.find(t => t.id === l.turma_id);
+      const student = allStudents.find(s => s.id === l.student_id);
+      return turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
+    };
+
+    aReporEl.innerHTML = aRepor.length ? aRepor.map(l => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = formatTimeRange(l);
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${whoOf(l)}</div>
+            <div class="report-row-title">Aula de ${date}${time ? ' · ' + time : ''}</div>
+          </div>
+          <button class="btn-report-action btn-toggle" onclick="openMarkMakeup('${l.id}')">🔄 Marcar reposição</button>
+        </div>` ;
+    }).join('') : '<div class="empty-reports">Nenhuma aula pendente de reposição.</div>';
+
+    feitasEl.innerHTML = reagendadas.length ? reagendadas.map(l => {
+      const original = logs.find(o => o.id === l.makeup_for_id);
+      const origDate = original ? new Date(original.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const newDate = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = formatTimeRange(l);
+      return `
+        <div class="report-row">
+          <div class="report-row-info">
+            <div class="report-row-student">${whoOf(l)}</div>
+            <div class="report-row-title">${origDate} → ${newDate}${time ? ' · ' + time : ''}</div>
+          </div>
+          <span class="report-status published">Reagendada</span>
+        </div>`;
+    }).join('') : '<div class="empty-reports">Nenhuma reposição feita ainda.</div>';
+  }
+
+  function openMarkMakeup(originalId) {
+    const original = allClassLogs.find(l => l.id === originalId);
+    if (!original) return;
+    const turma = allTurmas.find(t => t.id === original.turma_id);
+    const student = allStudents.find(s => s.id === original.student_id);
+    const who = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
+    const origDate = new Date(original.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+
+    document.getElementById('markMakeupOriginalId').value = originalId;
+    document.getElementById('markMakeupWho').textContent = who + ' · aula original de ' + origDate;
+    document.getElementById('markMakeupDate').value = '';
+    document.getElementById('markMakeupStartTime').value = original.start_time ? original.start_time.slice(0, 5) : '';
+    document.getElementById('markMakeupEndTime').value = original.end_time ? original.end_time.slice(0, 5) : '';
+    document.getElementById('markMakeupError').style.display = 'none';
+    document.getElementById('modalMarkMakeup').classList.add('open');
+  }
+
+  function closeMarkMakeup() {
+    document.getElementById('modalMarkMakeup').classList.remove('open');
+  }
+
+  async function saveMarkMakeup() {
+    const originalId = document.getElementById('markMakeupOriginalId').value;
+    const original = allClassLogs.find(l => l.id === originalId);
+    const date = document.getElementById('markMakeupDate').value;
+    const startTime = document.getElementById('markMakeupStartTime').value || null;
+    const endTime = document.getElementById('markMakeupEndTime').value || null;
+    const errEl = document.getElementById('markMakeupError');
+
+    if (!original) return;
+    if (!date) {
+      errEl.textContent = 'Informe a data da reposição.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const { error } = await sb.from('class_logs').insert({
+      turma_id: original.turma_id,
+      student_id: original.student_id,
+      class_date: date,
+      start_time: startTime,
+      end_time: endTime,
+      status: 'pendente',
+      makeup_for_id: originalId,
+      created_by: session.user.id
+    });
+
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeMarkMakeup();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
   async function saveClassLog() {
     const turmaId = document.getElementById('classLogTurma').value || null;
     const studentId = document.getElementById('classLogStudent').value || null;
@@ -2381,6 +2504,7 @@
     const endTime = document.getElementById('classLogEndTime').value || null;
     const status = document.getElementById('classLogStatus').value;
     const content = document.getElementById('classLogContent').value.trim();
+    const needsMakeup = document.getElementById('classLogNeedsMakeup').checked;
 
     if (!turmaId && !studentId) {
       alert('Selecione uma turma ou um aluno.');
@@ -2396,12 +2520,14 @@
       end_time: endTime,
       status,
       content,
+      needs_makeup: needsMakeup,
       created_by: session.user.id
     });
 
     if (error) { alert('Erro ao registrar aula: ' + error.message); return; }
 
     document.getElementById('classLogContent').value = '';
+    document.getElementById('classLogNeedsMakeup').checked = false;
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
@@ -2520,6 +2646,7 @@
     document.getElementById('classLogEditEndTime').value = l.end_time ? l.end_time.slice(0, 5) : '';
     document.getElementById('classLogEditStatus').value = l.status || 'realizada';
     document.getElementById('classLogEditContent').value = l.content || '';
+    document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
 
     document.getElementById('modalClassLogEdit').classList.add('open');
   }
@@ -2535,7 +2662,8 @@
       start_time: document.getElementById('classLogEditStartTime').value || null,
       end_time: document.getElementById('classLogEditEndTime').value || null,
       status: document.getElementById('classLogEditStatus').value,
-      content: document.getElementById('classLogEditContent').value.trim()
+      content: document.getElementById('classLogEditContent').value.trim(),
+      needs_makeup: document.getElementById('classLogEditNeedsMakeup').checked
     };
 
     const errEl = document.getElementById('classLogEditError');
@@ -3270,13 +3398,20 @@
 
     <div class="modal-row">
       <label class="modal-label">Status</label>
-      <select class="modal-select" id="classLogEditStatus">
+      <select class="modal-select" id="classLogEditStatus" onchange="if(this.value==='cancelada_falta')document.getElementById('classLogEditNeedsMakeup').checked=true;">
         <option value="realizada">Realizada</option>
         <option value="pendente">Pendente</option>
         <option value="cancelada">Cancelada</option>
         <option value="cancelada_falta">Cancelada por falta</option>
         <option value="reagendada">Reagendada</option>
       </select>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="classLogEditNeedsMakeup" />
+        <span>🔄 Aluno precisa repor essa aula</span>
+      </label>
     </div>
 
     <div class="modal-row">
@@ -3290,6 +3425,38 @@
       <button class="btn-modal-cancel" onclick="closeClassLogEdit()">Cancelar</button>
       <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteClassLogFromModal()">Excluir</button>
       <button class="btn-modal-save" onclick="saveClassLogEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Marcar reposição -->
+<div class="modal-overlay" id="modalMarkMakeup">
+  <div class="modal-box">
+    <div class="modal-title">Marcar reposição</div>
+    <div class="modal-sub" id="markMakeupWho"></div>
+    <input type="hidden" id="markMakeupOriginalId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Data da reposição</label>
+      <input type="date" class="modal-input" id="markMakeupDate" />
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Horário início</label>
+        <input type="time" class="modal-input" id="markMakeupStartTime" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Horário fim</label>
+        <input type="time" class="modal-input" id="markMakeupEndTime" />
+      </div>
+    </div>
+
+    <div class="modal-error" id="markMakeupError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeMarkMakeup()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveMarkMakeup()">Salvar reposição</button>
     </div>
   </div>
 </div>
