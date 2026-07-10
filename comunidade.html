@@ -440,6 +440,34 @@
     reader.readAsDataURL(file);
   });
 
+  // Alguns celulares (iPhone/iPad) salvam fotos em HEIC, formato que a maioria
+  // dos navegadores não consegue exibir num <img>. Convertendo tudo pra JPEG
+  // aqui garante que a foto apareça pra qualquer pessoa, em qualquer aparelho.
+  function imageFileToJpegBlob(file, maxDim) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (maxDim && Math.max(w, h) > maxDim) {
+          const scale = maxDim / Math.max(w, h);
+          w = Math.round(w * scale);
+          h = Math.round(h * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob); else reject(new Error('Não foi possível processar a imagem.'));
+        }, 'image/jpeg', 0.85);
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Não foi possível ler essa imagem. Tente uma foto em JPG ou PNG.')); };
+      img.src = url;
+    });
+  }
+
   async function createPost() {
     const textarea = document.getElementById('postContent');
     const fileInput = document.getElementById('postImageInput');
@@ -455,9 +483,9 @@
     try {
       let imageUrl = null;
       if (file) {
-        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
-        const path = 'posts/' + CURRENT_USER_ID + '_' + Date.now() + '.' + ext;
-        const { error: upErr } = await sb.storage.from('Avatars').upload(path, file);
+        const jpegBlob = await imageFileToJpegBlob(file, 1600);
+        const path = 'posts/' + CURRENT_USER_ID + '_' + Date.now() + '.jpg';
+        const { error: upErr } = await sb.storage.from('Avatars').upload(path, jpegBlob, { contentType: 'image/jpeg' });
         if (upErr) throw upErr;
         const { data: urlData } = sb.storage.from('Avatars').getPublicUrl(path);
         imageUrl = urlData.publicUrl;
