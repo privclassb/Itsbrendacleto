@@ -1374,7 +1374,7 @@
       <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
       <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>`;
 
-    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: false }).limit(10);
+    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: true }).order('start_time', { ascending: true });
     classQuery = turma
       ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
       : classQuery.eq('student_id', studentId);
