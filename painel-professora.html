@@ -543,6 +543,18 @@
     .detail-value { font-size: 14px; color: var(--text); font-weight: 500; text-align: right; }
     .detail-actions { display: flex; gap: 10px; margin-top: 20px; }
 
+    /* Stats de aulas no perfil do aluno */
+    .aula-stats-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .aula-stat-chip { background: var(--cream); border-radius: 99px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: var(--text); }
+
+    /* Aula registrada (clicável pra lançar/editar relatório) */
+    .aula-log-row { padding: 12px 0; border-bottom: 1px solid var(--sand); cursor: pointer; transition: background 0.15s; }
+    .aula-log-row:last-child { border-bottom: none; }
+    .aula-log-row:hover { background: var(--cream); }
+    .aula-log-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .aula-log-date { font-size: 13px; font-weight: 600; color: var(--text); }
+    .aula-log-content { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
     /* Perfil unificado do aluno */
     .profile-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
     .profile-options-wrap { position: relative; flex-shrink: 0; }
@@ -1275,6 +1287,8 @@
   };
 
   let currentProfileStudentId = null;
+  let profileReportsByClassLog = {};
+  let profileClassLogsCache = [];
 
   async function openStudentProfile(studentId) {
     const student = allStudents.find(s => s.id === studentId);
@@ -1347,12 +1361,31 @@
     }
 
     // Aulas
+    let statusQuery = sb.from('class_logs').select('status');
+    statusQuery = turma
+      ? statusQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
+      : statusQuery.eq('student_id', studentId);
+    const { data: allStatusRows } = await statusQuery;
+    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0 };
+    (allStatusRows || []).forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; });
+    document.getElementById('profileAulasStats').innerHTML = `
+      <span class="aula-stat-chip">📋 ${statusCounts.pendente} pendentes</span>
+      <span class="aula-stat-chip">✅ ${statusCounts.realizada} realizadas</span>
+      <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
+      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>`;
+
     let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: false }).limit(10);
     classQuery = turma
       ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
       : classQuery.eq('student_id', studentId);
     const { data: logs } = await classQuery;
     const logsListEl = document.getElementById('profileClassLogsList');
+    profileClassLogsCache = logs || [];
+
+    const { data: studentReports } = await sb.from('reports').select('*').eq('student_id', studentId);
+    profileReportsByClassLog = {};
+    (studentReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
+
     if (!logs || logs.length === 0) {
       logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
     } else {
@@ -1362,10 +1395,17 @@
         const time = formatTimeRange(l);
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
         const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
+        const report = profileReportsByClassLog[l.id];
+        const reportBadge = report
+          ? `<span class="report-status ${report.is_published ? 'published' : 'draft'}">${report.is_published ? '📄 Publicado' : '📝 Rascunho'}</span>`
+          : `<span class="report-status draft">➕ Lançar relatório</span>`;
         return `
-          <div class="detail-row">
-            <span class="detail-label">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
-            <span class="detail-value">${l.content || '—'}</span>
+          <div class="aula-log-row" onclick="openClassReport('${l.id}', '${studentId}')">
+            <div class="aula-log-top">
+              <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
+              ${reportBadge}
+            </div>
+            ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
           </div>`;
       }).join('');
     }
@@ -3062,6 +3102,90 @@
     await loadClassLogs(session.user.id, currentUserIsBrenda);
   }
 
+  // ---- Relatório vinculado a uma aula específica (a partir da página do aluno) ----
+
+  async function openClassReport(classLogId, studentId) {
+    const log = profileClassLogsCache.find(l => l.id === classLogId);
+    const report = profileReportsByClassLog[classLogId] || null;
+    const student = allStudents.find(s => s.id === studentId);
+    const dateLabel = log ? new Date(log.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+
+    document.getElementById('classReportError').style.display = 'none';
+    document.getElementById('classReportClassLogId').value = classLogId;
+    document.getElementById('classReportStudentId').value = studentId;
+    document.getElementById('classReportId').value = report ? report.id : '';
+    document.getElementById('classReportWho').textContent = (student ? student.full_name : 'Aluno') + (dateLabel ? ' · aula de ' + dateLabel : '');
+
+    if (report) {
+      document.getElementById('classReportTitle').value = report.title || '';
+      document.getElementById('classReportPeriod').value = report.period || '';
+      document.getElementById('classReportContent').value = report.content || '';
+      document.getElementById('classReportPublished').checked = !!report.is_published;
+      document.getElementById('btnDeleteClassReport').style.display = 'inline-block';
+    } else {
+      document.getElementById('classReportTitle').value = dateLabel ? ('Aula de ' + dateLabel) : '';
+      document.getElementById('classReportPeriod').value = '';
+      document.getElementById('classReportContent').value = (log && log.content) || '';
+      document.getElementById('classReportPublished').checked = false;
+      document.getElementById('btnDeleteClassReport').style.display = 'none';
+    }
+
+    document.getElementById('modalClassReport').classList.add('open');
+  }
+
+  function closeClassReport() {
+    document.getElementById('modalClassReport').classList.remove('open');
+  }
+
+  async function saveClassReport() {
+    const id = document.getElementById('classReportId').value;
+    const classLogId = document.getElementById('classReportClassLogId').value;
+    const studentId = document.getElementById('classReportStudentId').value;
+    const title = document.getElementById('classReportTitle').value.trim();
+    const period = document.getElementById('classReportPeriod').value.trim();
+    const content = document.getElementById('classReportContent').value.trim();
+    const isPublished = document.getElementById('classReportPublished').checked;
+    const errEl = document.getElementById('classReportError');
+
+    if (!title || !content) {
+      errEl.textContent = 'Preencha título e conteúdo.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: isPublished };
+
+    const { error } = id
+      ? await sb.from('reports').update(payload).eq('id', id)
+      : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeClassReport();
+    await openStudentProfile(studentId);
+    await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteClassReport() {
+    const id = document.getElementById('classReportId').value;
+    const studentId = document.getElementById('classReportStudentId').value;
+    if (!id) return;
+    if (!confirm('Excluir este relatório?')) return;
+
+    const { error } = await sb.from('reports').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir relatório: ' + error.message); return; }
+
+    closeClassReport();
+    await openStudentProfile(studentId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
   // ---- Financeiro ----
 
   const PAYMENT_STATUS_LABEL = { em_dia: 'Em dia', pendente: 'Pendente', atrasado: 'Atrasado' };
@@ -3655,6 +3779,8 @@
 
     <div class="profile-section">
       <div class="profile-section-title">Aulas registradas</div>
+      <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela.</div>
+      <div class="aula-stats-row" id="profileAulasStats"></div>
       <div id="profileClassLogsList"></div>
       <button class="btn-sm" id="profileDeleteAllLogsBtn" onclick="deleteAllClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
     </div>
@@ -3827,6 +3953,47 @@
       <button class="btn-modal-cancel" onclick="closeClassLogEdit()">Cancelar</button>
       <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteClassLogFromModal()">Excluir</button>
       <button class="btn-modal-save" onclick="saveClassLogEdit()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Relatório da aula -->
+<div class="modal-overlay" id="modalClassReport">
+  <div class="modal-box">
+    <div class="modal-title">Relatório da aula</div>
+    <div class="modal-sub" id="classReportWho"></div>
+    <input type="hidden" id="classReportId" />
+    <input type="hidden" id="classReportClassLogId" />
+    <input type="hidden" id="classReportStudentId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Título</label>
+      <input type="text" class="modal-input" id="classReportTitle" placeholder="Ex: Aula de 03/07" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Período (opcional)</label>
+      <input type="text" class="modal-input" id="classReportPeriod" placeholder="Ex: Julho/2026" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Conteúdo</label>
+      <textarea class="modal-input" id="classReportContent" style="min-height:140px;resize:vertical;" placeholder="O que foi trabalhado, evolução do aluno, observações..."></textarea>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="classReportPublished" />
+        <span>Publicar (visível pro aluno/responsável)</span>
+      </label>
+    </div>
+
+    <div class="modal-error" id="classReportError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeClassReport()">Cancelar</button>
+      <button class="btn-modal-save" id="btnDeleteClassReport" style="background:#C0392B;display:none;" onclick="deleteClassReport()">Excluir</button>
+      <button class="btn-modal-save" onclick="saveClassReport()">Salvar relatório</button>
     </div>
   </div>
 </div>
