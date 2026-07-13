@@ -2576,11 +2576,11 @@
     listEl.innerHTML = allTurmas.map(t => {
       const count = allStudents.filter(s => s.turma_id === t.id).length;
       const actions = currentUserIsBrenda
-        ? `<button class="btn-report-action btn-toggle" onclick="openTurmaStudents('${t.id}')">+ Alunos</button>
-           <button class="btn-report-action btn-delete" onclick="deleteTurma('${t.id}')">Excluir</button>`
+        ? `<button class="btn-report-action btn-toggle" onclick="event.stopPropagation();openTurmaStudents('${t.id}')">+ Alunos</button>
+           <button class="btn-report-action btn-delete" onclick="event.stopPropagation();deleteTurma('${t.id}')">Excluir</button>`
         : '';
       return `
-        <div class="report-row">
+        <div class="report-row" style="cursor:pointer;" onclick="openTurmaProfile('${t.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${t.name}</div>
             <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s)</div>
@@ -2614,6 +2614,158 @@
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
     await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
+  }
+
+  // ---- Página da turma (Dados + Aulas registradas, igual a do aluno) ----
+
+  let currentProfileTurmaId = null;
+  let turmaProfileClassLogsCache = [];
+
+  async function openTurmaProfile(turmaId) {
+    const turma = allTurmas.find(t => t.id === turmaId);
+    if (!turma) return;
+    currentProfileTurmaId = turmaId;
+
+    const members = allStudents.filter(s => s.turma_id === turmaId);
+    document.getElementById('turmaProfileName').textContent = turma.name;
+    document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
+
+    document.getElementById('turmaProfileStudentsList').innerHTML = members.length
+      ? members.map(s => `
+          <div class="detail-row" style="cursor:pointer;" onclick="closeTurmaProfile();openStudentProfile('${s.id}')">
+            <span class="detail-label">${s.full_name || 'Sem nome'}</span>
+            <span class="detail-value">${s.role === 'kids' ? 'Kids' : 'Adulto'}</span>
+          </div>`).join('')
+      : '<div class="empty-reports">Nenhum aluno matriculado ainda.</div>';
+
+    const { data: logs } = await sb.from('class_logs').select('*').eq('turma_id', turmaId)
+      .order('class_date', { ascending: true }).order('start_time', { ascending: true });
+    turmaProfileClassLogsCache = logs || [];
+
+    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0 };
+    turmaProfileClassLogsCache.forEach(l => { if (statusCounts[l.status] !== undefined) statusCounts[l.status]++; });
+    document.getElementById('turmaProfileAulasStats').innerHTML = `
+      <span class="aula-stat-chip">📋 ${statusCounts.pendente} pendentes</span>
+      <span class="aula-stat-chip">✅ ${statusCounts.realizada} realizadas</span>
+      <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
+      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>`;
+
+    const memberIds = members.map(s => s.id);
+    const { data: reportsForTurma } = memberIds.length
+      ? await sb.from('reports').select('id, student_id, class_log_id, is_published').in('student_id', memberIds)
+      : { data: [] };
+
+    const listEl = document.getElementById('turmaProfileClassLogsList');
+    if (turmaProfileClassLogsCache.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
+    } else {
+      listEl.innerHTML = turmaProfileClassLogsCache.map(l => {
+        const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+        const time = formatTimeRange(l);
+        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+        const reportsForThis = (reportsForTurma || []).filter(r => r.class_log_id === l.id);
+        const badge = reportsForThis.length === 0
+          ? `<span class="report-status draft">➕ Lançar relatório</span>`
+          : `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`;
+        return `
+          <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
+            <div class="aula-log-top">
+              <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
+              ${badge}
+            </div>
+            ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    document.getElementById('modalTurmaProfile').classList.add('open');
+  }
+
+  function closeTurmaProfile() {
+    document.getElementById('modalTurmaProfile').classList.remove('open');
+  }
+
+  async function openTurmaClassReport(classLogId) {
+    const turma = allTurmas.find(t => t.id === currentProfileTurmaId);
+    const log = turmaProfileClassLogsCache.find(l => l.id === classLogId);
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const dateLabel = log ? new Date(log.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+
+    document.getElementById('turmaReportClassLogId').value = classLogId;
+    document.getElementById('turmaReportError').style.display = 'none';
+    document.getElementById('turmaReportWho').textContent = (turma ? turma.name : 'Turma') + (dateLabel ? ' · aula de ' + dateLabel : '') + ' · ' + members.length + ' aluno(s)';
+
+    const memberIds = members.map(s => s.id);
+    const { data: existing } = memberIds.length
+      ? await sb.from('reports').select('*').eq('class_log_id', classLogId).in('student_id', memberIds)
+      : { data: [] };
+
+    const first = (existing || [])[0];
+    document.getElementById('turmaReportTitle').value = first ? first.title : (dateLabel ? 'Aula de ' + dateLabel : '');
+    document.getElementById('turmaReportPeriod').value = first ? (first.period || '') : '';
+    document.getElementById('turmaReportContent').value = first ? first.content : ((log && log.content) || '');
+    document.getElementById('turmaReportPublished').checked = first ? !!first.is_published : false;
+
+    document.getElementById('modalTurmaClassReport').classList.add('open');
+  }
+
+  function closeTurmaClassReport() {
+    document.getElementById('modalTurmaClassReport').classList.remove('open');
+  }
+
+  async function saveTurmaClassReport() {
+    const classLogId = document.getElementById('turmaReportClassLogId').value;
+    const title = document.getElementById('turmaReportTitle').value.trim();
+    const period = document.getElementById('turmaReportPeriod').value.trim();
+    const content = document.getElementById('turmaReportContent').value.trim();
+    const isPublished = document.getElementById('turmaReportPublished').checked;
+    const errEl = document.getElementById('turmaReportError');
+
+    if (!title || !content) {
+      errEl.textContent = 'Preencha título e conteúdo.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    if (members.length === 0) {
+      errEl.textContent = 'Essa turma não tem alunos matriculados.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { data: { session } } = await sb.auth.getSession();
+    const memberIds = members.map(s => s.id);
+    const { data: existing } = await sb.from('reports').select('id, student_id').eq('class_log_id', classLogId).in('student_id', memberIds);
+    const existingByStudent = {};
+    (existing || []).forEach(r => { existingByStudent[r.student_id] = r.id; });
+
+    const btn = document.getElementById('btnSaveTurmaReport');
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    let hadError = false;
+    for (const s of members) {
+      const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: isPublished };
+      const existingId = existingByStudent[s.id];
+      const { error } = existingId
+        ? await sb.from('reports').update(payload).eq('id', existingId)
+        : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+      if (error) hadError = true;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Salvar pra todos os alunos';
+
+    if (hadError) {
+      errEl.textContent = 'Alguns relatórios não foram salvos. Tente novamente.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeTurmaClassReport();
+    await openTurmaProfile(currentProfileTurmaId);
+    await loadReports(session.user.id, currentUserIsBrenda);
   }
 
   function openTurmaStudents(turmaId) {
@@ -3792,6 +3944,75 @@
 
     <div class="detail-actions">
       <button class="btn-modal-cancel" onclick="closeStudentProfile()" style="flex:1;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Página da turma -->
+<div class="modal-overlay" id="modalTurmaProfile">
+  <div class="modal-box" style="max-width:640px;">
+
+    <div class="profile-header">
+      <div>
+        <div class="modal-title" id="turmaProfileName">Turma</div>
+        <div class="modal-sub" id="turmaProfileMeta" style="margin-bottom:0;"></div>
+      </div>
+    </div>
+
+    <div class="profile-section" style="margin-top:16px;">
+      <div class="profile-section-title">Alunos matriculados</div>
+      <div id="turmaProfileStudentsList"></div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">Aulas registradas</div>
+      <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela pra toda a turma.</div>
+      <div class="aula-stats-row" id="turmaProfileAulasStats"></div>
+      <div id="turmaProfileClassLogsList"></div>
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn-modal-cancel" onclick="closeTurmaProfile()" style="flex:1;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Relatório da aula (turma inteira) -->
+<div class="modal-overlay" id="modalTurmaClassReport">
+  <div class="modal-box">
+    <div class="modal-title">Relatório da aula (turma)</div>
+    <div class="modal-sub" id="turmaReportWho"></div>
+    <input type="hidden" id="turmaReportClassLogId" />
+
+    <div class="modal-hint" style="margin-bottom:14px;">Esse relatório é salvo individualmente pra cada aluno matriculado na turma, com o mesmo conteúdo.</div>
+
+    <div class="modal-row">
+      <label class="modal-label">Título</label>
+      <input type="text" class="modal-input" id="turmaReportTitle" placeholder="Ex: Aula de 03/07" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Período (opcional)</label>
+      <input type="text" class="modal-input" id="turmaReportPeriod" placeholder="Ex: Julho/2026" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Conteúdo</label>
+      <textarea class="modal-input" id="turmaReportContent" style="min-height:140px;resize:vertical;" placeholder="O que foi trabalhado, observações da turma..."></textarea>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="turmaReportPublished" />
+        <span>Publicar (visível pros alunos/responsáveis)</span>
+      </label>
+    </div>
+
+    <div class="modal-error" id="turmaReportError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeTurmaClassReport()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveTurmaReport" onclick="saveTurmaClassReport()">Salvar pra todos os alunos</button>
     </div>
   </div>
 </div>
