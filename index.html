@@ -347,37 +347,6 @@
     </div>
 
     <button class="btn-primary" id="loginBtn">Entrar</button>
-
-    <div class="toggle-link">
-      Não tem conta? <a id="goToRegister">Criar conta</a>
-    </div>
-  </div>
-
-  <!-- REGISTER FORM -->
-  <div id="registerForm" style="display:none;">
-    <h2>Criar conta</h2>
-    <p class="subtitle">Preencha os dados para começar.</p>
-
-    <div class="form-group">
-      <label for="registerName">Seu nome</label>
-      <input type="text" id="registerName" placeholder="Como você se chama?" />
-    </div>
-
-    <div class="form-group">
-      <label for="registerEmail">E-mail</label>
-      <input type="email" id="registerEmail" placeholder="seu@email.com" />
-    </div>
-
-    <div class="form-group">
-      <label for="registerPassword">Senha</label>
-      <input type="password" id="registerPassword" placeholder="Mínimo 6 caracteres" />
-    </div>
-
-    <button class="btn-primary" id="registerBtn">Criar minha conta</button>
-
-    <div class="toggle-link">
-      Já tem conta? <a id="goToLogin">Entrar</a>
-    </div>
   </div>
 
   <!-- FORGOT PASSWORD FORM -->
@@ -414,7 +383,6 @@
 
   // ─── DOM refs ──────────────────────────────────────────────────────
   const loginForm    = document.getElementById('loginForm');
-  const registerForm = document.getElementById('registerForm');
   const forgotForm   = document.getElementById('forgotForm');
   const pickerForm    = document.getElementById('pickerForm');
   const msgBox       = document.getElementById('message');
@@ -432,15 +400,12 @@
   function showForm(form) {
     clearMsg();
     loginForm.style.display    = 'none';
-    registerForm.style.display = 'none';
     forgotForm.style.display   = 'none';
     pickerForm.style.display   = 'none';
     form.style.display         = 'block';
   }
 
   // ─── Navigation ────────────────────────────────────────────────────
-  document.getElementById('goToRegister').addEventListener('click', () => showForm(registerForm));
-  document.getElementById('goToLogin').addEventListener('click', () => showForm(loginForm));
   document.getElementById('forgotLink').addEventListener('click', () => showForm(forgotForm));
   document.getElementById('goToLoginFromForgot').addEventListener('click', () => showForm(loginForm));
 
@@ -465,46 +430,6 @@
     }
 
     await redirect(data.user);
-  });
-
-  // ─── Register ──────────────────────────────────────────────────────
-  document.getElementById('registerBtn').addEventListener('click', async () => {
-    const name     = document.getElementById('registerName').value.trim();
-    const email    = document.getElementById('registerEmail').value.trim();
-    const password = document.getElementById('registerPassword').value;
-    const btn      = document.getElementById('registerBtn');
-
-    if (!name || !email || !password) { showMsg('Preencha todos os campos.', 'error'); return; }
-    if (password.length < 6) { showMsg('A senha deve ter pelo menos 6 caracteres.', 'error'); return; }
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="loading"></span>Criando conta...';
-
-    const { data, error } = await sb.auth.signUp({ email, password });
-
-    if (error) {
-      showMsg('Erro ao criar conta: ' + error.message, 'error');
-      btn.disabled = false;
-      btn.textContent = 'Criar minha conta';
-      return;
-    }
-
-    // Salva o nome no perfil
-    if (data.user) {
-      // Aguarda o gatilho on_auth_user_created criar a linha em profiles
-      await new Promise(r => setTimeout(r, 1000));
-
-      const { error: profileErr } = await sb.from('profiles').update({
-        full_name: name,
-        role: 'adulto'
-      }).eq('id', data.user.id);
-
-      if (profileErr) console.warn('Erro ao salvar nome do perfil:', profileErr);
-    }
-
-    showMsg('Conta criada! Verifique seu e-mail para confirmar.', 'success');
-    btn.disabled = false;
-    btn.textContent = 'Criar minha conta';
   });
 
   // ─── Forgot password ───────────────────────────────────────────────

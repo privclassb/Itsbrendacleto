@@ -820,6 +820,7 @@
   <div class="reports-section panel-section" id="classLogSection">
     <div class="report-form">
       <div class="report-form-title">📝 Registrar aula</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">O histórico completo de aulas de cada aluno fica na página dele (aba Alunos → abrir o aluno).</div>
       <div class="form-row">
         <label class="form-label">Turma (aula em grupo)</label>
         <select class="form-select" id="classLogTurma">
@@ -929,11 +930,6 @@
       <div id="reposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
       <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
       <div id="reposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
-    </div>
-
-    <div class="report-list">
-      <div class="report-list-title">Aulas registradas</div>
-      <div id="classLogList"><div class="empty-reports">Carregando...</div></div>
     </div>
   </div>
 
@@ -1267,6 +1263,7 @@
     document.getElementById('profileOptionEditBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionDeleteBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const turma = allTurmas.find(t => t.id === student.turma_id);
@@ -1363,6 +1360,30 @@
   function closeStudentProfile() {
     document.getElementById('modalStudentProfile').classList.remove('open');
     document.getElementById('profileOptionsMenu').classList.remove('open');
+  }
+
+  async function deleteAllClassLogs() {
+    if (!currentProfileStudentId) return;
+    if (!confirm('Excluir TODAS as aulas individuais registradas para esse aluno? (aulas de turma não são afetadas). Essa ação não pode ser desfeita.')) return;
+
+    const { error } = await sb.from('class_logs').delete().eq('student_id', currentProfileStudentId);
+    if (error) { alert('Erro ao excluir aulas: ' + error.message); return; }
+
+    await openStudentProfile(currentProfileStudentId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteAllPayments() {
+    if (!currentProfileStudentId) return;
+    if (!confirm('Excluir TODO o financeiro lançado para esse aluno? Essa ação não pode ser desfeita.')) return;
+
+    const { error } = await sb.from('payments').delete().eq('student_id', currentProfileStudentId);
+    if (error) { alert('Erro ao excluir financeiro: ' + error.message); return; }
+
+    await openStudentProfile(currentProfileStudentId);
+    loadFinanceiro();
   }
 
   function toggleProfileOptions() {
@@ -2591,32 +2612,9 @@
     let query = sb.from('class_logs').select('*').order('class_date', { ascending: false });
     if (!seeAll) query = query.eq('created_by', teacherId);
 
-    const { data: logs, error } = await query;
-    const listEl = document.getElementById('classLogList');
-
+    const { data: logs } = await query;
     allClassLogs = logs || [];
     renderReposicoes(allClassLogs);
-
-    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas.</div>'; return; }
-    if (!logs || logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>'; return; }
-
-    listEl.innerHTML = logs.map(l => {
-      const turma = allTurmas.find(t => t.id === l.turma_id);
-      const student = allStudents.find(s => s.id === l.student_id);
-      const who = turma ? ('Turma: ' + turma.name) : (student ? student.full_name : 'Aluno removido');
-      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
-      const time = formatTimeRange(l);
-      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-      return `
-        <div class="report-row">
-          <div class="report-row-info">
-            <div class="report-row-student">${who}</div>
-            <div class="report-row-title">${date}${time ? ' · ' + time : ''} · ${statusLabel}${l.content ? ' · ' + l.content : ''}</div>
-          </div>
-          <button class="btn-report-action btn-toggle" onclick="openClassLogEdit('${l.id}')">Editar</button>
-          <button class="btn-report-action btn-delete" onclick="deleteClassLog('${l.id}')">Excluir</button>
-        </div>`;
-    }).join('');
   }
 
   function renderReposicoes(logs) {
@@ -2845,15 +2843,6 @@
           <span class="report-status ${badgeClass}">${statusLabel}</span>
         </div>`;
     }).join('');
-  }
-
-  async function deleteClassLog(id) {
-    if (!confirm('Excluir este registro de aula?')) return;
-    const { error } = await sb.from('class_logs').delete().eq('id', id);
-    if (error) { alert('Erro ao excluir registro.'); return; }
-    const { data: { session } } = await sb.auth.getSession();
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
 
   async function openClassLogEdit(id) {
@@ -3512,11 +3501,13 @@
       <div class="profile-section-title">Financeiro</div>
       <div id="profileFinanceInfo"></div>
       <div id="profilePaymentsList" style="margin-top:8px;"></div>
+      <button class="btn-sm" onclick="deleteAllPayments()" style="margin-top:10px;color:#C0392B;">🗑️ Excluir todo o financeiro</button>
     </div>
 
     <div class="profile-section">
       <div class="profile-section-title">Aulas registradas</div>
       <div id="profileClassLogsList"></div>
+      <button class="btn-sm" id="profileDeleteAllLogsBtn" onclick="deleteAllClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
     </div>
 
     <div class="profile-section">
