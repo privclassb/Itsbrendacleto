@@ -206,12 +206,18 @@
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
     document.getElementById('rankingMonthLabel').textContent = 'Pontuação de ' + now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + ' · atividades, dias ativos e presença em aula';
 
-    const { data: students } = await sb.from('profiles').select('id, full_name, avatar_url, turma_id').eq('role', 'adulto');
+    const [{ data: students }, { data: turmasData }] = await Promise.all([
+      sb.from('profiles').select('id, full_name, avatar_url, turma_id').eq('role', 'adulto'),
+      sb.from('turmas').select('id, name')
+    ]);
     if (!students || students.length === 0) {
       document.getElementById('rankingList').innerHTML = '<div class="empty-msg">Ninguém no ranking ainda.</div>';
       return;
     }
     const ids = students.map(s => s.id);
+
+    const tp3Turma = (turmasData || []).find(t => (t.name || '').trim().toLowerCase() === 'tp 3');
+    const tp3Ids = tp3Turma ? new Set(students.filter(s => s.turma_id === tp3Turma.id).map(s => s.id)) : null;
 
     const [{ data: activities }, { data: activeDays }, { data: classes }] = await Promise.all([
       sb.from('lesson_progress').select('user_id, lesson_id, completed_at').in('user_id', ids).gte('completed_at', monthStart).lte('completed_at', monthEnd + 'T23:59:59'),
@@ -240,41 +246,48 @@
       return Object.assign({}, s, sc, { points });
     }).sort((a, b) => b.points - a.points);
 
-    renderRanking(ranked);
+    renderRanking(ranked, tp3Ids);
   }
 
-  function renderRanking(ranked) {
+  function renderRanking(ranked, tp3Ids) {
     const list = document.getElementById('rankingList');
-    if (!ranked.length || ranked.every(r => r.points === 0)) {
-      list.innerHTML = '<div class="empty-msg">Ainda não há atividade este mês. Complete aulas, mantenha sua sequência e participe das aulas para aparecer aqui! 🚀</div>';
-      document.getElementById('myRankNote').style.display = 'none';
-      return;
+    const myRankEl = document.getElementById('myRankNote');
+    const eligible = tp3Ids ? ranked.filter(r => tp3Ids.has(r.id)) : ranked;
+
+    if (!eligible.length || eligible.every(r => r.points === 0)) {
+      list.innerHTML = '<div class="empty-msg">Ainda não há atividade no ranking este mês. Complete aulas, mantenha sua sequência e participe das aulas para aparecer aqui! 🚀</div>';
+    } else {
+      const top = eligible.slice(0, 15);
+      const medals = ['🥇', '🥈', '🥉'];
+      list.innerHTML = top.map((r, i) => {
+        const isMe = r.id === CURRENT_USER_ID;
+        const avatar = r.avatar_url
+          ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
+          : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
+        return `
+          <div class="rank-item ${isMe ? 'rank-you' : ''}">
+            <div class="rank-position">${medals[i] || (i + 1)}</div>
+            <div class="rank-avatar">${avatar}</div>
+            <div class="rank-info">
+              <div class="rank-name">${escapeHtml(r.full_name || 'Aluno')}${isMe ? ' (você)' : ''}</div>
+              <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${r.classes} aulas</div>
+            </div>
+            <div class="rank-points">${r.points}<span>pts</span></div>
+          </div>`;
+      }).join('');
     }
 
-    const top = ranked.slice(0, 15);
-    const medals = ['🥇', '🥈', '🥉'];
-    list.innerHTML = top.map((r, i) => {
-      const isMe = r.id === CURRENT_USER_ID;
-      const avatar = r.avatar_url
-        ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
-        : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
-      return `
-        <div class="rank-item ${isMe ? 'rank-you' : ''}">
-          <div class="rank-position">${medals[i] || (i + 1)}</div>
-          <div class="rank-avatar">${avatar}</div>
-          <div class="rank-info">
-            <div class="rank-name">${escapeHtml(r.full_name || 'Aluno')}${isMe ? ' (você)' : ''}</div>
-            <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${r.classes} aulas</div>
-          </div>
-          <div class="rank-points">${r.points}<span>pts</span></div>
-        </div>`;
-    }).join('');
+    const myEntry = ranked.find(r => r.id === CURRENT_USER_ID);
+    const myEligibleRank = eligible.findIndex(r => r.id === CURRENT_USER_ID);
 
-    const myRank = ranked.findIndex(r => r.id === CURRENT_USER_ID);
-    const myRankEl = document.getElementById('myRankNote');
-    if (myRank >= 15) {
+    if (!myEntry) {
+      myRankEl.style.display = 'none';
+    } else if (tp3Ids && !tp3Ids.has(CURRENT_USER_ID)) {
       myRankEl.style.display = 'block';
-      myRankEl.textContent = 'Sua posição: #' + (myRank + 1) + ' · ' + ranked[myRank].points + ' pontos';
+      myRankEl.textContent = 'Sua pontuação: ' + myEntry.points + ' pontos · o ranking mostra só quem está no TP 3';
+    } else if (myEligibleRank >= 15) {
+      myRankEl.style.display = 'block';
+      myRankEl.textContent = 'Sua posição: #' + (myEligibleRank + 1) + ' · ' + myEntry.points + ' pontos';
     } else {
       myRankEl.style.display = 'none';
     }
