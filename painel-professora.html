@@ -627,6 +627,7 @@
     <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">💰 Financeiro</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">🔗 Materiais</button>
+    <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;">🔍 Acompanhar equipe</button>
     <a class="nav-btn" href="comunidade.html" style="text-decoration:none;display:inline-flex;align-items:center;">👥 Comunidade</a>
   </div>
 
@@ -990,6 +991,19 @@
     </div>
   </div>
 
+  <!-- Acompanhar equipe (só Brenda) -->
+  <div class="reports-section panel-section" id="equipeSection">
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">📅 Aulas de hoje — por professora</div>
+      <div id="equipeAulasHojeList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
+    <div class="report-list">
+      <div class="report-list-title">📊 Relatórios recentes — por professora</div>
+      <div id="equipeReportsList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
 </main>
 
 <!-- Modal: Add student -->
@@ -1055,7 +1069,8 @@
     relatorios: 'reportsSection',
     turmas: 'turmasSection',
     aulas: 'classLogSection',
-    financeiro: 'financeiroSection'
+    financeiro: 'financeiroSection',
+    equipe: 'equipeSection'
   };
 
   function showTab(tab) {
@@ -1105,6 +1120,7 @@
     if (isBrenda) {
       document.getElementById('navMateriais').style.display = 'inline-flex';
       document.getElementById('navFinanceiro').style.display = 'inline-flex';
+      document.getElementById('navEquipe').style.display = 'inline-flex';
       document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
       await loadStudentsForSelect();
@@ -1137,6 +1153,7 @@
       document.getElementById('financeFilterFrom').value = firstDay.toISOString().slice(0, 10);
       document.getElementById('financeFilterTo').value = lastDay.toISOString().slice(0, 10);
       await loadFinanceiro();
+      await loadEquipeOverview(user.id);
     }
   }
 
@@ -2837,16 +2854,30 @@
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
 
-  async function loadAulasHoje(teacherId, seeAll) {
-    const today = new Date().toISOString().slice(0, 10);
-    let query = sb.from('class_logs').select('*').eq('class_date', today).order('start_time', { ascending: true });
-    if (!seeAll) query = query.eq('created_by', teacherId);
+  // Quem é a professora responsável por uma aula (não usa created_by, porque
+  // quem lança/gera a aula no sistema pode ser diferente de quem dá aula —
+  // ex: Brenda cadastrando o cronograma inteiro de uma aluna da Carol).
+  function teacherOfLog(l) {
+    if (l.student_id) {
+      const s = allStudents.find(x => x.id === l.student_id);
+      return s ? s.teacher_id : null;
+    }
+    if (l.turma_id) {
+      const s = allStudents.find(x => x.turma_id === l.turma_id);
+      return s ? s.teacher_id : null;
+    }
+    return null;
+  }
 
-    const { data: logs, error } = await query;
+  async function loadAulasHoje(teacherId) {
+    const today = new Date().toISOString().slice(0, 10);
+    const { data: allLogs, error } = await sb.from('class_logs').select('*').eq('class_date', today).order('start_time', { ascending: true });
     const listEl = document.getElementById('aulasHojeList');
 
     if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas de hoje.</div>'; return; }
-    if (!logs || logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula agendada para hoje.</div>'; return; }
+
+    const logs = (allLogs || []).filter(l => teacherOfLog(l) === teacherId);
+    if (logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula agendada para hoje.</div>'; return; }
 
     listEl.innerHTML = logs.map(l => {
       const turma = allTurmas.find(t => t.id === l.turma_id);
@@ -2863,6 +2894,102 @@
             <div class="report-row-title">${time}</div>
           </div>
           <span class="report-status ${badgeClass}">${statusLabel}</span>
+        </div>`;
+    }).join('');
+  }
+
+  // ---- Acompanhar equipe (só Brenda) ----
+
+  async function loadEquipeOverview(myId) {
+    const today = new Date().toISOString().slice(0, 10);
+    const [{ data: logs }, { data: reports }] = await Promise.all([
+      sb.from('class_logs').select('*').eq('class_date', today),
+      sb.from('reports').select('*').order('created_at', { ascending: false }).limit(50)
+    ]);
+
+    renderEquipeAulasHoje(logs || [], myId);
+    renderEquipeReports(reports || [], myId);
+  }
+
+  function renderEquipeAulasHoje(logs, myId) {
+    const listEl = document.getElementById('equipeAulasHojeList');
+
+    const grouped = {};
+    logs.forEach(l => {
+      const tId = teacherOfLog(l);
+      if (!tId || tId === myId) return;
+      if (!grouped[tId]) grouped[tId] = [];
+      grouped[tId].push(l);
+    });
+
+    const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
+    if (relevantTeachers.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula de outra professora hoje.</div>';
+      return;
+    }
+
+    listEl.innerHTML = relevantTeachers.map(t => {
+      const rows = grouped[t.id]
+        .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''))
+        .map(l => {
+          const turma = allTurmas.find(x => x.id === l.turma_id);
+          const student = allStudents.find(x => x.id === l.student_id);
+          const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+          const time = formatTimeRange(l) || 'sem horário';
+          const badgeClass = l.status === 'realizada' ? 'published' : 'draft';
+          const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+          return `
+            <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
+              <div class="report-row-info">
+                <div class="report-row-student">${who}</div>
+                <div class="report-row-title">${time}</div>
+              </div>
+              <span class="report-status ${badgeClass}">${statusLabel}</span>
+            </div>`;
+        }).join('');
+      return `
+        <div style="margin-bottom:18px;">
+          <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">👩‍🏫 ${t.full_name}</div>
+          ${rows}
+        </div>`;
+    }).join('');
+  }
+
+  function renderEquipeReports(reports, myId) {
+    const listEl = document.getElementById('equipeReportsList');
+
+    const grouped = {};
+    reports.forEach(r => {
+      if (!r.created_by || r.created_by === myId) return;
+      if (!grouped[r.created_by]) grouped[r.created_by] = [];
+      grouped[r.created_by].push(r);
+    });
+
+    const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
+    if (relevantTeachers.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório recente de outra professora.</div>';
+      return;
+    }
+
+    listEl.innerHTML = relevantTeachers.map(t => {
+      const rows = grouped[t.id].slice(0, 5).map(r => {
+        const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+        const period = r.period ? ' · ' + r.period : '';
+        const badgeClass = r.is_published ? 'published' : 'draft';
+        const badgeLabel = r.is_published ? 'Publicado' : 'Rascunho';
+        return `
+          <div class="report-row">
+            <div class="report-row-info">
+              <div class="report-row-student">${studentNameById(r.student_id)} · ${r.title}${period}</div>
+              <div class="report-row-title">${date}</div>
+            </div>
+            <span class="report-status ${badgeClass}">${badgeLabel}</span>
+          </div>`;
+      }).join('');
+      return `
+        <div style="margin-bottom:18px;">
+          <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">👩‍🏫 ${t.full_name}</div>
+          ${rows}
         </div>`;
     }).join('');
   }
