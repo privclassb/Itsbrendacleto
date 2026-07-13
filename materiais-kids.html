@@ -128,7 +128,12 @@
     const { data: links } = await sb.from('material_links').select('*').eq('category', 'kids-materiais');
     const materialUrl = links && links[0] ? links[0].url : null;
 
-    const { data: folders } = await sb.from('student_folders').select('*').eq('student_id', studentId);
+    const { data: profile } = await sb.from('profiles').select('turma_id').eq('id', studentId).maybeSingle();
+    let foldersQuery = sb.from('student_folders').select('*');
+    foldersQuery = profile?.turma_id
+      ? foldersQuery.or(`student_id.eq.${studentId},turma_id.eq.${profile.turma_id}`)
+      : foldersQuery.eq('student_id', studentId);
+    const { data: folders } = await foldersQuery;
 
     const main = document.getElementById('mainContent');
 

@@ -733,18 +733,22 @@
 
     </div>
 
-    <!-- Subpastas por aluno -->
+    <!-- Subpastas por aluno ou turma -->
     <div class="links-card">
-      <div class="links-card-title">📂 Pastas por aluno <span style="font-size:12px;font-weight:400;color:var(--muted);">(materiais, gravações, etc.)</span></div>
+      <div class="links-card-title">📂 Pastas por aluno ou turma <span style="font-size:12px;font-weight:400;color:var(--muted);">(materiais, gravações, etc.)</span></div>
       <div class="folder-list" id="folderList">Carregando...</div>
 
+      <div class="modal-hint" style="margin-bottom:8px;">Escolha uma turma (todos os alunos dela veem a pasta) ou um aluno específico — não os dois.</div>
       <div class="add-folder-form">
-        <select id="folderStudent">
+        <select id="folderTurma" onchange="if(this.value)document.getElementById('folderStudent').value='';">
+          <option value="">Nenhuma (pasta individual)</option>
+        </select>
+        <select id="folderStudent" onchange="if(this.value)document.getElementById('folderTurma').value='';">
           <option value="">Selecione o aluno...</option>
         </select>
-        <input type="text" id="folderLabel" placeholder="Nome da pasta (ex: Módulo 1)" />
+        <input type="text" id="folderLabel" placeholder="Nome da pasta (ex: Módulo 1)" style="grid-column:1/-1;" />
         <input type="text" id="folderUrl" placeholder="Link do Drive..." style="grid-column:1/-1;" />
-        <button class="btn-add-folder" onclick="addFolder()">+ Adicionar pasta</button>
+        <button class="btn-add-folder" onclick="addFolder()" style="grid-column:1/-1;">+ Adicionar pasta</button>
       </div>
     </div>
 
@@ -1103,7 +1107,6 @@
       document.getElementById('navFinanceiro').style.display = 'inline-flex';
       document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
-      await loadFolders();
       await loadStudentsForSelect();
       document.getElementById('addTeacherBtn').style.display = 'inline-flex';
       document.getElementById('addTeacherFolderForm').style.display = 'grid';
@@ -1119,6 +1122,10 @@
     populateClassLogStudentSelect();
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
     await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
+    if (isBrenda) {
+      await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
+      await loadFolders();
+    }
     document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
     document.getElementById('scheduleFrom').value = new Date().toISOString().slice(0, 10);
     await loadClassLogs(user.id, isBrenda);
@@ -2134,6 +2141,10 @@
     return (allStudents.find(s => s.id === id) || {}).full_name || 'Aluno';
   }
 
+  function turmaNameById(id) {
+    return (allTurmas.find(t => t.id === id) || {}).name || 'Turma';
+  }
+
   // ---- Links de materiais (só Brenda) ----
 
   async function loadLinks() {
@@ -2194,23 +2205,33 @@
 
     listEl.innerHTML = folders.map(f => `
       <div class="folder-row">
-        <span class="folder-student">${studentNameById(f.student_id)}</span>
+        <span class="folder-student">${f.turma_id ? ('Turma: ' + turmaNameById(f.turma_id)) : studentNameById(f.student_id)}</span>
         <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
         <button class="btn-del" onclick="deleteFolder('${f.id}')">✕</button>
       </div>`).join('');
   }
 
   async function addFolder() {
+    const turmaId = document.getElementById('folderTurma').value;
     const studentId = document.getElementById('folderStudent').value;
     const label = document.getElementById('folderLabel').value.trim();
     const url = document.getElementById('folderUrl').value.trim();
 
-    if (!studentId || !label || !url) {
-      alert('Selecione o aluno e preencha nome e link da pasta.');
+    if (!turmaId && !studentId) {
+      alert('Selecione uma turma ou um aluno.');
+      return;
+    }
+    if (!label || !url) {
+      alert('Preencha nome e link da pasta.');
       return;
     }
 
-    const { error } = await sb.from('student_folders').insert({ student_id: studentId, label, url });
+    const { error } = await sb.from('student_folders').insert({
+      student_id: turmaId ? null : studentId,
+      turma_id: turmaId || null,
+      label,
+      url
+    });
 
     if (error) {
       alert('Erro ao adicionar pasta: ' + error.message);
@@ -2220,6 +2241,7 @@
     document.getElementById('folderLabel').value = '';
     document.getElementById('folderUrl').value = '';
     document.getElementById('folderStudent').value = '';
+    document.getElementById('folderTurma').value = '';
 
     await loadFolders();
   }

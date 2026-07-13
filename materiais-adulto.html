@@ -169,9 +169,13 @@
     const linkMap = {};
     (links || []).forEach(l => { linkMap[l.category] = l.url; });
 
-    // Busca subpastas do aluno
-    const { data: folders } = await sb.from('student_folders')
-      .select('*').eq('student_id', userId).order('created_at');
+    // Busca subpastas do aluno (individuais + as da turma dele, se tiver)
+    const { data: profile } = await sb.from('profiles').select('turma_id').eq('id', userId).maybeSingle();
+    let foldersQuery = sb.from('student_folders').select('*').order('created_at');
+    foldersQuery = profile?.turma_id
+      ? foldersQuery.or(`student_id.eq.${userId},turma_id.eq.${profile.turma_id}`)
+      : foldersQuery.eq('student_id', userId);
+    const { data: folders } = await foldersQuery;
 
     // Busca relatórios
     const { data: reports } = await sb.from('reports')
