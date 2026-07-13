@@ -645,6 +645,23 @@
       <div id="aulasHojeList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
+    <!-- Equipe -->
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;">
+        <span>👩‍🏫 Equipe</span>
+        <button class="btn-sm" id="addTeacherBtn" onclick="openAddTeacher()" style="display:none;">+ Nova professora</button>
+      </div>
+      <div class="folder-list" id="teacherFolderList">Carregando...</div>
+      <div class="add-folder-form" id="addTeacherFolderForm" style="display:none;">
+        <select id="teacherFolderTeacher">
+          <option value="">Selecione a professora...</option>
+        </select>
+        <input type="text" id="teacherFolderLabel" placeholder="Nome da pasta (ex: Treinamento)" />
+        <input type="text" id="teacherFolderUrl" placeholder="Link do Drive..." style="grid-column:1/-1;" />
+        <button class="btn-add-folder" onclick="addTeacherFolder()">+ Adicionar pasta</button>
+      </div>
+    </div>
+
     <!-- Overview -->
     <div class="overview-grid">
       <div class="overview-card">
@@ -1092,7 +1109,11 @@
       await loadLinks();
       await loadFolders();
       await loadStudentsForSelect();
+      document.getElementById('addTeacherBtn').style.display = 'inline-flex';
+      document.getElementById('addTeacherFolderForm').style.display = 'grid';
+      await loadTeachers();
     }
+    await loadTeacherFolders(user.id, isBrenda);
     // Relatórios — todas as professoras
     await loadStudentsForReports(user.id, isBrenda);
     await loadReports(user.id, isBrenda);
@@ -1556,6 +1577,7 @@
   // ── Adicionar aluno ──────────────────────────────────────────────────
   let allTurmas = [];
   let allClassLogs = [];
+  let allTeachers = [];
 
   async function populateTurmaSelect(selectId, selectedValue, placeholder) {
     const select = document.getElementById(selectId);
@@ -2186,6 +2208,166 @@
     const { error } = await sb.from('student_folders').delete().eq('id', id);
     if (error) { alert('Erro ao remover pasta.'); return; }
     await loadFolders();
+  }
+
+  // ---- Equipe: pastas por professora (todas veem as suas, Brenda vê e gerencia todas) ----
+
+  async function loadTeachers() {
+    const { data: teachers } = await sb.from('profiles').select('id, full_name').eq('role', 'professora').order('full_name');
+    allTeachers = teachers || [];
+    const sel = document.getElementById('teacherFolderTeacher');
+    if (sel) {
+      sel.innerHTML = '<option value="">Selecione a professora...</option>' +
+        allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
+    }
+  }
+
+  function teacherNameById(id) {
+    const t = allTeachers.find(x => x.id === id);
+    return t ? (t.full_name || 'Sem nome') : 'Professora';
+  }
+
+  async function loadTeacherFolders(userId, seeAll) {
+    const listEl = document.getElementById('teacherFolderList');
+    if (!listEl) return;
+
+    let query = sb.from('teacher_folders').select('*');
+    if (!seeAll) query = query.eq('teacher_id', userId);
+    const { data: folders, error } = await query;
+
+    if (error) {
+      listEl.innerHTML = 'Erro ao carregar pastas.';
+      return;
+    }
+    if (!folders || folders.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma pasta cadastrada ainda.</div>';
+      return;
+    }
+
+    listEl.innerHTML = folders.map(f => `
+      <div class="folder-row">
+        ${seeAll ? `<span class="folder-student">${teacherNameById(f.teacher_id)}</span>` : ''}
+        <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
+        ${seeAll ? `<button class="btn-del" onclick="deleteTeacherFolder('${f.id}')">✕</button>` : ''}
+      </div>`).join('');
+  }
+
+  async function addTeacherFolder() {
+    const teacherId = document.getElementById('teacherFolderTeacher').value;
+    const label = document.getElementById('teacherFolderLabel').value.trim();
+    const url = document.getElementById('teacherFolderUrl').value.trim();
+
+    if (!teacherId || !label || !url) {
+      alert('Selecione a professora e preencha nome e link da pasta.');
+      return;
+    }
+
+    const { error } = await sb.from('teacher_folders').insert({ teacher_id: teacherId, label, url });
+    if (error) {
+      alert('Erro ao adicionar pasta: ' + error.message);
+      return;
+    }
+
+    document.getElementById('teacherFolderLabel').value = '';
+    document.getElementById('teacherFolderUrl').value = '';
+    document.getElementById('teacherFolderTeacher').value = '';
+
+    const { data: { session } } = await sb.auth.getSession();
+    await loadTeacherFolders(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteTeacherFolder(id) {
+    if (!confirm('Remover esta pasta?')) return;
+    const { error } = await sb.from('teacher_folders').delete().eq('id', id);
+    if (error) { alert('Erro ao remover pasta.'); return; }
+    const { data: { session } } = await sb.auth.getSession();
+    await loadTeacherFolders(session.user.id, currentUserIsBrenda);
+  }
+
+  function openAddTeacher() {
+    document.getElementById('newTeacherName').value = '';
+    document.getElementById('newTeacherEmail').value = '';
+    document.getElementById('newTeacherPassword').value = '';
+    document.getElementById('addTeacherError').style.display = 'none';
+    document.getElementById('addTeacherSuccess').style.display = 'none';
+    document.getElementById('modalAddTeacher').classList.add('open');
+  }
+
+  function closeAddTeacher() {
+    document.getElementById('modalAddTeacher').classList.remove('open');
+  }
+
+  async function createTeacher() {
+    const name = document.getElementById('newTeacherName').value.trim();
+    const email = document.getElementById('newTeacherEmail').value.trim();
+    const password = document.getElementById('newTeacherPassword').value.trim();
+    const errEl = document.getElementById('addTeacherError');
+    const sucEl = document.getElementById('addTeacherSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!name || !email || !password) {
+      errEl.textContent = 'Preencha todos os campos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 6) {
+      errEl.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveTeacher');
+    btn.disabled = true;
+    btn.textContent = 'Criando...';
+
+    try {
+      // Guarda a sessão da Brenda: criar um novo usuário troca a sessão ativa do navegador
+      const { data: { session: adminSession } } = await sb.auth.getSession();
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name, role: 'professora' } }
+      });
+      if (error) throw error;
+
+      if (data.user) {
+        if (data.session) {
+          await sb.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
+        }
+        await new Promise(r => setTimeout(r, 1000));
+
+        await sb.from('profiles').update({ full_name: name, role: 'professora' }).eq('id', data.user.id);
+
+        await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+            'apikey': 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj'
+          },
+          body: JSON.stringify({ data: { role: 'professora', full_name: name } })
+        });
+      }
+
+      // Restaura a sessão da Brenda
+      if (adminSession) {
+        await sb.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+      }
+
+      sucEl.textContent = '✅ Professora ' + name + ' criada com sucesso!';
+      sucEl.style.display = 'block';
+
+      await loadTeachers();
+      setTimeout(closeAddTeacher, 2000);
+    } catch (err) {
+      errEl.textContent = 'Erro: ' + (err.message || 'Tente novamente.');
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Criar professora';
+    }
   }
 
   // ---- Relatórios (todas as professoras) ----
@@ -3137,6 +3319,37 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeAddStudent()">Cancelar</button>
       <button class="btn-modal-save" id="btnSaveStudent" onclick="createStudent()">Criar aluno</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nova professora -->
+<div class="modal-overlay" id="modalAddTeacher">
+  <div class="modal-box">
+    <div class="modal-title">Nova professora</div>
+    <div class="modal-sub">Ela receberá acesso imediato com essas credenciais.</div>
+
+    <div class="modal-error" id="addTeacherError"></div>
+    <div class="modal-success" id="addTeacherSuccess"></div>
+
+    <div class="modal-row">
+      <label class="modal-label">Nome completo</label>
+      <input type="text" class="modal-input" id="newTeacherName" placeholder="Nome da professora" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">E-mail</label>
+      <input type="email" class="modal-input" id="newTeacherEmail" placeholder="email@exemplo.com" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Senha provisória</label>
+      <input type="text" class="modal-input" id="newTeacherPassword" placeholder="Mínimo 6 caracteres" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeAddTeacher()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveTeacher" onclick="createTeacher()">Criar professora</button>
     </div>
   </div>
 </div>
