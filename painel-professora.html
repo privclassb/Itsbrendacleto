@@ -2564,9 +2564,24 @@
 
   async function loadTurmas(teacherId, seeAll) {
     let query = sb.from('turmas').select('*').order('name');
-    if (!seeAll) query = query.eq('teacher_id', teacherId);
+    let error, turmas;
 
-    const { data: turmas, error } = await query;
+    if (!seeAll) {
+      // turmas.teacher_id é sempre quem criou a turma (só a Brenda cria turmas),
+      // então pra outras professoras a turma "delas" é aquela que tem alunos
+      // atribuídos a elas — não quem cadastrou a turma no sistema.
+      const myTurmaIds = [...new Set(allStudents.filter(s => s.teacher_id === teacherId && s.turma_id).map(s => s.turma_id))];
+      if (myTurmaIds.length === 0) {
+        allTurmas = [];
+        const listElEmpty = document.getElementById('turmasList');
+        listElEmpty.innerHTML = '<div class="empty-reports">Nenhuma turma com alunos seus ainda.</div>';
+        return;
+      }
+      ({ data: turmas, error } = await query.in('id', myTurmaIds));
+    } else {
+      ({ data: turmas, error } = await query);
+    }
+
     allTurmas = (error || !turmas) ? [] : turmas;
 
     const listEl = document.getElementById('turmasList');
