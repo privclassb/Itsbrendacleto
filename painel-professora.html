@@ -3076,8 +3076,7 @@
     const first = (existing || [])[0];
     document.getElementById('turmaReportTitle').value = first ? first.title : (dateLabel ? 'Aula de ' + dateLabel : '');
     document.getElementById('turmaReportPeriod').value = first ? (first.period || '') : '';
-    document.getElementById('turmaReportContent').value = first ? first.content : '';
-    document.getElementById('turmaReportPrivateNotes').value = (log && log.content) || '';
+    document.getElementById('turmaReportContent').value = first ? first.content : ((log && log.content) || '');
 
     const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', classLogId);
     const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
@@ -3095,7 +3094,6 @@
     const title = document.getElementById('turmaReportTitle').value.trim();
     const period = document.getElementById('turmaReportPeriod').value.trim();
     const content = document.getElementById('turmaReportContent').value.trim();
-    const privateNotes = document.getElementById('turmaReportPrivateNotes').value.trim();
     const errEl = document.getElementById('turmaReportError');
 
     if (!title || !content) {
@@ -3121,7 +3119,7 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
-    await sb.from('class_logs').update({ content: privateNotes }).eq('id', classLogId);
+    await sb.from('class_logs').update({ content }).eq('id', classLogId);
     const attendanceList = collectAttendanceFromContainer('turmaReportAttendanceList');
     await saveAttendanceForClassLog(classLogId, attendanceList);
 
@@ -4769,11 +4767,6 @@
     <div class="modal-row">
       <label class="modal-label">Alunos presentes</label>
       <div id="turmaReportAttendanceList"></div>
-    </div>
-
-    <div class="modal-row">
-      <label class="modal-label">Anotações do professor (privado)</label>
-      <textarea class="modal-input" id="turmaReportPrivateNotes" style="min-height:90px;resize:vertical;" placeholder="Anotações internas sobre a aula..."></textarea>
     </div>
 
     <div class="modal-hint" style="margin-bottom:14px;">O conteúdo abaixo é salvo individualmente pra cada aluno matriculado na turma. Essas anotações são só pra sua organização — não aparecem pro aluno/responsável. Os relatórios mensais que eles veem ficam na aba Relatórios.</div>
