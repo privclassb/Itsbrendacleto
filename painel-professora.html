@@ -1352,6 +1352,7 @@
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionDeleteBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
+    document.getElementById('profileRescheduleFixedBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const turma = allTurmas.find(t => t.id === student.turma_id);
@@ -2834,6 +2835,7 @@
     const members = allStudents.filter(s => s.turma_id === turmaId);
     document.getElementById('turmaProfileName').textContent = turma.name;
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
+    document.getElementById('turmaProfileRescheduleFixedBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
 
     document.getElementById('turmaProfileStudentsList').innerHTML = members.length
       ? members.map(s => `
@@ -3206,6 +3208,111 @@
     closeMarkMakeup();
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  // ---- Alterar dia/horário fixo das aulas pendentes (individual ou turma) ----
+
+  let rescheduleTarget = { type: null, id: null };
+
+  function openRescheduleFixed(type, id) {
+    if (!id) return;
+    rescheduleTarget = { type, id };
+
+    const who = type === 'turma'
+      ? (allTurmas.find(t => t.id === id)?.name || 'Turma')
+      : (allStudents.find(s => s.id === id)?.full_name || 'Aluno');
+    document.getElementById('rescheduleFixedWho').textContent = who;
+
+    document.getElementById('rescheduleFixedError').style.display = 'none';
+    document.getElementById('rescheduleFixedFromDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('rescheduleFixedWeekday').value = String(new Date().getDay());
+    document.getElementById('rescheduleFixedStartTime').value = '';
+    document.getElementById('rescheduleFixedEndTime').value = '';
+
+    document.getElementById('modalRescheduleFixed').classList.add('open');
+  }
+
+  function closeRescheduleFixed() {
+    document.getElementById('modalRescheduleFixed').classList.remove('open');
+  }
+
+  async function saveRescheduleFixed() {
+    const fromDate = document.getElementById('rescheduleFixedFromDate').value;
+    const weekday = parseInt(document.getElementById('rescheduleFixedWeekday').value, 10);
+    const startTime = document.getElementById('rescheduleFixedStartTime').value || null;
+    const endTime = document.getElementById('rescheduleFixedEndTime').value || null;
+    const errEl = document.getElementById('rescheduleFixedError');
+    errEl.style.display = 'none';
+
+    if (!fromDate) {
+      errEl.textContent = 'Informe a data a partir de quando aplicar.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!startTime) {
+      errEl.textContent = 'Informe o novo horário de início.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    let query = sb.from('class_logs').select('*').eq('status', 'pendente').gte('class_date', fromDate).order('class_date', { ascending: true });
+    query = rescheduleTarget.type === 'turma' ? query.eq('turma_id', rescheduleTarget.id) : query.eq('student_id', rescheduleTarget.id);
+    const { data: logs, error } = await query;
+
+    if (error) {
+      errEl.textContent = 'Erro ao buscar aulas: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!logs || logs.length === 0) {
+      errEl.textContent = 'Nenhuma aula pendente encontrada a partir dessa data.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveRescheduleFixed');
+    btn.disabled = true;
+    btn.textContent = 'Aplicando...';
+
+    // Gera as novas datas a partir do próximo dia da semana escolhido, uma por semana,
+    // mantendo a mesma quantidade de aulas que já estava pendente
+    const d = new Date(fromDate + 'T00:00:00');
+    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
+    const newDates = [];
+    for (let i = 0; i < logs.length; i++) {
+      newDates.push(d.toISOString().slice(0, 10));
+      d.setDate(d.getDate() + 7);
+    }
+
+    let failCount = 0;
+    for (let i = 0; i < logs.length; i++) {
+      const { data: updData, error: updErr } = await sb.from('class_logs').update({
+        class_date: newDates[i],
+        start_time: startTime,
+        end_time: endTime
+      }).eq('id', logs[i].id).select();
+      if (updErr || !updData || updData.length === 0) failCount++;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Aplicar novo dia/horário';
+
+    if (failCount > 0) {
+      errEl.textContent = failCount + ' de ' + logs.length + ' aula(s) não foram atualizadas. Tente novamente.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeRescheduleFixed();
+    const { data: { session } } = await sb.auth.getSession();
+    if (rescheduleTarget.type === 'turma') {
+      await openTurmaProfile(rescheduleTarget.id);
+    } else {
+      await openStudentProfile(rescheduleTarget.id);
+    }
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id);
+    alert(logs.length + ' aula(s) remarcada(s) com sucesso.');
   }
 
   async function saveClassLog() {
@@ -4379,6 +4486,7 @@
       <div class="profile-section-title">Aulas registradas</div>
       <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela.</div>
       <div class="aula-stats-row" id="profileAulasStats"></div>
+      <button class="btn-sm" id="profileRescheduleFixedBtn" onclick="openRescheduleFixed('student', currentProfileStudentId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="profileClassLogsList"></div>
       <button class="btn-sm" id="profileDeleteAllLogsBtn" onclick="deleteAllClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
     </div>
@@ -4390,6 +4498,51 @@
 
     <div class="detail-actions">
       <button class="btn-modal-cancel" onclick="closeStudentProfile()" style="flex:1;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Alterar dia/horário fixo das aulas pendentes -->
+<div class="modal-overlay" id="modalRescheduleFixed">
+  <div class="modal-box">
+    <div class="modal-title">Alterar dia/horário fixo</div>
+    <div class="modal-sub" id="rescheduleFixedWho"></div>
+    <div class="modal-hint" style="margin-bottom:14px;">Remarca todas as aulas <strong>pendentes</strong> a partir da data escolhida pro novo dia da semana e horário, mantendo a mesma quantidade de aulas. Aulas já realizadas ou canceladas não são alteradas.</div>
+
+    <div class="modal-row">
+      <label class="modal-label">A partir de qual data</label>
+      <input type="date" class="modal-input" id="rescheduleFixedFromDate" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Novo dia da semana</label>
+      <select class="modal-select" id="rescheduleFixedWeekday">
+        <option value="1">Segunda-feira</option>
+        <option value="2">Terça-feira</option>
+        <option value="3">Quarta-feira</option>
+        <option value="4">Quinta-feira</option>
+        <option value="5">Sexta-feira</option>
+        <option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Novo horário início</label>
+        <input type="time" class="modal-input" id="rescheduleFixedStartTime" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Novo horário fim</label>
+        <input type="time" class="modal-input" id="rescheduleFixedEndTime" />
+      </div>
+    </div>
+
+    <div class="modal-error" id="rescheduleFixedError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeRescheduleFixed()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveRescheduleFixed" onclick="saveRescheduleFixed()">Aplicar novo dia/horário</button>
     </div>
   </div>
 </div>
@@ -4414,6 +4567,7 @@
       <div class="profile-section-title">Aulas registradas</div>
       <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela pra toda a turma.</div>
       <div class="aula-stats-row" id="turmaProfileAulasStats"></div>
+      <button class="btn-sm" id="turmaProfileRescheduleFixedBtn" onclick="openRescheduleFixed('turma', currentProfileTurmaId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="turmaProfileClassLogsList"></div>
     </div>
 
