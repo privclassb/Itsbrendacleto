@@ -139,6 +139,30 @@
     .modal-content { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
     .btn-modal-close { width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
     .btn-modal-close:hover { background: var(--brown-light); }
+
+    /* Recibo de pagamento */
+    .receipt-select { width: 100%; padding: 12px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--white); margin-bottom: 14px; }
+    .btn-generate-receipt { width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
+    .btn-generate-receipt:hover { background: var(--brown-light); }
+    .receipt-box { background: var(--white); border-radius: 20px; padding: 32px 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .receipt-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); text-align: center; margin-bottom: 22px; }
+    .receipt-amount { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--brown); text-align: center; margin-bottom: 22px; }
+    .receipt-body { font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 24px; }
+    .receipt-meta { font-size: 13px; color: var(--muted); text-align: right; margin-bottom: 28px; }
+    .receipt-signature { text-align: center; font-size: 13px; color: var(--text); }
+    .receipt-signature-line { border-top: 1.5px solid var(--text); width: 220px; margin: 0 auto 6px; padding-top: 6px; }
+    .receipt-actions { display: flex; gap: 10px; margin-top: 24px; }
+    .receipt-actions button { flex: 1; padding: 12px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
+    .btn-receipt-print { background: var(--brown); color: white; }
+    .btn-receipt-print:hover { background: var(--brown-light); }
+    .btn-receipt-close { background: var(--sand); color: var(--text); }
+
+    @media print {
+      body * { visibility: hidden; }
+      .receipt-box, .receipt-box * { visibility: visible; }
+      .receipt-box { position: absolute; top: 0; left: 0; width: 100%; max-width: 100%; box-shadow: none; }
+      .no-print { display: none !important; }
+    }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -207,6 +231,15 @@
   <div class="card">
     <div id="paymentsList"><div class="empty-msg">Carregando...</div></div>
   </div>
+
+  <div class="section-title">🧾 Recibo de pagamento</div>
+  <div class="card">
+    <div class="empty-msg" id="receiptEmptyMsg" style="display:none;">Nenhuma parcela paga encontrada ainda.</div>
+    <div id="receiptFormWrap" style="display:none;">
+      <select id="receiptMonthSelect" class="receipt-select"></select>
+      <button class="btn-generate-receipt" onclick="openReceiptModal()">🧾 Gerar recibo</button>
+    </div>
+  </div>
 </main>
 
 <div class="modal-overlay" id="modalOverlay">
@@ -215,6 +248,23 @@
     <div class="modal-title" id="modalTitle"></div>
     <div class="modal-content" id="modalContent"></div>
     <button class="btn-modal-close" id="modalClose">Fechar</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="receiptModalOverlay">
+  <div class="receipt-box">
+    <div class="receipt-title">Recibo</div>
+    <div class="receipt-amount" id="receiptAmount"></div>
+    <div class="receipt-body" id="receiptBody"></div>
+    <div class="receipt-meta" id="receiptMeta"></div>
+    <div class="receipt-signature">
+      <div class="receipt-signature-line">Brenda Cleto</div>
+      Professora de inglês
+    </div>
+    <div class="receipt-actions no-print">
+      <button class="btn-receipt-close" onclick="closeReceiptModal()">Fechar</button>
+      <button class="btn-receipt-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
   </div>
 </div>
 
@@ -276,7 +326,7 @@
     await loadProgress(student.id);
     await loadAgenda(student.id, student.turma_id);
     await loadReports(student.id);
-    await loadFinance(student.id);
+    await loadFinance(student.id, profile.full_name || 'Responsável', student.full_name || 'o(a) aluno(a)');
   }
 
   const CLASS_STATUS_LABEL = {
@@ -319,9 +369,11 @@
       ? history.map(renderRow).join('') : '<div class="empty-msg">Nenhuma aula no histórico ainda.</div>';
   }
 
-  async function loadFinance(studentId) {
+  async function loadFinance(studentId, payerName, studentName) {
     const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).eq('type', 'entrada');
     const listEl = document.getElementById('paymentsList');
+
+    loadReceiptOptions(payments, payerName, studentName);
 
     if (!payments || payments.length === 0) {
       listEl.innerHTML = '<div class="empty-msg">Nenhum lançamento encontrado ainda.</div>';
@@ -349,6 +401,113 @@
           <div class="pay-amount">${amount}</div>
         </div>`;
     }).join('');
+  }
+
+  // ---- Recibo de pagamento ----
+
+  let receiptPaymentsCache = [];
+  let receiptPayerName = '';
+  let receiptStudentName = '';
+
+  function loadReceiptOptions(payments, payerName, studentName) {
+    receiptPayerName = payerName;
+    receiptStudentName = studentName;
+    receiptPaymentsCache = (payments || []).filter(p => p.paid).sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
+
+    const emptyEl = document.getElementById('receiptEmptyMsg');
+    const wrapEl = document.getElementById('receiptFormWrap');
+
+    if (receiptPaymentsCache.length === 0) {
+      emptyEl.style.display = 'block';
+      wrapEl.style.display = 'none';
+      return;
+    }
+
+    emptyEl.style.display = 'none';
+    wrapEl.style.display = 'block';
+
+    const sel = document.getElementById('receiptMonthSelect');
+    sel.innerHTML = receiptPaymentsCache.map((p, i) => {
+      const d = new Date((p.due_date || p.paid_at) + 'T00:00:00');
+      let label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      label = label.charAt(0).toUpperCase() + label.slice(1);
+      const amount = 'R$ ' + Number(p.amount || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+      return `<option value="${i}">${label} — ${amount}</option>`;
+    }).join('');
+  }
+
+  function openReceiptModal() {
+    const idx = parseInt(document.getElementById('receiptMonthSelect').value, 10);
+    const p = receiptPaymentsCache[idx];
+    if (!p) return;
+    renderReceipt(p, receiptPayerName, receiptStudentName);
+    document.getElementById('receiptModalOverlay').classList.add('open');
+  }
+
+  function closeReceiptModal() {
+    document.getElementById('receiptModalOverlay').classList.remove('open');
+  }
+
+  function renderReceipt(p, payerName, studentName) {
+    const refDate = new Date((p.due_date || p.paid_at) + 'T00:00:00');
+    const refLabel = refDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const issueDate = new Date((p.paid_at || p.due_date) + 'T00:00:00');
+    const amount = Number(p.amount || 0);
+    const amountStr = 'R$ ' + amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    const extenso = valorPorExtenso(amount);
+
+    document.getElementById('receiptAmount').textContent = amountStr;
+    document.getElementById('receiptBody').textContent =
+      `Recebi de ${payerName} a importância de ${amountStr} (${extenso}), referente à mensalidade de aulas de inglês de ${studentName} do mês de ${refLabel}.`;
+    document.getElementById('receiptMeta').textContent =
+      'Recibo emitido em ' + issueDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+  }
+
+  function valorPorExtenso(valor) {
+    const unidades = ['zero','um','dois','três','quatro','cinco','seis','sete','oito','nove'];
+    const dezA19 = ['dez','onze','doze','treze','quatorze','quinze','dezesseis','dezessete','dezoito','dezenove'];
+    const dezenas = ['','dez','vinte','trinta','quarenta','cinquenta','sessenta','setenta','oitenta','noventa'];
+    const centenas = ['','cento','duzentos','trezentos','quatrocentos','quinhentos','seiscentos','setecentos','oitocentos','novecentos'];
+
+    function trioToWords(n) {
+      if (n === 0) return '';
+      if (n === 100) return 'cem';
+      const parts = [];
+      const c = Math.floor(n / 100);
+      const r = n % 100;
+      if (c > 0) parts.push(centenas[c]);
+      if (r > 0) {
+        if (r < 10) parts.push(unidades[r]);
+        else if (r < 20) parts.push(dezA19[r - 10]);
+        else {
+          const d = Math.floor(r / 10);
+          const u = r % 10;
+          parts.push(u > 0 ? dezenas[d] + ' e ' + unidades[u] : dezenas[d]);
+        }
+      }
+      return parts.join(' e ');
+    }
+
+    function integerToWords(n) {
+      if (n === 0) return 'zero';
+      let resto = n;
+      const milhoes = Math.floor(resto / 1e6); resto %= 1e6;
+      const milhares = Math.floor(resto / 1e3); resto %= 1e3;
+      const parts = [];
+      if (milhoes) parts.push(trioToWords(milhoes) + (milhoes === 1 ? ' milhão' : ' milhões'));
+      if (milhares) parts.push(milhares === 1 ? 'mil' : trioToWords(milhares) + ' mil');
+      if (resto) parts.push(trioToWords(resto));
+      return parts.join(' e ');
+    }
+
+    const reais = Math.floor(valor);
+    const centavos = Math.round((valor - reais) * 100);
+
+    let result = integerToWords(reais) + (reais === 1 ? ' real' : ' reais');
+    if (centavos > 0) {
+      result += ' e ' + integerToWords(centavos) + (centavos === 1 ? ' centavo' : ' centavos');
+    }
+    return result;
   }
 
   async function loadProgress(studentId) {
