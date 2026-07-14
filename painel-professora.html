@@ -555,6 +555,19 @@
     .aula-log-date { font-size: 13px; font-weight: 600; color: var(--text); }
     .aula-log-content { font-size: 13px; color: var(--muted); margin-top: 4px; }
 
+    /* Agenda semanal */
+    .agenda-week-grid { display: grid; grid-template-columns: repeat(7, minmax(120px, 1fr)); gap: 8px; margin-top: 16px; overflow-x: auto; }
+    .agenda-day-col { background: var(--cream); border-radius: 10px; padding: 10px; min-height: 100px; }
+    .agenda-day-col.today { border: 1.5px solid var(--brown); }
+    .agenda-day-header { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; text-align: center; }
+    .agenda-day-item { background: var(--white); border-radius: 8px; padding: 8px; margin-bottom: 6px; cursor: pointer; box-shadow: var(--shadow); transition: transform 0.1s; }
+    .agenda-day-item:hover { transform: translateY(-1px); }
+    .agenda-day-item-time { font-size: 11px; font-weight: 700; color: var(--brown); }
+    .agenda-day-item-who { font-size: 12px; font-weight: 600; color: var(--text); margin-top: 2px; }
+    .agenda-day-item-status { font-size: 10px; color: var(--muted); margin-top: 2px; }
+    .agenda-day-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 10px 0; }
+    @media (max-width: 800px) { .agenda-week-grid { grid-template-columns: repeat(7, 140px); } }
+
     /* Perfil unificado do aluno */
     .profile-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
     .profile-options-wrap { position: relative; flex-shrink: 0; }
@@ -636,6 +649,7 @@
     <button class="nav-btn active" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">🏫 Turmas</button>
     <button class="nav-btn" data-tab="aulas" onclick="showTab('aulas')">📝 Aulas</button>
+    <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">📅 Minha Agenda</button>
     <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">💰 Financeiro</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">🔗 Materiais</button>
@@ -950,6 +964,22 @@
     </div>
   </div>
 
+  <!-- Minha Agenda (semanal) -->
+  <div class="reports-section panel-section" id="agendaSection">
+    <div class="report-list">
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>📅 Minha Agenda</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-sm" onclick="shiftAgendaWeek(-1)">← Anterior</button>
+          <span id="agendaWeekLabel" style="font-weight:600;font-size:13px;color:var(--text);"></span>
+          <button class="btn-sm" onclick="shiftAgendaWeek(1)">Próxima →</button>
+        </div>
+      </div>
+      <div class="modal-hint">Clique numa aula pra lançar ou editar o relatório dela.</div>
+      <div class="agenda-week-grid" id="agendaWeekGrid"></div>
+    </div>
+  </div>
+
   <!-- Financeiro -->
   <div class="reports-section panel-section" id="financeiroSection">
 
@@ -1081,6 +1111,7 @@
     relatorios: 'reportsSection',
     turmas: 'turmasSection',
     aulas: 'classLogSection',
+    agenda: 'agendaSection',
     financeiro: 'financeiroSection',
     equipe: 'equipeSection'
   };
@@ -1158,6 +1189,7 @@
     document.getElementById('scheduleFrom').value = new Date().toISOString().slice(0, 10);
     await loadClassLogs(user.id, isBrenda);
     await loadAulasHoje(user.id, isBrenda);
+    await loadAgendaWeek();
     if (isBrenda) {
       const now = new Date();
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -1696,6 +1728,13 @@
     document.getElementById('newStudentContractEnd').value = '';
     document.getElementById('newStudentFee').value = '';
     document.getElementById('newStudentPaymentStatus').value = 'em_dia';
+    document.getElementById('genSchedule').checked = false;
+    document.getElementById('genScheduleFields').style.display = 'none';
+    document.getElementById('genScheduleStartTime').value = '';
+    document.getElementById('genScheduleEndTime').value = '';
+    document.getElementById('genFinance').checked = false;
+    document.getElementById('genFinanceFields').style.display = 'none';
+    toggleGenRowsVisibility();
     document.getElementById('createGuardian').checked = false;
     document.getElementById('guardianName').value = '';
     document.getElementById('guardianEmail').value = '';
@@ -1705,6 +1744,26 @@
 
   function closeAddStudent() {
     document.getElementById('modalAddStudent').classList.remove('open');
+  }
+
+  function toggleGenRowsVisibility() {
+    const hasTurma = !!document.getElementById('newStudentTurma').value;
+    document.getElementById('genScheduleRow').style.display = hasTurma ? 'none' : 'block';
+    document.getElementById('genFinanceRow').style.display = hasTurma ? 'none' : 'block';
+    if (hasTurma) {
+      document.getElementById('genSchedule').checked = false;
+      document.getElementById('genFinance').checked = false;
+      document.getElementById('genScheduleFields').style.display = 'none';
+      document.getElementById('genFinanceFields').style.display = 'none';
+    }
+  }
+
+  function toggleGenScheduleFields() {
+    document.getElementById('genScheduleFields').style.display = document.getElementById('genSchedule').checked ? 'block' : 'none';
+  }
+
+  function toggleGenFinanceFields() {
+    document.getElementById('genFinanceFields').style.display = document.getElementById('genFinance').checked ? 'block' : 'none';
   }
 
   function toggleGuardianFields() {
@@ -1735,6 +1794,14 @@
     const guardianEmail = document.getElementById('guardianEmail').value.trim();
     const guardianPassword = (document.getElementById('guardianPassword').value.trim()) || password;
 
+    const wantsSchedule = !turmaId && document.getElementById('genSchedule').checked;
+    const scheduleWeekday = parseInt(document.getElementById('genScheduleWeekday').value, 10);
+    const scheduleStartTime = document.getElementById('genScheduleStartTime').value || null;
+    const scheduleEndTime = document.getElementById('genScheduleEndTime').value || null;
+
+    const wantsFinance = !turmaId && document.getElementById('genFinance').checked;
+    const financeMethod = document.getElementById('genFinanceMethod').value;
+
     const errEl = document.getElementById('addStudentError');
     const sucEl = document.getElementById('addStudentSuccess');
     errEl.style.display = 'none';
@@ -1757,6 +1824,16 @@
     }
     if (wantsGuardian && guardianPassword.length < 6) {
       errEl.textContent = 'A senha do responsável precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if ((wantsSchedule || wantsFinance) && (!contractStart || !contractEnd)) {
+      errEl.textContent = 'Preencha início e fim do contrato pra gerar aulas/financeiro automaticamente.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (wantsFinance && !monthlyFee) {
+      errEl.textContent = 'Informe a parcela mensal pra gerar o financeiro automaticamente.';
       errEl.style.display = 'block';
       return;
     }
@@ -1872,12 +1949,67 @@
         }
       }
 
+      // Gera as aulas do contrato inteiro (aluno individual)
+      let scheduleMsg = '';
+      if (wantsSchedule && data.user) {
+        const start = new Date(contractStart + 'T00:00:00');
+        const end = new Date(contractEnd + 'T00:00:00');
+        const d = new Date(start);
+        while (d.getDay() !== scheduleWeekday) d.setDate(d.getDate() + 1);
+        const dates = [];
+        while (d <= end) {
+          dates.push(d.toISOString().slice(0, 10));
+          d.setDate(d.getDate() + 7);
+        }
+        if (dates.length > 0) {
+          const { data: { session: profSession } } = await sb.auth.getSession();
+          const entries = dates.map(class_date => ({
+            student_id: data.user.id,
+            class_date,
+            start_time: scheduleStartTime,
+            end_time: scheduleEndTime,
+            status: 'pendente',
+            created_by: profSession.user.id
+          }));
+          const { error: schedError } = await sb.from('class_logs').insert(entries);
+          scheduleMsg = schedError ? ' ⚠️ Erro ao gerar aulas.' : ' 📅 ' + dates.length + ' aula(s) geradas.';
+        }
+      }
+
+      // Gera as parcelas do contrato inteiro (aluno individual)
+      let financeMsg = '';
+      if (wantsFinance && data.user) {
+        const startDate = new Date(contractStart + 'T00:00:00');
+        const endDate = new Date(contractEnd + 'T00:00:00');
+        const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth()) + 1;
+        if (months > 0) {
+          const { data: { session: profSession } } = await sb.auth.getSession();
+          const entries = [];
+          for (let i = 0; i < months; i++) {
+            const d = new Date(startDate);
+            d.setMonth(d.getMonth() + i);
+            entries.push({
+              type: 'entrada',
+              student_id: data.user.id,
+              description: 'Parcela mensal',
+              amount: monthlyFee,
+              payment_method: financeMethod,
+              due_date: d.toISOString().slice(0, 10),
+              paid: false,
+              created_by: profSession.user.id
+            });
+          }
+          const { error: finError } = await sb.from('payments').insert(entries);
+          financeMsg = finError ? ' ⚠️ Erro ao gerar financeiro.' : ' 💰 ' + months + ' parcela(s) geradas.';
+        }
+      }
+
       if (studentUpsertError) {
         sucEl.textContent = '⚠️ Aluno criado, mas houve erro ao salvar turma/professora: ' + (studentUpsertError.message || studentUpsertError.code || JSON.stringify(studentUpsertError));
       } else if (guardianErrorMsg) {
-        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso! ⚠️ Erro ao criar responsável: ' + guardianErrorMsg;
+        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso! ⚠️ Erro ao criar responsável: ' + guardianErrorMsg + scheduleMsg + financeMsg;
       } else {
-        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '');
+        sucEl.textContent = '✅ Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '') + scheduleMsg + financeMsg;
       }
       sucEl.style.display = 'block';
 
@@ -1888,6 +2020,8 @@
       await loadStudentsForReports(session.user.id, isBrenda);
       await loadStudentsForSelect();
       populateClassLogStudentSelect();
+      await loadClassLogs(session.user.id, isBrenda);
+      await loadAulasHoje(session.user.id);
       loadFinanceiro();
 
       setTimeout(closeAddStudent, 2000);
@@ -3105,6 +3239,95 @@
     }).join('');
   }
 
+  // ---- Minha Agenda (semanal, todas as professoras) ----
+
+  let agendaWeekOffset = 0;
+
+  function getAgendaWeekDays(offsetWeeks) {
+    const now = new Date();
+    const sunday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - now.getDay() + offsetWeeks * 7);
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(sunday);
+      d.setDate(sunday.getDate() + i);
+      days.push(d);
+    }
+    return days;
+  }
+
+  function shiftAgendaWeek(delta) {
+    agendaWeekOffset += delta;
+    loadAgendaWeek();
+  }
+
+  async function loadAgendaWeek() {
+    const days = getAgendaWeekDays(agendaWeekOffset);
+    const startStr = days[0].toISOString().slice(0, 10);
+    const endStr = days[6].toISOString().slice(0, 10);
+
+    document.getElementById('agendaWeekLabel').textContent =
+      days[0].toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' – ' +
+      days[6].toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+    const { data: allLogs } = await sb.from('class_logs').select('*').gte('class_date', startStr).lte('class_date', endStr).order('start_time', { ascending: true });
+    const { data: { session } } = await sb.auth.getSession();
+    const myId = session.user.id;
+    const myLogs = (allLogs || []).filter(l => teacherOfLog(l) === myId);
+
+    const classLogIds = myLogs.map(l => l.id);
+    const { data: weekReports } = classLogIds.length
+      ? await sb.from('reports').select('class_log_id').in('class_log_id', classLogIds)
+      : { data: [] };
+    const classLogsWithReport = new Set((weekReports || []).map(r => r.class_log_id));
+
+    const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    document.getElementById('agendaWeekGrid').innerHTML = days.map((d, idx) => {
+      const dStr = d.toISOString().slice(0, 10);
+      const dayLogs = myLogs.filter(l => l.class_date === dStr);
+      const isToday = dStr === todayStr;
+
+      const items = dayLogs.length ? dayLogs.map(l => {
+        const turma = allTurmas.find(t => t.id === l.turma_id);
+        const student = allStudents.find(s => s.id === l.student_id);
+        const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+        const time = formatTimeRange(l) || 'sem horário';
+        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+        const reportIcon = classLogsWithReport.has(l.id) ? '📄' : '➕';
+        return `
+          <div class="agenda-day-item" onclick="openAgendaReport('${l.id}')">
+            <div class="agenda-day-item-time">${time}</div>
+            <div class="agenda-day-item-who">${who}</div>
+            <div class="agenda-day-item-status">${statusLabel} · ${reportIcon}</div>
+          </div>`;
+      }).join('') : '<div class="agenda-day-empty">—</div>';
+
+      return `
+        <div class="agenda-day-col ${isToday ? 'today' : ''}">
+          <div class="agenda-day-header">${dayNames[idx]}<br>${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}</div>
+          ${items}
+        </div>`;
+    }).join('');
+  }
+
+  async function openAgendaReport(classLogId) {
+    const { data: log } = await sb.from('class_logs').select('*').eq('id', classLogId).maybeSingle();
+    if (!log) return;
+
+    if (log.turma_id) {
+      currentProfileTurmaId = log.turma_id;
+      turmaProfileClassLogsCache = [log];
+      await openTurmaClassReport(classLogId);
+    } else if (log.student_id) {
+      profileClassLogsCache = [log];
+      const { data: existingReports } = await sb.from('reports').select('*').eq('student_id', log.student_id);
+      profileReportsByClassLog = {};
+      (existingReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
+      await openClassReport(classLogId, log.student_id);
+    }
+  }
+
   // ---- Acompanhar equipe (só Brenda) ----
 
   async function loadEquipeOverview(myId) {
@@ -3685,7 +3908,7 @@
 
     <div class="modal-row">
       <label class="modal-label">Turma</label>
-      <select class="modal-select" id="newStudentTurma">
+      <select class="modal-select" id="newStudentTurma" onchange="toggleGenRowsVisibility()">
         <option value="">Nenhuma</option>
       </select>
     </div>
@@ -3719,6 +3942,58 @@
           <option value="atrasado">Atrasado</option>
         </select>
       </div>
+    </div>
+
+    <div class="modal-row modal-checkbox-row" id="genScheduleRow">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="genSchedule" onchange="toggleGenScheduleFields()" />
+        <span>📅 Já lançar todas as aulas do contrato (aluno individual)</span>
+      </label>
+    </div>
+
+    <div id="genScheduleFields" style="display:none;">
+      <div class="modal-row">
+        <label class="modal-label">Dia da semana</label>
+        <select class="modal-select" id="genScheduleWeekday">
+          <option value="1">Segunda-feira</option>
+          <option value="2">Terça-feira</option>
+          <option value="3">Quarta-feira</option>
+          <option value="4">Quinta-feira</option>
+          <option value="5">Sexta-feira</option>
+          <option value="6">Sábado</option>
+          <option value="0">Domingo</option>
+        </select>
+      </div>
+      <div class="modal-row" style="display:flex;gap:10px;">
+        <div style="flex:1;">
+          <label class="modal-label">Horário início</label>
+          <input type="time" class="modal-input" id="genScheduleStartTime" />
+        </div>
+        <div style="flex:1;">
+          <label class="modal-label">Horário fim</label>
+          <input type="time" class="modal-input" id="genScheduleEndTime" />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-row modal-checkbox-row" id="genFinanceRow">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="genFinance" onchange="toggleGenFinanceFields()" />
+        <span>💰 Já lançar todas as parcelas do contrato (aluno individual)</span>
+      </label>
+    </div>
+
+    <div id="genFinanceFields" style="display:none;">
+      <div class="modal-row">
+        <label class="modal-label">Forma de pagamento</label>
+        <select class="modal-select" id="genFinanceMethod">
+          <option value="Boleto">Boleto</option>
+          <option value="Pix">Pix</option>
+          <option value="Cartão">Cartão</option>
+          <option value="Dinheiro">Dinheiro</option>
+        </select>
+      </div>
+      <div class="modal-hint">Gera uma parcela por mês, do início ao fim do contrato, usando a parcela mensal informada acima.</div>
     </div>
 
     <div class="modal-row modal-checkbox-row">
