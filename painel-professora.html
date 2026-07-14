@@ -2844,7 +2844,6 @@
               <span style="display:flex;gap:6px;flex-wrap:wrap;">
                 ${attendanceBadge}
                 ${badge}
-                <button class="btn-sm" onclick="event.stopPropagation();openClassLogEdit('${l.id}')">✅ Presença</button>
               </span>
             </div>
             ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
@@ -2877,8 +2876,13 @@
     const first = (existing || [])[0];
     document.getElementById('turmaReportTitle').value = first ? first.title : (dateLabel ? 'Aula de ' + dateLabel : '');
     document.getElementById('turmaReportPeriod').value = first ? (first.period || '') : '';
-    document.getElementById('turmaReportContent').value = first ? first.content : ((log && log.content) || '');
+    document.getElementById('turmaReportContent').value = first ? first.content : '';
     document.getElementById('turmaReportPublished').checked = first ? !!first.is_published : false;
+    document.getElementById('turmaReportPrivateNotes').value = (log && log.content) || '';
+
+    const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', classLogId);
+    const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
+    renderAttendanceList('turmaReportAttendanceList', currentProfileTurmaId, attendanceMap);
 
     document.getElementById('modalTurmaClassReport').classList.add('open');
   }
@@ -2893,6 +2897,7 @@
     const period = document.getElementById('turmaReportPeriod').value.trim();
     const content = document.getElementById('turmaReportContent').value.trim();
     const isPublished = document.getElementById('turmaReportPublished').checked;
+    const privateNotes = document.getElementById('turmaReportPrivateNotes').value.trim();
     const errEl = document.getElementById('turmaReportError');
 
     if (!title || !content) {
@@ -2918,6 +2923,10 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
+    await sb.from('class_logs').update({ content: privateNotes }).eq('id', classLogId);
+    const attendanceList = collectAttendanceFromContainer('turmaReportAttendanceList');
+    await saveAttendanceForClassLog(classLogId, attendanceList);
+
     let hadError = false;
     for (const s of members) {
       const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: isPublished };
@@ -2929,7 +2938,7 @@
     }
 
     btn.disabled = false;
-    btn.textContent = 'Salvar pra todos os alunos';
+    btn.textContent = 'Salvar';
 
     if (hadError) {
       errEl.textContent = 'Alguns relatórios não foram salvos. Tente novamente.';
@@ -3515,16 +3524,6 @@
     document.getElementById('classLogEditContent').value = l.content || '';
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
 
-    if (l.turma_id) {
-      const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', id);
-      const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
-      document.getElementById('classLogEditAttendanceRow').style.display = 'block';
-      renderAttendanceList('classLogEditAttendanceList', l.turma_id, attendanceMap);
-    } else {
-      document.getElementById('classLogEditAttendanceRow').style.display = 'none';
-      document.getElementById('classLogEditAttendanceList').innerHTML = '';
-    }
-
     document.getElementById('modalClassLogEdit').classList.add('open');
   }
 
@@ -3557,10 +3556,6 @@
       return;
     }
 
-    if (document.getElementById('classLogEditAttendanceRow').style.display !== 'none') {
-      const attendanceList = collectAttendanceFromContainer('classLogEditAttendanceList');
-      await saveAttendanceForClassLog(id, attendanceList);
-    }
 
     closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
@@ -4362,7 +4357,17 @@
     <div class="modal-sub" id="turmaReportWho"></div>
     <input type="hidden" id="turmaReportClassLogId" />
 
-    <div class="modal-hint" style="margin-bottom:14px;">Esse relatório é salvo individualmente pra cada aluno matriculado na turma, com o mesmo conteúdo.</div>
+    <div class="modal-row">
+      <label class="modal-label">Alunos presentes</label>
+      <div id="turmaReportAttendanceList"></div>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Anotações do professor (privado)</label>
+      <textarea class="modal-input" id="turmaReportPrivateNotes" style="min-height:90px;resize:vertical;" placeholder="Anotações internas sobre a aula..."></textarea>
+    </div>
+
+    <div class="modal-hint" style="margin-bottom:14px;">O relatório abaixo é salvo individualmente pra cada aluno matriculado na turma, com o mesmo conteúdo.</div>
 
     <div class="modal-row">
       <label class="modal-label">Título</label>
@@ -4375,7 +4380,7 @@
     </div>
 
     <div class="modal-row">
-      <label class="modal-label">Conteúdo</label>
+      <label class="modal-label">Anotações para o grupo</label>
       <textarea class="modal-input" id="turmaReportContent" style="min-height:140px;resize:vertical;" placeholder="O que foi trabalhado, observações da turma..."></textarea>
     </div>
 
@@ -4390,7 +4395,7 @@
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeTurmaClassReport()">Cancelar</button>
-      <button class="btn-modal-save" id="btnSaveTurmaReport" onclick="saveTurmaClassReport()">Salvar pra todos os alunos</button>
+      <button class="btn-modal-save" id="btnSaveTurmaReport" onclick="saveTurmaClassReport()">Salvar</button>
     </div>
   </div>
 </div>
@@ -4539,11 +4544,6 @@
         <input type="checkbox" id="classLogEditNeedsMakeup" />
         <span>🔄 Aluno precisa repor essa aula</span>
       </label>
-    </div>
-
-    <div class="modal-row" id="classLogEditAttendanceRow" style="display:none;">
-      <label class="modal-label">Alunos presentes</label>
-      <div id="classLogEditAttendanceList"></div>
     </div>
 
     <div class="modal-row">
