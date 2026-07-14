@@ -1352,7 +1352,7 @@
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionDeleteBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
-    document.getElementById('profileRescheduleFixedBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
+    document.getElementById('profileRescheduleFixedBtn').style.display = 'inline-block';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
     const turma = allTurmas.find(t => t.id === student.turma_id);
@@ -2835,7 +2835,7 @@
     const members = allStudents.filter(s => s.turma_id === turmaId);
     document.getElementById('turmaProfileName').textContent = turma.name;
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
-    document.getElementById('turmaProfileRescheduleFixedBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
+    document.getElementById('turmaProfileRescheduleFixedBtn').style.display = 'inline-block';
 
     document.getElementById('turmaProfileStudentsList').innerHTML = members.length
       ? members.map(s => `
