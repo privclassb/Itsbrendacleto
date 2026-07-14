@@ -1368,7 +1368,8 @@
       const { data: teacher } = await sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle();
       teacherName = teacher?.full_name || '—';
     }
-    const { data: guardian } = await sb.from('profiles').select('full_name').eq('guardian_of', studentId).maybeSingle();
+    const { data: guardianRows } = await sb.from('profiles').select('full_name, email').eq('guardian_of', studentId);
+    const guardian = (guardianRows && guardianRows[0]) || null;
     const createdAt = student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : '—';
     const contractStart = student.contract_start ? new Date(student.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
     const contractEnd = student.contract_end ? new Date(student.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
@@ -1378,11 +1379,26 @@
       ['Turma', turma ? turma.name : 'Nenhuma'],
       ['Professora responsável', teacherName],
       ...(currentUserIsBrenda ? [['Contrato', contractStart + ' – ' + contractEnd]] : []),
-      ['Cadastrado em', createdAt],
-      ['Responsável vinculado', guardian?.full_name || 'Nenhum cadastrado']
+      ['Cadastrado em', createdAt]
     ];
-    document.getElementById('profileDataList').innerHTML = dataRows.map(([label, value]) => `
+    let dataHtml = dataRows.map(([label, value]) => `
       <div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${value}</span></div>`).join('');
+
+    const studentEmail = student.email || '';
+    dataHtml += `
+      <div class="detail-row">
+        <span class="detail-label">Login do aluno</span>
+        <span class="detail-value">${studentEmail
+          ? studentEmail + ` <button class="btn-sm" onclick='copyLoginInfo(${JSON.stringify(studentEmail)})'>📋 Copiar</button>`
+          : 'Sem e-mail salvo'}</span>
+      </div>
+      <div class="detail-row">
+        <span class="detail-label">Responsável vinculado</span>
+        <span class="detail-value">${guardian
+          ? (guardian.full_name || 'Sem nome') + (guardian.email ? ` — ${guardian.email} <button class="btn-sm" onclick='copyLoginInfo(${JSON.stringify(guardian.email)})'>📋 Copiar</button>` : ' — sem e-mail salvo')
+          : 'Nenhum cadastrado'}</span>
+      </div>`;
+    document.getElementById('profileDataList').innerHTML = dataHtml;
 
     // Financeiro (só Brenda)
     if (currentUserIsBrenda) {
@@ -1881,6 +1897,7 @@
 
         const { error: upsertErr } = await sb.from('profiles').update({
           full_name: name,
+          email,
           role,
           teacher_id: teacherId,
           level: 1,
@@ -1929,11 +1946,12 @@
           }
           await new Promise(r => setTimeout(r, 1000));
 
-          const { error: upsertError } = await sb.from('profiles').update({
+          const { data: upsertData, error: upsertError } = await sb.from('profiles').update({
             full_name: guardianName,
+            email: guardianEmail,
             role: 'responsavel',
             guardian_of: data.user.id
-          }).eq('id', gData.user.id);
+          }).eq('id', gData.user.id).select();
 
           await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
             method: 'PUT',
@@ -1947,6 +1965,8 @@
 
           if (upsertError) {
             guardianErrorMsg = 'vínculo não salvo: ' + (upsertError.message || upsertError.code || JSON.stringify(upsertError));
+          } else if (!upsertData || upsertData.length === 0) {
+            guardianErrorMsg = 'vínculo não salvo: sem permissão pra atualizar o perfil do responsável. Verifique as regras de acesso (RLS) da tabela profiles.';
           } else {
             guardianCreated = true;
           }
@@ -2091,7 +2111,8 @@
 
   async function refreshGuardianSection(studentId) {
     // Verifica se já existe responsável vinculado a esse aluno (conta própria ou vinculada)
-    const { data: existingGuardian } = await sb.from('profiles').select('id, full_name, role').eq('guardian_of', studentId).maybeSingle();
+    const { data: existingGuardianRows } = await sb.from('profiles').select('id, full_name, role, email').eq('guardian_of', studentId);
+    const existingGuardian = (existingGuardianRows && existingGuardianRows[0]) || null;
     currentGuardian = existingGuardian || null;
 
     document.getElementById('editGuardianType').value = 'none';
@@ -2103,7 +2124,10 @@
 
     if (existingGuardian) {
       const tipo = existingGuardian.role === 'responsavel' ? 'login separado' : 'mesmo login que a própria conta';
-      document.getElementById('editGuardianExistingText').textContent = '👤 Responsável vinculado: ' + (existingGuardian.full_name || 'Sem nome') + ' (' + tipo + ')';
+      const emailPart = existingGuardian.email
+        ? ` — ${existingGuardian.email} <button class="btn-sm" onclick='copyLoginInfo(${JSON.stringify(existingGuardian.email)})'>📋 Copiar</button>`
+        : ' — sem e-mail salvo';
+      document.getElementById('editGuardianExistingText').innerHTML = '👤 Responsável vinculado: ' + (existingGuardian.full_name || 'Sem nome') + ' (' + tipo + ')' + emailPart;
       document.getElementById('editGuardianExistingRow').style.display = 'block';
       document.getElementById('editGuardianTypeRow').style.display = 'none';
     } else {
@@ -2120,8 +2144,9 @@
     const trimmed = newName.trim();
     if (!trimmed) return;
 
-    const { error } = await sb.from('profiles').update({ full_name: trimmed }).eq('id', currentGuardian.id);
+    const { data, error } = await sb.from('profiles').update({ full_name: trimmed }).eq('id', currentGuardian.id).select();
     if (error) { alert('Erro ao atualizar nome: ' + error.message); return; }
+    if (!data || data.length === 0) { alert('Não foi possível atualizar o nome (sem permissão pra editar o perfil do responsável).'); return; }
 
     const studentId = document.getElementById('editStudentId').value;
     await refreshGuardianSection(studentId);
@@ -2131,8 +2156,9 @@
     if (!currentGuardian) return;
     if (!confirm('Remover o vínculo desse responsável com esse aluno? A conta dele continua existindo, só deixa de aparecer como responsável vinculado.')) return;
 
-    const { error } = await sb.from('profiles').update({ guardian_of: null }).eq('id', currentGuardian.id);
+    const { data, error } = await sb.from('profiles').update({ guardian_of: null }).eq('id', currentGuardian.id).select();
     if (error) { alert('Erro ao remover vínculo: ' + error.message); return; }
+    if (!data || data.length === 0) { alert('Não foi possível remover o vínculo (sem permissão pra editar o perfil do responsável).'); return; }
 
     const studentId = document.getElementById('editStudentId').value;
     await refreshGuardianSection(studentId);
@@ -2269,12 +2295,17 @@
         }
         await new Promise(r => setTimeout(r, 1000));
 
-        const { error: upsertError } = await sb.from('profiles').update({
+        const { data: upsertData, error: upsertError } = await sb.from('profiles').update({
           full_name: guardianName,
+          email: guardianEmail,
           role: 'responsavel',
           guardian_of: id
-        }).eq('id', gData.user.id);
-        if (upsertError) linkError = upsertError;
+        }).eq('id', gData.user.id).select();
+        if (upsertError) {
+          linkError = upsertError;
+        } else if (!upsertData || upsertData.length === 0) {
+          linkError = { message: 'sem permissão pra atualizar o perfil do responsável (RLS da tabela profiles).' };
+        }
 
         await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
           method: 'PUT',
@@ -2310,11 +2341,18 @@
     }
 
     if (wantsExistingGuardian) {
-      const { error: linkExistingError } = await sb.from('profiles').update({ guardian_of: id }).eq('id', existingGuardianId);
+      const { data: linkExistingData, error: linkExistingError } = await sb.from('profiles').update({ guardian_of: id }).eq('id', existingGuardianId).select();
       if (linkExistingError) {
         btn.disabled = false;
         btn.textContent = 'Salvar alterações';
         errEl.textContent = 'Aluno atualizado, mas houve erro ao vincular a conta de responsável: ' + (linkExistingError.message || linkExistingError.code || JSON.stringify(linkExistingError));
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!linkExistingData || linkExistingData.length === 0) {
+        btn.disabled = false;
+        btn.textContent = 'Salvar alterações';
+        errEl.textContent = 'Aluno atualizado, mas o vínculo do responsável não foi salvo (sem permissão pra atualizar o perfil dele). Fale com o suporte sobre as regras de acesso da tabela profiles.';
         errEl.style.display = 'block';
         return;
       }
@@ -2583,7 +2621,7 @@
         }
         await new Promise(r => setTimeout(r, 1000));
 
-        await sb.from('profiles').update({ full_name: name, role: 'professora' }).eq('id', data.user.id);
+        await sb.from('profiles').update({ full_name: name, email, role: 'professora' }).eq('id', data.user.id);
 
         await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
           method: 'PUT',
@@ -3020,6 +3058,16 @@
     if (!l.start_time) return '';
     const end = l.end_time ? '–' + l.end_time.slice(0, 5) : '';
     return l.start_time.slice(0, 5) + end;
+  }
+
+  async function copyLoginInfo(text) {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      alert('E-mail copiado: ' + text);
+    } catch (e) {
+      prompt('Copie o e-mail abaixo:', text);
+    }
   }
 
   async function loadClassLogs(teacherId, seeAll) {
