@@ -568,6 +568,13 @@
     .agenda-day-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 10px 0; }
     @media (max-width: 800px) { .agenda-week-grid { grid-template-columns: repeat(7, 140px); } }
 
+    /* Presença dos alunos na aula de turma */
+    .attendance-list { background: var(--cream); border-radius: 10px; padding: 6px 12px; }
+    .attendance-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--sand); }
+    .attendance-row:last-child { border-bottom: none; }
+    .attendance-row input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; }
+    .attendance-row span { font-size: 13px; color: var(--text); }
+
     /* Perfil unificado do aluno */
     .profile-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
     .profile-options-wrap { position: relative; flex-shrink: 0; }
@@ -854,7 +861,7 @@
       <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">O histórico completo de aulas de cada aluno fica na página dele (aba Alunos → abrir o aluno).</div>
       <div class="form-row">
         <label class="form-label">Turma (aula em grupo)</label>
-        <select class="form-select" id="classLogTurma">
+        <select class="form-select" id="classLogTurma" onchange="updateClassLogAttendanceFields()">
           <option value="">Nenhuma (aula individual)</option>
         </select>
       </div>
@@ -863,6 +870,10 @@
         <select class="form-select" id="classLogStudent">
           <option value="">Selecione o aluno...</option>
         </select>
+      </div>
+      <div class="form-row" id="classLogAttendanceRow" style="display:none;">
+        <label class="form-label">Alunos presentes</label>
+        <div id="classLogAttendanceList"></div>
       </div>
       <div class="form-row">
         <label class="form-label">Data</label>
@@ -2804,6 +2815,11 @@
       ? await sb.from('reports').select('id, student_id, class_log_id, is_published').in('student_id', memberIds)
       : { data: [] };
 
+    const logIds = turmaProfileClassLogsCache.map(l => l.id);
+    const { data: attendanceForTurma } = logIds.length
+      ? await sb.from('class_attendance').select('class_log_id, present').in('class_log_id', logIds)
+      : { data: [] };
+
     const listEl = document.getElementById('turmaProfileClassLogsList');
     if (turmaProfileClassLogsCache.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
@@ -2816,11 +2832,20 @@
         const badge = reportsForThis.length === 0
           ? `<span class="report-status draft">➕ Lançar relatório</span>`
           : `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`;
+        const attendanceRows = (attendanceForTurma || []).filter(a => a.class_log_id === l.id);
+        const presentCount = attendanceRows.filter(a => a.present).length;
+        const attendanceBadge = attendanceRows.length > 0
+          ? `<span class="report-status published">👥 ${presentCount}/${members.length} presentes</span>`
+          : '';
         return `
           <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
             <div class="aula-log-top">
               <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
-              ${badge}
+              <span style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${attendanceBadge}
+                ${badge}
+                <button class="btn-sm" onclick="event.stopPropagation();openClassLogEdit('${l.id}')">✅ Presença</button>
+              </span>
             </div>
             ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
           </div>`;
@@ -3116,7 +3141,7 @@
     }
 
     const { data: { session } } = await sb.auth.getSession();
-    const { error } = await sb.from('class_logs').insert({
+    const { data: inserted, error } = await sb.from('class_logs').insert({
       turma_id: turmaId,
       student_id: turmaId ? null : studentId,
       class_date: date,
@@ -3126,14 +3151,62 @@
       content,
       needs_makeup: needsMakeup,
       created_by: session.user.id
-    });
+    }).select().single();
 
     if (error) { alert('Erro ao registrar aula: ' + error.message); return; }
 
+    if (turmaId && inserted) {
+      const attendanceList = collectAttendanceFromContainer('classLogAttendanceList');
+      await saveAttendanceForClassLog(inserted.id, attendanceList);
+    }
+
     document.getElementById('classLogContent').value = '';
     document.getElementById('classLogNeedsMakeup').checked = false;
+    document.getElementById('classLogAttendanceRow').style.display = 'none';
+    document.getElementById('classLogAttendanceList').innerHTML = '';
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  // ---- Presença dos alunos numa aula de turma ----
+
+  function renderAttendanceList(containerId, turmaId, attendanceMap) {
+    const container = document.getElementById(containerId);
+    const members = allStudents.filter(s => s.turma_id === turmaId);
+    if (members.length === 0) {
+      container.innerHTML = '<div class="empty-reports">Nenhum aluno matriculado nessa turma.</div>';
+      return;
+    }
+    container.innerHTML = '<div class="attendance-list">' + members.map(s => {
+      const present = attendanceMap.has(s.id) ? attendanceMap.get(s.id) : true;
+      return `
+        <label class="attendance-row">
+          <input type="checkbox" data-student-id="${s.id}" ${present ? 'checked' : ''} />
+          <span>${s.full_name || 'Sem nome'}</span>
+        </label>`;
+    }).join('') + '</div>';
+  }
+
+  function collectAttendanceFromContainer(containerId) {
+    const container = document.getElementById(containerId);
+    return Array.from(container.querySelectorAll('input[type="checkbox"]')).map(cb => ({
+      student_id: cb.dataset.studentId,
+      present: cb.checked
+    }));
+  }
+
+  async function saveAttendanceForClassLog(classLogId, attendanceList) {
+    if (!attendanceList || attendanceList.length === 0) return;
+    const rows = attendanceList.map(a => ({ class_log_id: classLogId, student_id: a.student_id, present: a.present }));
+    await sb.from('class_attendance').upsert(rows, { onConflict: 'class_log_id,student_id' });
+  }
+
+  function updateClassLogAttendanceFields() {
+    const turmaId = document.getElementById('classLogTurma').value;
+    const row = document.getElementById('classLogAttendanceRow');
+    if (!turmaId) { row.style.display = 'none'; document.getElementById('classLogAttendanceList').innerHTML = ''; return; }
+    row.style.display = 'block';
+    renderAttendanceList('classLogAttendanceList', turmaId, new Map());
   }
 
   function prefillScheduleFromContract() {
@@ -3442,6 +3515,16 @@
     document.getElementById('classLogEditContent').value = l.content || '';
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
 
+    if (l.turma_id) {
+      const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', id);
+      const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
+      document.getElementById('classLogEditAttendanceRow').style.display = 'block';
+      renderAttendanceList('classLogEditAttendanceList', l.turma_id, attendanceMap);
+    } else {
+      document.getElementById('classLogEditAttendanceRow').style.display = 'none';
+      document.getElementById('classLogEditAttendanceList').innerHTML = '';
+    }
+
     document.getElementById('modalClassLogEdit').classList.add('open');
   }
 
@@ -3472,6 +3555,11 @@
       errEl.textContent = 'Erro ao salvar: ' + error.message;
       errEl.style.display = 'block';
       return;
+    }
+
+    if (document.getElementById('classLogEditAttendanceRow').style.display !== 'none') {
+      const attendanceList = collectAttendanceFromContainer('classLogEditAttendanceList');
+      await saveAttendanceForClassLog(id, attendanceList);
     }
 
     closeClassLogEdit();
@@ -4451,6 +4539,11 @@
         <input type="checkbox" id="classLogEditNeedsMakeup" />
         <span>🔄 Aluno precisa repor essa aula</span>
       </label>
+    </div>
+
+    <div class="modal-row" id="classLogEditAttendanceRow" style="display:none;">
+      <label class="modal-label">Alunos presentes</label>
+      <div id="classLogEditAttendanceList"></div>
     </div>
 
     <div class="modal-row">
