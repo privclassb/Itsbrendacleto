@@ -2876,9 +2876,25 @@
   }
 
   async function deleteTurma(id) {
-    if (!confirm('Excluir esta turma? Os alunos vinculados a ela ficarão sem turma.')) return;
-    const { error } = await sb.from('turmas').delete().eq('id', id);
-    if (error) { alert('Erro ao excluir turma.'); return; }
+    if (!confirm('Excluir esta turma? Os alunos vinculados a ela ficarão sem turma, e as aulas/relatórios/pastas dessa turma também serão apagados.')) return;
+
+    // Apaga tudo que referencia essa turma antes de excluir a turma,
+    // pra não travar por chave estrangeira nem deixar lixo pra trás
+    await sb.from('profiles').update({ turma_id: null }).eq('turma_id', id);
+    await sb.from('student_folders').delete().eq('turma_id', id);
+
+    const { data: logs } = await sb.from('class_logs').select('id').eq('turma_id', id);
+    const logIds = (logs || []).map(l => l.id);
+    if (logIds.length > 0) {
+      await sb.from('class_attendance').delete().in('class_log_id', logIds);
+      await sb.from('reports').delete().in('class_log_id', logIds);
+    }
+    await sb.from('class_logs').delete().eq('turma_id', id);
+
+    const { data, error } = await sb.from('turmas').delete().eq('id', id).select();
+    if (error) { alert('Erro ao excluir turma: ' + error.message); return; }
+    if (!data || data.length === 0) { alert('Não foi possível excluir a turma (sem permissão pra apagar).'); return; }
+
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
