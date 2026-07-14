@@ -121,7 +121,7 @@
       .select('*').eq('student_id', session.user.id).eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    // Marca os relatórios como lidos (some o selo "novo" no menu)
+    // Marca quais já estavam lidos antes de marcar tudo como lido agora
     const readIds = JSON.parse(localStorage.getItem('read_reports') || '[]');
     const allIds = (reports || []).map(r => r.id);
     localStorage.setItem('read_reports', JSON.stringify([...new Set([...readIds, ...allIds])]));
@@ -140,10 +140,11 @@
 
     main.innerHTML = reports.map(r => {
       const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+      const isNew = !readIds.includes(r.id);
       return `
         <div class="report-card" onclick="openReport('${r.title}', '${r.period || ''}', \`${(r.content||'').replace(/`/g,"'")}\`)">
           <div class="report-header">
-            <div class="report-title">${r.title}</div>
+            <div class="report-title">${r.title}${isNew ? ' <span class="new-badge">Novo</span>' : ''}</div>
             ${r.period ? `<span class="report-period">${r.period}</span>` : ''}
           </div>
           <div class="report-preview">${(r.content||'').substring(0,100)}${r.content && r.content.length > 100 ? '...' : ''}</div>

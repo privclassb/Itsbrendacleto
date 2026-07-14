@@ -772,6 +772,13 @@
         <span class="save-ok" id="ok-adulto-auloes">✓</span>
       </div>
 
+      <div class="link-row">
+        <span class="link-label">Adulto — Lexi (IA)</span>
+        <input class="link-input" id="link-adulto-lexi" placeholder="https://..." />
+        <button class="btn-save-link" onclick="saveLink('adulto-lexi', 'Lexi Adulto')">Salvar</button>
+        <span class="save-ok" id="ok-adulto-lexi">✓</span>
+      </div>
+
     </div>
 
     <!-- Subpastas por aluno ou turma -->
@@ -2431,7 +2438,7 @@
   // ---- Links de materiais (só Brenda) ----
 
   async function loadLinks() {
-    const categories = ['kids-materiais', 'adulto-materiais', 'adulto-auloes'];
+    const categories = ['kids-materiais', 'adulto-materiais', 'adulto-auloes', 'adulto-lexi'];
     const { data: links, error } = await sb.from('material_links').select('*').in('category', categories);
     if (error || !links) return;
 

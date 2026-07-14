@@ -157,6 +157,10 @@
       <div class="menu-icon rose">📅</div>
       <div class="menu-title">Agenda</div>
     </a>
+    <a href="relatorios-kids.html" class="menu-card c-lavender" id="reportsMenuCard">
+      <div class="menu-icon lavender">📊</div>
+      <div class="menu-title">Relatórios</div>
+    </a>
   </div>
 
   <div class="progress-card">
@@ -207,6 +211,17 @@
     const { data: streak } = await sb.from('streaks').select('current_streak').eq('user_id', user.id).maybeSingle();
     document.getElementById('heroStreak').textContent = streak?.current_streak || 0;
     await updateStreak(user.id);
+
+    // Notificação de relatórios novos
+    const { data: reports } = await sb.from('reports').select('id').eq('student_id', user.id).eq('is_published', true);
+    const readIds = JSON.parse(localStorage.getItem('read_reports') || '[]');
+    const unreadCount = (reports || []).filter(function(r) { return !readIds.includes(r.id); }).length;
+    if (unreadCount > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'menu-badge';
+      badge.textContent = unreadCount;
+      document.getElementById('reportsMenuCard').appendChild(badge);
+    }
 
     // Avatar do aluno
     if (profile?.avatar_url) showAvatar(profile.avatar_url);

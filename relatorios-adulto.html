@@ -37,6 +37,7 @@
     .report-period { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; }
     .report-preview { font-size: 14px; color: var(--muted); line-height: 1.5; }
     .report-date { font-size: 12px; color: var(--sand); margin-top: 8px; }
+    .new-badge { background: var(--mint); color: #1E5C3A; font-size: 10px; font-weight: 700; border-radius: 99px; padding: 2px 10px; text-transform: uppercase; letter-spacing: 0.5px; }
 
     .empty-state { text-align: center; padding: 48px 20px; }
     .empty-icon { font-size: 40px; margin-bottom: 12px; }
@@ -119,7 +120,7 @@
       .select('*').eq('student_id', session.user.id).eq('is_published', true)
       .order('created_at', { ascending: false });
 
-    // Marca os relatórios como lidos (some o selo "novo" no menu)
+    // Marca quais já estavam lidos antes de marcar tudo como lido agora
     const readIds = JSON.parse(localStorage.getItem('read_reports') || '[]');
     const allIds = (reports || []).map(r => r.id);
     localStorage.setItem('read_reports', JSON.stringify([...new Set([...readIds, ...allIds])]));
@@ -138,10 +139,11 @@
 
     main.innerHTML = reports.map(r => {
       const date = new Date(r.created_at).toLocaleDateString('pt-BR');
+      const isNew = !readIds.includes(r.id);
       return `
         <div class="report-item" onclick="openReport('${r.title}', '${r.period || ''}', \`${(r.content||'').replace(/`/g,"'")}\`)">
           <div class="report-header">
-            <div class="report-title">${r.title}</div>
+            <div class="report-title">${r.title}${isNew ? ' <span class="new-badge">Novo</span>' : ''}</div>
             ${r.period ? `<span class="report-period">${r.period}</span>` : ''}
           </div>
           <div class="report-preview">${(r.content||'').substring(0,120)}${r.content && r.content.length > 120 ? '...' : ''}</div>
