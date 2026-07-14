@@ -1789,10 +1789,12 @@
     document.getElementById('newStudentPaymentStatus').value = 'em_dia';
     document.getElementById('genSchedule').checked = false;
     document.getElementById('genScheduleFields').style.display = 'none';
+    document.getElementById('genScheduleFromDate').value = '';
     document.getElementById('genScheduleStartTime').value = '';
     document.getElementById('genScheduleEndTime').value = '';
     document.getElementById('genFinance').checked = false;
     document.getElementById('genFinanceFields').style.display = 'none';
+    document.getElementById('genFinanceFromDate').value = '';
     toggleGenRowsVisibility();
     document.getElementById('createGuardian').checked = false;
     document.getElementById('guardianName').value = '';
@@ -1854,11 +1856,13 @@
     const guardianPassword = (document.getElementById('guardianPassword').value.trim()) || password;
 
     const wantsSchedule = !turmaId && document.getElementById('genSchedule').checked;
+    const scheduleFromDate = document.getElementById('genScheduleFromDate').value || null;
     const scheduleWeekday = parseInt(document.getElementById('genScheduleWeekday').value, 10);
     const scheduleStartTime = document.getElementById('genScheduleStartTime').value || null;
     const scheduleEndTime = document.getElementById('genScheduleEndTime').value || null;
 
     const wantsFinance = !turmaId && document.getElementById('genFinance').checked;
+    const financeFromDate = document.getElementById('genFinanceFromDate').value || null;
     const financeMethod = document.getElementById('genFinanceMethod').value;
 
     const errEl = document.getElementById('addStudentError');
@@ -2015,7 +2019,7 @@
       // Gera as aulas do contrato inteiro (aluno individual)
       let scheduleMsg = '';
       if (wantsSchedule && data.user) {
-        const start = new Date(contractStart + 'T00:00:00');
+        const start = new Date((scheduleFromDate || contractStart) + 'T00:00:00');
         const end = new Date(contractEnd + 'T00:00:00');
         const d = new Date(start);
         while (d.getDay() !== scheduleWeekday) d.setDate(d.getDate() + 1);
@@ -2042,7 +2046,7 @@
       // Gera as parcelas do contrato inteiro (aluno individual)
       let financeMsg = '';
       if (wantsFinance && data.user) {
-        const startDate = new Date(contractStart + 'T00:00:00');
+        const startDate = new Date((financeFromDate || contractStart) + 'T00:00:00');
         const endDate = new Date(contractEnd + 'T00:00:00');
         const months = (endDate.getFullYear() - startDate.getFullYear()) * 12 + (endDate.getMonth() - startDate.getMonth()) + 1;
         if (months > 0) {
@@ -4240,6 +4244,11 @@
 
     <div id="genScheduleFields" style="display:none;">
       <div class="modal-row">
+        <label class="modal-label">Gerar aulas a partir de (opcional)</label>
+        <input type="date" class="modal-input" id="genScheduleFromDate" />
+        <div class="modal-hint">Deixe em branco pra gerar a partir do início do contrato. Útil pra alunos migrados de outra plataforma: informe aqui a data de hoje (ou a próxima aula) pra não duplicar aulas que já foram dadas antes.</div>
+      </div>
+      <div class="modal-row">
         <label class="modal-label">Dia da semana</label>
         <select class="modal-select" id="genScheduleWeekday">
           <option value="1">Segunda-feira</option>
@@ -4272,6 +4281,11 @@
 
     <div id="genFinanceFields" style="display:none;">
       <div class="modal-row">
+        <label class="modal-label">Gerar parcelas a partir de (opcional)</label>
+        <input type="date" class="modal-input" id="genFinanceFromDate" />
+        <div class="modal-hint">Deixe em branco pra gerar desde o início do contrato. Pra alunos migrados, informe aqui o mês da próxima parcela em aberto, pra não duplicar parcelas já pagas antes.</div>
+      </div>
+      <div class="modal-row">
         <label class="modal-label">Forma de pagamento</label>
         <select class="modal-select" id="genFinanceMethod">
           <option value="Boleto">Boleto</option>
@@ -4280,7 +4294,7 @@
           <option value="Dinheiro">Dinheiro</option>
         </select>
       </div>
-      <div class="modal-hint">Gera uma parcela por mês, do início ao fim do contrato, usando a parcela mensal informada acima.</div>
+      <div class="modal-hint">Gera uma parcela por mês, do início ao fim do contrato (ou da data acima), usando a parcela mensal informada.</div>
     </div>
 
     <div class="modal-row modal-checkbox-row">
