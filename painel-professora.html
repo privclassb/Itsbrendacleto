@@ -1440,8 +1440,8 @@
         const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
         const report = profileReportsByClassLog[l.id];
         const reportBadge = report
-          ? `<span class="report-status ${report.is_published ? 'published' : 'draft'}">${report.is_published ? '📄 Publicado' : '📝 Rascunho'}</span>`
-          : `<span class="report-status draft">➕ Lançar relatório</span>`;
+          ? `<span class="report-status draft">📝 Anotado</span>`
+          : `<span class="report-status draft">➕ Anotar aula</span>`;
         return `
           <div class="aula-log-row" onclick="openClassReport('${l.id}', '${studentId}')">
             <div class="aula-log-top">
@@ -3593,13 +3593,11 @@
       document.getElementById('classReportTitle').value = report.title || '';
       document.getElementById('classReportPeriod').value = report.period || '';
       document.getElementById('classReportContent').value = report.content || '';
-      document.getElementById('classReportPublished').checked = !!report.is_published;
       document.getElementById('btnDeleteClassReport').style.display = 'inline-block';
     } else {
       document.getElementById('classReportTitle').value = dateLabel ? ('Aula de ' + dateLabel) : '';
       document.getElementById('classReportPeriod').value = '';
       document.getElementById('classReportContent').value = (log && log.content) || '';
-      document.getElementById('classReportPublished').checked = false;
       document.getElementById('btnDeleteClassReport').style.display = 'none';
     }
 
@@ -3617,7 +3615,6 @@
     const title = document.getElementById('classReportTitle').value.trim();
     const period = document.getElementById('classReportPeriod').value.trim();
     const content = document.getElementById('classReportContent').value.trim();
-    const isPublished = document.getElementById('classReportPublished').checked;
     const errEl = document.getElementById('classReportError');
 
     if (!title || !content) {
@@ -3627,7 +3624,7 @@
     }
 
     const { data: { session } } = await sb.auth.getSession();
-    const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: isPublished };
+    const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: false };
 
     const { error } = id
       ? await sb.from('reports').update(payload).eq('id', id)
@@ -3648,10 +3645,10 @@
     const id = document.getElementById('classReportId').value;
     const studentId = document.getElementById('classReportStudentId').value;
     if (!id) return;
-    if (!confirm('Excluir este relatório?')) return;
+    if (!confirm('Excluir esta anotação?')) return;
 
     const { error } = await sb.from('reports').delete().eq('id', id);
-    if (error) { alert('Erro ao excluir relatório: ' + error.message); return; }
+    if (error) { alert('Erro ao excluir anotação: ' + error.message); return; }
 
     closeClassReport();
     await openStudentProfile(studentId);
@@ -4564,8 +4561,9 @@
 <!-- Modal: Relatório da aula -->
 <div class="modal-overlay" id="modalClassReport">
   <div class="modal-box">
-    <div class="modal-title">Relatório da aula</div>
+    <div class="modal-title">Anotações da aula</div>
     <div class="modal-sub" id="classReportWho"></div>
+    <div class="modal-hint" style="margin-bottom:14px;">Essas anotações são só pra sua organização — não aparecem pro aluno/responsável. Os relatórios mensais que eles veem ficam na aba Relatórios.</div>
     <input type="hidden" id="classReportId" />
     <input type="hidden" id="classReportClassLogId" />
     <input type="hidden" id="classReportStudentId" />
@@ -4585,19 +4583,12 @@
       <textarea class="modal-input" id="classReportContent" style="min-height:140px;resize:vertical;" placeholder="O que foi trabalhado, evolução do aluno, observações..."></textarea>
     </div>
 
-    <div class="modal-row modal-checkbox-row">
-      <label class="modal-checkbox-label">
-        <input type="checkbox" id="classReportPublished" />
-        <span>Publicar (visível pro aluno/responsável)</span>
-      </label>
-    </div>
-
     <div class="modal-error" id="classReportError" style="display:none;"></div>
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeClassReport()">Cancelar</button>
       <button class="btn-modal-save" id="btnDeleteClassReport" style="background:#C0392B;display:none;" onclick="deleteClassReport()">Excluir</button>
-      <button class="btn-modal-save" onclick="saveClassReport()">Salvar relatório</button>
+      <button class="btn-modal-save" onclick="saveClassReport()">Salvar anotação</button>
     </div>
   </div>
 </div>
