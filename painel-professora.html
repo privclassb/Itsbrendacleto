@@ -916,6 +916,8 @@
         <label class="form-label">Conteúdo trabalhado</label>
         <textarea class="form-textarea" id="classLogContent" placeholder="O que foi visto na aula..."></textarea>
       </div>
+      <div class="modal-error" id="classLogSaveError"></div>
+      <div class="modal-success" id="classLogSaveSuccess"></div>
       <div class="form-actions">
         <button class="btn-publish" onclick="saveClassLog()" style="flex:1;">✅ Registrar aula</button>
       </div>
@@ -3344,6 +3346,11 @@
   }
 
   async function saveClassLog() {
+    const errEl = document.getElementById('classLogSaveError');
+    const sucEl = document.getElementById('classLogSaveSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
     const turmaId = document.getElementById('classLogTurma').value || null;
     const studentId = document.getElementById('classLogStudent').value || null;
     const date = document.getElementById('classLogDate').value || new Date().toISOString().slice(0, 10);
@@ -3354,7 +3361,8 @@
     const needsMakeup = document.getElementById('classLogNeedsMakeup').checked;
 
     if (!turmaId && !studentId) {
-      alert('Selecione uma turma ou um aluno.');
+      errEl.textContent = 'Selecione uma turma ou um aluno.';
+      errEl.style.display = 'block';
       return;
     }
 
@@ -3371,9 +3379,18 @@
       created_by: session.user.id
     }).select().single();
 
-    if (error) { alert('Erro ao registrar aula: ' + error.message); return; }
+    if (error) {
+      errEl.textContent = 'Erro ao registrar aula: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!inserted) {
+      errEl.textContent = 'A aula não foi salva (sem permissão). Tente novamente ou avise o suporte.';
+      errEl.style.display = 'block';
+      return;
+    }
 
-    if (turmaId && inserted) {
+    if (turmaId) {
       const attendanceList = collectAttendanceFromContainer('classLogAttendanceList');
       await saveAttendanceForClassLog(inserted.id, attendanceList);
     }
@@ -3384,6 +3401,10 @@
     document.getElementById('classLogAttendanceList').innerHTML = '';
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+
+    sucEl.textContent = '✅ Aula registrada com sucesso!';
+    sucEl.style.display = 'block';
+    setTimeout(() => { sucEl.style.display = 'none'; }, 4000);
   }
 
   // ---- Presença dos alunos numa aula de turma ----
