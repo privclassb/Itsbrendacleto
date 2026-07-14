@@ -1561,8 +1561,32 @@
     if (!confirm('Excluir definitivamente o cadastro de ' + student.full_name + '? O login do aluno deixará de funcionar no site, mas a conta de autenticação em si só é removida pelo painel do Supabase.')) return;
     if (!confirm('Tem certeza mesmo? Essa ação não pode ser desfeita.')) return;
 
-    const { error } = await sb.from('profiles').delete().eq('id', student.id);
+    const id = student.id;
+
+    // Apaga tudo que referencia esse aluno antes de excluir o perfil,
+    // pra não travar por chave estrangeira nem deixar lixo pra trás
+    await Promise.all([
+      sb.from('class_attendance').delete().eq('student_id', id),
+      sb.from('class_logs').delete().eq('student_id', id),
+      sb.from('payments').delete().eq('student_id', id),
+      sb.from('reports').delete().eq('student_id', id),
+      sb.from('student_folders').delete().eq('student_id', id),
+      sb.from('badges').delete().eq('user_id', id),
+      sb.from('streaks').delete().eq('user_id', id),
+      sb.from('lesson_progress').delete().eq('user_id', id),
+      sb.from('daily_activity_log').delete().eq('user_id', id),
+      sb.from('community_comments').delete().eq('author_id', id),
+      sb.from('community_likes').delete().eq('user_id', id),
+      sb.from('community_posts').delete().eq('author_id', id),
+      sb.from('profiles').update({ guardian_of: null }).eq('guardian_of', id)
+    ]);
+
+    const { data, error } = await sb.from('profiles').delete().eq('id', id).select();
     if (error) { alert('Erro ao excluir: ' + error.message); return; }
+    if (!data || data.length === 0) {
+      alert('Não foi possível excluir o aluno (sem permissão pra apagar o perfil dele). Fale com o suporte sobre as regras de acesso (RLS) da tabela profiles.');
+      return;
+    }
 
     closeStudentProfile();
     const { data: { session } } = await sb.auth.getSession();
