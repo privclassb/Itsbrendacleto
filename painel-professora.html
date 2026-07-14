@@ -904,6 +904,8 @@
           <option value="cancelada">Cancelada</option>
           <option value="cancelada_falta">Cancelada por falta</option>
           <option value="reagendada">Reagendada</option>
+          <option value="feriado">Feriado</option>
+          <option value="recesso">Recesso</option>
         </select>
       </div>
       <div class="form-row modal-checkbox-row">
@@ -1335,7 +1337,8 @@
 
   const CLASS_STATUS_LABEL = {
     realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
-    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada'
+    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada',
+    feriado: 'Feriado', recesso: 'Recesso'
   };
 
   let currentProfileStudentId = null;
@@ -1435,13 +1438,14 @@
       ? statusQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
       : statusQuery.eq('student_id', studentId);
     const { data: allStatusRows } = await statusQuery;
-    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0 };
+    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
     (allStatusRows || []).forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; });
     document.getElementById('profileAulasStats').innerHTML = `
       <span class="aula-stat-chip">📋 ${statusCounts.pendente} pendentes</span>
       <span class="aula-stat-chip">✅ ${statusCounts.realizada} realizadas</span>
       <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
-      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>`;
+      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>
+      <span class="aula-stat-chip">🎉 ${statusCounts.feriado + statusCounts.recesso} feriado/recesso</span>`;
 
     let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: true }).order('start_time', { ascending: true });
     classQuery = turma
@@ -1465,7 +1469,8 @@
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
         const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
         const report = profileReportsByClassLog[l.id];
-        const reportBadge = report
+        const hasNote = !!report || !!(l.content && l.content.trim());
+        const reportBadge = hasNote
           ? `<span class="report-status draft">📝 Anotado</span>`
           : `<span class="report-status draft">➕ Anotar aula</span>`;
         return `
@@ -2879,13 +2884,14 @@
       .order('class_date', { ascending: true }).order('start_time', { ascending: true });
     turmaProfileClassLogsCache = logs || [];
 
-    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0 };
+    const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
     turmaProfileClassLogsCache.forEach(l => { if (statusCounts[l.status] !== undefined) statusCounts[l.status]++; });
     document.getElementById('turmaProfileAulasStats').innerHTML = `
       <span class="aula-stat-chip">📋 ${statusCounts.pendente} pendentes</span>
       <span class="aula-stat-chip">✅ ${statusCounts.realizada} realizadas</span>
       <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
-      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>`;
+      <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>
+      <span class="aula-stat-chip">🎉 ${statusCounts.feriado + statusCounts.recesso} feriado/recesso</span>`;
 
     const memberIds = members.map(s => s.id);
     const { data: reportsForTurma } = memberIds.length
@@ -2906,9 +2912,12 @@
         const time = formatTimeRange(l);
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
         const reportsForThis = (reportsForTurma || []).filter(r => r.class_log_id === l.id);
-        const badge = reportsForThis.length === 0
-          ? `<span class="report-status draft">➕ Lançar relatório</span>`
-          : `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`;
+        const hasPrivateNote = !!(l.content && l.content.trim());
+        const badge = reportsForThis.length > 0
+          ? `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`
+          : (hasPrivateNote
+              ? `<span class="report-status draft">📝 Anotado</span>`
+              : `<span class="report-status draft">➕ Lançar relatório</span>`);
         const attendanceRows = (attendanceForTurma || []).filter(a => a.class_log_id === l.id);
         const presentCount = attendanceRows.filter(a => a.present).length;
         const attendanceBadge = attendanceRows.length > 0
@@ -3606,7 +3615,8 @@
         const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
         const time = formatTimeRange(l) || 'sem horário';
         const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-        const reportIcon = classLogsWithReport.has(l.id) ? '📄' : '➕';
+        const hasNote = classLogsWithReport.has(l.id) || !!(l.content && l.content.trim());
+        const reportIcon = hasNote ? '📄' : '➕';
         return `
           <div class="agenda-day-item" onclick="openAgendaReport('${l.id}')">
             <div class="agenda-day-item-time">${time}</div>
@@ -4824,6 +4834,8 @@
         <option value="cancelada">Cancelada</option>
         <option value="cancelada_falta">Cancelada por falta</option>
         <option value="reagendada">Reagendada</option>
+        <option value="feriado">Feriado</option>
+        <option value="recesso">Recesso</option>
       </select>
     </div>
 
