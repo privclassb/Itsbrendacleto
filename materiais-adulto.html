@@ -64,33 +64,6 @@
     .subfolder-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
 
     .loading-card { text-align: center; padding: 40px; color: var(--muted); }
-
-    /* Relatórios */
-    .report-item {
-      background: var(--white);
-      border-radius: var(--radius);
-      padding: 16px 20px;
-      box-shadow: var(--shadow);
-      margin-bottom: 10px;
-      border: 1.5px solid var(--sand);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .report-item:hover { border-color: var(--brown-light); }
-    .report-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-    .report-title { font-size: 15px; font-weight: 600; color: var(--text); }
-    .report-period { font-size: 12px; color: var(--muted); background: var(--cream); border-radius: 99px; padding: 2px 10px; }
-    .report-preview { font-size: 13px; color: var(--muted); line-height: 1.4; }
-    .report-new { background: var(--mint); color: #1E5C3A; font-size: 10px; font-weight: 700; border-radius: 99px; padding: 2px 8px; text-transform: uppercase; }
-
-    /* Modal relatório */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 4px; }
-    .modal-period { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-    .modal-content { font-size: 15px; color: var(--text); line-height: 1.7; white-space: pre-wrap; }
-    .modal-close { margin-top: 20px; width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; color: white; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -125,16 +98,6 @@
 <main>
   <div id="mainContent"><div class="loading-card">Carregando...</div></div>
 </main>
-
-<!-- Modal relatório -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle"></div>
-    <div class="modal-period" id="modalPeriod"></div>
-    <div class="modal-content" id="modalContent"></div>
-    <button class="modal-close" id="modalClose">Fechar</button>
-  </div>
-</div>
 
 <script>
   const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
@@ -177,15 +140,10 @@
       : foldersQuery.eq('student_id', userId);
     const { data: folders } = await foldersQuery;
 
-    // Busca relatórios
-    const { data: reports } = await sb.from('reports')
-      .select('*').eq('student_id', userId).eq('is_published', true)
-      .order('created_at', { ascending: false });
-
-    renderAll(linkMap, folders || [], reports || []);
+    renderAll(linkMap, folders || []);
   }
 
-  function renderAll(linkMap, folders, reports) {
+  function renderAll(linkMap, folders) {
     const main = document.getElementById('mainContent');
     let html = '';
 
@@ -219,49 +177,8 @@
       });
     }
 
-    // Relatórios
-    html += '<div class="section-title">Relatórios</div>';
-    if (reports.length === 0) {
-      html += `<div class="material-item unavailable">
-        <div class="material-icon">📊</div>
-        <div class="material-info">
-          <div class="material-title">Nenhum relatório ainda</div>
-          <div class="material-sub">Seus relatórios aparecerão aqui</div>
-        </div>
-      </div>`;
-    } else {
-      reports.forEach(r => {
-        const date = new Date(r.created_at).toLocaleDateString('pt-BR');
-        html += `
-          <div class="report-item" onclick="openReport('${r.id}', '${r.title}', '${r.period || ''}', \`${(r.content || '').replace(/`/g, "'")}\`)">
-            <div class="report-header">
-              <div class="report-title">${r.title}</div>
-              ${r.period ? `<span class="report-period">${r.period}</span>` : ''}
-            </div>
-            <div class="report-preview">${(r.content || '').substring(0, 80)}${r.content && r.content.length > 80 ? '...' : ''}</div>
-          </div>`;
-      });
-    }
-
     main.innerHTML = html;
   }
-
-  function openReport(id, title, period, content) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalPeriod').textContent = period;
-    document.getElementById('modalContent').textContent = content;
-    document.getElementById('modalOverlay').classList.add('open');
-  }
-
-  document.getElementById('modalClose').addEventListener('click', () => {
-    document.getElementById('modalOverlay').classList.remove('open');
-  });
-
-  document.getElementById('modalOverlay').addEventListener('click', (e) => {
-    if (e.target === document.getElementById('modalOverlay')) {
-      document.getElementById('modalOverlay').classList.remove('open');
-    }
-  });
 
   // Auth with retry for slow session loading
   (async () => {
