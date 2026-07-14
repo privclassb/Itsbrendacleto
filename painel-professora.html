@@ -568,6 +568,13 @@
     .agenda-day-empty { font-size: 11px; color: var(--muted); text-align: center; padding: 10px 0; }
     @media (max-width: 800px) { .agenda-week-grid { grid-template-columns: repeat(7, 140px); } }
 
+    /* Histórico de reagendamento */
+    .makeup-history-banner {
+      background: #FBEAD3; border: 1.5px solid #E8B36A; border-radius: 10px;
+      padding: 10px 14px; font-size: 13px; color: #8A5A1E; margin-bottom: 14px;
+    }
+    .makeup-history-banner strong { font-weight: 700; }
+
     /* Presença dos alunos na aula de turma */
     .attendance-list { background: var(--cream); border-radius: 10px; padding: 6px 12px; }
     .attendance-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--sand); }
@@ -2905,6 +2912,7 @@
     document.getElementById('turmaReportClassLogId').value = classLogId;
     document.getElementById('turmaReportError').style.display = 'none';
     document.getElementById('turmaReportWho').textContent = (turma ? turma.name : 'Turma') + (dateLabel ? ' · aula de ' + dateLabel : '') + ' · ' + members.length + ' aluno(s)';
+    document.getElementById('turmaReportMakeupHistory').innerHTML = await buildMakeupHistoryHtml(log);
 
     const memberIds = members.map(s => s.id);
     const { data: existing } = memberIds.length
@@ -3058,6 +3066,24 @@
     if (!l.start_time) return '';
     const end = l.end_time ? '–' + l.end_time.slice(0, 5) : '';
     return l.start_time.slice(0, 5) + end;
+  }
+
+  function formatDateTimeBR(dateStr, timeStr) {
+    const d = new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR');
+    const t = timeStr ? timeStr.slice(0, 5) : '';
+    return t ? (d + ', ' + t) : d;
+  }
+
+  async function buildMakeupHistoryHtml(log) {
+    if (!log || !log.makeup_for_id) return '';
+    const { data: original } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', log.makeup_for_id).maybeSingle();
+    if (!original) return '';
+    const origLabel = formatDateTimeBR(original.class_date, original.start_time);
+    const newLabel = formatDateTimeBR(log.class_date, log.start_time);
+    const madeAt = log.created_at
+      ? new Date(log.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+      : '';
+    return `<div class="makeup-history-banner">📅 Reagendamento de <strong>${origLabel}</strong> para <strong>${newLabel}</strong>${madeAt ? ' · marcado em ' + madeAt : ''}</div>`;
   }
 
   async function copyLoginInfo(text) {
@@ -3571,6 +3597,7 @@
     document.getElementById('classLogEditStatus').value = l.status || 'realizada';
     document.getElementById('classLogEditContent').value = l.content || '';
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
+    document.getElementById('classLogEditMakeupHistory').innerHTML = await buildMakeupHistoryHtml(l);
 
     document.getElementById('modalClassLogEdit').classList.add('open');
   }
@@ -3636,6 +3663,7 @@
     document.getElementById('classReportStudentId').value = studentId;
     document.getElementById('classReportId').value = report ? report.id : '';
     document.getElementById('classReportWho').textContent = (student ? student.full_name : 'Aluno') + (dateLabel ? ' · aula de ' + dateLabel : '');
+    document.getElementById('classReportMakeupHistory').innerHTML = await buildMakeupHistoryHtml(log);
 
     if (report) {
       document.getElementById('classReportTitle').value = report.title || '';
@@ -4400,6 +4428,7 @@
   <div class="modal-box">
     <div class="modal-title">Relatório da aula (turma)</div>
     <div class="modal-sub" id="turmaReportWho"></div>
+    <div id="turmaReportMakeupHistory"></div>
     <input type="hidden" id="turmaReportClassLogId" />
 
     <div class="modal-row">
@@ -4555,6 +4584,7 @@
   <div class="modal-box">
     <div class="modal-title">Editar aula</div>
     <div class="modal-sub" id="classLogEditWho"></div>
+    <div id="classLogEditMakeupHistory"></div>
     <input type="hidden" id="classLogEditId" />
 
     <div class="modal-row">
@@ -4611,6 +4641,7 @@
   <div class="modal-box">
     <div class="modal-title">Anotações da aula</div>
     <div class="modal-sub" id="classReportWho"></div>
+    <div id="classReportMakeupHistory"></div>
     <div class="modal-hint" style="margin-bottom:14px;">Essas anotações são só pra sua organização — não aparecem pro aluno/responsável. Os relatórios mensais que eles veem ficam na aba Relatórios.</div>
     <input type="hidden" id="classReportId" />
     <input type="hidden" id="classReportClassLogId" />
