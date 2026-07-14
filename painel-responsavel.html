@@ -153,6 +153,7 @@
     .receipt-body { font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 24px; }
     .receipt-meta { font-size: 13px; color: var(--muted); text-align: right; margin-bottom: 28px; }
     .receipt-signature { text-align: center; font-size: 13px; color: var(--text); }
+    .receipt-signature-img { display: block; max-width: 200px; max-height: 55px; margin: 0 auto -6px; object-fit: contain; }
     .receipt-signature-line { border-top: 1.5px solid var(--text); width: 220px; margin: 0 auto 6px; padding-top: 6px; }
     .receipt-actions { display: flex; gap: 10px; margin-top: 24px; }
     .receipt-actions button { flex: 1; padding: 12px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; border: none; }
@@ -265,6 +266,7 @@
     <div class="receipt-body" id="receiptBody"></div>
     <div class="receipt-meta" id="receiptMeta"></div>
     <div class="receipt-signature">
+      <img src="assets/assinatura-brenda.png" alt="Assinatura de Brenda Cleto" class="receipt-signature-img" />
       <div class="receipt-signature-line">Brenda Cleto</div>
       Priv Class B · CNPJ 43.151.392/0001-00
     </div>
@@ -458,14 +460,18 @@
   function renderReceipt(p, payerName, studentName) {
     const refDate = new Date((p.due_date || p.paid_at) + 'T00:00:00');
     const refLabel = refDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-    const issueDate = new Date((p.paid_at || p.due_date) + 'T00:00:00');
+    const paidDateStr = p.paid_at
+      ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+      : null;
+    const issueDate = new Date(); // data em que a pessoa está solicitando o recibo no site
     const amount = Number(p.amount || 0);
     const amountStr = 'R$ ' + amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     const extenso = valorPorExtenso(amount);
 
     document.getElementById('receiptAmount').textContent = amountStr;
     document.getElementById('receiptBody').textContent =
-      `Recebi de ${payerName} a importância de ${amountStr} (${extenso}), referente à parcela mensal de aulas de inglês de ${studentName} do mês de ${refLabel}.`;
+      `Recebi de ${payerName} a importância de ${amountStr} (${extenso}), referente à parcela mensal de aulas de inglês de ${studentName} do mês de ${refLabel}` +
+      (paidDateStr ? `, paga em ${paidDateStr}.` : '.');
     document.getElementById('receiptMeta').textContent =
       'Recibo emitido em ' + issueDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
   }
