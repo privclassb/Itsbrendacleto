@@ -3009,7 +3009,6 @@
     document.getElementById('turmaReportTitle').value = first ? first.title : (dateLabel ? 'Aula de ' + dateLabel : '');
     document.getElementById('turmaReportPeriod').value = first ? (first.period || '') : '';
     document.getElementById('turmaReportContent').value = first ? first.content : '';
-    document.getElementById('turmaReportPublished').checked = first ? !!first.is_published : false;
     document.getElementById('turmaReportPrivateNotes').value = (log && log.content) || '';
 
     const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', classLogId);
@@ -3028,7 +3027,6 @@
     const title = document.getElementById('turmaReportTitle').value.trim();
     const period = document.getElementById('turmaReportPeriod').value.trim();
     const content = document.getElementById('turmaReportContent').value.trim();
-    const isPublished = document.getElementById('turmaReportPublished').checked;
     const privateNotes = document.getElementById('turmaReportPrivateNotes').value.trim();
     const errEl = document.getElementById('turmaReportError');
 
@@ -3061,7 +3059,7 @@
 
     let hadError = false;
     for (const s of members) {
-      const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: isPublished };
+      const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: false };
       const existingId = existingByStudent[s.id];
       const { error } = existingId
         ? await sb.from('reports').update(payload).eq('id', existingId)
@@ -4695,7 +4693,7 @@
 <!-- Modal: Relatório da aula (turma inteira) -->
 <div class="modal-overlay" id="modalTurmaClassReport">
   <div class="modal-box">
-    <div class="modal-title">Relatório da aula (turma)</div>
+    <div class="modal-title">Anotações da aula (turma)</div>
     <div class="modal-sub" id="turmaReportWho"></div>
     <div id="turmaReportMakeupHistory"></div>
     <input type="hidden" id="turmaReportClassLogId" />
@@ -4710,7 +4708,7 @@
       <textarea class="modal-input" id="turmaReportPrivateNotes" style="min-height:90px;resize:vertical;" placeholder="Anotações internas sobre a aula..."></textarea>
     </div>
 
-    <div class="modal-hint" style="margin-bottom:14px;">O relatório abaixo é salvo individualmente pra cada aluno matriculado na turma, com o mesmo conteúdo.</div>
+    <div class="modal-hint" style="margin-bottom:14px;">O conteúdo abaixo é salvo individualmente pra cada aluno matriculado na turma. Essas anotações são só pra sua organização — não aparecem pro aluno/responsável. Os relatórios mensais que eles veem ficam na aba Relatórios.</div>
 
     <div class="modal-row">
       <label class="modal-label">Título</label>
@@ -4723,15 +4721,8 @@
     </div>
 
     <div class="modal-row">
-      <label class="modal-label">Anotações para o grupo</label>
+      <label class="modal-label">Conteúdo da aula</label>
       <textarea class="modal-input" id="turmaReportContent" style="min-height:140px;resize:vertical;" placeholder="O que foi trabalhado, observações da turma..."></textarea>
-    </div>
-
-    <div class="modal-row modal-checkbox-row">
-      <label class="modal-checkbox-label">
-        <input type="checkbox" id="turmaReportPublished" />
-        <span>Publicar (visível pros alunos/responsáveis)</span>
-      </label>
     </div>
 
     <div class="modal-error" id="turmaReportError" style="display:none;"></div>
