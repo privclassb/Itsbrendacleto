@@ -1520,6 +1520,27 @@
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
 
+  async function deleteAllTurmaClassLogs() {
+    if (!currentProfileTurmaId) return;
+    if (!confirm('Excluir TODAS as aulas registradas para essa turma? Essa ação não pode ser desfeita.')) return;
+
+    const { data: logs } = await sb.from('class_logs').select('id').eq('turma_id', currentProfileTurmaId);
+    const logIds = (logs || []).map(l => l.id);
+
+    if (logIds.length > 0) {
+      await sb.from('class_attendance').delete().in('class_log_id', logIds);
+      await sb.from('reports').delete().in('class_log_id', logIds);
+    }
+
+    const { error } = await sb.from('class_logs').delete().eq('turma_id', currentProfileTurmaId);
+    if (error) { alert('Erro ao excluir aulas: ' + error.message); return; }
+
+    await openTurmaProfile(currentProfileTurmaId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
   async function deleteAllPayments() {
     if (!currentProfileStudentId) return;
     if (!confirm('Excluir TODO o financeiro lançado para esse aluno? Essa ação não pode ser desfeita.')) return;
@@ -2878,6 +2899,7 @@
     document.getElementById('turmaProfileName').textContent = turma.name;
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
     document.getElementById('turmaProfileRescheduleFixedBtn').style.display = 'inline-block';
+    document.getElementById('turmaProfileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
 
     document.getElementById('turmaProfileStudentsList').innerHTML = members.length
       ? members.map(s => `
@@ -4645,6 +4667,7 @@
       <div class="aula-stats-row" id="turmaProfileAulasStats"></div>
       <button class="btn-sm" id="turmaProfileRescheduleFixedBtn" onclick="openRescheduleFixed('turma', currentProfileTurmaId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="turmaProfileClassLogsList"></div>
+      <button class="btn-sm" id="turmaProfileDeleteAllLogsBtn" onclick="deleteAllTurmaClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
     </div>
 
     <div class="detail-actions">
