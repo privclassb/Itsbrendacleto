@@ -858,6 +858,10 @@
           <option value="adulto">Adulto</option>
         </select>
       </div>
+      <div class="form-row">
+        <label class="form-label">Professora responsável</label>
+        <select class="form-select" id="turmaTeacher"></select>
+      </div>
       <div class="form-actions">
         <button class="btn-publish" onclick="createTurma()" style="flex:1;">+ Criar turma</button>
       </div>
@@ -2574,6 +2578,12 @@
       sel.innerHTML = '<option value="">Selecione a professora...</option>' +
         allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
     }
+    const turmaTeacherSel = document.getElementById('turmaTeacher');
+    if (turmaTeacherSel) {
+      turmaTeacherSel.innerHTML = allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) turmaTeacherSel.value = session.user.id;
+    }
   }
 
   function teacherNameById(id) {
@@ -2821,10 +2831,13 @@
     let error, turmas;
 
     if (!seeAll) {
-      // turmas.teacher_id é sempre quem criou a turma (só a Brenda cria turmas),
-      // então pra outras professoras a turma "delas" é aquela que tem alunos
-      // atribuídos a elas — não quem cadastrou a turma no sistema.
-      const myTurmaIds = [...new Set(allStudents.filter(s => s.teacher_id === teacherId && s.turma_id).map(s => s.turma_id))];
+      // Uma turma é "da professora" se ela tem alunos matriculados nela OU
+      // se a turma foi explicitamente atribuída a ela (mesmo sem alunos ainda)
+      const { data: assignedTurmas } = await sb.from('turmas').select('id').eq('teacher_id', teacherId);
+      const myTurmaIds = [...new Set([
+        ...allStudents.filter(s => s.teacher_id === teacherId && s.turma_id).map(s => s.turma_id),
+        ...(assignedTurmas || []).map(t => t.id)
+      ])];
       if (myTurmaIds.length === 0) {
         allTurmas = [];
         const listElEmpty = document.getElementById('turmasList');
@@ -2844,15 +2857,17 @@
 
     listEl.innerHTML = allTurmas.map(t => {
       const count = allStudents.filter(s => s.turma_id === t.id).length;
+      const teacherLabel = t.teacher_id ? teacherNameById(t.teacher_id) : 'Sem professora';
       const actions = currentUserIsBrenda
         ? `<button class="btn-report-action btn-toggle" onclick="event.stopPropagation();openTurmaStudents('${t.id}')">+ Alunos</button>
+           <button class="btn-report-action btn-toggle" onclick="event.stopPropagation();editTurma('${t.id}')">✏️ Editar</button>
            <button class="btn-report-action btn-delete" onclick="event.stopPropagation();deleteTurma('${t.id}')">Excluir</button>`
         : '';
       return `
         <div class="report-row" style="cursor:pointer;" onclick="openTurmaProfile('${t.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${t.name}</div>
-            <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s)</div>
+            <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s) · ${teacherLabel}</div>
           </div>
           ${actions}
         </div>`;
@@ -2865,7 +2880,8 @@
     if (!name) { alert('Digite o nome da turma.'); return; }
 
     const { data: { session } } = await sb.auth.getSession();
-    const { error } = await sb.from('turmas').insert({ name, student_type: studentType, teacher_id: session.user.id });
+    const teacherId = document.getElementById('turmaTeacher').value || session.user.id;
+    const { error } = await sb.from('turmas').insert({ name, student_type: studentType, teacher_id: teacherId });
 
     if (error) { alert('Erro ao criar turma: ' + error.message); return; }
 
@@ -2895,6 +2911,58 @@
     if (error) { alert('Erro ao excluir turma: ' + error.message); return; }
     if (!data || data.length === 0) { alert('Não foi possível excluir a turma (sem permissão pra apagar).'); return; }
 
+    const { data: { session } } = await sb.auth.getSession();
+    await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
+    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
+  }
+
+  function editTurma(id) {
+    const turma = allTurmas.find(t => t.id === id);
+    if (!turma) return;
+
+    document.getElementById('editTurmaId').value = turma.id;
+    document.getElementById('editTurmaName').value = turma.name || '';
+    document.getElementById('editTurmaType').value = turma.student_type === 'kids' ? 'kids' : 'adulto';
+    document.getElementById('editTurmaError').style.display = 'none';
+
+    const sel = document.getElementById('editTurmaTeacher');
+    sel.innerHTML = allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
+    sel.value = turma.teacher_id || '';
+
+    document.getElementById('modalEditTurma').classList.add('open');
+  }
+
+  function closeEditTurma() {
+    document.getElementById('modalEditTurma').classList.remove('open');
+  }
+
+  async function saveTurmaEdit() {
+    const id = document.getElementById('editTurmaId').value;
+    const name = document.getElementById('editTurmaName').value.trim();
+    const studentType = document.getElementById('editTurmaType').value;
+    const teacherId = document.getElementById('editTurmaTeacher').value;
+    const errEl = document.getElementById('editTurmaError');
+
+    if (!name) {
+      errEl.textContent = 'Digite o nome da turma.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!teacherId) {
+      errEl.textContent = 'Selecione a professora responsável.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const { error } = await sb.from('turmas').update({ name, student_type: studentType, teacher_id: teacherId }).eq('id', id);
+    if (error) {
+      errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeEditTurma();
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
@@ -4977,6 +5045,39 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeTurmaStudents()">Cancelar</button>
       <button class="btn-modal-save" id="btnSaveTurmaStudents" onclick="saveTurmaStudents()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Editar turma -->
+<div class="modal-overlay" id="modalEditTurma">
+  <div class="modal-box">
+    <div class="modal-title">Editar turma</div>
+    <input type="hidden" id="editTurmaId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Nome da turma</label>
+      <input type="text" class="modal-input" id="editTurmaName" placeholder="Ex: Kids Terça 18h" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Tipo</label>
+      <select class="modal-select" id="editTurmaType">
+        <option value="kids">Kids</option>
+        <option value="adulto">Adulto</option>
+      </select>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Professora responsável</label>
+      <select class="modal-select" id="editTurmaTeacher"></select>
+    </div>
+
+    <div class="modal-error" id="editTurmaError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeEditTurma()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveTurmaEdit()">Salvar</button>
     </div>
   </div>
 </div>
