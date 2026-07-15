@@ -3826,7 +3826,7 @@
         const hasNote = classLogsWithReport.has(l.id) || !!(l.content && l.content.trim());
         const reportIcon = hasNote ? '📄' : '➕';
         return `
-          <div class="agenda-day-item" onclick="openAgendaReport('${l.id}')">
+          <div class="agenda-day-item" onclick="openClassLogEdit('${l.id}')">
             <div class="agenda-day-item-time">${time}</div>
             <div class="agenda-day-item-who">${who}</div>
             <div class="agenda-day-item-status">${statusLabel} · ${reportIcon}</div>
@@ -3839,23 +3839,6 @@
           ${items}
         </div>`;
     }).join('');
-  }
-
-  async function openAgendaReport(classLogId) {
-    const { data: log } = await sb.from('class_logs').select('*').eq('id', classLogId).maybeSingle();
-    if (!log) return;
-
-    if (log.turma_id) {
-      currentProfileTurmaId = log.turma_id;
-      turmaProfileClassLogsCache = [log];
-      await openTurmaClassReport(classLogId);
-    } else if (log.student_id) {
-      profileClassLogsCache = [log];
-      const { data: existingReports } = await sb.from('reports').select('*').eq('student_id', log.student_id);
-      profileReportsByClassLog = {};
-      (existingReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
-      await openClassReport(classLogId, log.student_id);
-    }
   }
 
   // ---- Acompanhar equipe (só Brenda) ----
