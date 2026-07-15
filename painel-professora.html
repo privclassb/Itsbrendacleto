@@ -909,7 +909,7 @@
       </div>
       <div class="form-row">
         <label class="form-label">Status</label>
-        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta')document.getElementById('classLogNeedsMakeup').checked=true;">
+        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classLogNeedsMakeup').checked=true;">
           <option value="realizada">Realizada</option>
           <option value="pendente">Pendente</option>
           <option value="cancelada">Cancelada</option>
@@ -3109,6 +3109,11 @@
     document.getElementById('turmaReportTitle').value = first ? first.title : (dateLabel ? 'Aula de ' + dateLabel : '');
     document.getElementById('turmaReportPeriod').value = first ? (first.period || '') : '';
     document.getElementById('turmaReportContent').value = first ? first.content : ((log && log.content) || '');
+    document.getElementById('turmaReportDate').value = log ? log.class_date : '';
+    document.getElementById('turmaReportStartTime').value = log && log.start_time ? log.start_time.slice(0, 5) : '';
+    document.getElementById('turmaReportEndTime').value = log && log.end_time ? log.end_time.slice(0, 5) : '';
+    document.getElementById('turmaReportStatus').value = log ? (log.status || 'realizada') : 'realizada';
+    document.getElementById('turmaReportNeedsMakeup').checked = !!(log && log.needs_makeup);
 
     const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', classLogId);
     const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
@@ -3126,10 +3131,20 @@
     const title = document.getElementById('turmaReportTitle').value.trim();
     const period = document.getElementById('turmaReportPeriod').value.trim();
     const content = document.getElementById('turmaReportContent').value.trim();
+    const date = document.getElementById('turmaReportDate').value;
+    const startTime = document.getElementById('turmaReportStartTime').value || null;
+    const endTime = document.getElementById('turmaReportEndTime').value || null;
+    const status = document.getElementById('turmaReportStatus').value;
+    const needsMakeup = document.getElementById('turmaReportNeedsMakeup').checked;
     const errEl = document.getElementById('turmaReportError');
 
     if (!title || !content) {
       errEl.textContent = 'Preencha título e conteúdo.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!date) {
+      errEl.textContent = 'Informe a data da aula.';
       errEl.style.display = 'block';
       return;
     }
@@ -3151,7 +3166,9 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
-    await sb.from('class_logs').update({ content }).eq('id', classLogId);
+    await sb.from('class_logs').update({
+      content, class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
+    }).eq('id', classLogId);
     const attendanceList = collectAttendanceFromContainer('turmaReportAttendanceList');
     await saveAttendanceForClassLog(classLogId, attendanceList);
 
@@ -4035,6 +4052,11 @@
     document.getElementById('classReportId').value = report ? report.id : '';
     document.getElementById('classReportWho').textContent = (student ? student.full_name : 'Aluno') + (dateLabel ? ' · aula de ' + dateLabel : '');
     document.getElementById('classReportMakeupHistory').innerHTML = await buildMakeupHistoryHtml(log);
+    document.getElementById('classReportDate').value = log ? log.class_date : '';
+    document.getElementById('classReportStartTime').value = log && log.start_time ? log.start_time.slice(0, 5) : '';
+    document.getElementById('classReportEndTime').value = log && log.end_time ? log.end_time.slice(0, 5) : '';
+    document.getElementById('classReportStatus').value = log ? (log.status || 'realizada') : 'realizada';
+    document.getElementById('classReportNeedsMakeup').checked = !!(log && log.needs_makeup);
 
     if (report) {
       document.getElementById('classReportTitle').value = report.title || '';
@@ -4062,10 +4084,20 @@
     const title = document.getElementById('classReportTitle').value.trim();
     const period = document.getElementById('classReportPeriod').value.trim();
     const content = document.getElementById('classReportContent').value.trim();
+    const date = document.getElementById('classReportDate').value;
+    const startTime = document.getElementById('classReportStartTime').value || null;
+    const endTime = document.getElementById('classReportEndTime').value || null;
+    const status = document.getElementById('classReportStatus').value;
+    const needsMakeup = document.getElementById('classReportNeedsMakeup').checked;
     const errEl = document.getElementById('classReportError');
 
     if (!title || !content) {
       errEl.textContent = 'Preencha título e conteúdo.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!date) {
+      errEl.textContent = 'Informe a data da aula.';
       errEl.style.display = 'block';
       return;
     }
@@ -4082,6 +4114,10 @@
       errEl.style.display = 'block';
       return;
     }
+
+    await sb.from('class_logs').update({
+      class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
+    }).eq('id', classLogId);
 
     closeClassReport();
     await openStudentProfile(studentId);
@@ -4870,6 +4906,42 @@
     <input type="hidden" id="turmaReportClassLogId" />
 
     <div class="modal-row">
+      <label class="modal-label">Data</label>
+      <input type="date" class="modal-input" id="turmaReportDate" />
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Horário início</label>
+        <input type="time" class="modal-input" id="turmaReportStartTime" onchange="autofillEndTime(this, 'turmaReportEndTime')" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Horário fim</label>
+        <input type="time" class="modal-input" id="turmaReportEndTime" />
+      </div>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Status</label>
+      <select class="modal-select" id="turmaReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('turmaReportNeedsMakeup').checked=true;">
+        <option value="realizada">Realizada</option>
+        <option value="pendente">Pendente</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="reagendada">Reagendada</option>
+        <option value="feriado">Feriado</option>
+        <option value="recesso">Recesso</option>
+      </select>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="turmaReportNeedsMakeup" />
+        <span>🔄 Turma precisa repor essa aula</span>
+      </label>
+    </div>
+
+    <div class="modal-row">
       <label class="modal-label">Alunos presentes</label>
       <div id="turmaReportAttendanceList"></div>
     </div>
@@ -5031,7 +5103,7 @@
 
     <div class="modal-row">
       <label class="modal-label">Status</label>
-      <select class="modal-select" id="classLogEditStatus" onchange="if(this.value==='cancelada_falta')document.getElementById('classLogEditNeedsMakeup').checked=true;">
+      <select class="modal-select" id="classLogEditStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classLogEditNeedsMakeup').checked=true;">
         <option value="realizada">Realizada</option>
         <option value="pendente">Pendente</option>
         <option value="cancelada">Cancelada</option>
@@ -5079,6 +5151,42 @@
     <input type="hidden" id="classReportId" />
     <input type="hidden" id="classReportClassLogId" />
     <input type="hidden" id="classReportStudentId" />
+
+    <div class="modal-row">
+      <label class="modal-label">Data</label>
+      <input type="date" class="modal-input" id="classReportDate" />
+    </div>
+
+    <div class="modal-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="modal-label">Horário início</label>
+        <input type="time" class="modal-input" id="classReportStartTime" onchange="autofillEndTime(this, 'classReportEndTime')" />
+      </div>
+      <div style="flex:1;">
+        <label class="modal-label">Horário fim</label>
+        <input type="time" class="modal-input" id="classReportEndTime" />
+      </div>
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Status</label>
+      <select class="modal-select" id="classReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classReportNeedsMakeup').checked=true;">
+        <option value="realizada">Realizada</option>
+        <option value="pendente">Pendente</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="reagendada">Reagendada</option>
+        <option value="feriado">Feriado</option>
+        <option value="recesso">Recesso</option>
+      </select>
+    </div>
+
+    <div class="modal-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="classReportNeedsMakeup" />
+        <span>🔄 Aluno precisa repor essa aula</span>
+      </label>
+    </div>
 
     <div class="modal-row">
       <label class="modal-label">Título</label>
