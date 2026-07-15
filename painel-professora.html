@@ -1368,6 +1368,7 @@
 
     document.getElementById('profileOptionsMenu').classList.remove('open');
     document.getElementById('profileFinanceSection').style.display = currentUserIsBrenda ? 'block' : 'none';
+    document.getElementById('profileContractSection').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionPaymentBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionEditBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
@@ -1449,6 +1450,22 @@
     }
     }
 
+    // Contrato (só Brenda)
+    if (currentUserIsBrenda) {
+      document.getElementById('profileContractInfo').innerHTML =
+        `<div class="detail-row"><span class="detail-label">Período atual</span><span class="detail-value">${contractStart} – ${contractEnd}</span></div>`;
+
+      const alertEl = document.getElementById('profileContractAlert');
+      if (student.contract_end && student.contract_end < todayLocalISO()) {
+        alertEl.innerHTML = '⚠️ Este contrato já encerrou.';
+        alertEl.style.display = 'block';
+      } else {
+        alertEl.style.display = 'none';
+      }
+
+      await loadContractHistory(studentId);
+    }
+
     // Aulas
     let statusQuery = sb.from('class_logs').select('status');
     statusQuery = turma
@@ -1516,6 +1533,95 @@
   function closeStudentProfile() {
     document.getElementById('modalStudentProfile').classList.remove('open');
     document.getElementById('profileOptionsMenu').classList.remove('open');
+  }
+
+  // ---- Histórico de contratos ----
+
+  async function loadContractHistory(studentId) {
+    const listEl = document.getElementById('profileContractHistoryList');
+    const { data: history, error } = await sb.from('contract_history').select('*').eq('student_id', studentId).order('contract_end', { ascending: false });
+
+    if (error) {
+      listEl.innerHTML = '<div class="empty-reports">Não foi possível carregar o histórico de contratos.</div>';
+      return;
+    }
+    if (!history || history.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum contrato anterior.</div>';
+      return;
+    }
+
+    listEl.innerHTML = history.map(c => {
+      const start = c.contract_start ? new Date(c.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const end = c.contract_end ? new Date(c.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `<div class="detail-row"><span class="detail-label">${start} – ${end}</span></div>`;
+    }).join('');
+  }
+
+  function openNewContract(studentId) {
+    if (!studentId) return;
+    const student = allStudents.find(s => s.id === studentId);
+    if (!student) return;
+
+    document.getElementById('newContractStudentId').value = studentId;
+    document.getElementById('newContractWho').textContent = student.full_name || 'Aluno';
+    document.getElementById('newContractError').style.display = 'none';
+    document.getElementById('newContractStart').value = todayLocalISO();
+    document.getElementById('newContractEnd').value = '';
+    document.getElementById('modalNewContract').classList.add('open');
+  }
+
+  function closeNewContract() {
+    document.getElementById('modalNewContract').classList.remove('open');
+  }
+
+  async function saveNewContract() {
+    const studentId = document.getElementById('newContractStudentId').value;
+    const start = document.getElementById('newContractStart').value;
+    const end = document.getElementById('newContractEnd').value;
+    const errEl = document.getElementById('newContractError');
+    errEl.style.display = 'none';
+
+    if (!start || !end) {
+      errEl.textContent = 'Preencha início e fim do novo contrato.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const student = allStudents.find(s => s.id === studentId);
+
+    if (student && (student.contract_start || student.contract_end)) {
+      const { error: archiveErr } = await withAuthRetry(() => sb.from('contract_history').insert({
+        student_id: studentId,
+        contract_start: student.contract_start || null,
+        contract_end: student.contract_end || null
+      }));
+      if (archiveErr) {
+        errEl.textContent = 'Erro ao arquivar contrato anterior: ' + archiveErr.message;
+        errEl.style.display = 'block';
+        return;
+      }
+    }
+
+    const { data: updData, error } = await withAuthRetry(() => sb.from('profiles').update({
+      contract_start: start,
+      contract_end: end
+    }).eq('id', studentId).select());
+
+    if (error) {
+      errEl.textContent = 'Erro ao salvar novo contrato: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!updData || updData.length === 0) {
+      errEl.textContent = 'Não foi possível salvar (sem permissão).';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    closeNewContract();
+    const { data: { session } } = await sb.auth.getSession();
+    await loadStudents(session.user.id, currentUserIsBrenda);
+    await openStudentProfile(studentId);
   }
 
   async function deleteAllClassLogs() {
@@ -4978,6 +5084,17 @@
       </div>
     </div>
 
+    <div class="profile-section" id="profileContractSection">
+      <div class="profile-section-title">Contrato</div>
+      <div id="profileContractInfo"></div>
+      <div class="profile-warning" id="profileContractAlert" style="display:none;margin-top:8px;"></div>
+      <div style="margin-top:10px;">
+        <button class="btn-sm" onclick="openNewContract(currentProfileStudentId)">+ Novo contrato</button>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Histórico de contratos</div>
+      <div id="profileContractHistoryList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
     <div class="profile-section">
       <div class="profile-section-title">Aulas registradas</div>
       <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela.</div>
@@ -5443,6 +5560,32 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeMarkMakeup()">Cancelar</button>
       <button class="btn-modal-save" onclick="saveMarkMakeup()">Salvar reposição</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo contrato -->
+<div class="modal-overlay" id="modalNewContract">
+  <div class="modal-box">
+    <div class="modal-title">Novo contrato</div>
+    <div class="modal-sub" id="newContractWho"></div>
+    <input type="hidden" id="newContractStudentId" />
+    <div class="modal-hint">O contrato atual (se houver) vai pro histórico automaticamente.</div>
+
+    <div class="modal-row">
+      <label class="modal-label">Início do contrato</label>
+      <input type="date" class="modal-input" id="newContractStart" />
+    </div>
+    <div class="modal-row">
+      <label class="modal-label">Fim do contrato</label>
+      <input type="date" class="modal-input" id="newContractEnd" />
+    </div>
+
+    <div class="modal-error" id="newContractError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeNewContract()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveNewContract()">Salvar novo contrato</button>
     </div>
   </div>
 </div>
