@@ -452,12 +452,22 @@
     .save-ok { color: var(--mint); font-size: 18px; display: none; }
 
     /* Student folders */
+    .folder-search { width: 100%; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; margin-bottom: 12px; }
+    .folder-search:focus { border-color: var(--mint); }
     .folder-list { margin-bottom: 14px; }
+    .folder-group { border: 1px solid var(--sand); border-radius: 12px; margin-bottom: 8px; overflow: hidden; }
+    .folder-group-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 14px; background: var(--cream); cursor: pointer; user-select: none; }
+    .folder-group-name { font-size: 13px; font-weight: 700; color: var(--text); }
+    .folder-group-badge { font-size: 11px; font-weight: 600; color: var(--muted); background: var(--white); border-radius: 99px; padding: 2px 9px; margin-left: 8px; }
+    .folder-group-chevron { font-size: 11px; color: var(--muted); transition: transform 0.15s; }
+    .folder-group.open .folder-group-chevron { transform: rotate(90deg); }
+    .folder-group-body { display: none; padding: 4px 14px; }
+    .folder-group.open .folder-group-body { display: block; }
     .folder-row { display: flex; gap: 8px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--sand); }
     .folder-row:last-child { border-bottom: none; }
-    .folder-student { font-size: 13px; font-weight: 600; color: var(--text); width: 120px; flex-shrink: 0; }
     .folder-name { font-size: 13px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .btn-del { background: #FFF0EE; border: none; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #C0392B; cursor: pointer; }
+    .empty-reports.folder-empty { padding: 16px 0; }
 
     .add-folder-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
     .add-folder-form select, .add-folder-form input { padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
@@ -784,6 +794,7 @@
     <!-- Subpastas por aluno ou turma -->
     <div class="links-card">
       <div class="links-card-title">📂 Pastas por aluno ou turma <span style="font-size:12px;font-weight:400;color:var(--muted);">(materiais, gravações, etc.)</span></div>
+      <input type="text" class="folder-search" id="folderSearch" placeholder="🔍 Buscar aluno ou turma..." oninput="renderFolderGroups()" />
       <div class="folder-list" id="folderList">Carregando...</div>
 
       <div class="modal-hint" style="margin-bottom:8px;">Escolha uma turma (todos os alunos dela veem a pasta) ou um aluno específico — não os dois.</div>
@@ -2538,6 +2549,9 @@
       allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
   }
 
+  let foldersCache = [];
+  const openFolderGroups = new Set();
+
   async function loadFolders() {
     const listEl = document.getElementById('folderList');
     const { data: folders, error } = await sb.from('student_folders').select('*');
@@ -2546,16 +2560,60 @@
       listEl.innerHTML = 'Erro ao carregar pastas.';
       return;
     }
-    if (!folders || folders.length === 0) {
+
+    foldersCache = folders || [];
+    renderFolderGroups();
+  }
+
+  function toggleFolderGroup(key) {
+    if (openFolderGroups.has(key)) openFolderGroups.delete(key);
+    else openFolderGroups.add(key);
+    renderFolderGroups();
+  }
+
+  function renderFolderGroups() {
+    const listEl = document.getElementById('folderList');
+    const search = (document.getElementById('folderSearch')?.value || '').trim().toLowerCase();
+
+    if (foldersCache.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma pasta cadastrada ainda.</div>';
       return;
     }
 
-    listEl.innerHTML = folders.map(f => `
-      <div class="folder-row">
-        <span class="folder-student">${f.turma_id ? ('Turma: ' + turmaNameById(f.turma_id)) : studentNameById(f.student_id)}</span>
-        <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
-        <button class="btn-del" onclick="deleteFolder('${f.id}')">✕</button>
+    const groups = {};
+    foldersCache.forEach(f => {
+      const key = f.turma_id ? ('turma:' + f.turma_id) : ('student:' + f.student_id);
+      const name = f.turma_id ? ('Turma: ' + turmaNameById(f.turma_id)) : studentNameById(f.student_id);
+      if (!groups[key]) groups[key] = { name, items: [] };
+      groups[key].items.push(f);
+    });
+
+    const filtered = Object.entries(groups)
+      .filter(([, g]) => !search || g.name.toLowerCase().includes(search))
+      .sort((a, b) => a[1].name.localeCompare(b[1].name, 'pt-BR'));
+
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports folder-empty">Nenhum aluno ou turma encontrado.</div>';
+      return;
+    }
+
+    if (search && filtered.length <= 5) {
+      filtered.forEach(([key]) => openFolderGroups.add(key));
+    }
+
+    listEl.innerHTML = filtered.map(([key, g]) => `
+      <div class="folder-group ${openFolderGroups.has(key) ? 'open' : ''}">
+        <div class="folder-group-header" onclick="toggleFolderGroup('${key}')">
+          <span class="folder-group-name">${g.name}<span class="folder-group-badge">${g.items.length}</span></span>
+          <span class="folder-group-chevron">▶</span>
+        </div>
+        <div class="folder-group-body">
+          ${g.items.map(f => `
+            <div class="folder-row">
+              <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
+              <button class="btn-del" onclick="deleteFolder('${f.id}')">✕</button>
+            </div>`).join('')}
+        </div>
       </div>`).join('');
   }
 
