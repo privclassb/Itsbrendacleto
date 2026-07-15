@@ -1476,16 +1476,17 @@
 
     const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: true });
     const paymentsListEl = document.getElementById('profilePaymentsList');
+    const newLancamentoBtn = `<button class="btn-sm" onclick="openLancamento(null, '${studentId}')" style="margin-top:10px;">+ Novo lançamento</button>`;
     if (!payments || payments.length === 0) {
-      paymentsListEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>';
+      paymentsListEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>' + newLancamentoBtn;
     } else {
       const todayStr = todayLocalISO();
       paymentsListEl.innerHTML = payments.map(p => {
         const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
         const overdue = !p.paid && p.due_date && p.due_date < todayStr;
         const statusLabel = p.paid ? ' · Pago' : (overdue ? ' · Atrasado' : ' · Pendente');
-        return `<div class="detail-row"><span class="detail-label">${date}${statusLabel}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
-      }).join('');
+        return `<div class="detail-row" style="cursor:pointer;" onclick="openLancamento('${p.id}')"><span class="detail-label">${date}${statusLabel}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
+      }).join('') + newLancamentoBtn;
     }
     }
 
@@ -4571,7 +4572,7 @@
     await loadFinanceiro();
   }
 
-  async function openLancamento(id) {
+  async function openLancamento(id, presetStudentId) {
     document.getElementById('lancamentoError').style.display = 'none';
     const sel = document.getElementById('lancamentoStudent');
     sel.innerHTML = '<option value="">Nenhum</option>' +
@@ -4593,12 +4594,13 @@
       document.getElementById('lancamentoPaidDate').value = p.paid_at || '';
       document.getElementById('lancamentoPaid').checked = !!p.paid;
     } else {
+      const presetStudent = presetStudentId ? allStudents.find(s => s.id === presetStudentId) : null;
       document.getElementById('lancamentoTitle').textContent = 'Novo lançamento';
       document.getElementById('lancamentoId').value = '';
       document.getElementById('lancamentoType').value = 'entrada';
-      document.getElementById('lancamentoStudent').value = '';
+      document.getElementById('lancamentoStudent').value = presetStudentId || '';
       document.getElementById('lancamentoDescription').value = 'Parcela mensal';
-      document.getElementById('lancamentoAmount').value = '';
+      document.getElementById('lancamentoAmount').value = presetStudent && presetStudent.monthly_fee != null ? presetStudent.monthly_fee : '';
       document.getElementById('lancamentoMethod').value = 'Boleto';
       document.getElementById('lancamentoDueDate').value = todayLocalISO();
       document.getElementById('lancamentoPaidDate').value = '';
@@ -4655,15 +4657,15 @@
           created_by: session.user.id
         });
       }
-      ({ error } = await sb.from('payments').insert(entries));
+      ({ error } = await withAuthRetry(() => sb.from('payments').insert(entries)));
     } else {
       const payload = {
         type, student_id: studentId, description, amount,
         payment_method: method, due_date: dueDate, paid, paid_at: paidDate
       };
-      ({ error } = id
-        ? await sb.from('payments').update(payload).eq('id', id)
-        : await sb.from('payments').insert({ ...payload, created_by: session.user.id }));
+      ({ error } = await withAuthRetry(() => id
+        ? sb.from('payments').update(payload).eq('id', id)
+        : sb.from('payments').insert({ ...payload, created_by: session.user.id })));
     }
 
     if (error) {
@@ -4674,16 +4676,22 @@
 
     closeLancamento();
     await loadFinanceiro();
+    if (currentProfileStudentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      await openStudentProfile(currentProfileStudentId);
+    }
   }
 
   async function deleteLancamento() {
     const id = document.getElementById('lancamentoId').value;
     if (!id) return;
     if (!confirm('Excluir este lançamento?')) return;
-    const { error } = await sb.from('payments').delete().eq('id', id);
+    const { error } = await withAuthRetry(() => sb.from('payments').delete().eq('id', id));
     if (error) { alert('Erro ao excluir: ' + error.message); return; }
     closeLancamento();
     await loadFinanceiro();
+    if (currentProfileStudentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      await openStudentProfile(currentProfileStudentId);
+    }
   }
 
   async function openPayments(studentId) {
