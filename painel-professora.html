@@ -3162,9 +3162,20 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
-    await sb.from('class_logs').update({
+    const { data: logUpdData, error: logUpdErr } = await sb.from('class_logs').update({
       content, class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
-    }).eq('id', classLogId);
+    }).eq('id', classLogId).select();
+
+    if (logUpdErr || !logUpdData || logUpdData.length === 0) {
+      btn.disabled = false;
+      btn.textContent = 'Salvar';
+      errEl.textContent = logUpdErr
+        ? 'Erro ao salvar a aula: ' + logUpdErr.message
+        : 'Não foi possível salvar a aula (sem permissão). Fale com o suporte sobre as regras de acesso (RLS) da tabela class_logs.';
+      errEl.style.display = 'block';
+      return;
+    }
+
     const attendanceList = collectAttendanceFromContainer('turmaReportAttendanceList');
     await saveAttendanceForClassLog(classLogId, attendanceList);
 
@@ -4006,9 +4017,14 @@
       return;
     }
 
-    const { error } = await sb.from('class_logs').update(updates).eq('id', id);
+    const { data: updData, error } = await sb.from('class_logs').update(updates).eq('id', id).select();
     if (error) {
       errEl.textContent = 'Erro ao salvar: ' + error.message;
+      errEl.style.display = 'block';
+      return;
+    }
+    if (!updData || updData.length === 0) {
+      errEl.textContent = 'Não foi possível salvar (sem permissão). Fale com o suporte sobre as regras de acesso (RLS) da tabela class_logs.';
       errEl.style.display = 'block';
       return;
     }
@@ -4110,9 +4126,17 @@
       }
     }
 
-    await sb.from('class_logs').update({
+    const { data: logUpdData, error: logUpdErr } = await sb.from('class_logs').update({
       class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
-    }).eq('id', classLogId);
+    }).eq('id', classLogId).select();
+
+    if (logUpdErr || !logUpdData || logUpdData.length === 0) {
+      errEl.textContent = logUpdErr
+        ? 'Erro ao salvar a aula: ' + logUpdErr.message
+        : 'Não foi possível salvar a aula (sem permissão). Fale com o suporte sobre as regras de acesso (RLS) da tabela class_logs.';
+      errEl.style.display = 'block';
+      return;
+    }
 
     closeClassReport();
     await openStudentProfile(studentId);
