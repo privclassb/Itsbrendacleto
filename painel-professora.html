@@ -507,6 +507,7 @@
     .report-status.draft { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
     .report-status.birthday { background: #FDEDEB; color: #B0503E; }
     .report-status.contract-alert { background: #FFF8E5; color: #A9740C; }
+    .report-status.payment-alert { background: #FFF0EE; color: #C0392B; }
     .btn-report-action { padding: 6px 12px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; transition: all 0.2s; }
     .btn-toggle { background: var(--cream); color: var(--brown); border: 1.5px solid var(--sand); }
     .btn-toggle:hover { border-color: var(--brown); }
@@ -1264,10 +1265,10 @@
     await loadStudentsProgress(students.map(s => s.id));
     updateOverview(students);
     renderStudents(students);
-    renderNotifications(students);
+    await renderNotifications(students);
   }
 
-  function renderNotifications(students) {
+  async function renderNotifications(students) {
     const card = document.getElementById('notificacoesCard');
     const listEl = document.getElementById('notificacoesList');
 
@@ -1288,11 +1289,39 @@
       return (d.getMonth() + 1) === todayMonth && d.getFullYear() === todayYear;
     }) : [];
 
-    if (birthdays.length === 0 && contractsEnding.length === 0) {
+    let overdueByStudent = {};
+    if (currentUserIsBrenda) {
+      const studentIds = students.map(s => s.id);
+      const { data: overduePayments } = await sb.from('payments').select('student_id, due_date, amount')
+        .eq('paid', false).lt('due_date', todayLocalISO())
+        .in('student_id', studentIds.length ? studentIds : ['00000000-0000-0000-0000-000000000000']);
+
+      (overduePayments || []).forEach(p => {
+        if (!overdueByStudent[p.student_id]) overdueByStudent[p.student_id] = { count: 0, total: 0 };
+        overdueByStudent[p.student_id].count++;
+        overdueByStudent[p.student_id].total += Number(p.amount);
+      });
+    }
+    const overdueEntries = Object.entries(overdueByStudent);
+
+    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0) {
       card.style.display = 'none';
       return;
     }
     card.style.display = 'block';
+
+    const overdueRows = overdueEntries.map(([studentId, info]) => {
+      const s = students.find(st => st.id === studentId);
+      const label = info.count === 1 ? '1 parcela atrasada' : info.count + ' parcelas atrasadas';
+      return `
+      <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${studentId}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${s ? (s.full_name || 'Aluno') : 'Aluno'}</div>
+          <div class="report-row-title">${label} · R$ ${info.total.toFixed(2)}</div>
+        </div>
+        <span class="report-status payment-alert">⚠️ Inadimplente</span>
+      </div>`;
+    }).join('');
 
     const birthdayRows = birthdays.map(s => `
       <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${s.id}')">
@@ -1315,7 +1344,7 @@
       </div>`;
     }).join('');
 
-    listEl.innerHTML = birthdayRows + contractRows;
+    listEl.innerHTML = overdueRows + birthdayRows + contractRows;
   }
 
   // Nomes amigáveis para as atividades registradas em lesson_progress
@@ -1445,14 +1474,17 @@
       <div class="detail-row"><span class="detail-label">Parcela mensal</span><span class="detail-value">${fee}</span></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${PAYMENT_STATUS_LABEL[student.payment_status || 'em_dia']}</span></div>`;
 
-    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: false }).limit(5);
+    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: true });
     const paymentsListEl = document.getElementById('profilePaymentsList');
     if (!payments || payments.length === 0) {
       paymentsListEl.innerHTML = '<div class="empty-reports">Nenhum pagamento registrado ainda.</div>';
     } else {
+      const todayStr = todayLocalISO();
       paymentsListEl.innerHTML = payments.map(p => {
         const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
-        return `<div class="detail-row"><span class="detail-label">${date}${p.paid ? '' : ' · Pendente'}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
+        const overdue = !p.paid && p.due_date && p.due_date < todayStr;
+        const statusLabel = p.paid ? ' · Pago' : (overdue ? ' · Atrasado' : ' · Pendente');
+        return `<div class="detail-row"><span class="detail-label">${date}${statusLabel}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
       }).join('');
     }
     }
