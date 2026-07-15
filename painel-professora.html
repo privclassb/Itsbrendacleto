@@ -3286,9 +3286,9 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
-    const { data: logUpdData, error: logUpdErr } = await sb.from('class_logs').update({
+    const { data: logUpdData, error: logUpdErr } = await withAuthRetry(() => sb.from('class_logs').update({
       content, class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
-    }).eq('id', classLogId).select();
+    }).eq('id', classLogId).select());
 
     if (logUpdErr || !logUpdData || logUpdData.length === 0) {
       btn.disabled = false;
@@ -3308,9 +3308,9 @@
       for (const s of members) {
         const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: false };
         const existingId = existingByStudent[s.id];
-        const { error } = existingId
-          ? await sb.from('reports').update(payload).eq('id', existingId)
-          : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+        const { error } = await withAuthRetry(() => existingId
+          ? sb.from('reports').update(payload).eq('id', existingId)
+          : sb.from('reports').insert({ ...payload, created_by: session.user.id }));
         if (error) hadError = true;
       }
     }
@@ -3404,6 +3404,17 @@
   function todayLocalISO() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  // Reenvia uma vez, após renovar a sessão, se o erro parecer ser de token/sessão expirada.
+  // Seguro: só reexecuta quando a 1ª tentativa realmente falhou (nada foi salvo), então não duplica dados.
+  async function withAuthRetry(fn) {
+    const result = await fn();
+    if (result?.error && /jwt|token|session|auth/i.test(result.error.message || '')) {
+      await sb.auth.getSession();
+      return await fn();
+    }
+    return result;
   }
 
   function formatTimeRange(l) {
@@ -3693,7 +3704,7 @@
     }
 
     const { data: { session } } = await sb.auth.getSession();
-    const { data: inserted, error } = await sb.from('class_logs').insert({
+    const { data: inserted, error } = await withAuthRetry(() => sb.from('class_logs').insert({
       turma_id: turmaId,
       student_id: turmaId ? null : studentId,
       class_date: date,
@@ -3703,7 +3714,7 @@
       content,
       needs_makeup: needsMakeup,
       created_by: session.user.id
-    }).select().single();
+    }).select().single());
 
     if (error) {
       errEl.textContent = 'Erro ao registrar aula: ' + error.message;
@@ -4155,7 +4166,7 @@
       return;
     }
 
-    const { data: updData, error } = await sb.from('class_logs').update(updates).eq('id', id).select();
+    const { data: updData, error } = await withAuthRetry(() => sb.from('class_logs').update(updates).eq('id', id).select());
     if (error) {
       errEl.textContent = 'Erro ao salvar: ' + error.message;
       errEl.style.display = 'block';
@@ -4182,7 +4193,7 @@
     const id = document.getElementById('classLogEditId').value;
     if (!id) return;
     if (!confirm('Excluir este registro de aula?')) return;
-    const { error } = await sb.from('class_logs').delete().eq('id', id);
+    const { error } = await withAuthRetry(() => sb.from('class_logs').delete().eq('id', id));
     if (error) { alert('Erro ao excluir registro.'); return; }
     closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
@@ -4253,9 +4264,9 @@
 
     if (title || content) {
       const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: false };
-      const { error } = id
-        ? await sb.from('reports').update(payload).eq('id', id)
-        : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+      const { error } = await withAuthRetry(() => id
+        ? sb.from('reports').update(payload).eq('id', id)
+        : sb.from('reports').insert({ ...payload, created_by: session.user.id }));
 
       if (error) {
         errEl.textContent = 'Erro ao salvar: ' + error.message;
@@ -4264,9 +4275,9 @@
       }
     }
 
-    const { data: logUpdData, error: logUpdErr } = await sb.from('class_logs').update({
+    const { data: logUpdData, error: logUpdErr } = await withAuthRetry(() => sb.from('class_logs').update({
       class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
-    }).eq('id', classLogId).select();
+    }).eq('id', classLogId).select());
 
     if (logUpdErr || !logUpdData || logUpdData.length === 0) {
       errEl.textContent = logUpdErr
