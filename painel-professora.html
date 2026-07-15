@@ -1452,6 +1452,7 @@
     const { data: logs } = await classQuery;
     const logsListEl = document.getElementById('profileClassLogsList');
     profileClassLogsCache = logs || [];
+    renderReposicoesInto(profileClassLogsCache, 'profileReposicoesAReporList', 'profileReposicoesFeitasList');
 
     const { data: studentReports } = await sb.from('reports').select('*').eq('student_id', studentId);
     profileReportsByClassLog = {};
@@ -3029,6 +3030,7 @@
     const { data: logs } = await sb.from('class_logs').select('*').eq('turma_id', turmaId)
       .order('class_date', { ascending: true }).order('start_time', { ascending: true });
     turmaProfileClassLogsCache = logs || [];
+    renderReposicoesInto(turmaProfileClassLogsCache, 'turmaProfileReposicoesAReporList', 'turmaProfileReposicoesFeitasList');
 
     const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
     turmaProfileClassLogsCache.forEach(l => { if (statusCounts[l.status] !== undefined) statusCounts[l.status]++; });
@@ -3326,8 +3328,12 @@
   }
 
   function renderReposicoes(logs) {
-    const aReporEl = document.getElementById('reposicoesAReporList');
-    const feitasEl = document.getElementById('reposicoesFeitasList');
+    renderReposicoesInto(logs, 'reposicoesAReporList', 'reposicoesFeitasList');
+  }
+
+  function renderReposicoesInto(logs, aReporElId, feitasElId) {
+    const aReporEl = document.getElementById(aReporElId);
+    const feitasEl = document.getElementById(feitasElId);
     if (!aReporEl || !feitasEl) return;
 
     const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
@@ -3370,7 +3376,9 @@
   }
 
   function openMarkMakeup(originalId) {
-    const original = allClassLogs.find(l => l.id === originalId);
+    const original = allClassLogs.find(l => l.id === originalId)
+      || profileClassLogsCache.find(l => l.id === originalId)
+      || turmaProfileClassLogsCache.find(l => l.id === originalId);
     if (!original) return;
     const turma = allTurmas.find(t => t.id === original.turma_id);
     const student = allStudents.find(s => s.id === original.student_id);
@@ -3392,7 +3400,9 @@
 
   async function saveMarkMakeup() {
     const originalId = document.getElementById('markMakeupOriginalId').value;
-    const original = allClassLogs.find(l => l.id === originalId);
+    const original = allClassLogs.find(l => l.id === originalId)
+      || profileClassLogsCache.find(l => l.id === originalId)
+      || turmaProfileClassLogsCache.find(l => l.id === originalId);
     const date = document.getElementById('markMakeupDate').value;
     const startTime = document.getElementById('markMakeupStartTime').value || null;
     const endTime = document.getElementById('markMakeupEndTime').value || null;
@@ -3426,6 +3436,12 @@
     closeMarkMakeup();
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    if (currentProfileStudentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      await openStudentProfile(currentProfileStudentId);
+    }
+    if (currentProfileTurmaId && document.getElementById('modalTurmaProfile').classList.contains('open')) {
+      await openTurmaProfile(currentProfileTurmaId);
+    }
   }
 
   // ---- Alterar dia/horário fixo das aulas pendentes (individual ou turma) ----
@@ -4827,6 +4843,14 @@
     </div>
 
     <div class="profile-section">
+      <div class="profile-section-title">🔄 Reposições</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
+      <div id="profileReposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
+      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
+      <div id="profileReposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
+    <div class="profile-section">
       <div class="profile-section-title">Progresso (gamificação)</div>
       <div id="profileProgressInfo"></div>
     </div>
@@ -4908,6 +4932,14 @@
         <button class="btn-sm" id="turmaProfileDeletePendingLogsBtn" onclick="deletePendingTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir aulas pendentes</button>
         <button class="btn-sm" id="turmaProfileDeleteAllLogsBtn" onclick="deleteAllTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir todas as aulas</button>
       </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">🔄 Reposições</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
+      <div id="turmaProfileReposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
+      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
+      <div id="turmaProfileReposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
     <div class="detail-actions">
