@@ -228,6 +228,14 @@
     <div id="agendaHistoryList"><div class="empty-msg">Carregando...</div></div>
   </div>
 
+  <div class="section-title">🔄 Reposições</div>
+  <div class="card">
+    <div class="agenda-subtitle" id="repoPendingTitle">A repor</div>
+    <div id="repoPendingList"><div class="empty-msg">Carregando...</div></div>
+    <div class="agenda-subtitle" id="repoDoneTitle" style="margin-top:16px;">Já feitas</div>
+    <div id="repoDoneList"><div class="empty-msg">Carregando...</div></div>
+  </div>
+
   <div class="section-title">📁 Relatórios</div>
   <div class="card" id="reportsCard">
     <div class="empty-msg">Carregando...</div>
@@ -353,7 +361,7 @@
 
   async function loadAgenda(studentId, turmaId) {
     const today = todayLocalISO();
-    let query = sb.from('class_logs').select('class_date, start_time, end_time, status');
+    let query = sb.from('class_logs').select('id, class_date, start_time, end_time, status, needs_makeup, makeup_for_id');
     query = turmaId
       ? query.or(`student_id.eq.${studentId},turma_id.eq.${turmaId}`)
       : query.eq('student_id', studentId);
@@ -383,6 +391,46 @@
       ? upcoming.map(renderRow).join('') : '<div class="empty-msg">Nenhuma aula agendada.</div>';
     document.getElementById('agendaHistoryList').innerHTML = history.length
       ? history.map(renderRow).join('') : '<div class="empty-msg">Nenhuma aula no histórico ainda.</div>';
+
+    const linkedOriginalIds = new Set(all.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
+    const repoPending = all.filter(l => l.needs_makeup && !linkedOriginalIds.has(l.id));
+    const repoDone = all.filter(l => l.makeup_for_id);
+
+    const renderRepoPendingRow = (l) => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      const time = l.start_time ? l.start_time.slice(0, 5) + (l.end_time ? '–' + l.end_time.slice(0, 5) : '') : 'sem horário';
+      return `
+        <div class="agenda-row">
+          <div>
+            <div class="agenda-date">Aula de ${date}</div>
+            <div class="agenda-time">${time}</div>
+          </div>
+          <span class="agenda-status pendente">Aguardando reposição</span>
+        </div>`;
+    };
+
+    const renderRepoDoneRow = (l) => {
+      const original = all.find(o => o.id === l.makeup_for_id);
+      const origDate = original ? new Date(original.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      const newDate = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = l.start_time ? l.start_time.slice(0, 5) + (l.end_time ? '–' + l.end_time.slice(0, 5) : '') : 'sem horário';
+      return `
+        <div class="agenda-row">
+          <div>
+            <div class="agenda-date">${origDate} → ${newDate}</div>
+            <div class="agenda-time">${time}</div>
+          </div>
+          <span class="agenda-status realizada">Reagendada</span>
+        </div>`;
+    };
+
+    document.getElementById('repoPendingTitle').textContent = `A repor (${repoPending.length})`;
+    document.getElementById('repoDoneTitle').textContent = `Já feitas (${repoDone.length})`;
+
+    document.getElementById('repoPendingList').innerHTML = repoPending.length
+      ? repoPending.map(renderRepoPendingRow).join('') : '<div class="empty-msg">Nenhuma reposição pendente. 🎉</div>';
+    document.getElementById('repoDoneList').innerHTML = repoDone.length
+      ? repoDone.map(renderRepoDoneRow).join('') : '<div class="empty-msg">Nenhuma reposição feita ainda.</div>';
   }
 
   async function loadFinance(studentId, payerName, studentName) {
