@@ -3973,6 +3973,16 @@
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
     document.getElementById('classLogEditMakeupHistory').innerHTML = await buildMakeupHistoryHtml(l);
 
+    if (l.turma_id) {
+      const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', id);
+      const attendanceMap = new Map((existingAttendance || []).map(a => [a.student_id, a.present]));
+      document.getElementById('classLogEditAttendanceRow').style.display = 'block';
+      renderAttendanceList('classLogEditAttendanceList', l.turma_id, attendanceMap);
+    } else {
+      document.getElementById('classLogEditAttendanceRow').style.display = 'none';
+      document.getElementById('classLogEditAttendanceList').innerHTML = '';
+    }
+
     document.getElementById('modalClassLogEdit').classList.add('open');
   }
 
@@ -4005,6 +4015,10 @@
       return;
     }
 
+    if (document.getElementById('classLogEditAttendanceRow').style.display !== 'none') {
+      const attendanceList = collectAttendanceFromContainer('classLogEditAttendanceList');
+      await saveAttendanceForClassLog(id, attendanceList);
+    }
 
     closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
@@ -5050,6 +5064,11 @@
         <input type="checkbox" id="classLogEditNeedsMakeup" />
         <span>🔄 Aluno precisa repor essa aula</span>
       </label>
+    </div>
+
+    <div class="modal-row" id="classLogEditAttendanceRow" style="display:none;">
+      <label class="modal-label">Alunos presentes</label>
+      <div id="classLogEditAttendanceList"></div>
     </div>
 
     <div class="modal-row">
