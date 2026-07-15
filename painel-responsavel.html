@@ -117,6 +117,7 @@
     .agenda-status.realizada { background: #E8F8EF; color: #1E5C3A; }
     .agenda-status.cancelada, .agenda-status.cancelada_falta { background: #FFF0EE; color: #C0392B; }
     .agenda-status.reagendada { background: #FFF8E5; color: #A9740C; }
+    .agenda-status.para_reagendar { background: #FFF8E5; color: #A9740C; }
     .agenda-subtitle { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0 8px; }
 
     /* Financeiro */
@@ -346,7 +347,7 @@
 
   const CLASS_STATUS_LABEL = {
     realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
-    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada',
+    cancelada_falta: 'Cancelada por falta', para_reagendar: 'Para reagendar', reagendada: 'Reagendada',
     feriado: 'Feriado', recesso: 'Recesso'
   };
 

@@ -909,11 +909,12 @@
       </div>
       <div class="form-row">
         <label class="form-label">Status</label>
-        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classLogNeedsMakeup').checked=true;">
+        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('classLogNeedsMakeup').checked=true;">
           <option value="realizada">Realizada</option>
           <option value="pendente">Pendente</option>
           <option value="cancelada">Cancelada</option>
           <option value="cancelada_falta">Cancelada por falta</option>
+          <option value="para_reagendar">Para reagendar</option>
           <option value="reagendada">Reagendada</option>
           <option value="feriado">Feriado</option>
           <option value="recesso">Recesso</option>
@@ -1333,7 +1334,7 @@
 
   const CLASS_STATUS_LABEL = {
     realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
-    cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada',
+    cancelada_falta: 'Cancelada por falta', para_reagendar: 'Para reagendar', reagendada: 'Reagendada',
     feriado: 'Feriado', recesso: 'Recesso'
   };
 
@@ -3138,11 +3139,6 @@
     const needsMakeup = document.getElementById('turmaReportNeedsMakeup').checked;
     const errEl = document.getElementById('turmaReportError');
 
-    if (!title || !content) {
-      errEl.textContent = 'Preencha título e conteúdo.';
-      errEl.style.display = 'block';
-      return;
-    }
     if (!date) {
       errEl.textContent = 'Informe a data da aula.';
       errEl.style.display = 'block';
@@ -3173,13 +3169,15 @@
     await saveAttendanceForClassLog(classLogId, attendanceList);
 
     let hadError = false;
-    for (const s of members) {
-      const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: false };
-      const existingId = existingByStudent[s.id];
-      const { error } = existingId
-        ? await sb.from('reports').update(payload).eq('id', existingId)
-        : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
-      if (error) hadError = true;
+    if (title || content) {
+      for (const s of members) {
+        const payload = { student_id: s.id, class_log_id: classLogId, title, period, content, is_published: false };
+        const existingId = existingByStudent[s.id];
+        const { error } = existingId
+          ? await sb.from('reports').update(payload).eq('id', existingId)
+          : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+        if (error) hadError = true;
+      }
     }
 
     btn.disabled = false;
@@ -4091,11 +4089,6 @@
     const needsMakeup = document.getElementById('classReportNeedsMakeup').checked;
     const errEl = document.getElementById('classReportError');
 
-    if (!title || !content) {
-      errEl.textContent = 'Preencha título e conteúdo.';
-      errEl.style.display = 'block';
-      return;
-    }
     if (!date) {
       errEl.textContent = 'Informe a data da aula.';
       errEl.style.display = 'block';
@@ -4103,16 +4096,18 @@
     }
 
     const { data: { session } } = await sb.auth.getSession();
-    const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: false };
 
-    const { error } = id
-      ? await sb.from('reports').update(payload).eq('id', id)
-      : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
+    if (title || content) {
+      const payload = { student_id: studentId, class_log_id: classLogId, title, period, content, is_published: false };
+      const { error } = id
+        ? await sb.from('reports').update(payload).eq('id', id)
+        : await sb.from('reports').insert({ ...payload, created_by: session.user.id });
 
-    if (error) {
-      errEl.textContent = 'Erro ao salvar: ' + error.message;
-      errEl.style.display = 'block';
-      return;
+      if (error) {
+        errEl.textContent = 'Erro ao salvar: ' + error.message;
+        errEl.style.display = 'block';
+        return;
+      }
     }
 
     await sb.from('class_logs').update({
@@ -4923,11 +4918,12 @@
 
     <div class="modal-row">
       <label class="modal-label">Status</label>
-      <select class="modal-select" id="turmaReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('turmaReportNeedsMakeup').checked=true;">
+      <select class="modal-select" id="turmaReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('turmaReportNeedsMakeup').checked=true;">
         <option value="realizada">Realizada</option>
         <option value="pendente">Pendente</option>
         <option value="cancelada">Cancelada</option>
         <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="para_reagendar">Para reagendar</option>
         <option value="reagendada">Reagendada</option>
         <option value="feriado">Feriado</option>
         <option value="recesso">Recesso</option>
@@ -5103,11 +5099,12 @@
 
     <div class="modal-row">
       <label class="modal-label">Status</label>
-      <select class="modal-select" id="classLogEditStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classLogEditNeedsMakeup').checked=true;">
+      <select class="modal-select" id="classLogEditStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('classLogEditNeedsMakeup').checked=true;">
         <option value="realizada">Realizada</option>
         <option value="pendente">Pendente</option>
         <option value="cancelada">Cancelada</option>
         <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="para_reagendar">Para reagendar</option>
         <option value="reagendada">Reagendada</option>
         <option value="feriado">Feriado</option>
         <option value="recesso">Recesso</option>
@@ -5170,11 +5167,12 @@
 
     <div class="modal-row">
       <label class="modal-label">Status</label>
-      <select class="modal-select" id="classReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='reagendada')document.getElementById('classReportNeedsMakeup').checked=true;">
+      <select class="modal-select" id="classReportStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('classReportNeedsMakeup').checked=true;">
         <option value="realizada">Realizada</option>
         <option value="pendente">Pendente</option>
         <option value="cancelada">Cancelada</option>
         <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="para_reagendar">Para reagendar</option>
         <option value="reagendada">Reagendada</option>
         <option value="feriado">Feriado</option>
         <option value="recesso">Recesso</option>

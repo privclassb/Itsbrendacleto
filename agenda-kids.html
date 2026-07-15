@@ -35,6 +35,7 @@
     .agenda-status.realizada { background: #E8F8EF; color: #1E5C3A; }
     .agenda-status.cancelada, .agenda-status.cancelada_falta { background: #FFF0EE; color: #C0392B; }
     .agenda-status.reagendada { background: #FFF8E5; color: #A9740C; }
+    .agenda-status.para_reagendar { background: #FFF8E5; color: #A9740C; }
 
     .empty-msg { text-align: center; padding: 20px; color: #AAA; font-size: 13px; font-weight: 700; }
   </style>
@@ -100,7 +101,7 @@
 
   const CLASS_STATUS_LABEL = {
     realizada: 'Feita ✓', pendente: 'Agendada', cancelada: 'Cancelada',
-    cancelada_falta: 'Cancelada', reagendada: 'Remarcada',
+    cancelada_falta: 'Cancelada', para_reagendar: 'Vai remarcar', reagendada: 'Remarcada',
     feriado: 'Feriado', recesso: 'Recesso'
   };
 
