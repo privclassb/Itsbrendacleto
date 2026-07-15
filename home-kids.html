@@ -183,6 +183,11 @@
     }
   });
 
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   async function init(session) {
     // Session already verified before init()
     const user = session.user;
@@ -235,7 +240,7 @@
   };
 
   async function loadAgenda(userId, turmaId) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     let query = sb.from('class_logs').select('class_date, start_time, end_time, status')
       .gte('class_date', today).order('class_date', { ascending: true }).order('start_time', { ascending: true }).limit(5);
     query = turmaId ? query.or(`student_id.eq.${userId},turma_id.eq.${turmaId}`) : query.eq('student_id', userId);
@@ -282,7 +287,7 @@
   });
 
   async function updateStreak(userId) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayLocalISO();
     const { data: s } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
     if (!s) { await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 }); document.getElementById('heroStreak').textContent = 1; return; }
     const diff = Math.floor((new Date(today) - new Date(s.last_access)) / 86400000);

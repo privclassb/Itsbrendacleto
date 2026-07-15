@@ -79,6 +79,11 @@
     }
   });
 
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   const CLASS_STATUS_LABEL = {
     realizada: 'Realizada', pendente: 'Pendente', cancelada: 'Cancelada',
     cancelada_falta: 'Cancelada por falta', reagendada: 'Reagendada',
@@ -102,7 +107,7 @@
   async function init(session) {
     const user = session.user;
     const { data: profile } = await sb.from('profiles').select('turma_id').eq('id', user.id).maybeSingle();
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
 
     let query = sb.from('class_logs').select('class_date, start_time, end_time, status');
     query = profile?.turma_id

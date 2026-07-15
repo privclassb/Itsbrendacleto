@@ -153,6 +153,11 @@
     }
   });
 
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   function renderPaymentsInto(listEl, summaryPaidEl, summaryPendingEl, payments) {
     if (!payments || payments.length === 0) {
       listEl.innerHTML = '<div class="empty-msg">Nenhum lançamento encontrado ainda.</div>';
@@ -161,7 +166,7 @@
       return;
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     let totalPaid = 0, totalPending = 0;
 
     const sorted = [...payments].sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));

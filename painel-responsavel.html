@@ -292,6 +292,11 @@
     }
   });
 
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   // Nomes amigáveis para as atividades registradas em lesson_progress
   const ACTIVITY_LABELS = {
     'kids-m1-a1': 'Aula 1 completa',
@@ -346,7 +351,7 @@
   };
 
   async function loadAgenda(studentId, turmaId) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     let query = sb.from('class_logs').select('class_date, start_time, end_time, status');
     query = turmaId
       ? query.or(`student_id.eq.${studentId},turma_id.eq.${turmaId}`)
@@ -390,7 +395,7 @@
       return;
     }
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     const sorted = [...payments].sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
 
     listEl.innerHTML = sorted.map(p => {

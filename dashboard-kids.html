@@ -183,6 +183,11 @@
     }
   });
 
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   const ACCENT_COLORS = ['accent-rose','accent-mint','accent-lavender','accent-yellow','accent-sky'];
 
   const MISSIONS = [
@@ -309,7 +314,7 @@
   }
 
   async function updateStreak(userId) {
-    const today = new Date().toISOString().split('T')[0];
+    const today = todayLocalISO();
     const { data: streak } = await sb.from('streaks').select('*').eq('user_id', userId).maybeSingle();
     if (!streak) {
       await sb.from('streaks').insert({ user_id: userId, last_access: today, current_streak: 1 });

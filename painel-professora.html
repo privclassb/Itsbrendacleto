@@ -900,7 +900,7 @@
       <div class="form-row" style="display:flex;gap:10px;">
         <div style="flex:1;">
           <label class="form-label">Horário início</label>
-          <input type="time" class="form-input" id="classLogStartTime" />
+          <input type="time" class="form-input" id="classLogStartTime" onchange="autofillEndTime(this, 'classLogEndTime')" />
         </div>
         <div style="flex:1;">
           <label class="form-label">Horário fim</label>
@@ -952,26 +952,10 @@
         </select>
       </div>
       <div class="form-row">
-        <label class="form-label">Dia da semana</label>
-        <select class="form-select" id="scheduleWeekday">
-          <option value="1">Segunda-feira</option>
-          <option value="2">Terça-feira</option>
-          <option value="3">Quarta-feira</option>
-          <option value="4">Quinta-feira</option>
-          <option value="5">Sexta-feira</option>
-          <option value="6">Sábado</option>
-          <option value="0">Domingo</option>
-        </select>
-      </div>
-      <div class="form-row" style="display:flex;gap:10px;">
-        <div style="flex:1;">
-          <label class="form-label">Horário início</label>
-          <input type="time" class="form-input" id="scheduleStartTime" />
-        </div>
-        <div style="flex:1;">
-          <label class="form-label">Horário fim</label>
-          <input type="time" class="form-input" id="scheduleEndTime" />
-        </div>
+        <label class="form-label">Dias e horários na semana</label>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Adicione mais de um dia pra alunos/turmas que têm aula mais de uma vez por semana.</div>
+        <div id="scheduleSlotsList"></div>
+        <button type="button" class="btn-sm" onclick="addScheduleSlot()">+ Adicionar outro dia</button>
       </div>
       <div class="form-row" style="display:flex;gap:10px;">
         <div style="flex:1;">
@@ -1214,12 +1198,13 @@
     populateClassLogStudentSelect();
     await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
     await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
+    initScheduleSlots();
     if (isBrenda) {
       await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
       await loadFolders();
     }
-    document.getElementById('classLogDate').value = new Date().toISOString().slice(0, 10);
-    document.getElementById('scheduleFrom').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('classLogDate').value = todayLocalISO();
+    document.getElementById('scheduleFrom').value = todayLocalISO();
     await loadClassLogs(user.id, isBrenda);
     await loadAulasHoje(user.id, isBrenda);
     await loadAgendaWeek();
@@ -1368,6 +1353,7 @@
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionDeleteBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
+    document.getElementById('profileDeletePendingLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
     document.getElementById('profileRescheduleFixedBtn').style.display = 'inline-block';
 
     const roleLabel = student.role === 'kids' ? 'Kids' : 'Adulto';
@@ -1524,6 +1510,19 @@
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
 
+  async function deletePendingClassLogs() {
+    if (!currentProfileStudentId) return;
+    if (!confirm('Excluir as aulas PENDENTES (não lançadas) desse aluno? Aulas já realizadas, canceladas ou reagendadas não são afetadas.')) return;
+
+    const { error } = await sb.from('class_logs').delete().eq('student_id', currentProfileStudentId).eq('status', 'pendente');
+    if (error) { alert('Erro ao excluir aulas pendentes: ' + error.message); return; }
+
+    await openStudentProfile(currentProfileStudentId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
   async function deleteAllTurmaClassLogs() {
     if (!currentProfileTurmaId) return;
     if (!confirm('Excluir TODAS as aulas registradas para essa turma? Essa ação não pode ser desfeita.')) return;
@@ -1545,12 +1544,44 @@
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
 
+  async function deletePendingTurmaClassLogs() {
+    if (!currentProfileTurmaId) return;
+    if (!confirm('Excluir as aulas PENDENTES (não lançadas) dessa turma? Aulas já realizadas, canceladas ou reagendadas não são afetadas.')) return;
+
+    const { data: logs } = await sb.from('class_logs').select('id').eq('turma_id', currentProfileTurmaId).eq('status', 'pendente');
+    const logIds = (logs || []).map(l => l.id);
+
+    if (logIds.length > 0) {
+      await sb.from('class_attendance').delete().in('class_log_id', logIds);
+      await sb.from('reports').delete().in('class_log_id', logIds);
+    }
+
+    const { error } = await sb.from('class_logs').delete().eq('turma_id', currentProfileTurmaId).eq('status', 'pendente');
+    if (error) { alert('Erro ao excluir aulas pendentes: ' + error.message); return; }
+
+    await openTurmaProfile(currentProfileTurmaId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
   async function deleteAllPayments() {
     if (!currentProfileStudentId) return;
     if (!confirm('Excluir TODO o financeiro lançado para esse aluno? Essa ação não pode ser desfeita.')) return;
 
     const { error } = await sb.from('payments').delete().eq('student_id', currentProfileStudentId);
     if (error) { alert('Erro ao excluir financeiro: ' + error.message); return; }
+
+    await openStudentProfile(currentProfileStudentId);
+    loadFinanceiro();
+  }
+
+  async function deletePendingPayments() {
+    if (!currentProfileStudentId) return;
+    if (!confirm('Excluir os pagamentos PENDENTES (não pagos) desse aluno? Pagamentos já quitados não são afetados.')) return;
+
+    const { error } = await sb.from('payments').delete().eq('student_id', currentProfileStudentId).eq('paid', false);
+    if (error) { alert('Erro ao excluir pagamentos pendentes: ' + error.message); return; }
 
     await openStudentProfile(currentProfileStudentId);
     loadFinanceiro();
@@ -2984,6 +3015,7 @@
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
     document.getElementById('turmaProfileRescheduleFixedBtn').style.display = 'inline-block';
     document.getElementById('turmaProfileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
+    document.getElementById('turmaProfileDeletePendingLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
 
     document.getElementById('turmaProfileStudentsList').innerHTML = members.length
       ? members.map(s => `
@@ -3212,6 +3244,18 @@
     });
   }
 
+  function autofillEndTime(startInput, endInputId) {
+    if (!startInput.value) return;
+    const [h, m] = startInput.value.split(':').map(Number);
+    const endH = (h + 1) % 24;
+    document.getElementById(endInputId).value = String(endH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
+  function todayLocalISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   function formatTimeRange(l) {
     if (!l.start_time) return '';
     const end = l.end_time ? '–' + l.end_time.slice(0, 5) : '';
@@ -3372,7 +3416,7 @@
     document.getElementById('rescheduleFixedWho').textContent = who;
 
     document.getElementById('rescheduleFixedError').style.display = 'none';
-    document.getElementById('rescheduleFixedFromDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('rescheduleFixedFromDate').value = todayLocalISO();
     document.getElementById('rescheduleFixedWeekday').value = String(new Date().getDay());
     document.getElementById('rescheduleFixedStartTime').value = '';
     document.getElementById('rescheduleFixedEndTime').value = '';
@@ -3471,7 +3515,7 @@
 
     const turmaId = document.getElementById('classLogTurma').value || null;
     const studentId = document.getElementById('classLogStudent').value || null;
-    const date = document.getElementById('classLogDate').value || new Date().toISOString().slice(0, 10);
+    const date = document.getElementById('classLogDate').value || todayLocalISO();
     const startTime = document.getElementById('classLogStartTime').value || null;
     const endTime = document.getElementById('classLogEndTime').value || null;
     const status = document.getElementById('classLogStatus').value;
@@ -3577,12 +3621,58 @@
     if (student.contract_end) toEl.value = student.contract_end;
   }
 
+  function renderScheduleSlotRow() {
+    return `
+      <div class="schedule-slot-row" style="display:flex;gap:8px;align-items:flex-end;margin-bottom:10px;">
+        <div style="flex:1.3;">
+          <label class="form-label" style="font-size:11px;">Dia da semana</label>
+          <select class="form-select schedule-slot-weekday">
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+            <option value="0">Domingo</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="font-size:11px;">Início</label>
+          <input type="time" class="form-input schedule-slot-start" onchange="autofillSlotEndTime(this)" />
+        </div>
+        <div style="flex:1;">
+          <label class="form-label" style="font-size:11px;">Fim</label>
+          <input type="time" class="form-input schedule-slot-end" />
+        </div>
+        <button type="button" class="btn-sm" onclick="removeScheduleSlot(this)" style="color:#C0392B;flex-shrink:0;">✕</button>
+      </div>`;
+  }
+
+  function initScheduleSlots() {
+    document.getElementById('scheduleSlotsList').innerHTML = renderScheduleSlotRow();
+  }
+
+  function addScheduleSlot() {
+    document.getElementById('scheduleSlotsList').insertAdjacentHTML('beforeend', renderScheduleSlotRow());
+  }
+
+  function removeScheduleSlot(btn) {
+    const list = document.getElementById('scheduleSlotsList');
+    if (list.querySelectorAll('.schedule-slot-row').length <= 1) return;
+    btn.closest('.schedule-slot-row').remove();
+  }
+
+  function autofillSlotEndTime(startInput) {
+    if (!startInput.value) return;
+    const [h, m] = startInput.value.split(':').map(Number);
+    const endH = (h + 1) % 24;
+    const endInput = startInput.closest('.schedule-slot-row').querySelector('.schedule-slot-end');
+    endInput.value = String(endH).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+  }
+
   async function generateScheduledClasses() {
     const turmaId = document.getElementById('scheduleTurma').value || null;
     const studentId = document.getElementById('scheduleStudent').value || null;
-    const weekday = parseInt(document.getElementById('scheduleWeekday').value, 10);
-    const startTime = document.getElementById('scheduleStartTime').value || null;
-    const endTime = document.getElementById('scheduleEndTime').value || null;
     const from = document.getElementById('scheduleFrom').value;
     const to = document.getElementById('scheduleTo').value;
 
@@ -3593,26 +3683,34 @@
     const end = new Date(to + 'T00:00:00');
     if (end < start) { alert('A data fim precisa ser depois da data início.'); return; }
 
-    // Avança até o primeiro dia que bate com o dia da semana escolhido
-    const d = new Date(start);
-    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
+    const slots = Array.from(document.querySelectorAll('#scheduleSlotsList .schedule-slot-row')).map(row => ({
+      weekday: parseInt(row.querySelector('.schedule-slot-weekday').value, 10),
+      startTime: row.querySelector('.schedule-slot-start').value || null,
+      endTime: row.querySelector('.schedule-slot-end').value || null
+    }));
+    if (slots.length === 0) { alert('Adicione pelo menos um dia da semana.'); return; }
 
-    const dates = [];
-    while (d <= end) {
-      dates.push(d.toISOString().slice(0, 10));
-      d.setDate(d.getDate() + 7);
-    }
+    // Gera as datas de cada dia/horário configurado, avançando semana a semana
+    const allEntries = [];
+    slots.forEach(slot => {
+      const d = new Date(start);
+      while (d.getDay() !== slot.weekday) d.setDate(d.getDate() + 1);
+      while (d <= end) {
+        allEntries.push({ class_date: d.toISOString().slice(0, 10), start_time: slot.startTime, end_time: slot.endTime });
+        d.setDate(d.getDate() + 7);
+      }
+    });
 
-    if (dates.length === 0) { alert('Nenhuma data encontrada nesse período pro dia da semana escolhido.'); return; }
-    if (!confirm(`Isso vai criar ${dates.length} aula(s), uma por semana. Confirmar?`)) return;
+    if (allEntries.length === 0) { alert('Nenhuma data encontrada nesse período pros dias da semana escolhidos.'); return; }
+    if (!confirm(`Isso vai criar ${allEntries.length} aula(s). Confirmar?`)) return;
 
     const { data: { session } } = await sb.auth.getSession();
-    const entries = dates.map(class_date => ({
+    const entries = allEntries.map(({ class_date, start_time, end_time }) => ({
       turma_id: turmaId,
       student_id: turmaId ? null : studentId,
       class_date,
-      start_time: startTime,
-      end_time: endTime,
+      start_time,
+      end_time,
       status: 'pendente',
       created_by: session.user.id
     }));
@@ -3620,7 +3718,8 @@
     const { error } = await sb.from('class_logs').insert(entries);
     if (error) { alert('Erro ao gerar aulas: ' + error.message); return; }
 
-    alert(dates.length + ' aula(s) agendada(s) com sucesso!');
+    alert(entries.length + ' aula(s) agendada(s) com sucesso!');
+    initScheduleSlots();
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
   }
@@ -3641,7 +3740,7 @@
   }
 
   async function loadAulasHoje(teacherId) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     const { data: allLogs, error } = await sb.from('class_logs').select('*').eq('class_date', today).order('start_time', { ascending: true });
     const listEl = document.getElementById('aulasHojeList');
 
@@ -3711,7 +3810,7 @@
     const classLogsWithReport = new Set((weekReports || []).map(r => r.class_log_id));
 
     const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStr = todayLocalISO();
 
     document.getElementById('agendaWeekGrid').innerHTML = days.map((d, idx) => {
       const dStr = d.toISOString().slice(0, 10);
@@ -3762,7 +3861,7 @@
   // ---- Acompanhar equipe (só Brenda) ----
 
   async function loadEquipeOverview(myId) {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
     const [{ data: logs }, { data: reports }] = await Promise.all([
       sb.from('class_logs').select('*').eq('class_date', today),
       sb.from('reports').select('*').order('created_at', { ascending: false }).limit(50)
@@ -4066,7 +4165,7 @@
 
     filtered.sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = todayLocalISO();
 
     listEl.innerHTML = filtered.map(p => {
       const student = allStudents.find(s => s.id === p.student_id);
@@ -4096,7 +4195,7 @@
   }
 
   async function toggleLancamentoPaid(id, newPaid) {
-    const updates = { paid: newPaid, paid_at: newPaid ? new Date().toISOString().slice(0, 10) : null };
+    const updates = { paid: newPaid, paid_at: newPaid ? todayLocalISO() : null };
     const { error } = await sb.from('payments').update(updates).eq('id', id);
     if (error) { alert('Erro ao atualizar: ' + error.message); return; }
     await loadFinanceiro();
@@ -4131,7 +4230,7 @@
       document.getElementById('lancamentoDescription').value = 'Parcela mensal';
       document.getElementById('lancamentoAmount').value = '';
       document.getElementById('lancamentoMethod').value = 'Boleto';
-      document.getElementById('lancamentoDueDate').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('lancamentoDueDate').value = todayLocalISO();
       document.getElementById('lancamentoPaidDate').value = '';
       document.getElementById('lancamentoPaid').checked = false;
       document.getElementById('lancamentoRepeat').value = '1';
@@ -4147,7 +4246,7 @@
   function toggleLancamentoPaidDate() {
     const checked = document.getElementById('lancamentoPaid').checked;
     const dateInput = document.getElementById('lancamentoPaidDate');
-    if (checked && !dateInput.value) dateInput.value = new Date().toISOString().slice(0, 10);
+    if (checked && !dateInput.value) dateInput.value = todayLocalISO();
   }
 
   async function saveLancamento() {
@@ -4159,7 +4258,7 @@
     const method = document.getElementById('lancamentoMethod').value;
     const dueDate = document.getElementById('lancamentoDueDate').value || null;
     const paid = document.getElementById('lancamentoPaid').checked;
-    const paidDate = paid ? (document.getElementById('lancamentoPaidDate').value || new Date().toISOString().slice(0, 10)) : null;
+    const paidDate = paid ? (document.getElementById('lancamentoPaidDate').value || todayLocalISO()) : null;
     const repeatMonths = id ? 1 : (parseInt(document.getElementById('lancamentoRepeat').value, 10) || 1);
 
     const errEl = document.getElementById('lancamentoError');
@@ -4222,7 +4321,7 @@
     document.getElementById('paymentsStudentId').value = studentId;
     document.getElementById('paymentsStudentName').textContent = 'Pagamentos — ' + (student ? student.full_name : '');
     document.getElementById('newPaymentAmount').value = student && student.monthly_fee != null ? student.monthly_fee : '';
-    document.getElementById('newPaymentDate').value = new Date().toISOString().slice(0, 10);
+    document.getElementById('newPaymentDate').value = todayLocalISO();
     await loadPayments(studentId);
     document.getElementById('modalPayments').classList.add('open');
   }
@@ -4403,7 +4502,7 @@
       <div class="modal-row" style="display:flex;gap:10px;">
         <div style="flex:1;">
           <label class="modal-label">Horário início</label>
-          <input type="time" class="modal-input" id="genScheduleStartTime" />
+          <input type="time" class="modal-input" id="genScheduleStartTime" onchange="autofillEndTime(this, 'genScheduleEndTime')" />
         </div>
         <div style="flex:1;">
           <label class="modal-label">Horário fim</label>
@@ -4657,7 +4756,10 @@
       <div class="profile-section-title">Financeiro</div>
       <div id="profileFinanceInfo"></div>
       <div id="profilePaymentsList" style="margin-top:8px;"></div>
-      <button class="btn-sm" onclick="deleteAllPayments()" style="margin-top:10px;color:#C0392B;">🗑️ Excluir todo o financeiro</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn-sm" onclick="deletePendingPayments()" style="color:#C0392B;">🗑️ Excluir pagamentos pendentes</button>
+        <button class="btn-sm" onclick="deleteAllPayments()" style="color:#C0392B;">🗑️ Excluir todo o financeiro</button>
+      </div>
     </div>
 
     <div class="profile-section">
@@ -4666,7 +4768,10 @@
       <div class="aula-stats-row" id="profileAulasStats"></div>
       <button class="btn-sm" id="profileRescheduleFixedBtn" onclick="openRescheduleFixed('student', currentProfileStudentId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="profileClassLogsList"></div>
-      <button class="btn-sm" id="profileDeleteAllLogsBtn" onclick="deleteAllClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn-sm" id="profileDeletePendingLogsBtn" onclick="deletePendingClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir aulas pendentes</button>
+        <button class="btn-sm" id="profileDeleteAllLogsBtn" onclick="deleteAllClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir todas as aulas</button>
+      </div>
     </div>
 
     <div class="profile-section">
@@ -4708,7 +4813,7 @@
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
         <label class="modal-label">Novo horário início</label>
-        <input type="time" class="modal-input" id="rescheduleFixedStartTime" />
+        <input type="time" class="modal-input" id="rescheduleFixedStartTime" onchange="autofillEndTime(this, 'rescheduleFixedEndTime')" />
       </div>
       <div style="flex:1;">
         <label class="modal-label">Novo horário fim</label>
@@ -4747,7 +4852,10 @@
       <div class="aula-stats-row" id="turmaProfileAulasStats"></div>
       <button class="btn-sm" id="turmaProfileRescheduleFixedBtn" onclick="openRescheduleFixed('turma', currentProfileTurmaId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="turmaProfileClassLogsList"></div>
-      <button class="btn-sm" id="turmaProfileDeleteAllLogsBtn" onclick="deleteAllTurmaClassLogs()" style="display:none;margin-top:10px;color:#C0392B;">🗑️ Excluir todas as aulas</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button class="btn-sm" id="turmaProfileDeletePendingLogsBtn" onclick="deletePendingTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir aulas pendentes</button>
+        <button class="btn-sm" id="turmaProfileDeleteAllLogsBtn" onclick="deleteAllTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir todas as aulas</button>
+      </div>
     </div>
 
     <div class="detail-actions">
@@ -4916,7 +5024,7 @@
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
         <label class="modal-label">Horário início</label>
-        <input type="time" class="modal-input" id="classLogEditStartTime" />
+        <input type="time" class="modal-input" id="classLogEditStartTime" onchange="autofillEndTime(this, 'classLogEditEndTime')" />
       </div>
       <div style="flex:1;">
         <label class="modal-label">Horário fim</label>
