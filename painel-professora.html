@@ -1059,6 +1059,7 @@
       </div>
       <div class="form-actions">
         <button class="btn-draft" onclick="loadFinanceiro()" style="flex:1;">🔍 Aplicar filtros</button>
+        <button class="btn-draft" onclick="resetFinanceiroFilters()" style="flex:1;">↺ Redefinir filtros</button>
         <button class="btn-publish" onclick="openLancamento()" style="flex:1;">+ Novo lançamento</button>
       </div>
     </div>
@@ -4311,6 +4312,20 @@
 
   const PAYMENT_STATUS_LABEL = { em_dia: 'Em dia', pendente: 'Pendente', atrasado: 'Atrasado' };
   const PAYMENT_STATUS_CLASS = { em_dia: 'published', pendente: 'draft', atrasado: 'draft' };
+
+  function resetFinanceiroFilters() {
+    document.getElementById('financeFilterStudent').value = '';
+    const now = new Date();
+    const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    document.getElementById('financeFilterFrom').value = firstDay.toISOString().slice(0, 10);
+    document.getElementById('financeFilterTo').value = lastDay.toISOString().slice(0, 10);
+    document.getElementById('financeShowEntradas').checked = true;
+    document.getElementById('financeShowSaidas').checked = true;
+    document.getElementById('financeShowPagos').checked = true;
+    document.getElementById('financeShowPendentes').checked = true;
+    loadFinanceiro();
+  }
 
   async function loadFinanceiro() {
     const listEl = document.getElementById('financeiroList');
