@@ -286,7 +286,7 @@
   async function loadAgenda(userId, turmaId) {
     const today = todayLocalISO();
     let query = sb.from('class_logs').select('class_date, start_time, end_time, status')
-      .gte('class_date', today).order('class_date', { ascending: true }).order('start_time', { ascending: true }).limit(5);
+      .gte('class_date', today).order('class_date', { ascending: true }).order('start_time', { ascending: true }).limit(2);
     query = turmaId ? query.or(`student_id.eq.${userId},turma_id.eq.${turmaId}`) : query.eq('student_id', userId);
 
     const { data: logs } = await query;
