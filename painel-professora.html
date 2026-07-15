@@ -687,7 +687,8 @@
 
   <!-- Navegação por abas -->
   <div class="panel-nav">
-    <button class="nav-btn active" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
+    <button class="nav-btn active" data-tab="inicio" onclick="showTab('inicio')">🏠 Página inicial</button>
+    <button class="nav-btn" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">🏫 Turmas</button>
     <button class="nav-btn" data-tab="aulas" onclick="showTab('aulas')">📝 Aulas</button>
     <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">📅 Minha Agenda</button>
@@ -698,8 +699,8 @@
     <a class="nav-btn" href="comunidade.html" style="text-decoration:none;display:inline-flex;align-items:center;">👥 Comunidade</a>
   </div>
 
-  <!-- Aba: Alunos -->
-  <div class="panel-section active" id="alunosSection">
+  <!-- Aba: Página inicial -->
+  <div class="panel-section active" id="inicioSection">
 
     <!-- Minhas tarefas -->
     <div class="report-list" style="margin-bottom:24px;">
@@ -756,6 +757,11 @@
         <div class="overview-label">Alunos adultos</div>
       </div>
     </div>
+
+  </div>
+
+  <!-- Aba: Alunos -->
+  <div class="panel-section" id="alunosSection">
 
     <!-- Add student (só Brenda) -->
     <button class="btn-add" id="addStudentBtn" onclick="openAddStudent()" style="display:none;">
@@ -1168,6 +1174,7 @@
   let isBrenda = false;
 
   const TAB_SECTIONS = {
+    inicio: 'inicioSection',
     alunos: 'alunosSection',
     materiais: 'linksSection',
     relatorios: 'reportsSection',
