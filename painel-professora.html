@@ -467,7 +467,10 @@
     .folder-row:last-child { border-bottom: none; }
     .folder-name { font-size: 13px; color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .btn-del { background: #FFF0EE; border: none; border-radius: 6px; padding: 4px 8px; font-size: 12px; color: #C0392B; cursor: pointer; }
+    .btn-edit-folder { background: var(--sand); border: none; border-radius: 6px; padding: 4px 8px; font-size: 12px; cursor: pointer; }
     .empty-reports.folder-empty { padding: 16px 0; }
+    .folder-edit-banner { display: none; align-items: center; justify-content: space-between; gap: 8px; background: #FFF8E5; color: #A9740C; font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 10px; margin-bottom: 10px; }
+    .folder-edit-cancel { background: none; border: none; color: #A9740C; font-size: 12px; font-weight: 700; text-decoration: underline; cursor: pointer; }
 
     .add-folder-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
     .add-folder-form select, .add-folder-form input { padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
@@ -798,6 +801,10 @@
       <div class="folder-list" id="folderList">Carregando...</div>
 
       <div class="modal-hint" style="margin-bottom:8px;">Escolha uma turma (todos os alunos dela veem a pasta) ou um aluno específico — não os dois.</div>
+      <div class="folder-edit-banner" id="folderEditBanner">
+        <span id="folderEditBannerText">✎ Editando pasta</span>
+        <button type="button" class="folder-edit-cancel" onclick="cancelEditFolder()">Cancelar</button>
+      </div>
       <div class="add-folder-form">
         <select id="folderTurma" onchange="if(this.value)document.getElementById('folderStudent').value='';">
           <option value="">Nenhuma (pasta individual)</option>
@@ -807,7 +814,7 @@
         </select>
         <input type="text" id="folderLabel" placeholder="Nome da pasta (ex: Módulo 1)" style="grid-column:1/-1;" />
         <input type="text" id="folderUrl" placeholder="Link do Drive..." style="grid-column:1/-1;" />
-        <button class="btn-add-folder" onclick="addFolder()" style="grid-column:1/-1;">+ Adicionar pasta</button>
+        <button class="btn-add-folder" id="folderSubmitBtn" onclick="addFolder()" style="grid-column:1/-1;">+ Adicionar pasta</button>
       </div>
     </div>
 
@@ -2611,24 +2618,73 @@
           ${g.items.map(f => `
             <div class="folder-row">
               <a class="folder-name" href="${f.url}" target="_blank" rel="noopener">${f.label}</a>
+              <button class="btn-edit-folder" onclick="editFolder('${f.id}')" title="Editar pasta">✏️</button>
               <button class="btn-del" onclick="deleteFolder('${f.id}')">✕</button>
             </div>`).join('')}
         </div>
       </div>`).join('');
   }
 
+  let editingFolderId = null;
+
+  function editFolder(id) {
+    const f = foldersCache.find(x => x.id === id);
+    if (!f) return;
+    editingFolderId = id;
+    document.getElementById('folderLabel').value = f.label;
+    document.getElementById('folderUrl').value = f.url;
+    document.getElementById('folderTurma').value = '';
+    document.getElementById('folderStudent').value = '';
+    document.getElementById('folderTurma').disabled = true;
+    document.getElementById('folderStudent').disabled = true;
+    const owner = f.turma_id ? ('Turma: ' + turmaNameById(f.turma_id)) : studentNameById(f.student_id);
+    document.getElementById('folderEditBannerText').textContent = '✎ Editando pasta de ' + owner;
+    document.getElementById('folderEditBanner').style.display = 'flex';
+    document.getElementById('folderSubmitBtn').textContent = '💾 Salvar edição';
+    document.getElementById('folderLabel').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function cancelEditFolder() {
+    editingFolderId = null;
+    document.getElementById('folderLabel').value = '';
+    document.getElementById('folderUrl').value = '';
+    document.getElementById('folderTurma').disabled = false;
+    document.getElementById('folderStudent').disabled = false;
+    document.getElementById('folderTurma').value = '';
+    document.getElementById('folderStudent').value = '';
+    document.getElementById('folderEditBanner').style.display = 'none';
+    document.getElementById('folderSubmitBtn').textContent = '+ Adicionar pasta';
+  }
+
   async function addFolder() {
-    const turmaId = document.getElementById('folderTurma').value;
-    const studentId = document.getElementById('folderStudent').value;
     const label = document.getElementById('folderLabel').value.trim();
     const url = document.getElementById('folderUrl').value.trim();
 
-    if (!turmaId && !studentId) {
-      alert('Selecione uma turma ou um aluno.');
-      return;
-    }
     if (!label || !url) {
       alert('Preencha nome e link da pasta.');
+      return;
+    }
+
+    if (editingFolderId) {
+      const { data, error } = await sb.from('student_folders').update({ label, url }).eq('id', editingFolderId).select();
+      if (error) {
+        alert('Erro ao editar pasta: ' + error.message);
+        return;
+      }
+      if (!data || data.length === 0) {
+        alert('Não foi possível editar a pasta (permissão do banco de dados). Avise o suporte técnico.');
+        return;
+      }
+      cancelEditFolder();
+      await loadFolders();
+      return;
+    }
+
+    const turmaId = document.getElementById('folderTurma').value;
+    const studentId = document.getElementById('folderStudent').value;
+
+    if (!turmaId && !studentId) {
+      alert('Selecione uma turma ou um aluno.');
       return;
     }
 
@@ -2654,8 +2710,16 @@
 
   async function deleteFolder(id) {
     if (!confirm('Remover esta pasta?')) return;
-    const { error } = await sb.from('student_folders').delete().eq('id', id);
-    if (error) { alert('Erro ao remover pasta.'); return; }
+    const { data, error } = await sb.from('student_folders').delete().eq('id', id).select();
+    if (error) {
+      alert('Erro ao remover pasta: ' + error.message);
+      return;
+    }
+    if (!data || data.length === 0) {
+      alert('Não foi possível remover a pasta (permissão do banco de dados). Avise o suporte técnico.');
+      return;
+    }
+    if (editingFolderId === id) cancelEditFolder();
     await loadFolders();
   }
 
