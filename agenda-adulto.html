@@ -40,6 +40,18 @@
     .agenda-subtitle { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin: 4px 0 8px; }
 
     .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+    .agenda-toggle-btn { display: block; width: 100%; margin-top: 10px; padding: 10px; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--brown); cursor: pointer; text-align: center; }
+    .agenda-toggle-btn:hover { border-color: var(--brown-light); }
+
+    .history-filters { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .history-filters input[type="date"] { flex: 1; min-width: 120px; padding: 9px 10px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
+    .history-filters input[type="date"]:focus { border-color: var(--mint); }
+    .history-filters input[type="date"]:disabled { opacity: 0.5; }
+    .btn-filter { padding: 9px 16px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: white; cursor: pointer; white-space: nowrap; }
+    .btn-filter:hover { background: var(--brown-light); }
+    .history-showall { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 14px; cursor: pointer; }
+    .history-showall input { cursor: pointer; }
   </style>
 </head>
 <body>
@@ -64,6 +76,14 @@
 
   <div class="section-title">Histórico</div>
   <div class="card">
+    <div class="history-filters">
+      <input type="date" id="historyFrom" onchange="renderHistory()" />
+      <input type="date" id="historyTo" onchange="renderHistory()" />
+      <button class="btn-filter" onclick="renderHistory()">Buscar</button>
+    </div>
+    <label class="history-showall">
+      <input type="checkbox" id="historyShowAll" onchange="onHistoryShowAllChange()" /> Mostrar todas
+    </label>
     <div id="historyList"><div class="empty-msg">Carregando...</div></div>
   </div>
 
@@ -143,6 +163,57 @@
       </div>`;
   }
 
+  let upcomingCache = [];
+  let upcomingExpanded = false;
+  let historyCache = [];
+
+  function renderUpcoming() {
+    const upcomingEl = document.getElementById('upcomingList');
+    if (upcomingCache.length === 0) {
+      upcomingEl.innerHTML = '<div class="empty-msg">Nenhuma aula agendada.</div>';
+      return;
+    }
+    const shown = upcomingExpanded ? upcomingCache : upcomingCache.slice(0, 3);
+    let html = shown.map(renderRow).join('');
+    if (upcomingCache.length > 3) {
+      html += `<button class="agenda-toggle-btn" onclick="toggleUpcoming()">${upcomingExpanded ? 'Ver menos' : 'Ver todas as próximas (' + upcomingCache.length + ')'}</button>`;
+    }
+    upcomingEl.innerHTML = html;
+  }
+
+  function toggleUpcoming() {
+    upcomingExpanded = !upcomingExpanded;
+    renderUpcoming();
+  }
+
+  function onHistoryShowAllChange() {
+    const showAll = document.getElementById('historyShowAll').checked;
+    document.getElementById('historyFrom').disabled = showAll;
+    document.getElementById('historyTo').disabled = showAll;
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const historyEl = document.getElementById('historyList');
+    const showAll = document.getElementById('historyShowAll').checked;
+    const from = document.getElementById('historyFrom').value;
+    const to = document.getElementById('historyTo').value;
+
+    let filtered;
+    if (showAll) {
+      filtered = historyCache;
+    } else if (from || to) {
+      filtered = historyCache.filter(l => (!from || l.class_date >= from) && (!to || l.class_date <= to));
+    } else {
+      historyEl.innerHTML = '<div class="empty-msg">Escolha um período acima ou marque "Mostrar todas" para ver o histórico.</div>';
+      return;
+    }
+
+    historyEl.innerHTML = filtered.length
+      ? filtered.map(renderRow).join('')
+      : '<div class="empty-msg">Nenhuma aula encontrada nesse período.</div>';
+  }
+
   async function init(session) {
     const user = session.user;
     const { data: profile } = await sb.from('profiles').select('turma_id').eq('id', user.id).maybeSingle();
@@ -156,20 +227,12 @@
     const { data: logs } = await query.order('class_date', { ascending: false }).order('start_time', { ascending: false });
     const all = logs || [];
 
-    const upcoming = all.filter(l => l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada'))
+    upcomingCache = all.filter(l => l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada'))
       .sort((a, b) => (a.class_date + (a.start_time || '')).localeCompare(b.class_date + (b.start_time || '')));
-    const history = all.filter(l => !(l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada')));
+    historyCache = all.filter(l => !(l.class_date >= today && (l.status === 'pendente' || l.status === 'reagendada')));
 
-    const upcomingEl = document.getElementById('upcomingList');
-    const historyEl = document.getElementById('historyList');
-
-    upcomingEl.innerHTML = upcoming.length
-      ? upcoming.map(renderRow).join('')
-      : '<div class="empty-msg">Nenhuma aula agendada.</div>';
-
-    historyEl.innerHTML = history.length
-      ? history.map(renderRow).join('')
-      : '<div class="empty-msg">Nenhuma aula no histórico ainda.</div>';
+    renderUpcoming();
+    renderHistory();
 
     const linkedOriginalIds = new Set(all.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
     const repoPending = all.filter(l => l.needs_makeup && !linkedOriginalIds.has(l.id));
