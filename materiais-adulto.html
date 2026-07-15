@@ -47,22 +47,6 @@
     .material-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .material-arrow { font-size: 18px; color: var(--sand); }
 
-    /* Subpastas */
-    .subfolder-item {
-      background: var(--cream);
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      border: 1.5px solid var(--sand);
-      transition: all 0.2s;
-    }
-    .subfolder-item:hover { border-color: var(--brown-light); background: var(--white); }
-    .subfolder-label { font-size: 14px; font-weight: 500; color: var(--text); flex: 1; }
-
     .loading-card { text-align: center; padding: 40px; color: var(--muted); }
   </style>
   <link rel="manifest" href="manifest.json" />
@@ -115,7 +99,6 @@
 
   const GLOBAL_CATEGORIES = [
     { key: 'adulto-materiais',    icon: '📖', label: 'Material digital',   sub: 'Slides e atividades' },
-    { key: 'adulto-gravacoes',    icon: '🎥', label: 'Gravações das aulas', sub: 'Assista quando quiser' },
     { key: 'adulto-auloes',       icon: '🎓', label: 'Aulões',              sub: 'Aulas especiais extras' },
     { key: 'adulto-lexi',         icon: '🤖', label: 'Lexi — IA exclusiva', sub: 'Tire dúvidas e pratique inglês' },
   ];
@@ -164,15 +147,19 @@
         </a>`;
     });
 
-    // Subpastas do aluno
+    // Subpastas do aluno (gravações, materiais extras, etc. definidos pela professora)
     if (folders.length > 0) {
       html += '<div class="section-title">Suas pastas</div>';
       folders.forEach(f => {
+        const icon = /grava/i.test(f.label) ? '🎥' : '📂';
         html += `
-          <a href="${f.url}" target="_blank" class="subfolder-item">
-            <span>📂</span>
-            <span class="subfolder-label">${f.label}</span>
-            <span style="color:#DDD;font-size:18px;">›</span>
+          <a href="${f.url}" target="_blank" class="material-item">
+            <div class="material-icon">${icon}</div>
+            <div class="material-info">
+              <div class="material-title">${f.label}</div>
+              <div class="material-sub">Assista/acesse quando quiser</div>
+            </div>
+            <div class="material-arrow">›</div>
           </a>`;
       });
     }
