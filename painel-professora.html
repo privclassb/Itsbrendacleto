@@ -4591,7 +4591,7 @@
 
     if (filtered.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum lançamento encontrado.</div>'; return; }
 
-    filtered.sort((a, b) => (b.due_date || '').localeCompare(a.due_date || ''));
+    filtered.sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
 
     const today = todayLocalISO();
 
