@@ -703,7 +703,6 @@
     <button class="nav-btn active" data-tab="inicio" onclick="showTab('inicio')">🏠 Página inicial</button>
     <button class="nav-btn" data-tab="alunos" onclick="showTab('alunos')">👥 Alunos</button>
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">🏫 Turmas</button>
-    <button class="nav-btn" data-tab="aulas" onclick="showTab('aulas')">📝 Aulas</button>
     <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">📅 Minha Agenda</button>
     <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">💰 Financeiro</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
@@ -736,6 +735,15 @@
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title">📅 Aulas de hoje</div>
       <div id="aulasHojeList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
+    <!-- Reposições -->
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">🔄 Reposições</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
+      <div id="reposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
+      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
+      <div id="reposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
     <!-- Equipe -->
@@ -934,116 +942,6 @@
     </div>
   </div>
 
-  <!-- Registro de aulas -->
-  <div class="reports-section panel-section" id="classLogSection">
-    <div class="report-form">
-      <div class="report-form-title">📝 Registrar aula</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">O histórico completo de aulas de cada aluno fica na página dele (aba Alunos → abrir o aluno).</div>
-      <div class="form-row">
-        <label class="form-label">Turma (aula em grupo)</label>
-        <select class="form-select" id="classLogTurma" onchange="updateClassLogAttendanceFields()">
-          <option value="">Nenhuma (aula individual)</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Aluno (se a aula não for de turma)</label>
-        <select class="form-select" id="classLogStudent">
-          <option value="">Selecione o aluno...</option>
-        </select>
-      </div>
-      <div class="form-row" id="classLogAttendanceRow" style="display:none;">
-        <label class="form-label">Alunos presentes</label>
-        <div id="classLogAttendanceList"></div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Data</label>
-        <input type="date" class="form-input" id="classLogDate" />
-      </div>
-      <div class="form-row" style="display:flex;gap:10px;">
-        <div style="flex:1;">
-          <label class="form-label">Horário início</label>
-          <input type="time" class="form-input" id="classLogStartTime" onchange="autofillEndTime(this, 'classLogEndTime')" />
-        </div>
-        <div style="flex:1;">
-          <label class="form-label">Horário fim</label>
-          <input type="time" class="form-input" id="classLogEndTime" />
-        </div>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Status</label>
-        <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('classLogNeedsMakeup').checked=true;">
-          <option value="realizada">Realizada</option>
-          <option value="pendente">Pendente</option>
-          <option value="cancelada">Cancelada</option>
-          <option value="cancelada_falta">Cancelada por falta</option>
-          <option value="para_reagendar">Para reagendar</option>
-          <option value="reagendada">Reagendada</option>
-          <option value="feriado">Feriado</option>
-          <option value="recesso">Recesso</option>
-        </select>
-      </div>
-      <div class="form-row modal-checkbox-row">
-        <label class="modal-checkbox-label">
-          <input type="checkbox" id="classLogNeedsMakeup" />
-          <span>🔄 Aluno precisa repor essa aula</span>
-        </label>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Conteúdo trabalhado</label>
-        <textarea class="form-textarea" id="classLogContent" placeholder="O que foi visto na aula..."></textarea>
-      </div>
-      <div class="modal-error" id="classLogSaveError"></div>
-      <div class="modal-success" id="classLogSaveSuccess"></div>
-      <div class="form-actions">
-        <button class="btn-publish" onclick="saveClassLog()" style="flex:1;">✅ Registrar aula</button>
-      </div>
-    </div>
-
-    <div class="report-form">
-      <div class="report-form-title">📅 Agendar aulas do contrato</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Gera uma aula por semana no mesmo dia/horário, dentro do período informado — útil pra já deixar cadastrado o contrato inteiro do aluno.</div>
-      <div class="form-row">
-        <label class="form-label">Turma (aula em grupo)</label>
-        <select class="form-select" id="scheduleTurma">
-          <option value="">Nenhuma (aula individual)</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Aluno (se a aula não for de turma)</label>
-        <select class="form-select" id="scheduleStudent" onchange="prefillScheduleFromContract()">
-          <option value="">Selecione o aluno...</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label class="form-label">Dias e horários na semana</label>
-        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Adicione mais de um dia pra alunos/turmas que têm aula mais de uma vez por semana.</div>
-        <div id="scheduleSlotsList"></div>
-        <button type="button" class="btn-sm" onclick="addScheduleSlot()">+ Adicionar outro dia</button>
-      </div>
-      <div class="form-row" style="display:flex;gap:10px;">
-        <div style="flex:1;">
-          <label class="form-label">Data início</label>
-          <input type="date" class="form-input" id="scheduleFrom" />
-        </div>
-        <div style="flex:1;">
-          <label class="form-label">Data fim (fim do contrato)</label>
-          <input type="date" class="form-input" id="scheduleTo" />
-        </div>
-      </div>
-      <div class="form-actions">
-        <button class="btn-publish" onclick="generateScheduledClasses()" style="flex:1;">📅 Gerar aulas</button>
-      </div>
-    </div>
-
-    <div class="report-list" style="margin-bottom:24px;">
-      <div class="report-list-title">🔄 Reposições</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
-      <div id="reposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
-      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
-      <div id="reposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
-    </div>
-  </div>
-
   <!-- Minha Agenda (semanal) -->
   <div class="reports-section panel-section" id="agendaSection">
     <div class="report-list">
@@ -1192,7 +1090,6 @@
     materiais: 'linksSection',
     relatorios: 'reportsSection',
     turmas: 'turmasSection',
-    aulas: 'classLogSection',
     agenda: 'agendaSection',
     financeiro: 'financeiroSection',
     equipe: 'equipeSection'
@@ -1261,16 +1158,10 @@
 
     // Turmas, registro de aulas e financeiro — todas as professoras
     await loadTurmas(user.id, isBrenda);
-    populateClassLogStudentSelect();
-    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
-    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
-    initScheduleSlots();
     if (isBrenda) {
       await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
       await loadFolders();
     }
-    document.getElementById('classLogDate').value = todayLocalISO();
-    document.getElementById('scheduleFrom').value = todayLocalISO();
     await loadClassLogs(user.id, isBrenda);
     await loadAulasHoje(user.id, isBrenda);
     await loadAgendaWeek();
@@ -1506,11 +1397,12 @@
   async function openStudentProfile(studentId) {
     const student = allStudents.find(s => s.id === studentId);
     if (!student) return;
+    const wasAlreadyOpen = document.getElementById('modalStudentProfile').classList.contains('open') && currentProfileStudentId === studentId;
     currentProfileStudentId = studentId;
 
     document.getElementById('profileOptionsMenu').classList.remove('open');
     document.getElementById('profileTabFinanceiroBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
-    showProfileTab('dados');
+    if (!wasAlreadyOpen) showProfileTab('dados');
     document.getElementById('profileOptionPaymentBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileOptionEditBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
     document.getElementById('profileToggleActiveBtn').style.display = currentUserIsBrenda ? 'block' : 'none';
@@ -1880,11 +1772,8 @@
   }
 
   function profileOptionLogClass() {
-    const id = currentProfileStudentId;
-    closeStudentProfile();
-    showTab('aulas');
-    document.getElementById('classLogTurma').value = '';
-    document.getElementById('classLogStudent').value = id;
+    document.getElementById('profileOptionsMenu').classList.remove('open');
+    openLogClass(currentProfileStudentId, null);
   }
 
   function profileOptionPayment() {
@@ -2438,7 +2327,6 @@
       await loadStudents(session.user.id, isBrenda);
       await loadStudentsForReports(session.user.id, isBrenda);
       await loadStudentsForSelect();
-      populateClassLogStudentSelect();
       await loadClassLogs(session.user.id, isBrenda);
       await loadAulasHoje(session.user.id);
       loadFinanceiro();
@@ -2752,7 +2640,6 @@
     closeEditStudent();
     const { data: { session } } = await sb.auth.getSession();
     await loadStudents(session.user.id, currentUserIsBrenda);
-    populateClassLogStudentSelect();
     loadFinanceiro();
   }
 
@@ -3304,8 +3191,6 @@
 
     document.getElementById('turmaName').value = '';
     await loadTurmas(session.user.id, currentUserIsBrenda);
-    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
-    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
   }
 
   async function deleteTurma(id) {
@@ -3330,8 +3215,6 @@
 
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
-    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
-    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
   }
 
   function editTurma(id) {
@@ -3382,8 +3265,6 @@
     closeEditTurma();
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
-    await populateTurmaSelect('classLogTurma', '', 'Nenhuma (aula individual)');
-    await populateTurmaSelect('scheduleTurma', '', 'Nenhuma (aula individual)');
   }
 
   // ---- Página da turma (Dados + Aulas registradas, igual a do aluno) ----
@@ -3646,15 +3527,6 @@
   }
 
   // ---- Registro de aulas ----
-
-  function populateClassLogStudentSelect() {
-    const options = '<option value="">Selecione o aluno...</option>' +
-      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
-    ['classLogStudent', 'scheduleStudent'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (sel) sel.innerHTML = options;
-    });
-  }
 
   function autofillEndTime(startInput, endInputId) {
     if (!startInput.value) return;
@@ -3944,14 +3816,43 @@
     alert(logs.length + ' aula(s) remarcada(s) com sucesso.');
   }
 
+  function openLogClass(studentId, turmaId) {
+    document.getElementById('logClassStudentId').value = studentId || '';
+    document.getElementById('logClassTurmaId').value = turmaId || '';
+    const who = turmaId
+      ? ('Turma: ' + (allTurmas.find(t => t.id === turmaId)?.name || 'Turma'))
+      : (allStudents.find(s => s.id === studentId)?.full_name || 'Aluno');
+    document.getElementById('logClassWho').textContent = who;
+
+    document.getElementById('classLogDate').value = todayLocalISO();
+    document.getElementById('classLogStartTime').value = '';
+    document.getElementById('classLogEndTime').value = '';
+    document.getElementById('classLogStatus').value = 'realizada';
+    document.getElementById('classLogNeedsMakeup').checked = false;
+    document.getElementById('classLogContent').value = '';
+    document.getElementById('classLogSaveError').style.display = 'none';
+
+    if (turmaId) {
+      document.getElementById('classLogAttendanceRow').style.display = 'block';
+      renderAttendanceList('classLogAttendanceList', turmaId, new Map());
+    } else {
+      document.getElementById('classLogAttendanceRow').style.display = 'none';
+      document.getElementById('classLogAttendanceList').innerHTML = '';
+    }
+
+    document.getElementById('modalLogClass').classList.add('open');
+  }
+
+  function closeLogClass() {
+    document.getElementById('modalLogClass').classList.remove('open');
+  }
+
   async function saveClassLog() {
     const errEl = document.getElementById('classLogSaveError');
-    const sucEl = document.getElementById('classLogSaveSuccess');
     errEl.style.display = 'none';
-    sucEl.style.display = 'none';
 
-    const turmaId = document.getElementById('classLogTurma').value || null;
-    const studentId = document.getElementById('classLogStudent').value || null;
+    const turmaId = document.getElementById('logClassTurmaId').value || null;
+    const studentId = document.getElementById('logClassStudentId').value || null;
     const date = document.getElementById('classLogDate').value || todayLocalISO();
     const startTime = document.getElementById('classLogStartTime').value || null;
     const endTime = document.getElementById('classLogEndTime').value || null;
@@ -3960,7 +3861,7 @@
     const needsMakeup = document.getElementById('classLogNeedsMakeup').checked;
 
     if (!turmaId && !studentId) {
-      errEl.textContent = 'Selecione uma turma ou um aluno.';
+      errEl.textContent = 'Nenhum aluno ou turma selecionado.';
       errEl.style.display = 'block';
       return;
     }
@@ -3994,16 +3895,16 @@
       await saveAttendanceForClassLog(inserted.id, attendanceList);
     }
 
-    document.getElementById('classLogContent').value = '';
-    document.getElementById('classLogNeedsMakeup').checked = false;
-    document.getElementById('classLogAttendanceRow').style.display = 'none';
-    document.getElementById('classLogAttendanceList').innerHTML = '';
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    if (studentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      await openStudentProfile(studentId);
+    }
+    if (turmaId && document.getElementById('modalTurmaProfile').classList.contains('open')) {
+      await openTurmaProfile(turmaId);
+    }
 
-    sucEl.textContent = '✅ Aula registrada com sucesso!';
-    sucEl.style.display = 'block';
-    setTimeout(() => { sucEl.style.display = 'none'; }, 4000);
+    closeLogClass();
   }
 
   // ---- Presença dos alunos numa aula de turma ----
@@ -4039,23 +3940,30 @@
     await sb.from('class_attendance').upsert(rows, { onConflict: 'class_log_id,student_id' });
   }
 
-  function updateClassLogAttendanceFields() {
-    const turmaId = document.getElementById('classLogTurma').value;
-    const row = document.getElementById('classLogAttendanceRow');
-    if (!turmaId) { row.style.display = 'none'; document.getElementById('classLogAttendanceList').innerHTML = ''; return; }
-    row.style.display = 'block';
-    renderAttendanceList('classLogAttendanceList', turmaId, new Map());
-  }
+  function openScheduleContract(studentId, turmaId) {
+    document.getElementById('scheduleContractStudentId').value = studentId || '';
+    document.getElementById('scheduleContractTurmaId').value = turmaId || '';
+    const who = turmaId
+      ? ('Turma: ' + (allTurmas.find(t => t.id === turmaId)?.name || 'Turma'))
+      : (allStudents.find(s => s.id === studentId)?.full_name || 'Aluno');
+    document.getElementById('scheduleContractWho').textContent = who;
 
-  function prefillScheduleFromContract() {
-    if (!currentUserIsBrenda) return;
-    const studentId = document.getElementById('scheduleStudent').value;
-    const student = allStudents.find(s => s.id === studentId);
-    if (!student) return;
+    initScheduleSlots();
     const fromEl = document.getElementById('scheduleFrom');
     const toEl = document.getElementById('scheduleTo');
-    if (student.contract_start && !fromEl.value) fromEl.value = student.contract_start;
-    if (student.contract_end) toEl.value = student.contract_end;
+    fromEl.value = todayLocalISO();
+    toEl.value = '';
+    if (studentId) {
+      const student = allStudents.find(s => s.id === studentId);
+      if (student?.contract_start) fromEl.value = student.contract_start;
+      if (student?.contract_end) toEl.value = student.contract_end;
+    }
+
+    document.getElementById('modalScheduleContract').classList.add('open');
+  }
+
+  function closeScheduleContract() {
+    document.getElementById('modalScheduleContract').classList.remove('open');
   }
 
   function renderScheduleSlotRow() {
@@ -4108,8 +4016,8 @@
   }
 
   async function generateScheduledClasses() {
-    const turmaId = document.getElementById('scheduleTurma').value || null;
-    const studentId = document.getElementById('scheduleStudent').value || null;
+    const turmaId = document.getElementById('scheduleContractTurmaId').value || null;
+    const studentId = document.getElementById('scheduleContractStudentId').value || null;
     const from = document.getElementById('scheduleFrom').value;
     const to = document.getElementById('scheduleTo').value;
 
@@ -4156,9 +4064,15 @@
     if (error) { alert('Erro ao gerar aulas: ' + error.message); return; }
 
     alert(entries.length + ' aula(s) agendada(s) com sucesso!');
-    initScheduleSlots();
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    if (studentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      await openStudentProfile(studentId);
+    }
+    if (turmaId && document.getElementById('modalTurmaProfile').classList.contains('open')) {
+      await openTurmaProfile(turmaId);
+    }
+    closeScheduleContract();
   }
 
   // Quem é a professora responsável por uma aula (não usa created_by, porque
@@ -5269,7 +5183,12 @@
     </div>
 
     <div class="profile-tab-panel" id="profileTabPanelAulas">
-      <div class="profile-section" style="margin-top:16px;">
+      <div class="profile-section" style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-sm" onclick="openLogClass(currentProfileStudentId, null)">📝 Registrar aula</button>
+        <button class="btn-sm" onclick="openScheduleContract(currentProfileStudentId, null)">📅 Agendar aulas do contrato</button>
+      </div>
+
+      <div class="profile-section">
         <div class="profile-section-title">Aulas registradas</div>
         <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela.</div>
         <div class="aula-stats-row" id="profileAulasStats"></div>
@@ -5362,6 +5281,11 @@
     <div class="profile-section" style="margin-top:16px;">
       <div class="profile-section-title">Alunos matriculados</div>
       <div id="turmaProfileStudentsList"></div>
+    </div>
+
+    <div class="profile-section" style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-sm" onclick="openLogClass(null, currentProfileTurmaId)">📝 Registrar aula</button>
+      <button class="btn-sm" onclick="openScheduleContract(null, currentProfileTurmaId)">📅 Agendar aulas do contrato</button>
     </div>
 
     <div class="profile-section">
@@ -5763,6 +5687,97 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeNewContract()">Cancelar</button>
       <button class="btn-modal-save" onclick="saveNewContract()">Salvar novo contrato</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Registrar aula -->
+<div class="modal-overlay" id="modalLogClass">
+  <div class="modal-box">
+    <div class="modal-title">Registrar aula</div>
+    <div class="modal-sub" id="logClassWho"></div>
+    <input type="hidden" id="logClassStudentId" />
+    <input type="hidden" id="logClassTurmaId" />
+
+    <div class="form-row" id="classLogAttendanceRow" style="display:none;">
+      <label class="form-label">Alunos presentes</label>
+      <div id="classLogAttendanceList"></div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Data</label>
+      <input type="date" class="form-input" id="classLogDate" />
+    </div>
+    <div class="form-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="form-label">Horário início</label>
+        <input type="time" class="form-input" id="classLogStartTime" onchange="autofillEndTime(this, 'classLogEndTime')" />
+      </div>
+      <div style="flex:1;">
+        <label class="form-label">Horário fim</label>
+        <input type="time" class="form-input" id="classLogEndTime" />
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Status</label>
+      <select class="form-select" id="classLogStatus" onchange="if(this.value==='cancelada_falta'||this.value==='para_reagendar')document.getElementById('classLogNeedsMakeup').checked=true;">
+        <option value="realizada">Realizada</option>
+        <option value="pendente">Pendente</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="cancelada_falta">Cancelada por falta</option>
+        <option value="para_reagendar">Para reagendar</option>
+        <option value="reagendada">Reagendada</option>
+        <option value="feriado">Feriado</option>
+        <option value="recesso">Recesso</option>
+      </select>
+    </div>
+    <div class="form-row modal-checkbox-row">
+      <label class="modal-checkbox-label">
+        <input type="checkbox" id="classLogNeedsMakeup" />
+        <span>🔄 Aluno precisa repor essa aula</span>
+      </label>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Conteúdo trabalhado</label>
+      <textarea class="form-textarea" id="classLogContent" placeholder="O que foi visto na aula..."></textarea>
+    </div>
+    <div class="modal-error" id="classLogSaveError" style="display:none;"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeLogClass()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveClassLog()">✅ Registrar aula</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Agendar aulas do contrato -->
+<div class="modal-overlay" id="modalScheduleContract">
+  <div class="modal-box">
+    <div class="modal-title">Agendar aulas do contrato</div>
+    <div class="modal-sub" id="scheduleContractWho"></div>
+    <div class="modal-hint">Gera uma aula por semana no mesmo dia/horário, dentro do período informado — útil pra já deixar cadastrado o contrato inteiro.</div>
+    <input type="hidden" id="scheduleContractStudentId" />
+    <input type="hidden" id="scheduleContractTurmaId" />
+
+    <div class="form-row">
+      <label class="form-label">Dias e horários na semana</label>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Adicione mais de um dia pra alunos/turmas que têm aula mais de uma vez por semana.</div>
+      <div id="scheduleSlotsList"></div>
+      <button type="button" class="btn-sm" onclick="addScheduleSlot()">+ Adicionar outro dia</button>
+    </div>
+    <div class="form-row" style="display:flex;gap:10px;">
+      <div style="flex:1;">
+        <label class="form-label">Data início</label>
+        <input type="date" class="form-input" id="scheduleFrom" />
+      </div>
+      <div style="flex:1;">
+        <label class="form-label">Data fim (fim do contrato)</label>
+        <input type="date" class="form-input" id="scheduleTo" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeScheduleContract()">Cancelar</button>
+      <button class="btn-modal-save" onclick="generateScheduledClasses()">📅 Gerar aulas</button>
     </div>
   </div>
 </div>
