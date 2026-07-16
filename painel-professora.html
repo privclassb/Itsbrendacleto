@@ -1213,7 +1213,7 @@
     if (currentUserIsBrenda) {
       const studentIds = students.map(s => s.id);
       const { data: overduePayments } = await sb.from('payments').select('student_id, due_date, amount')
-        .eq('paid', false).lt('due_date', todayLocalISO())
+        .eq('paid', false).eq('type', 'entrada').lt('due_date', todayLocalISO())
         .in('student_id', studentIds.length ? studentIds : ['00000000-0000-0000-0000-000000000000']);
 
       (overduePayments || []).forEach(p => {
