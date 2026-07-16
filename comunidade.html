@@ -216,28 +216,38 @@
     const [{ data: activities }, { data: activeDays }, { data: classes }] = await Promise.all([
       sb.from('lesson_progress').select('user_id, lesson_id, completed_at').in('user_id', ids).gte('completed_at', monthStart).lte('completed_at', monthEnd + 'T23:59:59'),
       sb.from('daily_activity_log').select('user_id, activity_date').in('user_id', ids).gte('activity_date', monthStart).lte('activity_date', monthEnd),
-      sb.from('class_logs').select('student_id, turma_id, class_date, status').eq('status', 'realizada').gte('class_date', monthStart).lte('class_date', monthEnd)
+      sb.from('class_logs').select('student_id, turma_id, class_date, status').in('status', ['realizada', 'cancelada_falta']).gte('class_date', monthStart).lte('class_date', monthEnd)
     ]);
 
     const scoreMap = {};
-    students.forEach(s => { scoreMap[s.id] = { activities: 0, activeDays: 0, classes: 0 }; });
+    students.forEach(s => { scoreMap[s.id] = { activities: 0, activeDays: 0, classesAttended: 0, classesScheduled: 0 }; });
 
     (activities || []).forEach(a => {
       if (/^adulto-l\d+-a\d+$/.test(a.lesson_id) && scoreMap[a.user_id]) scoreMap[a.user_id].activities++;
     });
     (activeDays || []).forEach(d => { if (scoreMap[d.user_id]) scoreMap[d.user_id].activeDays++; });
     (classes || []).forEach(c => {
-      if (c.student_id && scoreMap[c.student_id]) {
-        scoreMap[c.student_id].classes++;
+      const attended = c.status === 'realizada';
+      const applyTo = (id) => {
+        if (!scoreMap[id]) return;
+        scoreMap[id].classesScheduled++;
+        if (attended) scoreMap[id].classesAttended++;
+      };
+      if (c.student_id) {
+        applyTo(c.student_id);
       } else if (c.turma_id) {
-        students.filter(s => s.turma_id === c.turma_id).forEach(s => scoreMap[s.id].classes++);
+        students.filter(s => s.turma_id === c.turma_id).forEach(s => applyTo(s.id));
       }
     });
 
+    // Presença conta como taxa (%), não como quantidade bruta de aulas — assim quem tem
+    // 1 aula por semana não fica em desvantagem contra quem tem 3+ aulas por semana.
     const ranked = students.map(s => {
       const sc = scoreMap[s.id];
-      const points = sc.activities * 10 + sc.activeDays * 5 + sc.classes * 15;
-      return Object.assign({}, s, sc, { points });
+      const attendanceRate = sc.classesScheduled > 0 ? sc.classesAttended / sc.classesScheduled : null;
+      const attendancePoints = attendanceRate !== null ? Math.round(attendanceRate * 30) : 0;
+      const points = sc.activities * 10 + sc.activeDays * 5 + attendancePoints;
+      return Object.assign({}, s, sc, { attendanceRate, points });
     }).sort((a, b) => b.points - a.points);
 
     renderRanking(ranked);
@@ -257,13 +267,14 @@
         const avatar = r.avatar_url
           ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
           : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
+        const attendanceLabel = r.attendanceRate !== null ? Math.round(r.attendanceRate * 100) + '% de presença' : 'sem aulas no período';
         return `
           <div class="rank-item ${isMe ? 'rank-you' : ''}">
             <div class="rank-position">${medals[i] || (i + 1)}</div>
             <div class="rank-avatar">${avatar}</div>
             <div class="rank-info">
               <div class="rank-name">${escapeHtml(r.full_name || 'Aluno')}${isMe ? ' (você)' : ''}</div>
-              <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${r.classes} aulas</div>
+              <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${attendanceLabel}</div>
             </div>
             <div class="rank-points">${r.points}<span>pts</span></div>
           </div>`;
