@@ -4110,7 +4110,8 @@
         <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${who}</div>
-            <div class="report-row-title">${time}${names ? ' · ' + names : ''}</div>
+            <div class="report-row-title">${time}</div>
+            ${names ? `<div class="report-row-title" style="font-size:12px;">${names}</div>` : ''}
           </div>
           <span class="report-status ${badgeClass}">${statusLabel}</span>
         </div>`;
