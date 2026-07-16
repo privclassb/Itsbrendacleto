@@ -4482,6 +4482,44 @@
     await loadReports(session.user.id, currentUserIsBrenda);
   }
 
+  async function deleteClassFromReport() {
+    const classLogId = document.getElementById('classReportClassLogId').value;
+    const studentId = document.getElementById('classReportStudentId').value;
+    if (!classLogId) return;
+    if (!confirm('Excluir esta aula por completo? Isso apaga o registro da aula e a anotação vinculada a ela. Essa ação não pode ser desfeita.')) return;
+
+    await sb.from('reports').delete().eq('class_log_id', classLogId);
+    const { error } = await withAuthRetry(() => sb.from('class_logs').delete().eq('id', classLogId));
+    if (error) { alert('Erro ao excluir aula: ' + error.message); return; }
+
+    closeClassReport();
+    await openStudentProfile(studentId);
+    const { data: { session } } = await sb.auth.getSession();
+    await loadReports(session.user.id, currentUserIsBrenda);
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
+  async function deleteClassFromTurmaReport() {
+    const classLogId = document.getElementById('turmaReportClassLogId').value;
+    if (!classLogId) return;
+    if (!confirm('Excluir esta aula por completo? Isso apaga o registro da aula, a presença e as anotações vinculadas a ela pra todos os alunos da turma. Essa ação não pode ser desfeita.')) return;
+
+    await sb.from('reports').delete().eq('class_log_id', classLogId);
+    await sb.from('class_attendance').delete().eq('class_log_id', classLogId);
+    const { error } = await withAuthRetry(() => sb.from('class_logs').delete().eq('id', classLogId));
+    if (error) { alert('Erro ao excluir aula: ' + error.message); return; }
+
+    closeTurmaClassReport();
+    const { data: { session } } = await sb.auth.getSession();
+    if (currentProfileTurmaId && document.getElementById('modalTurmaProfile').classList.contains('open')) {
+      await openTurmaProfile(currentProfileTurmaId);
+    }
+    await loadReports(session.user.id, currentUserIsBrenda);
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+  }
+
   // ---- Financeiro ----
 
   const PAYMENT_STATUS_LABEL = { em_dia: 'Em dia', pendente: 'Pendente', atrasado: 'Atrasado' };
@@ -5385,6 +5423,7 @@
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeTurmaClassReport()">Cancelar</button>
+      <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteClassFromTurmaReport()">🗑️ Excluir aula</button>
       <button class="btn-modal-save" id="btnSaveTurmaReport" onclick="saveTurmaClassReport()">Salvar</button>
     </div>
   </div>
@@ -5627,7 +5666,8 @@
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeClassReport()">Cancelar</button>
-      <button class="btn-modal-save" id="btnDeleteClassReport" style="background:#C0392B;display:none;" onclick="deleteClassReport()">Excluir</button>
+      <button class="btn-modal-save" id="btnDeleteClassReport" style="background:#C0392B;display:none;" onclick="deleteClassReport()">Excluir anotação</button>
+      <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteClassFromReport()">🗑️ Excluir aula</button>
       <button class="btn-modal-save" onclick="saveClassReport()">Salvar anotação</button>
     </div>
   </div>
