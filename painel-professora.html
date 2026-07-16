@@ -2647,6 +2647,14 @@
     return (allStudents.find(s => s.id === id) || {}).full_name || 'Aluno';
   }
 
+  function firstNamesAlphabetical(members) {
+    return members
+      .map(s => (s.full_name || '').trim().split(/\s+/)[0])
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'))
+      .join(', ');
+  }
+
   function turmaNameById(id) {
     return (allTurmas.find(t => t.id === id) || {}).name || 'Turma';
   }
@@ -3151,8 +3159,9 @@
     if (allTurmas.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma turma cadastrada ainda.</div>'; return; }
 
     listEl.innerHTML = allTurmas.map(t => {
-      const count = allStudents.filter(s => s.turma_id === t.id).length;
+      const members = allStudents.filter(s => s.turma_id === t.id);
       const teacherLabel = t.teacher_id ? teacherNameById(t.teacher_id) : 'Sem professora';
+      const names = firstNamesAlphabetical(members);
       const actions = currentUserIsBrenda
         ? `<button class="btn-report-action btn-toggle" onclick="event.stopPropagation();openTurmaStudents('${t.id}')">+ Alunos</button>
            <button class="btn-report-action btn-toggle" onclick="event.stopPropagation();editTurma('${t.id}')">✏️ Editar</button>
@@ -3162,7 +3171,8 @@
         <div class="report-row" style="cursor:pointer;" onclick="openTurmaProfile('${t.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${t.name}</div>
-            <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${count} aluno(s) · ${teacherLabel}</div>
+            <div class="report-row-title">${t.student_type === 'kids' ? 'Kids' : 'Adulto'} · ${members.length} aluno(s) · ${teacherLabel}</div>
+            ${names ? `<div class="report-row-title" style="font-size:12px;">${names}</div>` : ''}
           </div>
           ${actions}
         </div>`;
@@ -3271,6 +3281,7 @@
     const members = allStudents.filter(s => s.turma_id === turmaId);
     document.getElementById('turmaProfileName').textContent = turma.name;
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
+    document.getElementById('turmaProfileNames').textContent = firstNamesAlphabetical(members);
     document.getElementById('turmaProfileRescheduleFixedBtn').style.display = 'inline-block';
     document.getElementById('turmaProfileDeleteAllLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
     document.getElementById('turmaProfileDeletePendingLogsBtn').style.display = currentUserIsBrenda ? 'inline-block' : 'none';
@@ -5261,6 +5272,7 @@
       <div>
         <div class="modal-title" id="turmaProfileName">Turma</div>
         <div class="modal-sub" id="turmaProfileMeta" style="margin-bottom:0;"></div>
+        <div class="modal-sub" id="turmaProfileNames" style="margin-bottom:0;font-size:12px;"></div>
       </div>
     </div>
 
