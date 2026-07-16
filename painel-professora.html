@@ -737,15 +737,6 @@
       <div id="aulasHojeList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
-    <!-- Reposições -->
-    <div class="report-list" style="margin-bottom:24px;">
-      <div class="report-list-title">🔄 Reposições</div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">A repor</div>
-      <div id="reposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
-      <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
-      <div id="reposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
-    </div>
-
     <!-- Equipe -->
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;">
@@ -3591,11 +3582,6 @@
 
     const { data: logs } = await query;
     allClassLogs = logs || [];
-    renderReposicoes(allClassLogs);
-  }
-
-  function renderReposicoes(logs) {
-    renderReposicoesInto(logs, 'reposicoesAReporList', 'reposicoesFeitasList');
   }
 
   function renderReposicoesInto(logs, aReporElId, feitasElId) {
