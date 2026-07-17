@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aula 4 — Foods & Drinks! | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1; --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0; --text: #3D2B1F; --white: #FFFFFF; --radius: 20px; }
+    body { font-family: 'Nunito', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--white); padding: 14px 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: var(--cream); border: 2px solid #EEE; border-radius: 12px; padding: 7px 14px; font-family: 'Nunito', sans-serif; font-size: 13px; font-weight: 800; color: var(--text); cursor: pointer; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: all 0.2s; }
+    .btn-back:hover { border-color: var(--yellow); background: #FFFBEC; }
+    .header-title { font-size: 15px; font-weight: 900; color: var(--text); }
+    .hero { background: linear-gradient(135deg, var(--yellow), var(--rose)); padding: 28px 24px; text-align: center; }
+    .hero-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: rgba(61,43,31,0.6); margin-bottom: 4px; }
+    .hero-title { font-size: 26px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .hero-sub { font-size: 13px; font-weight: 700; color: rgba(61,43,31,0.65); }
+    .progress-wrap { background: var(--white); padding: 16px 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+    .progress-top { display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .progress-bar { height: 10px; background: #F0F0F0; border-radius: 99px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--yellow), var(--rose)); border-radius: 99px; transition: width 0.5s ease; }
+    main { padding: 24px 20px; max-width: 600px; margin: 0 auto; }
+    .section-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #AAA; margin-bottom: 12px; }
+    .activity-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 28px; }
+    .activity-card { background: var(--white); border-radius: var(--radius); padding: 16px 18px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 14px; cursor: pointer; transition: all 0.2s; border: 3px solid transparent; }
+    .activity-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+    .activity-card.done { border-color: var(--mint); background: #F5FFF9; }
+    .activity-checkbox { width: 28px; height: 28px; border-radius: 50%; border: 3px solid #DDD; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; transition: all 0.2s; background: var(--white); color: transparent; }
+    .activity-card.done .activity-checkbox { background: var(--mint); border-color: var(--mint); color: white; }
+    .activity-emoji { font-size: 28px; flex-shrink: 0; }
+    .activity-info { flex: 1; }
+    .fase-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--mint); margin-bottom: 2px; }
+    .activity-name { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 2px; }
+    .activity-card.done .activity-name { text-decoration: line-through; color: #AAA; }
+    .activity-desc { font-size: 12px; font-weight: 600; color: #AAA; }
+    .activity-link { font-size: 13px; color: var(--mint); font-weight: 800; text-decoration: none; flex-shrink: 0; background: #F0FFF6; border-radius: 10px; padding: 6px 10px; }
+    .tip-card { background: linear-gradient(135deg, #FFD97D22, #F9A8C922); border: 2px solid var(--yellow); border-radius: var(--radius); padding: 16px 18px; margin-bottom: 20px; font-size: 13px; font-weight: 700; color: var(--text); display: flex; gap: 10px; align-items: flex-start; }
+    .tip-icon { font-size: 20px; flex-shrink: 0; }
+    .badge-section { background: var(--white); border-radius: var(--radius); padding: 24px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.06); display: none; }
+    .badge-section.show { display: block; }
+    .badge-icon-big { font-size: 64px; margin-bottom: 12px; animation: pulse 1s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    .badge-title { font-size: 22px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .badge-sub { font-size: 14px; font-weight: 700; color: #AAA; margin-bottom: 20px; }
+    .canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <a href="dashboard-kids.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Aula 4 — Foods & Drinks!</div>
+</header>
+
+<div class="hero">
+  <div class="hero-label">Mission 1 · Aula 4</div>
+  <div class="hero-title">Foods & Drinks! 🍕</div>
+  <div class="hero-sub">Faça uma fase por dia e complete a aula!</div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-top">
+    <span>Seu progresso</span>
+    <span id="progressText">0 de 5 fases</span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+</div>
+
+<main>
+  <div class="tip-card">
+    <div class="tip-icon">💡</div>
+    <div>Faça <strong>uma fase por dia</strong> — seu progresso fica salvo automaticamente!</div>
+  </div>
+
+  <div class="section-label">Fases da aula</div>
+
+  <div class="activity-list" id="activityList">
+    <div class="activity-card" data-id="kids-l1-a4-flashcards" data-fase="flashcards">
+      <div class="activity-checkbox">✓</div>
+      <div class="activity-emoji">🃏</div>
+      <div class="activity-info">
+        <div class="fase-label">Fase 1</div>
+        <div class="activity-name">Vocab</div>
+        <div class="activity-desc">Flashcards de foods e drinks</div>
+      </div>
+      <a href="aula-kids-4.html?fase=flashcards" class="activity-link" onclick="event.stopPropagation()">Abrir →</a>
+    </div>
+
+    <div class="activity-card" data-id="kids-l1-a4-supermarket" data-fase="supermarket">
+      <div class="activity-checkbox">✓</div>
+      <div class="activity-emoji">🛒</div>
+      <div class="activity-info">
+        <div class="fase-label">Fase 2</div>
+        <div class="activity-name">Supermarket!</div>
+        <div class="activity-desc">Ache o item certo e jogue no carrinho</div>
+      </div>
+      <a href="aula-kids-4.html?fase=supermarket" class="activity-link" onclick="event.stopPropagation()">Abrir →</a>
+    </div>
+
+    <div class="activity-card" data-id="kids-l1-a4-builder" data-fase="builder">
+      <div class="activity-checkbox">✓</div>
+      <div class="activity-emoji">🧩</div>
+      <div class="activity-info">
+        <div class="fase-label">Fase 3</div>
+        <div class="activity-name">Build It!</div>
+        <div class="activity-desc">Monte frases sobre comidas e bebidas</div>
+      </div>
+      <a href="aula-kids-4.html?fase=builder" class="activity-link" onclick="event.stopPropagation()">Abrir →</a>
+    </div>
+
+    <div class="activity-card" data-id="kids-l1-a4-speech" data-fase="speech">
+      <div class="activity-checkbox">✓</div>
+      <div class="activity-emoji">🎤</div>
+      <div class="activity-info">
+        <div class="fase-label">Fase 4</div>
+        <div class="activity-name">Say It!</div>
+        <div class="activity-desc">Fale o que você come em cada refeição!</div>
+      </div>
+      <a href="aula-kids-4.html?fase=speech" class="activity-link" onclick="event.stopPropagation()">Abrir →</a>
+    </div>
+
+    <div class="activity-card" data-id="kids-l1-a4-quiz" data-fase="quiz">
+      <div class="activity-checkbox">✓</div>
+      <div class="activity-emoji">❓</div>
+      <div class="activity-info">
+        <div class="fase-label">Fase 5</div>
+        <div class="activity-name">Quiz</div>
+        <div class="activity-desc">8 perguntas sobre foods, drinks e meals</div>
+      </div>
+      <a href="aula-kids-4.html?fase=quiz" class="activity-link" onclick="event.stopPropagation()">Abrir →</a>
+    </div>
+  </div>
+
+  <div class="badge-section" id="badgeSection">
+    <div class="badge-icon-big">🏆</div>
+    <div class="badge-title">Badge conquistado!</div>
+    <div class="badge-sub">Você completou a Aula 4 — Foods & Drinks!</div>
+  </div>
+</main>
+
+<canvas class="canvas" id="confettiCanvas"></canvas>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  const LESSON_ID = 'kids-m1-a4';
+  const BADGE_NAME = 'aula-kids-4-completa';
+  const TOTAL = 5;
+  let userId = null;
+  let checkedItems = new Set();
+
+  async function init(session) {
+    // Session already verified before init()
+    userId = session.user.id;
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', 'kids-l1-a4-%');
+    if (progress) progress.forEach(p => checkedItems.add(p.lesson_id));
+    renderChecks();
+  }
+
+  function renderChecks() {
+    document.querySelectorAll('.activity-card').forEach(card => {
+      const chk = card.querySelector('.activity-checkbox');
+      if (checkedItems.has(card.dataset.id)) { card.classList.add('done'); chk.textContent = '✓'; chk.style.color = 'white'; }
+      else { card.classList.remove('done'); chk.style.color = 'transparent'; }
+    });
+    const done = checkedItems.size;
+    document.getElementById('progressText').textContent = done + ' de ' + TOTAL + ' fases';
+    document.getElementById('progressFill').style.width = (done / TOTAL * 100) + '%';
+    if (done === TOTAL) showBadge();
+  }
+
+  document.querySelectorAll('.activity-card').forEach(card => {
+    card.addEventListener('click', async () => {
+      const actId = card.dataset.id;
+      if (checkedItems.has(actId)) { checkedItems.delete(actId); await sb.from('lesson_progress').delete().eq('user_id', userId).eq('lesson_id', actId); }
+      else { checkedItems.add(actId); await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: actId, completed_at: new Date().toISOString() }); }
+      renderChecks();
+    });
+  });
+
+  async function showBadge() {
+    await sb.from('badges').upsert({ user_id: userId, badge_name: BADGE_NAME, earned_at: new Date().toISOString() });
+    await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+    document.getElementById('badgeSection').classList.add('show');
+    launchConfetti();
+  }
+
+  function launchConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+    const colors = ['#F9A8C9','#7ECBA1','#C3B1E1','#FFD97D','#90C9F9'];
+    const pieces = Array.from({length: 80}, () => ({ x: Math.random()*canvas.width, y: Math.random()*-canvas.height, w: Math.random()*10+5, h: Math.random()*6+3, color: colors[Math.floor(Math.random()*colors.length)], speed: Math.random()*3+2, angle: Math.random()*360, spin: Math.random()*4-2 }));
+    let frame = 0;
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      pieces.forEach(p => { ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.angle*Math.PI/180); ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore(); p.y+=p.speed; p.angle+=p.spin; if(p.y>canvas.height) p.y=-20; });
+      frame++; if(frame<200) requestAnimationFrame(draw); else ctx.clearRect(0,0,canvas.width,canvas.height);
+    }
+    draw();
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>
