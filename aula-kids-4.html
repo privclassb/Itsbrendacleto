@@ -404,6 +404,16 @@ var DRINKS=[
 ];
 var ALL_ITEMS=FOOD.concat(DRINKS);
 
+// Palavras de comida/bebida além das vistas nos flashcards da aula — pra reconhecer
+// no Say It! mesmo quando o aluno usa um vocabulário que não foi ensinado aqui.
+var EXTRA_FOOD_WORDS=[
+  'chicken','fish','meat','beef','pork','shrimp','soup','noodles','spaghetti','pasta','taco','burrito','sushi',
+  'potato','potatoes','popcorn','candy','ice cream','banana','apple','orange','grape','grapes',
+  'strawberry','watermelon','mango','pineapple','hot dog','hotdog','chips','cereal','yogurt','cheese','ham','bacon',
+  'pancake','pancakes','waffle','waffles','donut','doughnut','muffin','vegetables','carrot','broccoli','beans',
+  'tea','coffee','smoothie','milkshake','hot chocolate','coconut water','yerba mate'
+];
+
 var SM_ROUNDS=[
   {cmd:'Put the PIZZA in the cart! 🛒',     target:'Pizza'},
   {cmd:'Find the WATER! 🛒',               target:'Water'},
@@ -676,7 +686,7 @@ function startSpeech(){
     document.getElementById('sp-transcript').textContent='"'+t+'"';
     var hasEat=t.indexOf('eat')>=0||t.indexOf('drink')>=0;
     var hasMeal=t.indexOf(spMeal)>=0;
-    var hasFood=ALL_ITEMS.some(function(item){return t.indexOf(item.en.toLowerCase())>=0;});
+    var hasFood=ALL_ITEMS.some(function(item){return t.indexOf(item.en.toLowerCase())>=0;})||EXTRA_FOOD_WORDS.some(function(w){return t.indexOf(w)>=0;});
     if(hasEat&&hasMeal&&hasFood){
       fb.textContent='🎉 Amazing! Great sentence!';fb.className='sp-fb show ok';
       speak('Great job!');
