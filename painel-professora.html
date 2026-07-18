@@ -1020,6 +1020,22 @@
   <!-- Acompanhar equipe (só Brenda) -->
   <div class="reports-section panel-section" id="equipeSection">
     <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>📅 Calendário semanal — Equipe</span>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <select class="form-select" id="equipeTeacherSelect" onchange="equipeWeekOffset=0;loadEquipeWeek();" style="max-width:180px;">
+            <option value="">Selecione a professora...</option>
+          </select>
+          <button class="btn-sm" onclick="shiftEquipeWeek(-1)">← Anterior</button>
+          <span id="equipeWeekLabel" style="font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;"></span>
+          <button class="btn-sm" onclick="shiftEquipeWeek(1)">Próxima →</button>
+        </div>
+      </div>
+      <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra ver/editar. 📝✓ = relatório lançado · 📝✗ = sem relatório ainda.</div>
+      <div class="agenda-week-grid" id="equipeWeekGrid"></div>
+    </div>
+
+    <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title">📅 Aulas de hoje — por professora</div>
       <div id="equipeAulasHojeList"><div class="empty-reports">Carregando...</div></div>
     </div>
@@ -4138,6 +4154,7 @@
   // ---- Minha Agenda (semanal, todas as professoras) ----
 
   let agendaWeekOffset = 0;
+  let equipeWeekOffset = 0;
 
   function getAgendaWeekDays(offsetWeeks) {
     const now = new Date();
@@ -4219,6 +4236,77 @@
 
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipeReports(reports || [], myId);
+
+    const teacherSelect = document.getElementById('equipeTeacherSelect');
+    const otherTeachers = allTeachers.filter(t => t.id !== myId);
+    const currentValue = teacherSelect.value;
+    teacherSelect.innerHTML = '<option value="">Selecione a professora...</option>' +
+      otherTeachers.map(t => `<option value="${t.id}">${t.full_name}</option>`).join('');
+    teacherSelect.value = otherTeachers.some(t => t.id === currentValue) ? currentValue : (otherTeachers[0] ? otherTeachers[0].id : '');
+    equipeWeekOffset = 0;
+    await loadEquipeWeek();
+  }
+
+  function shiftEquipeWeek(delta) {
+    equipeWeekOffset += delta;
+    loadEquipeWeek();
+  }
+
+  async function loadEquipeWeek() {
+    const teacherId = document.getElementById('equipeTeacherSelect').value;
+    const days = getAgendaWeekDays(equipeWeekOffset);
+    const startStr = days[0].toISOString().slice(0, 10);
+    const endStr = days[6].toISOString().slice(0, 10);
+
+    document.getElementById('equipeWeekLabel').textContent =
+      days[0].toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' – ' +
+      days[6].toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+
+    const gridEl = document.getElementById('equipeWeekGrid');
+    if (!teacherId) {
+      gridEl.innerHTML = '<div class="empty-reports">Selecione uma professora acima pra ver a agenda semanal dela.</div>';
+      return;
+    }
+
+    const { data: allLogs } = await sb.from('class_logs').select('*').gte('class_date', startStr).lte('class_date', endStr).order('start_time', { ascending: true });
+    const teacherLogs = (allLogs || []).filter(l => teacherOfLog(l) === teacherId);
+
+    const classLogIds = teacherLogs.map(l => l.id);
+    const { data: weekReports } = classLogIds.length
+      ? await sb.from('reports').select('class_log_id').in('class_log_id', classLogIds)
+      : { data: [] };
+    const classLogsWithReport = new Set((weekReports || []).map(r => r.class_log_id));
+
+    const dayNames = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
+    const todayStr = todayLocalISO();
+
+    gridEl.innerHTML = days.map((d, idx) => {
+      const dStr = d.toISOString().slice(0, 10);
+      const dayLogs = teacherLogs.filter(l => l.class_date === dStr);
+      const isToday = dStr === todayStr;
+
+      const items = dayLogs.length ? dayLogs.map(l => {
+        const turma = allTurmas.find(t => t.id === l.turma_id);
+        const student = allStudents.find(s => s.id === l.student_id);
+        const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+        const time = formatTimeRange(l) || 'sem horário';
+        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+        const hasNote = classLogsWithReport.has(l.id) || !!(l.content && l.content.trim());
+        const reportIcon = hasNote ? '📝✓' : '📝✗';
+        return `
+          <div class="agenda-day-item" onclick="openClassLogEdit('${l.id}')">
+            <div class="agenda-day-item-time">${time}</div>
+            <div class="agenda-day-item-who">${who}</div>
+            <div class="agenda-day-item-status">${statusLabel} · ${reportIcon}</div>
+          </div>`;
+      }).join('') : '<div class="agenda-day-empty">—</div>';
+
+      return `
+        <div class="agenda-day-col ${isToday ? 'today' : ''}">
+          <div class="agenda-day-header">${dayNames[idx]}<br>${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}</div>
+          ${items}
+        </div>`;
+    }).join('');
   }
 
   function renderEquipeAulasHoje(logs, myId) {
