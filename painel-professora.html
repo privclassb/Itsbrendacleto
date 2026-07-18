@@ -513,6 +513,14 @@
     .report-status.birthday { background: #FDEDEB; color: #B0503E; }
     .report-status.contract-alert { background: #FFF8E5; color: #A9740C; }
     .report-status.payment-alert { background: #FFF0EE; color: #C0392B; }
+    .report-status.status-realizada { background: #EFF7F3; color: #1E5C3A; }
+    .report-status.status-pendente { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
+    .report-status.status-cancelada { background: #F3EDF7; color: #6B4C93; }
+    .report-status.status-cancelada_falta { background: #FFF0EE; color: #C0392B; }
+    .report-status.status-para_reagendar { background: #FFF8E5; color: #A9740C; }
+    .report-status.status-reagendada { background: #E8F1FB; color: #2E5C8A; }
+    .report-status.status-feriado { background: #FDEDEB; color: #B0503E; }
+    .report-status.status-recesso { background: #E5F3F3; color: #2D6E6E; }
 
     .task-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
     .task-row:last-child { border-bottom: none; }
@@ -4136,8 +4144,7 @@
       const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
       const names = turma ? firstNamesAlphabetical(allStudents.filter(s => s.turma_id === turma.id)) : '';
       const time = formatTimeRange(l) || 'sem horário';
-      const isDone = l.status === 'realizada';
-      const badgeClass = isDone ? 'published' : 'draft';
+      const badgeClass = 'status-' + l.status;
       const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
       return `
         <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
@@ -4334,7 +4341,7 @@
           const student = allStudents.find(x => x.id === l.student_id);
           const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
           const time = formatTimeRange(l) || 'sem horário';
-          const badgeClass = l.status === 'realizada' ? 'published' : 'draft';
+          const badgeClass = 'status-' + l.status;
           const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
           return `
             <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
