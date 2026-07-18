@@ -3206,6 +3206,7 @@
 
     document.getElementById('turmaName').value = '';
     await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
   }
 
   async function deleteTurma(id) {
@@ -3230,6 +3231,7 @@
 
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
   }
 
   function editTurma(id) {
@@ -3280,6 +3282,7 @@
     closeEditTurma();
     const { data: { session } } = await sb.auth.getSession();
     await loadTurmas(session.user.id, currentUserIsBrenda);
+    await populateTurmaSelect('folderTurma', '', 'Nenhuma (pasta individual)');
   }
 
   // ---- Página da turma (Dados + Aulas registradas, igual a do aluno) ----
