@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual do Aluno | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: var(--white); text-decoration: none; transition: all 0.2s; cursor: pointer; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); font-weight: 400; margin-bottom: 10px; }
+    .hero-sub { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .manual-section { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; border: 1.5px solid var(--sand); overflow: hidden; }
+    .manual-section-header { display: flex; align-items: center; gap: 14px; padding: 18px 20px; cursor: pointer; user-select: none; }
+    .manual-section-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--cream); display: flex; align-items: center; justify-content: center; font-size: 19px; flex-shrink: 0; }
+    .manual-section-title { flex: 1; font-size: 15px; font-weight: 600; color: var(--text); }
+    .manual-section-chevron { font-size: 13px; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+    .manual-section.open .manual-section-chevron { transform: rotate(180deg); }
+    .manual-section-body { max-height: 0; overflow: hidden; transition: max-height 0.25s ease; }
+    .manual-section.open .manual-section-body { max-height: 2400px; }
+    .manual-section-body-inner { padding: 0 20px 22px; font-size: 14px; color: var(--text); line-height: 1.75; }
+    .manual-section-body-inner p { margin-bottom: 12px; }
+    .manual-section-body-inner p:last-child { margin-bottom: 0; }
+    .manual-section-body-inner ul { margin: 0 0 12px 18px; }
+    .manual-section-body-inner li { margin-bottom: 6px; }
+    .manual-section-body-inner b { color: var(--brown); }
+    .highlight-box { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; padding: 12px 14px; margin: 4px 0 12px; font-size: 13px; color: var(--text); }
+    .highlight-box.warn { background: #FFF8E5; border-color: #F0D9A0; }
+
+    .manual-footer { text-align: center; padding: 20px; font-size: 13px; color: var(--muted); }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <a href="javascript:history.back()" class="btn-back">← Voltar</a>
+  <div class="header-title">Manual do Aluno</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Guia rápido</div>
+    <div class="hero-title">Manual do Aluno 📘</div>
+    <div class="hero-sub">Tudo o que você precisa saber sobre as aulas, o contrato e a plataforma itsbrendacleto, num só lugar.</div>
+  </div>
+</div>
+
+<main id="manualMain">
+  <!-- Ver como aluno banner é inserido aqui via JS quando aplicável -->
+
+  <div class="manual-section open" data-section="1">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">👋</div>
+      <div class="manual-section-title">Bem-vindo(a)!</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Esse manual reúne as principais informações sobre como funcionam as aulas de inglês e a plataforma itsbrendacleto. A ideia é que você tenha tudo isso à mão sempre que precisar, sem precisar reler o contrato inteiro.</p>
+        <p>Qualquer dúvida que não for respondida aqui, é só chamar a sua professora diretamente. 💛</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="2">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">📅</div>
+      <div class="manual-section-title">Como funcionam as aulas</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>As aulas acontecem <b>toda semana, no mesmo horário combinado</b>, durante o período de vigência do contrato — respeitando feriados e recessos previstos no calendário.</p>
+        <p>Todas as aulas contratadas devem ser <b>frequentadas dentro do período de vencimento das parcelas</b>. Depois que o contrato vence, não são mais possíveis reposições de aulas antigas — a não ser que o contrato seja renovado.</p>
+        <p>Faltar ou não participar das atividades não isenta do pagamento das parcelas combinadas — o valor contratado é pela vaga/horário reservado, não por aula avulsa.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="3">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">⏰</div>
+      <div class="manual-section-title">Atrasos e faltas</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <div class="highlight-box warn">
+          <b>Tolerância de atraso: até 10 minutos.</b> Depois disso, a aula é considerada <b>falta</b> — e esses 10 minutinhos não são acrescentados no final da aula.
+        </div>
+        <p>Isso vale tanto pra quem chega atrasado quanto pra quem demora a entrar na chamada. Por isso, é importante estar pronto(a) e conectado(a) no horário combinado — assim você aproveita a aula inteira!</p>
+        <p>Se algo imprevisto acontecer e você souber que vai se atrasar ou faltar, avise sua professora o quanto antes — veja a seção de <b>Cancelamento e reposição</b> logo abaixo pra entender os prazos.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="4">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">🔄</div>
+      <div class="manual-section-title">Cancelamento e reposição</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Precisa cancelar uma aula? <b>Avise com pelo menos 12 horas de antecedência.</b> Avisando dentro desse prazo (e com o combinado dos demais colegas de turma, se for o caso), a aula pode ser reposta sem custo extra.</p>
+        <p>Se o aviso for feito depois desse prazo, ou em caso de falta sem aviso, a aula é considerada como dada — mas ainda é possível repor, mediante o pagamento de uma <b>taxa de reposição de R$ 50,00</b>.</p>
+        <p>Se a aula for interrompida no meio por algum motivo de força maior, a professora pode, a critério dela, complementar o tempo restante na aula seguinte.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="5">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">💻</div>
+      <div class="manual-section-title">Equipamentos necessários</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>É responsabilidade do aluno (ou responsável, no caso dos kids) garantir uma <b>boa internet, câmera e áudio</b> funcionando para a aula.</p>
+        <p>Se uma aula for prejudicada ou interrompida por problema técnico do lado do aluno, ela é cobrada integralmente do mesmo jeito — então vale a pena testar tudo antes do horário combinado!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="6">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">💰</div>
+      <div class="manual-section-title">Pagamento</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>O pagamento é feito em <b>parcelas mensais</b>, por boleto enviado no e-mail cadastrado.</p>
+        <p>O valor das parcelas é reajustado <b>anualmente pelo IPCA</b> (Índice Nacional de Preços ao Consumidor Amplo).</p>
+        <p>Em caso de atraso no pagamento, incide <b>multa de R$ 15,00 + 1% ao mês</b>, contados da data de vencimento até o pagamento efetivo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="7">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">📝</div>
+      <div class="manual-section-title">Renovação e cancelamento do contrato</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Quer encerrar o contrato? É só comunicar <b>por escrito, com no mínimo 30 dias de antecedência</b>, e não há multa nenhuma.</p>
+        <p>Se o cancelamento for comunicado fora desse prazo, incide uma <b>multa de 10%</b> sobre o total das parcelas ainda em aberto até o fim da vigência do contrato.</p>
+        <p>Em caso de inadimplência (parcela vencida e não paga), o contrato pode ser rescindido, sem prejuízo da cobrança do débito — inclusive com possível inclusão em cadastros de proteção ao crédito (SPC/Serasa), sempre com aviso prévio por escrito.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="8">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">🖥️</div>
+      <div class="manual-section-title">Como funciona a plataforma</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Além das aulas ao vivo, você tem acesso ao <b>app itsbrendacleto</b> — sua área pessoal com tudo relacionado ao seu aprendizado:</p>
+        <ul>
+          <li><b>🎯 Atividades</b> — exercícios e aulas interativas pra praticar o que foi visto em sala.</li>
+          <li><b>📅 Agenda</b> — todas as suas aulas marcadas, com data, horário e status (realizada, reagendada, etc).</li>
+          <li><b>📁 Materiais</b> — slides, gravações e conteúdos extras liberados pela professora.</li>
+          <li><b>📖 Dicionário</b> e <b>💬 Frase do dia</b> — ferramentas rápidas pra tirar dúvidas de vocabulário e praticar todo dia.</li>
+          <li><b>📊 Relatórios</b> — feedback que a professora registra sobre sua evolução em cada aula.</li>
+          <li><b>💳 Financeiro</b> — acompanhamento das suas parcelas e pagamentos.</li>
+          <li><b>👥 Comunidade</b> — espaço pra interagir com outros alunos.</li>
+        </ul>
+        <p>O app funciona como um PWA: dá pra "instalar" na tela inicial do celular e usar como um aplicativo normal, direto do navegador.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="9">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">🎮</div>
+      <div class="manual-section-title">Atividades, exercícios e conquistas</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Cada aula do módulo de Atividades tem exercícios interativos — quiz, jogo da memória, pronúncia, caça-palavras e outros — pensados pra fixar o conteúdo de um jeito leve e divertido.</p>
+        <p>Conforme você completa as atividades, seu progresso é salvo automaticamente: <b>nível</b>, <b>sequência de dias seguidos praticando (streak)</b> e <b>conquistas/badges</b> desbloqueadas. Tudo isso aparece na sua tela inicial e ajuda a professora a acompanhar como você está evoluindo.</p>
+        <p>Não existe "errar" nas atividades — o objetivo é praticar. Pode repetir quantas vezes quiser!</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="10">
+    <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">💬</div>
+      <div class="manual-section-title">Ficou com alguma dúvida?</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>Fale diretamente com a sua professora — ela vai adorar ajudar! Esse manual é só um resumo prático; o contrato assinado continua valendo como documento oficial em qualquer caso de dúvida mais específica.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-footer">itsbrendacleto · Manual do Aluno</div>
+</main>
+
+<script>
+  function toggleSection(headerEl) {
+    var section = headerEl.closest('.manual-section');
+    section.classList.toggle('open');
+  }
+
+  // ---- Banner "Ver como aluno" (Brenda em modo visualização) ----
+  (function () {
+    var previewAs = sessionStorage.getItem('__preview_as');
+    if (!previewAs) return;
+    var banner = document.createElement('div');
+    banner.id = 'previewModeBanner';
+    banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+    var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+    banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+      '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+    document.body.insertBefore(banner, document.body.firstChild);
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as');
+        sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  })();
+</script>
+</body>
+</html>
