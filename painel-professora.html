@@ -616,6 +616,15 @@
     }
     .makeup-history-banner strong { font-weight: 700; }
 
+    /* Histórico de alterações de data/horário */
+    .reschedule-history-box {
+      background: #E8F1FB; border: 1.5px solid #B7D2EE; border-radius: 10px;
+      padding: 10px 14px; font-size: 12.5px; color: #2E5C8A; margin-bottom: 14px;
+    }
+    .reschedule-history-title { font-weight: 700; margin-bottom: 6px; }
+    .reschedule-history-row { padding: 3px 0; }
+    .reschedule-history-row strong { font-weight: 700; }
+
     /* Presença dos alunos na aula de turma */
     .attendance-list { background: var(--cream); border-radius: 10px; padding: 6px 12px; }
     .attendance-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--sand); }
@@ -3524,6 +3533,9 @@
     btn.disabled = true;
     btn.textContent = 'Salvando...';
 
+    const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', classLogId).maybeSingle();
+    const oldLog = oldLogRaw ? { ...oldLogRaw } : null;
+
     const { data: logUpdData, error: logUpdErr } = await withAuthRetry(() => sb.from('class_logs').update({
       content, class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
     }).eq('id', classLogId).select());
@@ -3537,6 +3549,8 @@
       errEl.style.display = 'block';
       return;
     }
+
+    await logRescheduleIfChanged(classLogId, oldLog, { class_date: date, start_time: startTime, end_time: endTime });
 
     const attendanceList = collectAttendanceFromContainer('turmaReportAttendanceList');
     await saveAttendanceForClassLog(classLogId, attendanceList);
@@ -3671,6 +3685,45 @@
       ? new Date(log.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
       : '';
     return `<div class="makeup-history-banner">📅 Reagendamento de <strong>${origLabel}</strong> para <strong>${newLabel}</strong>${madeAt ? ' · marcado em ' + madeAt : ''}</div>`;
+  }
+
+  // ---- Histórico de alterações de data/horário de uma aula ----
+
+  async function logRescheduleIfChanged(logId, oldLog, newVals) {
+    if (!oldLog) return;
+    const dateChanged = (oldLog.class_date || null) !== (newVals.class_date || null);
+    const startChanged = (oldLog.start_time || null) !== (newVals.start_time || null);
+    const endChanged = (oldLog.end_time || null) !== (newVals.end_time || null);
+    if (!dateChanged && !startChanged && !endChanged) return;
+
+    const { data: { session } } = await sb.auth.getSession();
+    await withAuthRetry(() => sb.from('class_log_reschedule_history').insert({
+      class_log_id: logId,
+      changed_by: session.user.id,
+      old_class_date: oldLog.class_date || null,
+      old_start_time: oldLog.start_time || null,
+      old_end_time: oldLog.end_time || null,
+      new_class_date: newVals.class_date || null,
+      new_start_time: newVals.start_time || null,
+      new_end_time: newVals.end_time || null
+    }));
+  }
+
+  async function buildRescheduleHistoryHtml(logId) {
+    const { data: rows } = await sb.from('class_log_reschedule_history').select('*').eq('class_log_id', logId).order('created_at', { ascending: false });
+    if (!rows || rows.length === 0) return '';
+
+    const items = rows.map(r => {
+      const oldLabel = formatDateTimeBR(r.old_class_date, r.old_start_time);
+      const newLabel = formatDateTimeBR(r.new_class_date, r.new_start_time);
+      const who = (allTeachers.find(t => t.id === r.changed_by) || {}).full_name || '';
+      const when = r.created_at
+        ? new Date(r.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : '';
+      return `<div class="reschedule-history-row">🔁 De <strong>${oldLabel}</strong> para <strong>${newLabel}</strong>${who ? ' · por ' + who : ''}${when ? ' · ' + when : ''}</div>`;
+    }).join('');
+
+    return `<div class="reschedule-history-box"><div class="reschedule-history-title">Histórico de alterações (${rows.length})</div>${items}</div>`;
   }
 
   async function copyLoginInfo(text) {
@@ -3880,12 +3933,17 @@
 
     let failCount = 0;
     for (let i = 0; i < logs.length; i++) {
+      const oldLog = { class_date: logs[i].class_date, start_time: logs[i].start_time, end_time: logs[i].end_time };
       const { data: updData, error: updErr } = await sb.from('class_logs').update({
         class_date: newDates[i],
         start_time: startTime,
         end_time: endTime
       }).eq('id', logs[i].id).select();
-      if (updErr || !updData || updData.length === 0) failCount++;
+      if (updErr || !updData || updData.length === 0) {
+        failCount++;
+      } else {
+        await logRescheduleIfChanged(logs[i].id, oldLog, { class_date: newDates[i], start_time: startTime, end_time: endTime });
+      }
     }
 
     btn.disabled = false;
@@ -4474,6 +4532,7 @@
     document.getElementById('classLogEditContent').value = l.content || '';
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
     document.getElementById('classLogEditMakeupHistory').innerHTML = await buildMakeupHistoryHtml(l);
+    document.getElementById('classLogEditRescheduleHistory').innerHTML = await buildRescheduleHistoryHtml(id);
 
     if (l.turma_id) {
       const { data: existingAttendance } = await sb.from('class_attendance').select('student_id, present').eq('class_log_id', id);
@@ -4510,6 +4569,9 @@
       return;
     }
 
+    const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', id).maybeSingle();
+    const oldLog = oldLogRaw ? { ...oldLogRaw } : null;
+
     const { data: updData, error } = await withAuthRetry(() => sb.from('class_logs').update(updates).eq('id', id).select());
     if (error) {
       errEl.textContent = 'Erro ao salvar: ' + error.message;
@@ -4521,6 +4583,8 @@
       errEl.style.display = 'block';
       return;
     }
+
+    await logRescheduleIfChanged(id, oldLog, updates);
 
     if (document.getElementById('classLogEditAttendanceRow').style.display !== 'none') {
       const attendanceList = collectAttendanceFromContainer('classLogEditAttendanceList');
@@ -4623,6 +4687,9 @@
       }
     }
 
+    const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', classLogId).maybeSingle();
+    const oldLog = oldLogRaw ? { ...oldLogRaw } : null;
+
     const { data: logUpdData, error: logUpdErr } = await withAuthRetry(() => sb.from('class_logs').update({
       class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
     }).eq('id', classLogId).select());
@@ -4634,6 +4701,8 @@
       errEl.style.display = 'block';
       return;
     }
+
+    await logRescheduleIfChanged(classLogId, oldLog, { class_date: date, start_time: startTime, end_time: endTime });
 
     closeClassReport();
     await openStudentProfile(studentId);
@@ -5800,6 +5869,7 @@
     <div class="modal-title">Editar aula</div>
     <div class="modal-sub" id="classLogEditWho"></div>
     <div id="classLogEditMakeupHistory"></div>
+    <div id="classLogEditRescheduleHistory"></div>
     <input type="hidden" id="classLogEditId" />
 
     <div class="modal-row">
