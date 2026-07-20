@@ -3565,6 +3565,9 @@
     closeTurmaClassReport();
     await openTurmaProfile(currentProfileTurmaId);
     await loadReports(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
   }
 
   function openTurmaStudents(turmaId) {
@@ -3903,6 +3906,8 @@
     }
     await loadClassLogs(session.user.id, currentUserIsBrenda);
     await loadAulasHoje(session.user.id);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
     alert(logs.length + ' aula(s) remarcada(s) com sucesso.');
   }
 
@@ -4526,6 +4531,8 @@
     const { data: { session } } = await sb.auth.getSession();
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
     await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
   }
 
   async function deleteClassLogFromModal() {
@@ -4538,6 +4545,8 @@
     const { data: { session } } = await sb.auth.getSession();
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
     await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
   }
 
   // ---- Relatório vinculado a uma aula específica (a partir da página do aluno) ----
@@ -4629,6 +4638,9 @@
     closeClassReport();
     await openStudentProfile(studentId);
     await loadReports(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
   }
 
   async function deleteClassReport() {
