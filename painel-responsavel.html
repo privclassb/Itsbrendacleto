@@ -315,6 +315,57 @@
     }
   });
 
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, {
+          user: Object.assign({}, real.data.session.user, { id: __previewAs })
+        });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, {
+        get: function (t, prop) {
+          if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+          return function () { return p; };
+        }
+      });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+        qb[m] = function () { return __previewNoop(); };
+      });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '\uD83D\uDD0D Modo visualiza\u00e7\u00e3o \u2014 voc\u00ea \u00e9 a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada \u00e9 salvo) ' +
+        '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualiza\u00e7\u00e3o</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as');
+        sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
   function todayLocalISO() {
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');

@@ -730,6 +730,7 @@
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">📊 Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">🔗 Materiais</button>
     <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;">🔍 Acompanhar equipe</button>
+    <button class="nav-btn" data-tab="vercomo" onclick="showTab('vercomo')">👁️ Ver como aluno</button>
     <a class="nav-btn" href="comunidade.html" style="text-decoration:none;display:inline-flex;align-items:center;">👥 Comunidade</a>
   </div>
 
@@ -1054,6 +1055,21 @@
     </div>
   </div>
 
+  <!-- Ver como aluno -->
+  <div class="reports-section panel-section" id="vercomoSection">
+    <div class="report-list">
+      <div class="report-list-title">👁️ Ver como aluno</div>
+      <div class="modal-hint" style="margin-bottom:16px;">Veja o app exatamente como o aluno (ou responsável) vê, sem precisar do login dele. Modo <b>somente leitura</b>: nada que você fizer lá dentro é salvo de verdade.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;max-width:520px;">
+        <div style="flex:1;min-width:240px;">
+          <label class="form-label">Quem você quer ver?</label>
+          <select class="form-select" id="vercomoSelect"></select>
+        </div>
+        <button class="btn-save-link" onclick="abrirVerComoAluno()">Abrir visualização →</button>
+      </div>
+    </div>
+  </div>
+
 </main>
 
 <!-- Modal: Add student -->
@@ -1121,7 +1137,8 @@
     turmas: 'turmasSection',
     agenda: 'agendaSection',
     financeiro: 'financeiroSection',
-    equipe: 'equipeSection'
+    equipe: 'equipeSection',
+    vercomo: 'vercomoSection'
   };
 
   function showTab(tab) {
@@ -1224,6 +1241,41 @@
     updateOverview(students);
     renderStudents(students);
     await renderNotifications(students);
+    await loadVerComoOptions();
+  }
+
+  // ---- Ver como aluno (preview somente leitura) ----
+
+  async function loadVerComoOptions() {
+    const sel = document.getElementById('vercomoSelect');
+    if (!sel) return;
+
+    const opts = [];
+    allStudents.filter(s => s.role === 'adulto').forEach(s => opts.push({ id: s.id, role: 'adulto', label: (s.full_name || 'Aluno') + ' — Aluno adulto' }));
+    allStudents.filter(s => s.role === 'kids').forEach(s => opts.push({ id: s.id, role: 'kids', label: (s.full_name || 'Aluno') + ' — Aluno kids' }));
+
+    const studentIds = new Set(allStudents.map(s => s.id));
+    const { data: guardians } = await sb.from('profiles').select('id, full_name, guardian_of').not('guardian_of', 'is', null);
+    (guardians || []).filter(g => studentIds.has(g.guardian_of)).forEach(g => {
+      const kid = allStudents.find(s => s.id === g.guardian_of);
+      opts.push({ id: g.id, role: 'responsavel', label: (g.full_name || 'Responsável') + ' — Responsável de ' + (kid ? kid.full_name : '?') });
+    });
+
+    opts.sort((a, b) => a.label.localeCompare(b.label));
+    sel.innerHTML = opts.length
+      ? opts.map(o => `<option value="${o.id}" data-role="${o.role}" data-name="${(o.label.split(' — ')[0] || '').replace(/"/g, '&quot;')}">${o.label}</option>`).join('')
+      : '<option value="">Nenhum aluno cadastrado ainda</option>';
+  }
+
+  function abrirVerComoAluno() {
+    const sel = document.getElementById('vercomoSelect');
+    const opt = sel.options[sel.selectedIndex];
+    if (!opt || !opt.value) return;
+    const role = opt.dataset.role;
+    sessionStorage.setItem('__preview_as', opt.value);
+    sessionStorage.setItem('__preview_name', opt.dataset.name || 'aluno');
+    const target = role === 'kids' ? 'home-kids.html' : (role === 'responsavel' ? 'painel-responsavel.html' : 'home-adulto.html');
+    window.location.href = target;
   }
 
   async function renderNotifications(students) {
