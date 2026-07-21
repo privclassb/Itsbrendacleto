@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 17 · Around Town · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --brown-dk: #2C1A0E;
+  --brown:    #5C3A1E;
+  --brown-md: #8B5E3C;
+  --brown-lt: #C4956A;
+  --cream:    #FAF7F4;
+  --sand:     #EDE5DA;
+  --sand-md:  #D9CCBC;
+  --white:    #FFFFFF;
+  --text:     #2C1A0E;
+  --text-md:  #7A5C40;
+  --text-lt:  #A88B70;
+  --ok:       #3D7A5E;
+  --ok-lt:    #EAF4EF;
+  --fail:     #963030;
+  --fail-lt:  #FAEAEA;
+  --warn-lt:  #FFF8E8;
+  --warn:     #8B6914;
+  --r: 14px;
+  --rs: 9px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+.header { background: var(--brown-dk); padding: 32px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%); pointer-events:none; }
+.btn-back { position:relative; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 14px; font-size:13px; font-weight:500; color:#fff; text-decoration:none; transition:all .2s; margin-bottom:16px; }
+.btn-back:hover { background: rgba(255,255,255,.22); }
+.brand { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--brown-lt); position:relative; margin-bottom:14px; }
+.h-eyebrow { font-size:.7rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.38); position:relative; margin-bottom:7px; }
+.h-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
+.h-title em { font-style:italic; color:var(--brown-lt); }
+.h-desc { font-size:.76rem; color:rgba(255,255,255,.38); margin-top:9px; position:relative; letter-spacing:.04em; }
+
+.day-nav-wrap { background:var(--brown-dk); padding:0 16px 20px; position:sticky; top:0; z-index:100; }
+.day-nav { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; max-width:680px; margin:0 auto; }
+.day-nav::-webkit-scrollbar { display:none; }
+.day-pill { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.5); padding:8px 16px; border-radius:20px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.day-pill:hover { background:rgba(255,255,255,.13); color:rgba(255,255,255,.8); }
+.day-pill.on { background:var(--brown-lt); border-color:var(--brown-lt); color:var(--brown-dk); }
+.day-pill-name { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; font-weight:500; }
+.day-pill-label { font-size:.68rem; font-weight:500; opacity:.7; }
+.day-pill.on .day-pill-label { opacity:1; }
+.day-pill.done .day-pill-name::after { content:' ✓'; color:var(--brown-lt); }
+.day-pill.on.done .day-pill-name::after { color:var(--brown-dk); }
+
+.main { max-width:680px; margin:0 auto; padding:24px 16px 56px; }
+.day-sec { display:none; }
+.day-sec.on { display:block; }
+
+.day-header { margin-bottom:20px; }
+.day-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.day-weekday { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); margin-bottom:3px; }
+.day-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
+.day-done-btn { flex-shrink:0; background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; color:var(--text-md); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-top:4px; }
+.day-done-btn:hover { background:var(--sand-md); }
+.day-done-btn.on { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.day-intro { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; font-size:.82rem; color:var(--text-md); line-height:1.6; }
+.day-intro strong { color:var(--brown-dk); font-weight:600; }
+
+.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(44,26,14,.06); overflow:hidden; margin-bottom:14px; }
+.block-head { padding:14px 18px; border-bottom:1px solid var(--sand); display:flex; align-items:center; gap:11px; }
+.block-icon { width:36px; height:36px; border-radius:9px; background:var(--sand); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.block-title { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
+.block-sub { font-size:.71rem; color:var(--text-lt); margin-top:1px; }
+.block-body { padding:16px 18px; }
+
+.task-list { display:flex; flex-direction:column; gap:8px; padding-left:18px; }
+.task-list li { font-size:.82rem; color:var(--text); line-height:1.55; padding-left:4px; }
+.task-list li a { color:var(--brown-md); text-decoration:underline; text-underline-offset:2px; font-weight:500; }
+.task-list li a:hover { color:var(--brown-dk); }
+
+.notes-area { width:100%; min-height:80px; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--text); resize:vertical; outline:none; background:var(--cream); transition:border-color .2s; line-height:1.55; }
+.notes-area:focus { border-color:var(--brown-lt); }
+.notes-area::placeholder { color:var(--text-lt); font-size:.78rem; }
+.starter-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.starter-chip { background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:5px 12px; font-size:.74rem; color:var(--text-md); cursor:pointer; transition:all .15s; }
+.starter-chip:hover { background:var(--sand-md); color:var(--brown-dk); }
+
+/* FLASHCARDS */
+.fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:9px; }
+.fc { perspective:700px; cursor:pointer; height:100px; }
+.fc-in { width:100%; height:100%; transition:transform .48s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d; position:relative; }
+.fc.flip .fc-in { transform:rotateY(180deg); }
+.fc-f, .fc-b { position:absolute; inset:0; border-radius:var(--rs); backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; border:1.5px solid transparent; }
+.fc-f { background:var(--sand); border-color:var(--sand-md); }
+.fc-b { background:var(--brown-dk); border-color:var(--brown-dk); transform:rotateY(180deg); }
+.fc-en { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:.9rem; color:var(--brown-dk); line-height:1.25; }
+.fc-f .fc-pt { font-size:.66rem; color:var(--text-lt); margin-top:3px; }
+.fc-b .fc-pt { font-family:'Cormorant Garamond',serif; font-size:.82rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
+.fc-b .fc-en-back { font-size:.7rem; color:rgba(255,255,255,.55); margin-top:3px; }
+.fc-tap { font-size:.58rem; color:var(--text-lt); margin-top:5px; letter-spacing:.03em; }
+.audio-btn { background:var(--brown-lt); border:none; cursor:pointer; border-radius:50%; width:23px; height:23px; display:flex; align-items:center; justify-content:center; font-size:.62rem; margin-top:5px; transition:transform .15s,background .2s; flex-shrink:0; }
+.audio-btn:hover { transform:scale(1.15); background:var(--brown); }
+
+/* SPEAKING / INTERVIEW-STYLE Q&A */
+.riddle-card { background:var(--sand); border-radius:var(--rs); padding:16px; margin-bottom:14px; text-align:center; }
+.riddle-progress { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--text-lt); margin-bottom:8px; }
+.riddle-text { font-size:1.05rem; color:var(--brown-dk); font-weight:600; line-height:1.5; font-family:'Cormorant Garamond',serif; }
+.iv-model-box { display:none; background:var(--sand); border-radius:var(--rs); padding:12px 14px; margin-top:10px; font-size:.85rem; color:var(--text-md); line-height:1.5; }
+.iv-model-box.show { display:block; }
+.iv-model-label { font-family:'DM Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-lt); margin-bottom:4px; }
+.btn-listen, .btn-speak { border:none; border-radius:var(--rs); padding:7px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:5px; }
+.btn-listen { background:var(--sand); color:var(--brown-dk); }
+.btn-listen:hover { background:var(--sand-md); }
+.btn-speak { background:var(--brown-dk); color:#fff; }
+.btn-speak:hover { background:var(--brown); }
+.btn-speak.listening { background:var(--fail); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+.btn-sm { background:var(--sand); border:none; border-radius:8px; padding:6px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.71rem; cursor:pointer; color:var(--text-md); transition:background .2s; }
+.btn-sm:hover { background:var(--sand-md); }
+.pron-fb { margin-top:9px; border-radius:var(--rs); padding:9px 12px; font-size:.77rem; font-weight:500; display:none; line-height:1.45; background:var(--sand); color:var(--text-md); }
+.pron-fb.on { display:block; }
+.qfb { text-align:center; font-weight:500; font-size:.8rem; padding:9px; border-radius:var(--rs); margin-bottom:11px; display:none; }
+.qfb.on { display:block; }
+.qfb.ok { background:var(--ok-lt); color:var(--ok); }
+.btn-next { background:var(--brown-dk); color:#fff; border:none; border-radius:var(--rs); padding:10px 26px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.82rem; cursor:pointer; display:inline-block; transition:background .2s; }
+.btn-next:hover { background:var(--brown); }
+
+/* ITINERARY BUILDER */
+.order-chip { background:var(--white); border:1.5px solid var(--sand-md); border-radius:20px; padding:8px 14px; font-size:.82rem; font-weight:500; color:var(--text); cursor:pointer; transition:all .15s; }
+.order-chip:hover { border-color:var(--brown-lt); background:var(--sand); }
+.order-chip.sel { background:var(--brown-dk); color:#fff; border-color:var(--brown-dk); }
+.itin-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+.itin-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--sand); }
+.itin-row:last-child { border-bottom:none; }
+.itin-place { font-family:'DM Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-lt); width:90px; flex-shrink:0; }
+.itin-inp { flex:1; border:1.5px solid var(--sand-md); border-radius:8px; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:.8rem; color:var(--text); outline:none; background:var(--cream); }
+.itin-inp:focus { border-color:var(--brown-lt); }
+.madlib-result { margin-top:12px; background:var(--sand); border-radius:var(--rs); padding:14px; font-size:.86rem; line-height:1.6; color:var(--text-md); display:none; }
+.madlib-result.on { display:block; }
+
+/* MATCHER */
+.match-wrap { display:flex; gap:14px; justify-content:center; }
+.match-col { display:flex; flex-direction:column; gap:8px; flex:1; max-width:220px; }
+.match-item { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 10px; font-size:.8rem; font-weight:500; color:var(--text); cursor:pointer; text-align:center; transition:all .18s; }
+.match-item:hover { border-color:var(--brown-lt); background:var(--sand); }
+.match-item.sel { border-color:var(--brown-dk); background:var(--brown-dk); color:#fff; }
+.match-item.ok { border-color:var(--ok); background:var(--ok-lt); color:var(--ok); pointer-events:none; }
+.match-item.fail { border-color:var(--fail); background:var(--fail-lt); color:var(--fail); }
+.match-status { text-align:center; margin-top:14px; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-lt); }
+.match-win { text-align:center; padding:13px; background:var(--ok-lt); border-radius:var(--rs); margin-top:12px; display:none; }
+.match-win.on { display:block; }
+.match-win-t { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
+
+/* AUDIO RECORDER */
+.rec-controls { display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
+.btn-rec { background:var(--fail); color:#fff; border:none; border-radius:24px; padding:11px 22px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.84rem; cursor:pointer; transition:all .2s; }
+.btn-rec:hover { background:#7a2626; }
+.btn-rec.stop { background:var(--brown-dk); }
+.btn-rec.stop:hover { background:var(--brown); }
+.rec-player { text-align:center; }
+.rec-msg { text-align:center; font-size:.78rem; color:var(--text-lt); margin-top:8px; }
+
+.footer { text-align:center; padding:18px 16px 30px; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.09em; color:var(--text-lt); text-transform:uppercase; border-top:1px solid var(--sand); margin-top:8px; }
+
+@media(max-width:400px){
+  .fc-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<div class="header">
+  <a href="dashboard-adulto.html" class="btn-back">← Voltar</a>
+  <div class="brand">itsbrendacleto · adults</div>
+  <div class="h-eyebrow">Study Planner · Lição 17</div>
+  <div class="h-title">Around <em>Town</em></div>
+  <div class="h-desc">Places in the City · To Go</div>
+</div>
+
+<div class="day-nav-wrap">
+  <div class="day-nav">
+    <div class="day-pill on" onclick="showDay('mon',this)" id="pill-mon"><span class="day-pill-name">Mon</span><span class="day-pill-label">Places</span></div>
+    <div class="day-pill" onclick="showDay('tue',this)" id="pill-tue"><span class="day-pill-name">Tue</span><span class="day-pill-label">Speaking</span></div>
+    <div class="day-pill" onclick="showDay('wed',this)" id="pill-wed"><span class="day-pill-name">Wed</span><span class="day-pill-label">Itinerary</span></div>
+    <div class="day-pill" onclick="showDay('thu',this)" id="pill-thu"><span class="day-pill-name">Thu</span><span class="day-pill-label">Matcher</span></div>
+    <div class="day-pill" onclick="showDay('fri',this)" id="pill-fri"><span class="day-pill-name">Fri</span><span class="day-pill-label">Vlog</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SEGUNDA -->
+  <div class="day-sec on" id="day-mon">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Segunda-feira · Monday</div><div class="day-title">Places in the City</div></div>
+        <button class="day-done-btn" id="done-mon" onclick="toggleDone('mon')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Revise e pratique o vocabulário de lugares da cidade com o exercício e os cartões abaixo. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use o link abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Faça o <a href="https://wordwall.net/pt/resource/8725385/places" target="_blank">exercício de lugares da cidade ↗</a>.</li>
+          <li>Revise os Place Cards abaixo.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🏙️</div><div><div class="block-title">Place Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
+    </div>
+  </div>
+
+  <!-- TERÇA -->
+  <div class="day-sec" id="day-tue">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Terça-feira · Tuesday</div><div class="day-title">Speaking Practice</div></div>
+        <button class="day-done-btn" id="done-tue" onclick="toggleDone('tue')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Grave um áudio respondendo as perguntas abaixo para praticar sua comunicação. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Ouça cada pergunta e responda em voz alta.</li>
+          <li>Compare sua resposta com a resposta modelo.</li>
+          <li>Pesquise palavras novas e inclua no seu vocabulário.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎙️</div><div><div class="block-title">Speaking Practice</div><div class="block-sub">6 perguntas sobre lugares da sua cidade</div></div></div>
+      <div class="block-body">
+        <div class="riddle-card">
+          <div class="riddle-progress" id="iv-progress"></div>
+          <div class="riddle-text" id="iv-q"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn-listen" onclick="ivListenQ()">🔊 Ouvir pergunta</button>
+          <button class="btn-speak" id="iv-mic-btn" onclick="ivRecordAnswer()">🎙 Gravar resposta</button>
+          <button class="btn-sm" onclick="toggleModel()">💡 Ver resposta modelo</button>
+        </div>
+        <div class="pron-fb on" id="iv-transcript" style="min-height:20px"></div>
+        <div class="iv-model-box" id="iv-model-box"><div class="iv-model-label">Resposta modelo:</div><div id="iv-model"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px">
+          <button class="btn-sm" id="iv-prev" onclick="ivPrev()" style="display:none">← Anterior</button>
+          <button class="btn-next" id="iv-next" onclick="ivNext()">Próxima pergunta →</button>
+        </div>
+        <div class="qfb ok" id="iv-done" style="margin-top:12px">🎉 Você respondeu todas as perguntas!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTA -->
+  <div class="day-sec" id="day-wed">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quarta-feira · Wednesday</div><div class="day-title">City Itinerary</div></div>
+        <button class="day-done-btn" id="done-wed" onclick="toggleDone('wed')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Crie um roteiro para um amigo que nunca visitou sua cidade. Fale sobre os lugares que ele precisa ir e o que fazer em cada um deles. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Escolha os lugares do roteiro.</li>
+          <li>Edite a atividade sugerida pra cada lugar, se quiser.</li>
+          <li>Toque em "Ver meu roteiro" pra ver o resultado.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🗺️</div><div><div class="block-title">City Itinerary Builder</div><div class="block-sub">Escolha os lugares do roteiro</div></div></div>
+      <div class="block-body">
+        <div class="itin-grid" id="itin-grid"></div>
+        <div id="itin-list"></div>
+        <button class="btn-next" onclick="genItinerary()" style="margin-top:6px">Ver meu roteiro</button>
+        <div class="madlib-result" id="itin-result"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUINTA -->
+  <div class="day-sec" id="day-thu">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quinta-feira · Thursday</div><div class="day-title">Places & Activities</div></div>
+        <button class="day-done-btn" id="done-thu" onclick="toggleDone('thu')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Pratique o vocabulário com o exercício e crie frases com as palavras que apareceram. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use o link abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Faça o <a href="https://en.islcollective.com/english-esl-video-lessons/vocabulary-practice/general-vocabulary-practice/city/spongebob-places-in-town-can-you-name-them/1011621" target="_blank">exercício de vocabulário ↗</a>.</li>
+          <li>Jogue o "Places & Activities Matcher" abaixo.</li>
+          <li>Crie frases com o vocabulário novo.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🔗</div><div><div class="block-title">Places & Activities Matcher</div><div class="block-sub">Combine o lugar com a atividade certa</div></div></div>
+      <div class="block-body">
+        <div class="match-wrap">
+          <div class="match-col" id="match-col-a"></div>
+          <div class="match-col" id="match-col-b"></div>
+        </div>
+        <div class="match-status" id="match-status">0 / 6 pares</div>
+        <div class="match-win" id="match-win"><div class="match-win-t">✓ Todos os pares combinados!</div></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Novas frases</div><div class="block-sub">Use o vocabulário que apareceu</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" placeholder="Exemplo:&#10;I go to the bank to withdraw money."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEXTA -->
+  <div class="day-sec" id="day-fri">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Sexta-feira · Friday</div><div class="day-title">Weekend Vlog</div></div>
+        <button class="day-done-btn" id="done-fri" onclick="toggleDone('fri')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Faça um vlog sobre os lugares que você visita no final de semana e o que gosta neles. Divirta-se! <strong>O segredo da fluência é a constância!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Revisão final da semana</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Toque nos exemplos abaixo pra treinar.</li>
+          <li>Grave seu vlog sobre os lugares que você visita no fim de semana.</li>
+          <li>Revise os Cards da semana.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎙️</div><div><div class="block-title">Weekend Vlog</div><div class="block-sub">Grave falando sobre seus lugares favoritos</div></div></div>
+      <div class="block-body">
+        <div class="starter-chips" id="vlog-chips"></div>
+        <div class="rec-controls">
+          <button class="btn-rec" id="rec-start-btn" onclick="startRecording()">🔴 Gravar</button>
+          <button class="btn-rec stop" id="rec-stop-btn" onclick="stopRecording()" style="display:none">⏹ Parar</button>
+        </div>
+        <div class="rec-player" id="rec-player" style="display:none">
+          <audio id="rec-audio" controls style="width:100%"></audio>
+          <div style="text-align:center"><button class="btn-sm" onclick="resetRecording()" style="margin-top:8px">↩ Gravar novamente</button></div>
+        </div>
+        <div class="rec-msg" id="rec-msg"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🏙️</div><div><div class="block-title">Revisão de Places</div><div class="block-sub">Relembre todos os cartões da semana</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid-fri"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">itsbrendacleto · material exclusivo · reprodução não autorizada</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', {
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } }
+});
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, { user: Object.assign({}, real.data.session.user, { id: __previewAs }) });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, { get: function (t, prop) { if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); }; return function () { return p; }; } });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) { qb[m] = function () { return __previewNoop(); }; });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as'); sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+var LESSON_ID = 'adulto-l1-a17';
+var DAYS = ['mon','tue','wed','thu','fri'];
+var userId = null;
+var doneDays = {};
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+async function loadDoneDays() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    userId = session.user.id;
+    var { data: rows } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', LESSON_ID + '-%');
+    (rows || []).forEach(function (r) { var day = r.lesson_id.replace(LESSON_ID + '-', ''); if (DAYS.indexOf(day) >= 0) doneDays[day] = true; });
+    DAYS.forEach(function (d) {
+      if (doneDays[d]) {
+        document.getElementById('done-' + d).classList.add('on');
+        document.getElementById('done-' + d).textContent = '✓ Concluído';
+        document.getElementById('pill-' + d).classList.add('done');
+      }
+    });
+  } catch (e) { console.error('Erro ao carregar progresso:', e); }
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var FC = [
+  {en:'Bank',         pt:'Banco'},
+  {en:'Supermarket',  pt:'Supermercado'},
+  {en:'Park',         pt:'Parque'},
+  {en:'Restaurant',   pt:'Restaurante'},
+  {en:'Hospital',     pt:'Hospital'},
+  {en:'Bus stop',     pt:'Ponto de ônibus'},
+  {en:'Gym',          pt:'Academia'},
+  {en:'Library',      pt:'Biblioteca'},
+  {en:'Mall',         pt:'Shopping'},
+  {en:'Pharmacy',     pt:'Farmácia'},
+  {en:'Cinema',       pt:'Cinema'},
+  {en:'To go to...',  pt:'Ir para...'}
+];
+
+var QUESTIONS_6 = [
+  {q:'Where do you go every morning?',                       model:'I go to work every morning.'},
+  {q:'How often do you go to the supermarket?',              model:'I go to the supermarket once a week.'},
+  {q:'Where do you go when you are hungry?',                  model:'I go to a restaurant or the kitchen.'},
+  {q:'Is the bus stop far from your house?',                  model:"No, it isn't. It's very close to my house."},
+  {q:'What are your favorite places to go in your city?',    model:'My favorite places are the park and the beach.'},
+  {q:'What is there near your house?',                        model:'There is a supermarket and a pharmacy near my house.'}
+];
+
+var PLACES_ACTIVITIES = [
+  {place:'Park',       activity:'go for a walk'},
+  {place:'Restaurant', activity:'try local food'},
+  {place:'Museum',     activity:'learn about local history'},
+  {place:'Beach',      activity:'relax and swim'},
+  {place:'Mall',       activity:'go shopping'},
+  {place:'Cinema',     activity:'watch a movie'}
+];
+
+var PLACE_MATCH = [
+  {place:'Bank',         activity:'withdraw money'},
+  {place:'Park',         activity:'walk the dog'},
+  {place:'Restaurant',   activity:'eat dinner'},
+  {place:'Supermarket',  activity:'buy groceries'},
+  {place:'Library',      activity:'read books'},
+  {place:'Hospital',     activity:'see a doctor'}
+];
+
+var VLOG_STARTERS = ['On weekends, I go to...', 'I like this place because...'];
+
+function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
+function shuffle(arr) { var a = arr.slice(); a.sort(function(){ return Math.random()-.5; }); return a; }
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+var inited = {};
+function showDay(id, pill) {
+  document.querySelectorAll('.day-sec').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.day-pill').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('day-'+id).classList.add('on');
+  pill.classList.add('on');
+  if (!inited[id]) { inited[id]=true; INIT[id](); }
+}
+var INIT = {
+  mon: function(){ buildFC('fc-grid', FC); },
+  tue: function(){ initInterview(); },
+  wed: function(){ initItinerary(); },
+  thu: function(){ initMatch(); },
+  fri: function(){ initVlogChips(); buildFC('fc-grid-fri', FC); }
+};
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────
+function buildFC(gridId, data) {
+  var g = document.getElementById(gridId);
+  if (!g) return;
+  g.innerHTML='';
+  data.forEach(function(fc, i) {
+    var d = document.createElement('div');
+    d.className='fc'; d.id=gridId+'-'+i;
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><div class="fc-en">'+fc.en+'</div><div class="fc-pt">'+fc.pt+'</div><button class="audio-btn">🔊</button><div class="fc-tap">toque para girar</div></div><div class="fc-b"><div class="fc-pt">'+fc.pt+'</div><div class="fc-en-back">'+fc.en+'</div></div></div>';
+    d.addEventListener('click', function(){ d.classList.toggle('flip'); });
+    d.querySelector('.audio-btn').addEventListener('click', function(e){ e.stopPropagation(); speak(fc.en.replace('...','')); });
+    g.appendChild(d);
+  });
+}
+inited['mon']=true;
+buildFC('fc-grid', FC);
+
+// ── SPEAKING PRACTICE (INTERVIEW-STYLE Q&A) ───────────────────────────────────
+var ivCur=0;
+function initInterview(){ ivCur=0; renderIV(); }
+function renderIV(){
+  var q = QUESTIONS_6[ivCur];
+  document.getElementById('iv-progress').textContent='Pergunta '+(ivCur+1)+' / '+QUESTIONS_6.length;
+  document.getElementById('iv-q').textContent=q.q;
+  document.getElementById('iv-model').textContent=q.model;
+  document.getElementById('iv-model-box').classList.remove('show');
+  document.getElementById('iv-transcript').textContent='';
+  document.getElementById('iv-transcript').classList.remove('on');
+  document.getElementById('iv-prev').style.display = ivCur>0 ? 'inline-block' : 'none';
+  document.getElementById('iv-next').style.display = 'inline-block';
+  document.getElementById('iv-next').textContent = ivCur+1<QUESTIONS_6.length ? 'Próxima pergunta →' : 'Finalizar';
+  document.getElementById('iv-done').classList.remove('on');
+}
+function ivListenQ(){ speak(QUESTIONS_6[ivCur].q, 0.85); }
+function toggleModel(){ document.getElementById('iv-model-box').classList.toggle('show'); }
+function ivPrev(){ if (ivCur>0) { ivCur--; renderIV(); } }
+function ivNext(){
+  if (ivCur+1 < QUESTIONS_6.length) { ivCur++; renderIV(); }
+  else { document.getElementById('iv-next').style.display='none'; document.getElementById('iv-done').classList.add('on'); }
+}
+function ivRecordAnswer(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var btn = document.getElementById('iv-mic-btn');
+  var box = document.getElementById('iv-transcript');
+  box.classList.add('on');
+  if (!SR) { box.textContent='Reconhecimento de fala não disponível neste navegador.'; return; }
+  var rec = new SR();
+  rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+  btn.textContent='⏹ Ouvindo...'; btn.classList.add('listening');
+  rec.onresult=function(e){ box.textContent='Você disse: "'+e.results[0][0].transcript+'"'; btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.onerror=function(e){ box.textContent = e.error==='not-allowed' ? 'Acesso ao microfone negado.' : 'Não foi possível reconhecer. Tente novamente.'; btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.onend=function(){ btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.start();
+}
+
+// ── CITY ITINERARY BUILDER ────────────────────────────────────────────────────
+var itineraryItems = [];
+function initItinerary(){
+  itineraryItems = [];
+  var grid = document.getElementById('itin-grid'); grid.innerHTML='';
+  PLACES_ACTIVITIES.forEach(function(p) {
+    var el = document.createElement('div'); el.className='order-chip'; el.textContent = p.place;
+    el.addEventListener('click', function(){
+      el.classList.toggle('sel');
+      var idx = itineraryItems.findIndex ? itineraryItems.findIndex(function(it){ return it.place===p.place; }) : -1;
+      if (idx === -1) { for (var k=0;k<itineraryItems.length;k++) { if (itineraryItems[k].place===p.place) { idx=k; break; } } }
+      if (el.classList.contains('sel')) { if (idx===-1) itineraryItems.push({place:p.place, activity:p.activity}); }
+      else { if (idx!==-1) itineraryItems.splice(idx,1); }
+      renderItinList();
+    });
+    grid.appendChild(el);
+  });
+  document.getElementById('itin-result').classList.remove('on');
+  renderItinList();
+}
+function renderItinList(){
+  var list = document.getElementById('itin-list'); list.innerHTML='';
+  itineraryItems.forEach(function(item){
+    var row = document.createElement('div'); row.className='itin-row';
+    var label = document.createElement('div'); label.className='itin-place'; label.textContent = item.place;
+    var inp = document.createElement('input'); inp.type='text'; inp.className='itin-inp'; inp.value = item.activity;
+    inp.addEventListener('input', function(){ item.activity = inp.value; });
+    row.appendChild(label); row.appendChild(inp);
+    list.appendChild(row);
+  });
+}
+function genItinerary(){
+  var r = document.getElementById('itin-result');
+  if (itineraryItems.length===0) { r.textContent='Escolha pelo menos um lugar primeiro!'; r.classList.add('on'); return; }
+  var TRANSITIONS = ['First,','Then,','After that,','Next,','Finally,'];
+  var lines = itineraryItems.map(function(item, i){
+    var t = TRANSITIONS[Math.min(i, TRANSITIONS.length-1)];
+    return t+' go to the '+item.place+' to '+(item.activity||'explore')+'.';
+  });
+  r.textContent = lines.join(' ');
+  r.classList.add('on');
+}
+
+// ── PLACES & ACTIVITIES MATCHER ───────────────────────────────────────────────
+var matchSelA=null, matchSelB=null, matchPairs=0;
+function initMatch() {
+  matchSelA=null; matchSelB=null; matchPairs=0;
+  document.getElementById('match-win').classList.remove('on');
+  document.getElementById('match-status').textContent='0 / '+PLACE_MATCH.length+' pares';
+
+  var places = PLACE_MATCH.map(function(g,i){ return {label:g.place, id:i}; });
+  var acts = PLACE_MATCH.map(function(g,i){ return {label:g.activity, id:i}; });
+  acts = shuffle(acts);
+
+  var colA = document.getElementById('match-col-a'); colA.innerHTML='';
+  var colB = document.getElementById('match-col-b'); colB.innerHTML='';
+
+  places.forEach(function(c) {
+    var el = document.createElement('div');
+    el.className='match-item'; el.textContent=c.label; el.dataset.id=c.id;
+    el.addEventListener('click', function(){ selectMatch('a', el, c.id); });
+    colA.appendChild(el);
+  });
+  acts.forEach(function(a) {
+    var el = document.createElement('div');
+    el.className='match-item'; el.textContent=a.label; el.dataset.id=a.id;
+    el.addEventListener('click', function(){ selectMatch('b', el, a.id); });
+    colB.appendChild(el);
+  });
+}
+function selectMatch(side, el, id) {
+  if (el.classList.contains('ok')) return;
+  if (side === 'a') {
+    if (matchSelA) matchSelA.el.classList.remove('sel');
+    matchSelA = { el: el, id: id }; el.classList.add('sel');
+  } else {
+    if (matchSelB) matchSelB.el.classList.remove('sel');
+    matchSelB = { el: el, id: id }; el.classList.add('sel');
+  }
+  if (matchSelA && matchSelB) {
+    if (matchSelA.id === matchSelB.id) {
+      matchSelA.el.classList.remove('sel'); matchSelB.el.classList.remove('sel');
+      matchSelA.el.classList.add('ok'); matchSelB.el.classList.add('ok');
+      matchPairs++;
+      document.getElementById('match-status').textContent=matchPairs+' / '+PLACE_MATCH.length+' pares';
+      matchSelA=null; matchSelB=null;
+      if (matchPairs === PLACE_MATCH.length) document.getElementById('match-win').classList.add('on');
+    } else {
+      var a = matchSelA.el, b = matchSelB.el;
+      a.classList.add('fail'); b.classList.add('fail');
+      setTimeout(function(){
+        a.classList.remove('sel','fail'); b.classList.remove('sel','fail');
+        matchSelA=null; matchSelB=null;
+      }, 700);
+    }
+  }
+}
+
+// ── WEEKEND VLOG (AUDIO RECORDER) ─────────────────────────────────────────────
+var mediaRecorder=null, recordedChunks=[], mediaStream=null;
+function initVlogChips(){
+  var c = document.getElementById('vlog-chips'); c.innerHTML='';
+  VLOG_STARTERS.forEach(function(s){
+    var chip=document.createElement('div'); chip.className='starter-chip'; chip.textContent=s;
+    chip.addEventListener('click', function(){ speak(s.replace('...',''), 0.85); });
+    c.appendChild(chip);
+  });
+}
+async function startRecording(){
+  var msg=document.getElementById('rec-msg');
+  if (!navigator.mediaDevices || !window.MediaRecorder) { msg.textContent='Gravação de áudio não disponível neste navegador.'; return; }
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recordedChunks=[];
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = function(e){ if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = function(){
+      var blob = new Blob(recordedChunks, {type:'audio/webm'});
+      var url = URL.createObjectURL(blob);
+      var audio = document.getElementById('rec-audio');
+      audio.src = url;
+      document.getElementById('rec-player').style.display='block';
+      mediaStream.getTracks().forEach(function(t){ t.stop(); });
+    };
+    mediaRecorder.start();
+    document.getElementById('rec-start-btn').style.display='none';
+    document.getElementById('rec-stop-btn').style.display='inline-block';
+    msg.textContent='🔴 Gravando... fale sobre seus lugares favoritos.';
+  } catch(e){ msg.textContent='Não foi possível acessar o microfone. Verifique as permissões.'; }
+}
+function stopRecording(){
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  document.getElementById('rec-stop-btn').style.display='none';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-msg').textContent='✓ Gravação concluída! Ouça abaixo.';
+}
+function resetRecording(){
+  document.getElementById('rec-player').style.display='none';
+  document.getElementById('rec-msg').textContent='';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-stop-btn').style.display='none';
+}
+
+// ── DAY DONE ─────────────────────────────────────────────────────────────────
+async function toggleDone(id){
+  var btn=document.getElementById('done-'+id);
+  var pill=document.getElementById('pill-'+id);
+  var on=btn.classList.toggle('on');
+  btn.textContent=on?'✓ Concluído':'○ Concluído';
+  pill.classList.toggle('done',on);
+
+  try {
+    if (!userId) {
+      var { data } = await sb.auth.getSession();
+      userId = data && data.session && data.session.user.id;
+    }
+    if (!userId) return;
+    var dayLessonId = LESSON_ID + '-' + id;
+    if (on) {
+      doneDays[id] = true;
+      await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: dayLessonId, completed_at: new Date().toISOString() });
+    } else {
+      delete doneDays[id];
+      await sb.from('lesson_progress').delete().eq('user_id', userId).eq('lesson_id', dayLessonId);
+    }
+    var allDone = DAYS.every(function (d) { return doneDays[d]; });
+    if (allDone) await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do dia:', e); }
+}
+
+loadDoneDays();
+</script>
+</body>
+</html>
