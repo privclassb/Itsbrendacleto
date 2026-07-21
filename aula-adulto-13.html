@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 13 · What Time Is It? · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --brown-dk: #2C1A0E;
+  --brown:    #5C3A1E;
+  --brown-md: #8B5E3C;
+  --brown-lt: #C4956A;
+  --cream:    #FAF7F4;
+  --sand:     #EDE5DA;
+  --sand-md:  #D9CCBC;
+  --white:    #FFFFFF;
+  --text:     #2C1A0E;
+  --text-md:  #7A5C40;
+  --text-lt:  #A88B70;
+  --ok:       #3D7A5E;
+  --ok-lt:    #EAF4EF;
+  --fail:     #963030;
+  --fail-lt:  #FAEAEA;
+  --warn-lt:  #FFF8E8;
+  --warn:     #8B6914;
+  --r: 14px;
+  --rs: 9px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+.header { background: var(--brown-dk); padding: 32px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%); pointer-events:none; }
+.btn-back { position:relative; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 14px; font-size:13px; font-weight:500; color:#fff; text-decoration:none; transition:all .2s; margin-bottom:16px; }
+.btn-back:hover { background: rgba(255,255,255,.22); }
+.brand { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--brown-lt); position:relative; margin-bottom:14px; }
+.h-eyebrow { font-size:.7rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.38); position:relative; margin-bottom:7px; }
+.h-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
+.h-title em { font-style:italic; color:var(--brown-lt); }
+.h-desc { font-size:.76rem; color:rgba(255,255,255,.38); margin-top:9px; position:relative; letter-spacing:.04em; }
+
+.day-nav-wrap { background:var(--brown-dk); padding:0 16px 20px; position:sticky; top:0; z-index:100; }
+.day-nav { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; max-width:680px; margin:0 auto; }
+.day-nav::-webkit-scrollbar { display:none; }
+.day-pill { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.5); padding:8px 16px; border-radius:20px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.day-pill:hover { background:rgba(255,255,255,.13); color:rgba(255,255,255,.8); }
+.day-pill.on { background:var(--brown-lt); border-color:var(--brown-lt); color:var(--brown-dk); }
+.day-pill-name { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; font-weight:500; }
+.day-pill-label { font-size:.68rem; font-weight:500; opacity:.7; }
+.day-pill.on .day-pill-label { opacity:1; }
+.day-pill.done .day-pill-name::after { content:' ✓'; color:var(--brown-lt); }
+.day-pill.on.done .day-pill-name::after { color:var(--brown-dk); }
+
+.main { max-width:680px; margin:0 auto; padding:24px 16px 56px; }
+.day-sec { display:none; }
+.day-sec.on { display:block; }
+
+.day-header { margin-bottom:20px; }
+.day-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.day-weekday { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); margin-bottom:3px; }
+.day-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
+.day-done-btn { flex-shrink:0; background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; color:var(--text-md); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-top:4px; }
+.day-done-btn:hover { background:var(--sand-md); }
+.day-done-btn.on { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.day-intro { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; font-size:.82rem; color:var(--text-md); line-height:1.6; }
+.day-intro strong { color:var(--brown-dk); font-weight:600; }
+
+.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(44,26,14,.06); overflow:hidden; margin-bottom:14px; }
+.block-head { padding:14px 18px; border-bottom:1px solid var(--sand); display:flex; align-items:center; gap:11px; }
+.block-icon { width:36px; height:36px; border-radius:9px; background:var(--sand); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.block-title { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
+.block-sub { font-size:.71rem; color:var(--text-lt); margin-top:1px; }
+.block-body { padding:16px 18px; }
+
+.task-list { display:flex; flex-direction:column; gap:8px; padding-left:18px; }
+.task-list li { font-size:.82rem; color:var(--text); line-height:1.55; padding-left:4px; }
+.task-list li a { color:var(--brown-md); text-decoration:underline; text-underline-offset:2px; font-weight:500; }
+.task-list li a:hover { color:var(--brown-dk); }
+
+.notes-area { width:100%; min-height:80px; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--text); resize:vertical; outline:none; background:var(--cream); transition:border-color .2s; line-height:1.55; }
+.notes-area:focus { border-color:var(--brown-lt); }
+.notes-area::placeholder { color:var(--text-lt); font-size:.78rem; }
+.card-input { width:100%; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text); background:var(--white); outline:none; margin-bottom:10px; }
+.card-input:focus { border-color:var(--brown-lt); }
+
+/* FLASHCARDS */
+.fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:9px; }
+.fc { perspective:700px; cursor:pointer; height:100px; }
+.fc-in { width:100%; height:100%; transition:transform .48s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d; position:relative; }
+.fc.flip .fc-in { transform:rotateY(180deg); }
+.fc-f, .fc-b { position:absolute; inset:0; border-radius:var(--rs); backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; border:1.5px solid transparent; }
+.fc-f { background:var(--sand); border-color:var(--sand-md); }
+.fc-b { background:var(--brown-dk); border-color:var(--brown-dk); transform:rotateY(180deg); }
+.fc-en { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:.88rem; color:var(--brown-dk); line-height:1.25; }
+.fc-f .fc-pt { font-size:.65rem; color:var(--text-lt); margin-top:3px; }
+.fc-b .fc-pt { font-family:'Cormorant Garamond',serif; font-size:.82rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
+.fc-b .fc-en-back { font-size:.7rem; color:rgba(255,255,255,.55); margin-top:3px; }
+.fc-tap { font-size:.58rem; color:var(--text-lt); margin-top:5px; letter-spacing:.03em; }
+.audio-btn { background:var(--brown-lt); border:none; cursor:pointer; border-radius:50%; width:23px; height:23px; display:flex; align-items:center; justify-content:center; font-size:.62rem; margin-top:5px; transition:transform .15s,background .2s; flex-shrink:0; }
+.audio-btn:hover { transform:scale(1.15); background:var(--brown); }
+
+/* MEMORY MATCH */
+.mem-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.mem-card { perspective:600px; cursor:pointer; height:64px; }
+.mem-card-in { width:100%; height:100%; position:relative; transition:transform .4s; transform-style:preserve-3d; }
+.mem-card.flip .mem-card-in, .mem-card.matched .mem-card-in { transform:rotateY(180deg); }
+.mem-card-f, .mem-card-b { position:absolute; inset:0; backface-visibility:hidden; border-radius:8px; display:flex; align-items:center; justify-content:center; font-weight:600; padding:2px; text-align:center; }
+.mem-card-f { background:var(--brown-dk); color:#fff; font-size:1.2rem; }
+.mem-card-b { background:var(--sand); color:var(--brown-dk); transform:rotateY(180deg); font-size:.78rem; border:1.5px solid var(--sand-md); }
+.mem-card.matched .mem-card-b { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.mem-status { text-align:center; margin-top:12px; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-lt); }
+.mem-win { text-align:center; padding:13px; background:var(--ok-lt); border-radius:var(--rs); margin-top:12px; display:none; }
+.mem-win.on { display:block; }
+.mem-win-t { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
+
+/* CLOCK TIME QUIZ (riddle-card reused) */
+.riddle-card { background:var(--sand); border-radius:var(--rs); padding:20px; margin-bottom:14px; text-align:center; }
+.riddle-progress { font-family:'DM Mono',monospace; font-size:.68rem; color:var(--text-lt); margin-bottom:8px; }
+.riddle-text { font-size:2rem; color:var(--brown-dk); font-weight:700; line-height:1.2; font-family:'Cormorant Garamond',serif; }
+.qopts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:13px; }
+.qopt { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 9px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.78rem; cursor:pointer; color:var(--text); text-align:center; transition:all .18s; line-height:1.3; }
+.qopt:hover { border-color:var(--brown-lt); background:var(--sand); }
+.qopt.ok { border-color:var(--ok); background:var(--ok-lt); color:var(--ok); }
+.qopt.fail { border-color:var(--fail); background:var(--fail-lt); color:var(--fail); }
+.qopt:disabled { cursor:default; }
+.qfb { text-align:center; font-weight:500; font-size:.8rem; padding:9px; border-radius:var(--rs); margin-bottom:11px; display:none; }
+.qfb.on { display:block; }
+.qfb.ok { background:var(--ok-lt); color:var(--ok); }
+.qfb.fail { background:var(--fail-lt); color:var(--fail); }
+.btn-next { background:var(--brown-dk); color:#fff; border:none; border-radius:var(--rs); padding:10px 26px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.82rem; cursor:pointer; display:inline-block; transition:background .2s; }
+.btn-next:hover { background:var(--brown); }
+
+/* SPEAKING / INTERVIEW-STYLE Q&A */
+.iv-model-box { display:none; background:var(--sand); border-radius:var(--rs); padding:12px 14px; margin-top:10px; font-size:.85rem; color:var(--text-md); line-height:1.5; }
+.iv-model-box.show { display:block; }
+.iv-model-label { font-family:'DM Mono',monospace; font-size:.66rem; text-transform:uppercase; letter-spacing:.06em; color:var(--text-lt); margin-bottom:4px; }
+.btn-listen, .btn-speak { border:none; border-radius:var(--rs); padding:7px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; gap:5px; }
+.btn-listen { background:var(--sand); color:var(--brown-dk); }
+.btn-listen:hover { background:var(--sand-md); }
+.btn-speak { background:var(--brown-dk); color:#fff; }
+.btn-speak:hover { background:var(--brown); }
+.btn-speak.listening { background:var(--fail); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+.btn-sm { background:var(--sand); border:none; border-radius:8px; padding:6px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.71rem; cursor:pointer; color:var(--text-md); transition:background .2s; }
+.btn-sm:hover { background:var(--sand-md); }
+.pron-fb { margin-top:9px; border-radius:var(--rs); padding:9px 12px; font-size:.77rem; font-weight:500; display:none; line-height:1.45; background:var(--sand); color:var(--text-md); }
+.pron-fb.on { display:block; }
+
+/* QUESTION CONVERTER ACCORDION */
+.qa-item { border:1.5px solid var(--sand-md); border-radius:var(--rs); margin-bottom:8px; overflow:hidden; }
+.qa-q { padding:12px 14px; font-weight:600; color:var(--brown-dk); cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:.86rem; background:var(--white); transition:background .15s; }
+.qa-q:hover { background:var(--sand); }
+.qa-chevron { transition:transform .2s; color:var(--text-lt); flex-shrink:0; margin-left:8px; }
+.qa-item.open .qa-chevron { transform:rotate(180deg); }
+.qa-a { max-height:0; overflow:hidden; transition:max-height .25s ease; background:var(--sand); font-size:.82rem; color:var(--text-md); line-height:1.5; }
+.qa-item.open .qa-a { max-height:200px; padding:10px 14px; }
+.qa-a-label { font-family:'DM Mono',monospace; font-size:.62rem; text-transform:uppercase; color:var(--text-lt); margin-bottom:4px; }
+
+/* REPORTER CARD */
+.reporter-card { display:none; background:linear-gradient(160deg,var(--brown-dk),var(--brown)); border-radius:var(--r); padding:22px; color:#fff; margin-top:14px; }
+.reporter-card.on { display:block; }
+.reporter-eyebrow { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; color:var(--brown-lt); margin-bottom:8px; }
+.reporter-title { font-family:'Cormorant Garamond',serif; font-size:1.3rem; font-weight:600; margin-bottom:10px; }
+.reporter-body { font-size:.85rem; line-height:1.6; color:rgba(255,255,255,.9); }
+
+.footer { text-align:center; padding:18px 16px 30px; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.09em; color:var(--text-lt); text-transform:uppercase; border-top:1px solid var(--sand); margin-top:8px; }
+
+@media(max-width:400px){
+  .qopts { grid-template-columns:1fr; }
+  .fc-grid { grid-template-columns:repeat(2,1fr); }
+  .mem-grid { grid-template-columns:repeat(3,1fr); }
+}
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<div class="header">
+  <a href="dashboard-adulto.html" class="btn-back">← Voltar</a>
+  <div class="brand">itsbrendacleto · adults</div>
+  <div class="h-eyebrow">Study Planner · Lição 13</div>
+  <div class="h-title">What Time Is <em>It?</em></div>
+  <div class="h-desc">Telling Time · Daily Routine</div>
+</div>
+
+<div class="day-nav-wrap">
+  <div class="day-nav">
+    <div class="day-pill on" onclick="showDay('mon',this)" id="pill-mon"><span class="day-pill-name">Mon</span><span class="day-pill-label">Time</span></div>
+    <div class="day-pill" onclick="showDay('tue',this)" id="pill-tue"><span class="day-pill-name">Tue</span><span class="day-pill-label">Practice</span></div>
+    <div class="day-pill" onclick="showDay('wed',this)" id="pill-wed"><span class="day-pill-name">Wed</span><span class="day-pill-label">Speaking</span></div>
+    <div class="day-pill" onclick="showDay('thu',this)" id="pill-thu"><span class="day-pill-name">Thu</span><span class="day-pill-label">Interview</span></div>
+    <div class="day-pill" onclick="showDay('fri',this)" id="pill-fri"><span class="day-pill-name">Fri</span><span class="day-pill-label">Reporter</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SEGUNDA -->
+  <div class="day-sec on" id="day-mon">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Segunda-feira · Monday</div><div class="day-title">Telling the Time</div></div>
+        <button class="day-done-btn" id="done-mon" onclick="toggleDone('mon')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Relembre o vocabulário de frequência semanal e pratique os horários com o jogo da memória. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use o link abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Faça o <a href="https://wordwall.net/pt/resource/71508367/every-day-once-twice-a-week-times-a-week" target="_blank">exercício de frequência ↗</a>.</li>
+          <li>Revise os Time Cards abaixo.</li>
+          <li>Jogue "Clock Memory Match" abaixo.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🕐</div><div><div class="block-title">Time Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🃏</div><div><div class="block-title">Clock Memory Match</div><div class="block-sub">Encontre os pares: horário + expressão</div></div></div>
+      <div class="block-body">
+        <div class="mem-grid" id="mem-grid"></div>
+        <div class="mem-status" id="mem-status">0 / 6 pares</div>
+        <div class="mem-win" id="mem-win"><div class="mem-win-t">✓ Todos os horários combinados!</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERÇA -->
+  <div class="day-sec" id="day-tue">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Terça-feira · Tuesday</div><div class="day-title">Practice Telling Time</div></div>
+        <button class="day-done-btn" id="done-tue" onclick="toggleDone('tue')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Assista ao vídeo e faça os exercícios propostos. Anote as expressões novas e crie frases com elas. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use os links abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Assista ao <a href="https://www.youtube.com/watch?v=l7frLcVXFv8" target="_blank">vídeo ↗</a>.</li>
+          <li>Faça os <a href="https://en.islcollective.com/english-esl-video-lessons/grammar-practice/general-grammar-practice/word-order/telling-the-time/921924" target="_blank">exercícios ↗</a> e <a href="https://wordwall.net/pt/resource/14479911/telling-the-time" target="_blank">este também ↗</a>.</li>
+          <li>Faça o Time Quiz abaixo.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">❓</div><div><div class="block-title">Time Quiz</div><div class="block-sub">Que horas são?</div></div></div>
+      <div class="block-body">
+        <div class="riddle-card">
+          <div class="riddle-progress" id="tq-progress"></div>
+          <div class="riddle-text" id="tq-text"></div>
+        </div>
+        <div class="qopts" id="tq-opts"></div>
+        <div class="qfb" id="tq-fb"></div>
+        <div style="text-align:center;font-family:'DM Mono',monospace;font-size:.72rem;color:var(--text-lt)" id="tq-score">Acertos: 0</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Novas expressões</div><div class="block-sub">Anote e crie frases</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" placeholder="Exemplo:&#10;Expression: sharp (ex: at 9 o'clock sharp)&#10;Sentence: The meeting starts at 9 o'clock sharp."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTA -->
+  <div class="day-sec" id="day-wed">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quarta-feira · Wednesday</div><div class="day-title">Speaking Practice</div></div>
+        <button class="day-done-btn" id="done-wed" onclick="toggleDone('wed')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Responda as perguntas abaixo de forma oral, gravando áudios para treinar sua fala e escuta. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Ouça cada pergunta e responda em voz alta.</li>
+          <li>Compare sua resposta com a resposta modelo.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎙️</div><div><div class="block-title">Speaking Practice</div><div class="block-sub">10 perguntas sobre sua rotina</div></div></div>
+      <div class="block-body">
+        <div class="riddle-card">
+          <div class="riddle-progress" id="iv-progress"></div>
+          <div class="riddle-text" id="iv-q" style="font-size:1.15rem"></div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
+          <button class="btn-listen" onclick="ivListenQ()">🔊 Ouvir pergunta</button>
+          <button class="btn-speak" id="iv-mic-btn" onclick="ivRecordAnswer()">🎙 Gravar resposta</button>
+          <button class="btn-sm" onclick="toggleModel()">💡 Ver resposta modelo</button>
+        </div>
+        <div class="pron-fb on" id="iv-transcript" style="min-height:20px"></div>
+        <div class="iv-model-box" id="iv-model-box"><div class="iv-model-label">Resposta modelo:</div><div id="iv-model"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px">
+          <button class="btn-sm" id="iv-prev" onclick="ivPrev()" style="display:none">← Anterior</button>
+          <button class="btn-next" id="iv-next" onclick="ivNext()">Próxima pergunta →</button>
+        </div>
+        <div class="qfb ok" id="iv-done" style="margin-top:12px">🎉 Você respondeu todas as perguntas!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUINTA -->
+  <div class="day-sec" id="day-thu">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quinta-feira · Thursday</div><div class="day-title">He/She Interview</div></div>
+        <button class="day-done-btn" id="done-thu" onclick="toggleDone('thu')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Adapte as perguntas para He/She e entreviste um amigo ou familiar. Anote suas perguntas e respostas. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Toque nas perguntas abaixo pra ver a versão com He/She.</li>
+          <li>Entreviste um amigo ou familiar usando essas perguntas.</li>
+          <li>Anote as respostas dele(a).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🔄</div><div><div class="block-title">Question Converter</div><div class="block-sub">Toque pra ver a versão com He/She</div></div></div>
+      <div class="block-body">
+        <div id="qa-list"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Suas anotações</div><div class="block-sub">Perguntas e respostas da entrevista</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" style="min-height:120px" placeholder="Escreva aqui as perguntas e respostas da entrevista..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEXTA -->
+  <div class="day-sec" id="day-fri">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Sexta-feira · Friday</div><div class="day-title">Celebrity Reporter</div></div>
+        <button class="day-done-btn" id="done-fri" onclick="toggleDone('fri')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Escolha um famoso que goste, pesquise sobre a rotina dele(a) e imagine que é um repórter escrevendo uma matéria sobre isso. <strong>O segredo da fluência é a constância!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Revisão final da semana</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Pesquise sobre a rotina do famoso escolhido.</li>
+          <li>Preencha o formulário abaixo e publique sua matéria.</li>
+          <li>Revise os Cards da semana.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📰</div><div><div class="block-title">Celebrity Reporter</div><div class="block-sub">Escreva uma matéria sobre a rotina do famoso</div></div></div>
+      <div class="block-body">
+        <input type="text" class="card-input" id="rep-name" placeholder="Nome do famoso">
+        <input type="text" class="card-input" id="rep-wake" placeholder="Que horas ele(a) acorda? (ex: 5 a.m.)">
+        <input type="text" class="card-input" id="rep-morning" placeholder="O que faz de manhã? (ex: goes for a run)">
+        <input type="text" class="card-input" id="rep-evening" placeholder="O que faz à noite? (ex: watches movies)">
+        <button class="btn-next" onclick="publishArticle()">Publicar matéria</button>
+        <div class="reporter-card" id="reporter-card">
+          <div class="reporter-eyebrow">Breaking News</div>
+          <div class="reporter-title" id="rep-out-title"></div>
+          <div class="reporter-body" id="rep-out-body"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🕐</div><div><div class="block-title">Revisão de Time</div><div class="block-sub">Relembre todos os cartões da semana</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid-fri"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">itsbrendacleto · material exclusivo · reprodução não autorizada</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', {
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } }
+});
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, { user: Object.assign({}, real.data.session.user, { id: __previewAs }) });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, { get: function (t, prop) { if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); }; return function () { return p; }; } });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) { qb[m] = function () { return __previewNoop(); }; });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as'); sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+var LESSON_ID = 'adulto-l1-a13';
+var DAYS = ['mon','tue','wed','thu','fri'];
+var userId = null;
+var doneDays = {};
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+async function loadDoneDays() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    userId = session.user.id;
+    var { data: rows } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', LESSON_ID + '-%');
+    (rows || []).forEach(function (r) { var day = r.lesson_id.replace(LESSON_ID + '-', ''); if (DAYS.indexOf(day) >= 0) doneDays[day] = true; });
+    DAYS.forEach(function (d) {
+      if (doneDays[d]) {
+        document.getElementById('done-' + d).classList.add('on');
+        document.getElementById('done-' + d).textContent = '✓ Concluído';
+        document.getElementById('pill-' + d).classList.add('done');
+      }
+    });
+  } catch (e) { console.error('Erro ao carregar progresso:', e); }
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var FC = [
+  {en:"It's 3 o'clock",         pt:'São 3 horas'},
+  {en:'Half past three',        pt:'Três e meia'},
+  {en:'Quarter past three',     pt:'Três e quinze'},
+  {en:'Quarter to four',        pt:'Quinze pra quatro'},
+  {en:'a.m.',                   pt:'da manhã'},
+  {en:'p.m.',                   pt:'da tarde/noite'},
+  {en:'Once a week',            pt:'Uma vez por semana'},
+  {en:'Twice a week',           pt:'Duas vezes por semana'},
+  {en:'Every day',              pt:'Todos os dias'},
+  {en:'What time...?',          pt:'Que horas...?'},
+  {en:'When...?',               pt:'Quando...?'},
+  {en:'Routine',                pt:'Rotina'}
+];
+
+var CLOCK_PAIRS = [
+  {id:1, text:'3:00'},  {id:1, text:"three o'clock"},
+  {id:2, text:'3:30'},  {id:2, text:'half past three'},
+  {id:3, text:'3:15'},  {id:3, text:'quarter past three'},
+  {id:4, text:'3:45'},  {id:4, text:'quarter to four'},
+  {id:5, text:'6:00'},  {id:5, text:"six o'clock"},
+  {id:6, text:'9:30'},  {id:6, text:'half past nine'}
+];
+
+var TIME_QUIZ = [
+  {time:'3:00',  opts:["Three o'clock",'Half past three','Quarter to three','Three thirty'], c:0},
+  {time:'3:30',  opts:['Quarter past three','Half past three','Three fifty','Quarter to three'], c:1},
+  {time:'3:15',  opts:['Half past three','Quarter to three','Quarter past three','Three fifty'], c:2},
+  {time:'3:45',  opts:['Quarter past four','Half past four','Quarter to four',"Four o'clock"], c:2},
+  {time:'6:00',  opts:["Six o'clock",'Half past six','Quarter to six','Quarter past six'], c:0},
+  {time:'9:30',  opts:['Quarter past nine','Half past nine','Nine fifty','Quarter to ten'], c:1}
+];
+
+var QUESTIONS_10 = [
+  {q:'What time do you usually wake up?',                                                model:'I usually wake up at 7 a.m.'},
+  {q:'When do you have breakfast?',                                                      model:'I have breakfast at 7:30 a.m.'},
+  {q:'What time do you start working or studying?',                                       model:"I start working at 9 o'clock."},
+  {q:'When do you usually have lunch?',                                                  model:'I usually have lunch at noon.'},
+  {q:'What time do you finish your main activities for the day?',                        model:'I finish around 6 p.m.'},
+  {q:'When do you do something fun or relaxing, like watching TV or reading?',           model:'I relax in the evening, around 8 p.m.'},
+  {q:'What time do you have dinner?',                                                    model:'I have dinner at 7:30 p.m.'},
+  {q:'When do you usually go to bed?',                                                   model:'I usually go to bed at 11 p.m.'},
+  {q:'How often do you exercise during the week, and at what time?',                     model:'I exercise three times a week, usually in the morning.'},
+  {q:'What time do you usually do something special or different, like meeting friends?', model:'I usually meet friends on Friday evenings.'}
+];
+
+var CONVERTER_Q = [
+  {you:'What time do you usually wake up?',              heshe:'What time does he/she usually wake up?'},
+  {you:'When do you have breakfast?',                    heshe:'When does he/she have breakfast?'},
+  {you:'What time do you start working or studying?',    heshe:'What time does he/she start working or studying?'},
+  {you:'When do you usually have lunch?',                heshe:'When does he/she usually have lunch?'},
+  {you:'What time do you have dinner?',                  heshe:'What time does he/she have dinner?'},
+  {you:'When do you usually go to bed?',                 heshe:'When does he/she usually go to bed?'}
+];
+
+function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
+function shuffle(arr) { var a = arr.slice(); a.sort(function(){ return Math.random()-.5; }); return a; }
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+var inited = {};
+function showDay(id, pill) {
+  document.querySelectorAll('.day-sec').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.day-pill').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('day-'+id).classList.add('on');
+  pill.classList.add('on');
+  if (!inited[id]) { inited[id]=true; INIT[id](); }
+}
+var INIT = {
+  mon: function(){ buildFC('fc-grid', FC); initMemory(); },
+  tue: function(){ initTimeQuiz(); },
+  wed: function(){ initInterview(); },
+  thu: function(){ initConverter(); },
+  fri: function(){ buildFC('fc-grid-fri', FC); }
+};
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────
+function buildFC(gridId, data) {
+  var g = document.getElementById(gridId);
+  if (!g) return;
+  g.innerHTML='';
+  data.forEach(function(fc, i) {
+    var d = document.createElement('div');
+    d.className='fc'; d.id=gridId+'-'+i;
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><div class="fc-en">'+fc.en+'</div><div class="fc-pt">'+fc.pt+'</div><button class="audio-btn">🔊</button><div class="fc-tap">toque para girar</div></div><div class="fc-b"><div class="fc-pt">'+fc.pt+'</div><div class="fc-en-back">'+fc.en+'</div></div></div>';
+    d.addEventListener('click', function(){ d.classList.toggle('flip'); });
+    d.querySelector('.audio-btn').addEventListener('click', function(e){ e.stopPropagation(); speak(fc.en.replace('...','')); });
+    g.appendChild(d);
+  });
+}
+inited['mon']=true;
+buildFC('fc-grid', FC);
+
+// ── CLOCK MEMORY MATCH ────────────────────────────────────────────────────────
+var memCards=[], memFlipped=[], memMatched=0, memLock=false;
+function initMemory(){
+  memMatched=0; memFlipped=[]; memLock=false;
+  memCards = shuffle(CLOCK_PAIRS.map(function(c,i){ return {id:c.id, text:c.text, idx:i}; }));
+  renderMemory();
+  document.getElementById('mem-status').textContent='0 / 6 pares';
+  document.getElementById('mem-win').classList.remove('on');
+}
+function renderMemory(){
+  var grid = document.getElementById('mem-grid'); grid.innerHTML='';
+  memCards.forEach(function(c, pos){
+    var el = document.createElement('div'); el.className='mem-card'; el.dataset.pos=pos;
+    el.innerHTML = '<div class="mem-card-in"><div class="mem-card-f">?</div><div class="mem-card-b">'+c.text+'</div></div>';
+    el.addEventListener('click', function(){ flipMemory(pos, el); });
+    grid.appendChild(el);
+  });
+}
+function flipMemory(pos, el){
+  if (memLock || el.classList.contains('flip') || el.classList.contains('matched')) return;
+  el.classList.add('flip');
+  memFlipped.push({pos:pos, el:el});
+  if (memFlipped.length === 2) {
+    memLock = true;
+    var a = memFlipped[0], b = memFlipped[1];
+    var ca = memCards[a.pos], cb = memCards[b.pos];
+    if (ca.id === cb.id) {
+      a.el.classList.add('matched'); b.el.classList.add('matched');
+      memMatched++;
+      document.getElementById('mem-status').textContent = memMatched+' / 6 pares';
+      memFlipped = []; memLock = false;
+      if (memMatched === 6) document.getElementById('mem-win').classList.add('on');
+    } else {
+      setTimeout(function(){
+        a.el.classList.remove('flip'); b.el.classList.remove('flip');
+        memFlipped = []; memLock = false;
+      }, 700);
+    }
+  }
+}
+
+// ── TIME QUIZ ─────────────────────────────────────────────────────────────────
+var tqCur=0, tqScore=0;
+function initTimeQuiz(){ tqCur=0; tqScore=0; document.getElementById('tq-score').textContent='Acertos: 0'; renderTimeQuiz(); }
+function renderTimeQuiz(){
+  if (tqCur>=TIME_QUIZ.length){
+    document.getElementById('tq-text').textContent='';
+    document.getElementById('tq-progress').textContent='Desafio completo!';
+    document.getElementById('tq-opts').innerHTML='';
+    document.getElementById('tq-fb').className='qfb on ok';
+    document.getElementById('tq-fb').textContent='Você acertou '+tqScore+' de '+TIME_QUIZ.length+'!';
+    return;
+  }
+  var q = TIME_QUIZ[tqCur];
+  document.getElementById('tq-progress').textContent='Relógio '+(tqCur+1)+' / '+TIME_QUIZ.length;
+  document.getElementById('tq-text').textContent = q.time;
+  document.getElementById('tq-fb').className='qfb';
+  var optsEl = document.getElementById('tq-opts'); optsEl.innerHTML='';
+  q.opts.forEach(function(o, i){
+    var b=document.createElement('button'); b.className='qopt'; b.textContent=o;
+    b.addEventListener('click', function(){ answerTimeQuiz(i, b, q.c); });
+    optsEl.appendChild(b);
+  });
+}
+function answerTimeQuiz(chosen, btn, correct){
+  var btns = document.querySelectorAll('#tq-opts .qopt');
+  btns.forEach(function(b){ b.disabled=true; });
+  btns[correct].classList.add('ok');
+  var fb = document.getElementById('tq-fb');
+  if (chosen===correct){ tqScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  else { btn.classList.add('fail'); fb.textContent='A resposta certa é: "'+TIME_QUIZ[tqCur].opts[correct]+'"'; fb.className='qfb on fail'; }
+  document.getElementById('tq-score').textContent='Acertos: '+tqScore;
+  tqCur++;
+  setTimeout(renderTimeQuiz, 1500);
+}
+
+// ── SPEAKING PRACTICE (INTERVIEW-STYLE Q&A) ───────────────────────────────────
+var ivCur=0;
+function initInterview(){ ivCur=0; renderIV(); }
+function renderIV(){
+  var q = QUESTIONS_10[ivCur];
+  document.getElementById('iv-progress').textContent='Pergunta '+(ivCur+1)+' / '+QUESTIONS_10.length;
+  document.getElementById('iv-q').textContent=q.q;
+  document.getElementById('iv-model').textContent=q.model;
+  document.getElementById('iv-model-box').classList.remove('show');
+  document.getElementById('iv-transcript').textContent='';
+  document.getElementById('iv-transcript').classList.remove('on');
+  document.getElementById('iv-prev').style.display = ivCur>0 ? 'inline-block' : 'none';
+  document.getElementById('iv-next').style.display = 'inline-block';
+  document.getElementById('iv-next').textContent = ivCur+1<QUESTIONS_10.length ? 'Próxima pergunta →' : 'Finalizar';
+  document.getElementById('iv-done').classList.remove('on');
+}
+function ivListenQ(){ speak(QUESTIONS_10[ivCur].q, 0.85); }
+function toggleModel(){ document.getElementById('iv-model-box').classList.toggle('show'); }
+function ivPrev(){ if (ivCur>0) { ivCur--; renderIV(); } }
+function ivNext(){
+  if (ivCur+1 < QUESTIONS_10.length) { ivCur++; renderIV(); }
+  else { document.getElementById('iv-next').style.display='none'; document.getElementById('iv-done').classList.add('on'); }
+}
+function ivRecordAnswer(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var btn = document.getElementById('iv-mic-btn');
+  var box = document.getElementById('iv-transcript');
+  box.classList.add('on');
+  if (!SR) { box.textContent='Reconhecimento de fala não disponível neste navegador.'; return; }
+  var rec = new SR();
+  rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=1;
+  btn.textContent='⏹ Ouvindo...'; btn.classList.add('listening');
+  rec.onresult=function(e){ box.textContent='Você disse: "'+e.results[0][0].transcript+'"'; btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.onerror=function(e){ box.textContent = e.error==='not-allowed' ? 'Acesso ao microfone negado.' : 'Não foi possível reconhecer. Tente novamente.'; btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.onend=function(){ btn.textContent='🎙 Gravar resposta'; btn.classList.remove('listening'); };
+  rec.start();
+}
+
+// ── QUESTION CONVERTER ────────────────────────────────────────────────────────
+function initConverter(){
+  var c = document.getElementById('qa-list'); c.innerHTML='';
+  CONVERTER_Q.forEach(function(item, i){
+    var div = document.createElement('div'); div.className='qa-item'; div.id='qa-'+i;
+    div.innerHTML = '<div class="qa-q">'+item.you+'<span class="qa-chevron">▾</span></div><div class="qa-a"><div class="qa-a-label">He/She:</div>'+item.heshe+'</div>';
+    div.querySelector('.qa-q').addEventListener('click', function(){ div.classList.toggle('open'); });
+    c.appendChild(div);
+  });
+}
+
+// ── CELEBRITY REPORTER ────────────────────────────────────────────────────────
+function publishArticle(){
+  var name = document.getElementById('rep-name').value.trim() || 'The Celebrity';
+  var wake = document.getElementById('rep-wake').value.trim() || '6 a.m.';
+  var morning = document.getElementById('rep-morning').value.trim() || 'goes for a run';
+  var evening = document.getElementById('rep-evening').value.trim() || 'reads a book';
+  document.getElementById('rep-out-title').textContent = 'A Day in the Life of ' + name;
+  document.getElementById('rep-out-body').textContent = name + ' wakes up at ' + wake + '. In the morning, ' + name + ' ' + morning + '. In the evening, ' + name + ' ' + evening + '. What a life!';
+  document.getElementById('reporter-card').classList.add('on');
+}
+
+// ── DAY DONE ─────────────────────────────────────────────────────────────────
+async function toggleDone(id){
+  var btn=document.getElementById('done-'+id);
+  var pill=document.getElementById('pill-'+id);
+  var on=btn.classList.toggle('on');
+  btn.textContent=on?'✓ Concluído':'○ Concluído';
+  pill.classList.toggle('done',on);
+
+  try {
+    if (!userId) {
+      var { data } = await sb.auth.getSession();
+      userId = data && data.session && data.session.user.id;
+    }
+    if (!userId) return;
+    var dayLessonId = LESSON_ID + '-' + id;
+    if (on) {
+      doneDays[id] = true;
+      await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: dayLessonId, completed_at: new Date().toISOString() });
+    } else {
+      delete doneDays[id];
+      await sb.from('lesson_progress').delete().eq('user_id', userId).eq('lesson_id', dayLessonId);
+    }
+    var allDone = DAYS.every(function (d) { return doneDays[d]; });
+    if (allDone) await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do dia:', e); }
+}
+
+initMemory();
+loadDoneDays();
+</script>
+</body>
+</html>
