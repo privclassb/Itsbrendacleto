@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 6 · Play, Go or Do? · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --brown-dk: #2C1A0E;
+  --brown:    #5C3A1E;
+  --brown-md: #8B5E3C;
+  --brown-lt: #C4956A;
+  --cream:    #FAF7F4;
+  --sand:     #EDE5DA;
+  --sand-md:  #D9CCBC;
+  --white:    #FFFFFF;
+  --text:     #2C1A0E;
+  --text-md:  #7A5C40;
+  --text-lt:  #A88B70;
+  --ok:       #3D7A5E;
+  --ok-lt:    #EAF4EF;
+  --fail:     #963030;
+  --fail-lt:  #FAEAEA;
+  --warn-lt:  #FFF8E8;
+  --warn:     #8B6914;
+  --r: 14px;
+  --rs: 9px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+.header { background: var(--brown-dk); padding: 32px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%); pointer-events:none; }
+.btn-back { position:relative; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 14px; font-size:13px; font-weight:500; color:#fff; text-decoration:none; transition:all .2s; margin-bottom:16px; }
+.btn-back:hover { background: rgba(255,255,255,.22); }
+.brand { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--brown-lt); position:relative; margin-bottom:14px; }
+.h-eyebrow { font-size:.7rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.38); position:relative; margin-bottom:7px; }
+.h-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
+.h-title em { font-style:italic; color:var(--brown-lt); }
+.h-desc { font-size:.76rem; color:rgba(255,255,255,.38); margin-top:9px; position:relative; letter-spacing:.04em; }
+
+.day-nav-wrap { background:var(--brown-dk); padding:0 16px 20px; position:sticky; top:0; z-index:100; }
+.day-nav { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; max-width:680px; margin:0 auto; }
+.day-nav::-webkit-scrollbar { display:none; }
+.day-pill { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.5); padding:8px 16px; border-radius:20px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.day-pill:hover { background:rgba(255,255,255,.13); color:rgba(255,255,255,.8); }
+.day-pill.on { background:var(--brown-lt); border-color:var(--brown-lt); color:var(--brown-dk); }
+.day-pill-name { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; font-weight:500; }
+.day-pill-label { font-size:.68rem; font-weight:500; opacity:.7; }
+.day-pill.on .day-pill-label { opacity:1; }
+.day-pill.done .day-pill-name::after { content:' ✓'; color:var(--brown-lt); }
+.day-pill.on.done .day-pill-name::after { color:var(--brown-dk); }
+
+.main { max-width:680px; margin:0 auto; padding:24px 16px 56px; }
+.day-sec { display:none; }
+.day-sec.on { display:block; }
+
+.day-header { margin-bottom:20px; }
+.day-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.day-weekday { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); margin-bottom:3px; }
+.day-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
+.day-done-btn { flex-shrink:0; background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; color:var(--text-md); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-top:4px; }
+.day-done-btn:hover { background:var(--sand-md); }
+.day-done-btn.on { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.day-intro { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; font-size:.82rem; color:var(--text-md); line-height:1.6; }
+.day-intro strong { color:var(--brown-dk); font-weight:600; }
+
+.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(44,26,14,.06); overflow:hidden; margin-bottom:14px; }
+.block-head { padding:14px 18px; border-bottom:1px solid var(--sand); display:flex; align-items:center; gap:11px; }
+.block-icon { width:36px; height:36px; border-radius:9px; background:var(--sand); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.block-title { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
+.block-sub { font-size:.71rem; color:var(--text-lt); margin-top:1px; }
+.block-body { padding:16px 18px; }
+
+.task-list { display:flex; flex-direction:column; gap:8px; padding-left:18px; }
+.task-list li { font-size:.82rem; color:var(--text); line-height:1.55; padding-left:4px; }
+.task-list li a { color:var(--brown-md); text-decoration:underline; text-underline-offset:2px; font-weight:500; }
+.task-list li a:hover { color:var(--brown-dk); }
+
+.notes-area { width:100%; min-height:80px; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--text); resize:vertical; outline:none; background:var(--cream); transition:border-color .2s; line-height:1.55; }
+.notes-area:focus { border-color:var(--brown-lt); }
+.notes-area::placeholder { color:var(--text-lt); font-size:.78rem; }
+.qlist { display:flex; flex-direction:column; gap:6px; padding-left:18px; margin-bottom:14px; }
+.qlist li { font-size:.8rem; color:var(--text-md); line-height:1.5; }
+.starter-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.starter-chip { background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:5px 12px; font-size:.74rem; color:var(--text-md); cursor:pointer; transition:all .15s; }
+.starter-chip:hover { background:var(--sand-md); color:var(--brown-dk); }
+
+/* FLASHCARDS */
+.fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:9px; }
+.fc { perspective:700px; cursor:pointer; height:100px; }
+.fc-in { width:100%; height:100%; transition:transform .48s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d; position:relative; }
+.fc.flip .fc-in { transform:rotateY(180deg); }
+.fc-f, .fc-b { position:absolute; inset:0; border-radius:var(--rs); backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; border:1.5px solid transparent; }
+.fc-f { background:var(--sand); border-color:var(--sand-md); }
+.fc-b { background:var(--brown-dk); border-color:var(--brown-dk); transform:rotateY(180deg); }
+.fc-en { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:.92rem; color:var(--brown-dk); line-height:1.25; }
+.fc-f .fc-pt { font-size:.68rem; color:var(--text-lt); margin-top:3px; }
+.fc-b .fc-pt { font-family:'Cormorant Garamond',serif; font-size:.85rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
+.fc-b .fc-en-back { font-size:.72rem; color:rgba(255,255,255,.55); margin-top:3px; }
+.fc-tap { font-size:.58rem; color:var(--text-lt); margin-top:5px; letter-spacing:.03em; }
+.audio-btn { background:var(--brown-lt); border:none; cursor:pointer; border-radius:50%; width:23px; height:23px; display:flex; align-items:center; justify-content:center; font-size:.62rem; margin-top:5px; transition:transform .15s,background .2s; flex-shrink:0; }
+.audio-btn:hover { transform:scale(1.15); background:var(--brown); }
+
+/* READING */
+.reading-text { background:var(--sand); border-radius:var(--rs); padding:16px; font-size:.88rem; color:var(--text); line-height:1.75; margin-bottom:14px; font-style:italic; }
+
+/* SPORTS SORTER */
+.order-chip { background:var(--white); border:1.5px solid var(--sand-md); border-radius:20px; padding:8px 14px; font-size:.82rem; font-weight:500; color:var(--text); cursor:pointer; transition:all .15s; }
+.order-chip:hover { border-color:var(--brown-lt); background:var(--sand); }
+.order-chip.sel { background:var(--brown-dk); color:#fff; border-color:var(--brown-dk); }
+.sort-pool { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; min-height:40px; }
+.sort-status { text-align:center; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-lt); margin-bottom:12px; }
+.sort-buckets { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.sort-bucket { background:var(--sand); border:1.5px dashed var(--sand-md); border-radius:var(--rs); padding:10px 8px; min-height:100px; cursor:pointer; transition:all .15s; }
+.sort-bucket:hover { border-color:var(--brown-lt); }
+.sort-bucket-label { font-family:'DM Mono',monospace; font-size:.62rem; text-transform:uppercase; letter-spacing:.04em; color:var(--text-lt); margin-bottom:6px; text-align:center; }
+.sort-bucket-items { display:flex; flex-direction:column; gap:4px; }
+.order-log-item { background:var(--ok-lt); color:var(--ok); border-radius:8px; padding:6px 8px; font-size:.72rem; text-align:center; }
+
+/* WEEKLY TRACKER */
+.week-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--sand); }
+.week-row:last-child { border-bottom:none; }
+.week-chk { display:flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:.66rem; text-transform:uppercase; color:var(--text-md); width:58px; flex-shrink:0; }
+.week-inp { flex:1; border:1.5px solid var(--sand-md); border-radius:8px; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:.8rem; color:var(--text); outline:none; background:var(--cream); }
+.week-inp:focus { border-color:var(--brown-lt); }
+
+/* AUDIO RECORDER */
+.rec-controls { display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
+.btn-rec { background:var(--fail); color:#fff; border:none; border-radius:24px; padding:11px 22px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.84rem; cursor:pointer; transition:all .2s; }
+.btn-rec:hover { background:#7a2626; }
+.btn-rec.stop { background:var(--brown-dk); }
+.btn-rec.stop:hover { background:var(--brown); }
+.rec-player { text-align:center; }
+.rec-msg { text-align:center; font-size:.78rem; color:var(--text-lt); margin-top:8px; }
+
+/* PRONUNCIATION */
+.pron-intro { background:var(--sand); border-radius:var(--rs); padding:12px 14px; font-size:.8rem; color:var(--text-md); line-height:1.55; margin-bottom:14px; }
+.pron-list { display:flex; flex-direction:column; gap:10px; }
+.pron-item { border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; background:var(--white); }
+.pron-phrase { font-family:'Cormorant Garamond',serif; font-size:1.02rem; font-weight:600; color:var(--brown-dk); margin-bottom:3px; }
+.pron-pt { font-size:.71rem; color:var(--text-lt); margin-bottom:10px; }
+.pron-actions { display:flex; gap:7px; flex-wrap:wrap; }
+.btn-listen, .btn-speak { border:none; border-radius:var(--rs); padding:7px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; }
+.btn-listen { background:var(--sand); color:var(--brown-dk); }
+.btn-listen:hover { background:var(--sand-md); }
+.btn-speak { background:var(--brown-dk); color:#fff; }
+.btn-speak:hover { background:var(--brown); }
+.btn-speak.listening { background:var(--fail); animation:pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+.pron-fb { margin-top:9px; border-radius:var(--rs); padding:9px 12px; font-size:.77rem; font-weight:500; display:none; line-height:1.45; }
+.pron-fb.on { display:block; }
+.pron-fb.ok { background:var(--ok-lt); color:var(--ok); }
+.pron-fb.fail { background:var(--fail-lt); color:var(--fail); }
+.pron-fb.warn { background:var(--warn-lt); color:var(--warn); }
+
+/* QUIZ */
+.qprow { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.qpbar { flex:1; height:4px; background:var(--sand); border-radius:20px; overflow:hidden; }
+.qpfill { height:100%; border-radius:20px; background:linear-gradient(90deg,var(--brown-md),var(--brown-lt)); transition:width .4s; }
+.qplbl { font-family:'DM Mono',monospace; font-size:.66rem; color:var(--text-lt); white-space:nowrap; }
+.qq { background:var(--sand); border-radius:var(--rs); padding:16px; text-align:center; margin-bottom:13px; }
+.qq-ctx { font-size:.7rem; color:var(--text-lt); margin-bottom:5px; letter-spacing:.04em; }
+.qq-txt { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:1rem; color:var(--brown-dk); line-height:1.35; }
+.qopts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:13px; }
+.qopt { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 9px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.8rem; cursor:pointer; color:var(--text); text-align:center; transition:all .18s; line-height:1.25; }
+.qopt:hover { border-color:var(--brown-lt); background:var(--sand); }
+.qopt.ok { border-color:var(--ok); background:var(--ok-lt); color:var(--ok); }
+.qopt.fail { border-color:var(--fail); background:var(--fail-lt); color:var(--fail); }
+.qopt:disabled { cursor:default; }
+.qfb { text-align:center; font-weight:500; font-size:.8rem; padding:9px; border-radius:var(--rs); margin-bottom:11px; display:none; }
+.qfb.on { display:block; }
+.qfb.ok { background:var(--ok-lt); color:var(--ok); }
+.qfb.fail { background:var(--fail-lt); color:var(--fail); }
+.qnav { display:flex; justify-content:center; }
+.btn-next { background:var(--brown-dk); color:#fff; border:none; border-radius:var(--rs); padding:10px 26px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.82rem; cursor:pointer; display:none; transition:background .2s; }
+.btn-next:hover { background:var(--brown); }
+.qres { text-align:center; padding:18px; display:none; }
+.qres.on { display:block; }
+.qres-t { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--brown-dk); }
+.qres-s { font-size:.8rem; color:var(--text-md); margin-top:5px; }
+.btn-retry { background:var(--sand); color:var(--brown-dk); border:none; border-radius:var(--rs); padding:9px 22px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.78rem; cursor:pointer; margin-top:14px; transition:background .2s; }
+.btn-retry:hover { background:var(--sand-md); }
+.btn-sm { background:var(--sand); border:none; border-radius:8px; padding:6px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.71rem; cursor:pointer; color:var(--text-md); transition:background .2s; }
+.btn-sm:hover { background:var(--sand-md); }
+
+.footer { text-align:center; padding:18px 16px 30px; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.09em; color:var(--text-lt); text-transform:uppercase; border-top:1px solid var(--sand); margin-top:8px; }
+
+@media(max-width:400px){
+  .qopts { grid-template-columns:1fr; }
+  .fc-grid { grid-template-columns:repeat(2,1fr); }
+  .sort-buckets { grid-template-columns:1fr; }
+}
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<div class="header">
+  <a href="dashboard-adulto.html" class="btn-back">← Voltar</a>
+  <div class="brand">itsbrendacleto · adults</div>
+  <div class="h-eyebrow">Study Planner · Lição 6</div>
+  <div class="h-title">Play, Go <em>or Do?</em></div>
+  <div class="h-desc">Sports · To Play / To Go / To Do</div>
+</div>
+
+<div class="day-nav-wrap">
+  <div class="day-nav">
+    <div class="day-pill on" onclick="showDay('mon',this)" id="pill-mon"><span class="day-pill-name">Mon</span><span class="day-pill-label">Video</span></div>
+    <div class="day-pill" onclick="showDay('tue',this)" id="pill-tue"><span class="day-pill-name">Tue</span><span class="day-pill-label">Sorter</span></div>
+    <div class="day-pill" onclick="showDay('wed',this)" id="pill-wed"><span class="day-pill-name">Wed</span><span class="day-pill-label">Tracker</span></div>
+    <div class="day-pill" onclick="showDay('thu',this)" id="pill-thu"><span class="day-pill-name">Thu</span><span class="day-pill-label">Podcast</span></div>
+    <div class="day-pill" onclick="showDay('fri',this)" id="pill-fri"><span class="day-pill-name">Fri</span><span class="day-pill-label">Grammar</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SEGUNDA -->
+  <div class="day-sec on" id="day-mon">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Segunda-feira · Monday</div><div class="day-title">Sports Video</div></div>
+        <button class="day-done-btn" id="done-mon" onclick="toggleDone('mon')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Assista ao vídeo, pesquise os novos vocabulários e responda as perguntas abaixo. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use o link abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Assista ao <a href="https://www.youtube.com/watch?v=is1TnRNVJFc" target="_blank">vídeo sobre esportes no Reino Unido ↗</a>.</li>
+          <li>Pesquise os vocabulários novos que aparecerem.</li>
+          <li>Responda as perguntas sobre o vídeo abaixo.</li>
+          <li>Revise os Sports Cards.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">⚽</div><div><div class="block-title">Sports Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">❓</div><div><div class="block-title">Questions about the video</div><div class="block-sub">Responda depois de assistir</div></div></div>
+      <div class="block-body">
+        <ol class="qlist">
+          <li>What sports are popular in the UK?</li>
+          <li>Which sport is very common in England?</li>
+          <li>What sport do people play in Scotland?</li>
+          <li>What sport do people like in Wales?</li>
+          <li>Do people in Northern Ireland do any water sports?</li>
+          <li>How often do people in the UK play sports?</li>
+          <li>Why is sport important in British schools?</li>
+          <li>What big sports event happens in the UK?</li>
+          <li>How do sports influence British culture?</li>
+          <li>Does the video mention a famous British athlete? Who?</li>
+        </ol>
+        <textarea class="notes-area" style="min-height:110px" placeholder="Escreva suas respostas aqui..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERÇA -->
+  <div class="day-sec" id="day-tue">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Terça-feira · Tuesday</div><div class="day-title">Play, Go or Do?</div></div>
+        <button class="day-done-btn" id="done-tue" onclick="toggleDone('tue')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Leia o texto abaixo e organize os esportes no jogo "Sports Sorter". Depois, escreva sobre esportes populares na sua cidade. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Leia o texto abaixo.</li>
+          <li>Jogue o "Sports Sorter" — organize cada esporte na categoria certa.</li>
+          <li>Escreva 3 frases sobre esportes populares na sua cidade ou entre seus amigos.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📖</div><div><div class="block-title">Texto: Sports</div><div class="block-sub">Pesquise as palavras que não conhece</div></div></div>
+      <div class="block-body">
+        <div class="reading-text">Many people like sports. Some people play soccer, others go swimming, and some do yoga. In Brazil, soccer is very popular. Many children play soccer in schools and parks. Swimming is also common, especially in the summer. People do yoga to relax and stay healthy.</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🗂️</div><div><div class="block-title">Sports Sorter</div><div class="block-sub">Toque num esporte e depois na categoria certa</div></div></div>
+      <div class="block-body">
+        <div class="sort-pool" id="sort-pool"></div>
+        <div class="sort-status" id="sort-status">0 / 9 organizados</div>
+        <div class="sort-buckets">
+          <div class="sort-bucket" onclick="chooseBucket('play')">
+            <div class="sort-bucket-label">▶️ To Play</div>
+            <div class="sort-bucket-items" id="sort-bucket-play-items"></div>
+          </div>
+          <div class="sort-bucket" onclick="chooseBucket('go')">
+            <div class="sort-bucket-label">🏃 To Go</div>
+            <div class="sort-bucket-items" id="sort-bucket-go-items"></div>
+          </div>
+          <div class="sort-bucket" onclick="chooseBucket('do')">
+            <div class="sort-bucket-label">🧘 To Do</div>
+            <div class="sort-bucket-items" id="sort-bucket-do-items"></div>
+          </div>
+        </div>
+        <div class="qfb" id="sort-fb" style="margin-top:12px"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Esportes na sua cidade</div><div class="block-sub">3 frases sobre esportes populares</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" placeholder="Exemplo:&#10;Many people play soccer in my city.&#10;Some people go running in the park."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTA -->
+  <div class="day-sec" id="day-wed">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quarta-feira · Wednesday</div><div class="day-title">My Sports Week</div></div>
+        <button class="day-done-btn" id="done-wed" onclick="toggleDone('wed')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Registre sua semana esportiva! Perceba se você pratica alguma atividade física, mesmo que seja caminhar até o trabalho ou subir escadas. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Marque os dias em que você praticou alguma atividade física.</li>
+          <li>Escreva em inglês o que você fez em cada dia.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📅</div><div><div class="block-title">My Sports Week</div><div class="block-sub">Registre sua semana — salvo automaticamente neste aparelho</div></div></div>
+      <div class="block-body">
+        <div id="week-log"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUINTA -->
+  <div class="day-sec" id="day-thu">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quinta-feira · Thursday</div><div class="day-title">Mini Podcast</div></div>
+        <button class="day-done-btn" id="done-thu" onclick="toggleDone('thu')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Grave um áudio curto falando sobre um esporte que você gosta ou já praticou. Use frases com "go", "play" e "do". <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Toque nos exemplos abaixo para ouvir a pronúncia.</li>
+          <li>Grave seu Mini Podcast sobre um esporte.</li>
+          <li>Pratique as frases de pronúncia.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎙️</div><div><div class="block-title">Mini Podcast</div><div class="block-sub">Grave um áudio curto sobre um esporte que você gosta</div></div></div>
+      <div class="block-body">
+        <div class="starter-chips" id="podcast-chips"></div>
+        <div class="rec-controls">
+          <button class="btn-rec" id="rec-start-btn" onclick="startRecording()">🔴 Gravar</button>
+          <button class="btn-rec stop" id="rec-stop-btn" onclick="stopRecording()" style="display:none">⏹ Parar</button>
+        </div>
+        <div class="rec-player" id="rec-player" style="display:none">
+          <audio id="rec-audio" controls style="width:100%"></audio>
+          <div style="text-align:center"><button class="btn-sm" onclick="resetRecording()" style="margin-top:8px">↩ Gravar novamente</button></div>
+        </div>
+        <div class="rec-msg" id="rec-msg"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🗣️</div><div><div class="block-title">Pronunciation Practice</div><div class="block-sub">Ouça, repita e receba feedback</div></div></div>
+      <div class="block-body">
+        <div class="pron-intro">Pratique estas frases antes de gravar seu Mini Podcast.</div>
+        <div class="pron-list" id="pron-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEXTA -->
+  <div class="day-sec" id="day-fri">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Sexta-feira · Friday</div><div class="day-title">Play, Go or Do? (Quiz)</div></div>
+        <button class="day-done-btn" id="done-fri" onclick="toggleDone('fri')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Pergunte a um amigo, familiar ou colega sobre os esportes que ele pratica e escreva frases na terceira pessoa. Antes, faça o Quiz de revisão. <strong>O segredo da fluência é a constância!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Revisão final da semana</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Faça o Quiz "Play, Go or Do?" abaixo.</li>
+          <li>Pergunte a alguém sobre os esportes que pratica.</li>
+          <li>Escreva frases sobre ele/ela na terceira pessoa.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">❓</div><div><div class="block-title">Quiz: Play, Go or Do?</div><div class="block-sub">Escolha a forma certa na terceira pessoa</div></div></div>
+      <div class="block-body">
+        <div class="qprow"><div class="qpbar"><div class="qpfill" id="qpf" style="width:0%"></div></div><span class="qplbl" id="qpl">0 / 6</span></div>
+        <div id="quiz-area"></div>
+        <div class="qres" id="qres"><div class="qres-t" id="qres-t"></div><div class="qres-s" id="qres-s"></div><button class="btn-retry" onclick="initQuiz()">↩ Tentar novamente</button></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Sobre ele/ela</div><div class="block-sub">Ex: "He plays soccer every Sunday."</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" placeholder="Escreva aqui as frases sobre a pessoa que você entrevistou..."></textarea>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">⚽</div><div><div class="block-title">Revisão de Sports</div><div class="block-sub">Relembre todos os cartões da semana</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid-fri"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">itsbrendacleto · material exclusivo · reprodução não autorizada</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', {
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } }
+});
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, { user: Object.assign({}, real.data.session.user, { id: __previewAs }) });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, { get: function (t, prop) { if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); }; return function () { return p; }; } });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) { qb[m] = function () { return __previewNoop(); }; });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as'); sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+var LESSON_ID = 'adulto-l1-a6';
+var DAYS = ['mon','tue','wed','thu','fri'];
+var userId = null;
+var doneDays = {};
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+async function loadDoneDays() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    userId = session.user.id;
+    var { data: rows } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', LESSON_ID + '-%');
+    (rows || []).forEach(function (r) { var day = r.lesson_id.replace(LESSON_ID + '-', ''); if (DAYS.indexOf(day) >= 0) doneDays[day] = true; });
+    DAYS.forEach(function (d) {
+      if (doneDays[d]) {
+        document.getElementById('done-' + d).classList.add('on');
+        document.getElementById('done-' + d).textContent = '✓ Concluído';
+        document.getElementById('pill-' + d).classList.add('done');
+      }
+    });
+  } catch (e) { console.error('Erro ao carregar progresso:', e); }
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var FC = [
+  {en:'Soccer',                pt:'Futebol'},
+  {en:'Tennis',                pt:'Tênis'},
+  {en:'Basketball',            pt:'Basquete'},
+  {en:'Swimming',              pt:'Natação'},
+  {en:'Running',               pt:'Corrida'},
+  {en:'Cycling',               pt:'Ciclismo'},
+  {en:'Yoga',                  pt:'Yoga'},
+  {en:'Karate',                pt:'Caratê'},
+  {en:'Exercise',              pt:'Exercício'},
+  {en:'To play (a game)',      pt:'Jogar'},
+  {en:'To go (+ -ing)',        pt:'Ir (praticar)'},
+  {en:'To do (an activity)',   pt:'Fazer'}
+];
+
+var SPORTS = [
+  {word:'soccer',     cat:'play'},
+  {word:'tennis',     cat:'play'},
+  {word:'basketball', cat:'play'},
+  {word:'swimming',   cat:'go'},
+  {word:'running',    cat:'go'},
+  {word:'cycling',    cat:'go'},
+  {word:'yoga',       cat:'do'},
+  {word:'karate',     cat:'do'},
+  {word:'exercise',   cat:'do'}
+];
+
+var WEEK_DAYS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+var PODCAST_STARTERS = ['I like...', 'I play...', 'I go...', 'I do...', 'Every week, I...'];
+
+var PRON = [
+  {phrase:"I play soccer on weekends.",        pt:'Eu jogo futebol nos fins de semana.'},
+  {phrase:"I go swimming every summer.",       pt:'Eu vou nadar todo verão.'},
+  {phrase:"I do yoga to relax.",                pt:'Eu faço yoga para relaxar.'},
+  {phrase:"What sport do you like?",            pt:'De que esporte você gosta?'},
+  {phrase:"I don't play tennis very well.",     pt:'Eu não jogo tênis muito bem.'}
+];
+
+var QUIZ = [
+  {q:'She ___ soccer every Sunday.',                          ctx:'Play, Go or Do?', opts:['plays','goes','does'], c:0},
+  {q:'He ___ swimming on weekends.',                          ctx:'Play, Go or Do?', opts:['plays','goes','does'], c:1},
+  {q:'They ___ yoga every morning.',                          ctx:'Play, Go or Do?', opts:['play','go','do'], c:2},
+  {q:'My friend ___ basketball with his brother.',            ctx:'Play, Go or Do?', opts:['plays','goes','does'], c:0},
+  {q:'We ___ running in the park.',                           ctx:'Play, Go or Do?', opts:['play','go','do'], c:1},
+  {q:'She ___ karate twice a week.',                          ctx:'Play, Go or Do?', opts:['plays','goes','does'], c:2}
+];
+
+function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+var inited = {};
+function showDay(id, pill) {
+  document.querySelectorAll('.day-sec').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.day-pill').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('day-'+id).classList.add('on');
+  pill.classList.add('on');
+  if (!inited[id]) { inited[id]=true; INIT[id](); }
+}
+var INIT = {
+  mon: function(){ buildFC('fc-grid', FC); },
+  tue: function(){ initSort(); },
+  wed: function(){ initWeekLog(); },
+  thu: function(){ initPodcast(); initPron(); },
+  fri: function(){ initQuiz(); buildFC('fc-grid-fri', FC); }
+};
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────
+function buildFC(gridId, data) {
+  var g = document.getElementById(gridId);
+  if (!g) return;
+  g.innerHTML='';
+  data.forEach(function(fc, i) {
+    var d = document.createElement('div');
+    d.className='fc'; d.id=gridId+'-'+i;
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><div class="fc-en">'+fc.en+'</div><div class="fc-pt">'+fc.pt+'</div><button class="audio-btn">🔊</button><div class="fc-tap">toque para girar</div></div><div class="fc-b"><div class="fc-pt">'+fc.pt+'</div><div class="fc-en-back">'+fc.en+'</div></div></div>';
+    d.addEventListener('click', function(){ d.classList.toggle('flip'); });
+    d.querySelector('.audio-btn').addEventListener('click', function(e){ e.stopPropagation(); speak(fc.en.replace(/\(.*\)/,'')); });
+    g.appendChild(d);
+  });
+}
+inited['mon']=true;
+buildFC('fc-grid', FC);
+
+// ── SPORTS SORTER ─────────────────────────────────────────────────────────────
+var selectedSport = null, sortedCount = 0;
+function initSort(){
+  selectedSport = null; sortedCount = 0;
+  SPORTS.forEach(function(s){ s.sorted = false; });
+  document.getElementById('sort-status').textContent = '0 / '+SPORTS.length+' organizados';
+  ['play','go','do'].forEach(function(cat){ document.getElementById('sort-bucket-'+cat+'-items').innerHTML=''; });
+  document.getElementById('sort-fb').className='qfb';
+  renderSortPool();
+}
+function renderSortPool(){
+  var pool = document.getElementById('sort-pool'); pool.innerHTML='';
+  SPORTS.forEach(function(s, i){
+    if (s.sorted) return;
+    var chip = document.createElement('div'); chip.className='order-chip'; chip.textContent=s.word;
+    if (selectedSport===i) chip.classList.add('sel');
+    chip.addEventListener('click', function(){ selectedSport=i; renderSortPool(); });
+    pool.appendChild(chip);
+  });
+}
+function chooseBucket(cat){
+  if (selectedSport===null) return;
+  var s = SPORTS[selectedSport];
+  var fb = document.getElementById('sort-fb');
+  if (s.cat===cat) {
+    s.sorted = true; sortedCount++;
+    var item = document.createElement('div'); item.className='order-log-item'; item.textContent = s.word;
+    document.getElementById('sort-bucket-'+cat+'-items').appendChild(item);
+    fb.textContent = sortedCount===SPORTS.length ? '🎉 Você organizou todas as palavras!' : '✓ "'+s.word+'" vai com "to '+cat+'"!';
+    fb.className='qfb on ok';
+    document.getElementById('sort-status').textContent = sortedCount+' / '+SPORTS.length+' organizados';
+  } else {
+    fb.textContent='Não é bem assim... tente outra categoria!'; fb.className='qfb on fail';
+  }
+  selectedSport=null;
+  renderSortPool();
+}
+
+// ── WEEKLY TRACKER ────────────────────────────────────────────────────────────
+function initWeekLog(){
+  var c = document.getElementById('week-log'); c.innerHTML='';
+  var saved = {};
+  try { saved = JSON.parse(localStorage.getItem('l1a6_week_log') || '{}'); } catch(e){}
+  WEEK_DAYS.forEach(function(d){
+    var row = document.createElement('div'); row.className='week-row';
+    var chkId = 'wk-'+d+'-chk', txtId = 'wk-'+d+'-txt';
+    var chk = document.createElement('label'); chk.className='week-chk';
+    var chkInput = document.createElement('input'); chkInput.type='checkbox'; chkInput.id=chkId; chkInput.checked = !!saved[d+'_chk'];
+    chk.appendChild(chkInput); chk.appendChild(document.createTextNode(' '+d));
+    var txtInput = document.createElement('input'); txtInput.type='text'; txtInput.className='week-inp'; txtInput.id=txtId; txtInput.placeholder='O que você fez?'; txtInput.value = saved[d+'_txt'] || '';
+    row.appendChild(chk); row.appendChild(txtInput);
+    c.appendChild(row);
+    chkInput.addEventListener('change', saveWeekLog);
+    txtInput.addEventListener('input', saveWeekLog);
+  });
+}
+function saveWeekLog(){
+  var data = {};
+  WEEK_DAYS.forEach(function(d){
+    data[d+'_chk'] = document.getElementById('wk-'+d+'-chk').checked;
+    data[d+'_txt'] = document.getElementById('wk-'+d+'-txt').value;
+  });
+  localStorage.setItem('l1a6_week_log', JSON.stringify(data));
+}
+
+// ── MINI PODCAST (AUDIO RECORDER) ─────────────────────────────────────────────
+var mediaRecorder=null, recordedChunks=[], mediaStream=null;
+function initPodcast(){
+  var c = document.getElementById('podcast-chips'); c.innerHTML='';
+  PODCAST_STARTERS.forEach(function(s){
+    var chip=document.createElement('div'); chip.className='starter-chip'; chip.textContent=s;
+    chip.addEventListener('click', function(){ speak(s.replace('...',''), 0.85); });
+    c.appendChild(chip);
+  });
+}
+async function startRecording(){
+  var msg=document.getElementById('rec-msg');
+  if (!navigator.mediaDevices || !window.MediaRecorder) { msg.textContent='Gravação de áudio não disponível neste navegador.'; return; }
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recordedChunks=[];
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = function(e){ if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = function(){
+      var blob = new Blob(recordedChunks, {type:'audio/webm'});
+      var url = URL.createObjectURL(blob);
+      var audio = document.getElementById('rec-audio');
+      audio.src = url;
+      document.getElementById('rec-player').style.display='block';
+      mediaStream.getTracks().forEach(function(t){ t.stop(); });
+    };
+    mediaRecorder.start();
+    document.getElementById('rec-start-btn').style.display='none';
+    document.getElementById('rec-stop-btn').style.display='inline-block';
+    msg.textContent='🔴 Gravando... fale sobre um esporte que você gosta.';
+  } catch(e){ msg.textContent='Não foi possível acessar o microfone. Verifique as permissões.'; }
+}
+function stopRecording(){
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  document.getElementById('rec-stop-btn').style.display='none';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-msg').textContent='✓ Gravação concluída! Ouça abaixo.';
+}
+function resetRecording(){
+  document.getElementById('rec-player').style.display='none';
+  document.getElementById('rec-msg').textContent='';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-stop-btn').style.display='none';
+}
+
+// ── PRONUNCIATION ────────────────────────────────────────────────────────────
+function initPron() {
+  var container = document.getElementById('pron-list');
+  if (!container) return;
+  container.innerHTML='';
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  PRON.forEach(function(p, i) {
+    var fbId='pfb-'+i, btnId='psb-'+i;
+    var item = document.createElement('div');
+    item.className='pron-item';
+    item.innerHTML='<div class="pron-phrase">'+p.phrase+'</div><div class="pron-pt">'+p.pt+'</div><div class="pron-actions"><button class="btn-listen">🔊 Ouvir</button>'+(SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>' : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+'</div><div class="pron-fb" id="'+fbId+'"></div>';
+    item.querySelector('.btn-listen').addEventListener('click', function(){ speak(p.phrase, 0.8); });
+    container.appendChild(item);
+    if (!SR) return;
+    item.querySelector('#'+btnId).addEventListener('click', function() {
+      var btn = this;
+      var rec = new SR();
+      rec.lang='en-US'; rec.interimResults=false; rec.maxAlternatives=3;
+      btn.textContent='⏹ Ouvindo...'; btn.classList.add('listening');
+      rec.onresult=function(e){
+        var said='';
+        for(var a=0;a<e.results[0].length;a++){ said=e.results[0][a].transcript.toLowerCase().trim(); if(said)break; }
+        var exp=p.phrase.toLowerCase().replace(/[?.!,]/g,'').trim();
+        var sc=said.replace(/[?.!,]/g,'').trim();
+        var fb=document.getElementById(fbId);
+        var r=wordSimilarity(exp,sc);
+        if(r>=0.6){ fb.textContent='✓ Muito bem! "'+said+'" — ficou ótimo!'; fb.className='pron-fb on ok'; }
+        else if(r>=0.3){ fb.textContent='~ Quase! Você disse "'+said+'". Tente novamente.'; fb.className='pron-fb on warn'; }
+        else{ fb.textContent='↩ Você disse "'+said+'". A frase é: "'+p.phrase+'". Tente de novo!'; fb.className='pron-fb on fail'; }
+        btn.textContent='🎙 Falar'; btn.classList.remove('listening');
+      };
+      rec.onerror=function(e){
+        var fb=document.getElementById(fbId);
+        fb.textContent=e.error==='no-speech'?'Nenhuma fala detectada. Tente novamente.':e.error==='not-allowed'?'Acesso ao microfone negado.':'Não foi possível reconhecer. Tente novamente.';
+        fb.className='pron-fb on warn';
+        btn.textContent='🎙 Falar'; btn.classList.remove('listening');
+      };
+      rec.onend=function(){ btn.textContent='🎙 Falar'; btn.classList.remove('listening'); };
+      rec.start();
+    });
+  });
+}
+function wordSimilarity(a,b){ var aw=a.split(' '), bw=b.split(' '), m=0; aw.forEach(function(w){ if(bw.indexOf(w)!==-1)m++; }); return m/Math.max(aw.length,bw.length); }
+
+// ── QUIZ ──────────────────────────────────────────────────────────────────────
+var qCur=0,qScore=0,qDone=false;
+function initQuiz(){ qCur=0;qScore=0;qDone=false; document.getElementById('qres').classList.remove('on'); document.getElementById('quiz-area').innerHTML=''; renderQ(); }
+function renderQ(){
+  var q=QUIZ[qCur],tot=QUIZ.length;
+  document.getElementById('qpf').style.width=(qCur/tot*100)+'%';
+  document.getElementById('qpl').textContent=qCur+' / '+tot;
+  var area=document.getElementById('quiz-area');
+  area.innerHTML='<div class="qq">'+(q.ctx?'<div class="qq-ctx">'+q.ctx+'</div>':'')+'<div class="qq-txt">'+q.q+'</div></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div><div class="qnav"><button class="btn-next" id="qnxt">'+(qCur+1<tot?'Próxima →':'Ver resultado')+'</button></div>';
+  var opts=document.getElementById('qopts');
+  q.opts.forEach(function(o,i){ var b=document.createElement('button'); b.className='qopt'; b.textContent=o; b.addEventListener('click',function(){ answerQ(i); }); opts.appendChild(b); });
+  document.getElementById('qnxt').addEventListener('click',nextQ);
+  qDone=false;
+}
+function answerQ(chosen){
+  if(qDone)return; qDone=true;
+  var q=QUIZ[qCur]; var btns=document.querySelectorAll('.qopt');
+  btns.forEach(function(b){b.disabled=true;}); btns[q.c].classList.add('ok');
+  var fb=document.getElementById('qfb');
+  if(chosen===q.c){ qScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  else{ btns[chosen].classList.add('fail'); fb.textContent='A resposta correta é: '+q.opts[q.c]; fb.className='qfb on fail'; }
+  document.getElementById('qnxt').style.display='inline-block';
+}
+function nextQ(){
+  qCur++;
+  if(qCur>=QUIZ.length){
+    document.getElementById('quiz-area').innerHTML='';
+    document.getElementById('qpf').style.width='100%';
+    document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;
+    var p=qScore/QUIZ.length;
+    document.getElementById('qres-t').textContent=p===1?'Resultado perfeito!':p>=.6?'Muito bem!':'Continue praticando.';
+    document.getElementById('qres-s').textContent='Você acertou '+qScore+' de '+QUIZ.length+' questões.';
+    document.getElementById('qres').classList.add('on');
+    saveQuizScore(LESSON_ID + '-quiz', qScore, QUIZ.length);
+  } else { renderQ(); }
+}
+
+// ── DAY DONE ─────────────────────────────────────────────────────────────────
+async function toggleDone(id){
+  var btn=document.getElementById('done-'+id);
+  var pill=document.getElementById('pill-'+id);
+  var on=btn.classList.toggle('on');
+  btn.textContent=on?'✓ Concluído':'○ Concluído';
+  pill.classList.toggle('done',on);
+
+  try {
+    if (!userId) {
+      var { data } = await sb.auth.getSession();
+      userId = data && data.session && data.session.user.id;
+    }
+    if (!userId) return;
+    var dayLessonId = LESSON_ID + '-' + id;
+    if (on) {
+      doneDays[id] = true;
+      await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: dayLessonId, completed_at: new Date().toISOString() });
+    } else {
+      delete doneDays[id];
+      await sb.from('lesson_progress').delete().eq('user_id', userId).eq('lesson_id', dayLessonId);
+    }
+    var allDone = DAYS.every(function (d) { return doneDays[d]; });
+    if (allDone) await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do dia:', e); }
+}
+
+loadDoneDays();
+</script>
+</body>
+</html>
