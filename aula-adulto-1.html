@@ -138,20 +138,6 @@
   .btn-retry{background:var(--sand);color:var(--brown);border:none;border-radius:var(--rs);padding:9px 20px;font-weight:700;font-size:.84rem;cursor:pointer;margin-top:14px;}
   .btn-retry:hover{background:var(--rose-lt);}
 
-  /* MISSION */
-  .msn{background:var(--cream);border:1.5px solid var(--sand);border-radius:var(--r);padding:18px;}
-  .msn-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
-  .msn-ico{width:42px;height:42px;border-radius:50%;background:var(--rose-lt);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
-  .msn-t{font-weight:700;font-size:.95rem;color:var(--brown);}
-  .msn-w{font-size:.75rem;color:var(--muted);margin-top:1px;}
-  .msn-steps{display:flex;flex-direction:column;gap:9px;}
-  .mstep{display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:var(--rs);padding:11px 13px;border:1px solid var(--sand);}
-  .stchk{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2px solid var(--brown-light);cursor:pointer;display:flex;align-items:center;justify-content:center;background:#fff;transition:all .2s;margin-top:1px;}
-  .stchk.on{background:var(--mint);border-color:var(--mint);}
-  .stchk.on::after{content:'✓';font-size:.72rem;color:#fff;font-weight:800;}
-  .stxt{font-size:.85rem;color:var(--text);line-height:1.4;}
-  .stxt strong{color:var(--brown);}
-
   .footer{text-align:center;padding:24px 16px 32px;font-size:.73rem;color:var(--muted);border-top:1.5px solid var(--sand);margin-top:8px;}
   .footer strong{color:var(--brown);}
 
@@ -196,7 +182,7 @@
 <body>
 
 <div class="header">
-  <a class="btn-voltar" href="dashboard-adulto.html">← Voltar</a>
+  <a class="btn-voltar" id="btnVoltar" href="dashboard-adulto.html">← Voltar</a>
   <div class="brand">its<span>brenda</span>cleto</div>
   <span class="h-emoji">👋</span>
   <div class="h-num">Aula 1 · Bloco 1</div>
@@ -209,7 +195,6 @@
     <span class="pill"     onclick="show('spelling',this)">✏️ Spelling</span>
     <span class="pill"     onclick="show('speech',this)">🎤 Pronúncia</span>
     <span class="pill"     onclick="show('quiz',this)">❓ Quiz</span>
-    <span class="pill"     onclick="show('mission',this)">🎯 Missão</span>
   </div>
 </div>
 
@@ -278,16 +263,6 @@
     </div>
   </div>
 
-  <!-- MISSION -->
-  <div class="sec" id="sec-mission">
-    <div class="ch"><div class="ci">🎯</div><div><div class="ct">Missão da Semana</div><div class="cs">Complete todas as etapas!</div></div></div>
-    <div class="cb">
-      <div class="msn">
-        <div class="msn-top"><div class="msn-ico">🎯</div><div><div class="msn-t">Sua missão dessa semana!</div><div class="msn-w">Aula 1 — What's your name?</div></div></div>
-        <div class="msn-steps" id="msn-steps"></div>
-      </div>
-    </div>
-  </div>
 
 </div>
 
@@ -404,14 +379,6 @@ var QUIZ = [
   {em:'✏️', q:'Como você diz "Meu nome é Ana"?',           opts:['I am from Ana','My name is Ana','Your name is Ana','She is Ana'], c:1}
 ];
 
-var MISSION = [
-  'Explore os cards de <strong>Vocabulary</strong> e ouça a pronúncia de cada expressão.',
-  'Leia o <strong>Diálogo</strong> entre John e Emma e pesquise qualquer palavra que não conheça.',
-  'Pratique o <strong>alfabeto</strong> e a <strong>soletração</strong> do seu próprio nome.',
-  'Na aba <strong>Pronúncia</strong>, grave-se dizendo seu nome, de onde você é, e "nice to meet you".',
-  'Complete o <strong>Quiz</strong> pra fixar tudo que aprendeu essa semana!'
-];
-
 // ── AUDIO ─────────────────────────────────────────────────────────────────
 function speakLetter(l) {
   if (!window.speechSynthesis) return;
@@ -443,8 +410,7 @@ var INIT = {
   alphabet:   initAlpha,
   spelling:   initSpelling,
   speech:     function(){},
-  quiz:       initQuiz,
-  mission:    initMission
+  quiz:       initQuiz
 };
 
 // ── FLASHCARDS ─────────────────────────────────────────────────────────────
@@ -648,55 +614,29 @@ function nextQ() {
   } else { renderQ(); }
 }
 
-// ── MISSION ─────────────────────────────────────────────────────────────────
-var LESSON_ID = 'adulto-l1-a1';
-
-async function initMission() {
-  var ul = document.getElementById('msn-steps');
-  ul.innerHTML='';
-
-  var checkedSteps = {};
-  try {
-    var { data: { session } } = await sb.auth.getSession();
-    if (session) {
-      var { data: rows } = await sb.from('lesson_progress').select('lesson_id')
-        .eq('user_id', session.user.id).like('lesson_id', LESSON_ID + '-step-%');
-      (rows || []).forEach(function(r){ checkedSteps[r.lesson_id] = true; });
-    }
-  } catch (e) { console.error('Erro ao carregar missão:', e); }
-
-  MISSION.forEach(function(s,i){
-    var stepId = LESSON_ID + '-step-' + i;
-    var li = document.createElement('div');
-    li.className='mstep';
-    li.innerHTML='<div class="stchk'+(checkedSteps[stepId]?' on':'')+'" id="st'+i+'"></div><div class="stxt">'+s+'</div>';
-    li.querySelector('.stchk').addEventListener('click', function(){
-      this.classList.toggle('on');
-      saveMissionStep(stepId, this.classList.contains('on'));
-    });
-    ul.appendChild(li);
-  });
-}
-
-async function saveMissionStep(stepId, done) {
-  try {
-    var { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    if (done) {
-      await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: stepId, completed_at: new Date().toISOString() });
-    } else {
-      await sb.from('lesson_progress').delete().eq('user_id', session.user.id).eq('lesson_id', stepId);
-    }
-    var allDone = MISSION.every(function(_,i){ return document.getElementById('st'+i).classList.contains('on'); });
-    if (allDone) {
-      await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
-    }
-  } catch (e) { console.error('Erro ao salvar etapa da missão:', e); }
-}
-
 // ── INIT ────────────────────────────────────────────────────────────────────
 inited['flashcards'] = true;
 initFlashcards();
+
+// ── PLANNER MODE ───────────────────────────────────────────────────────────
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fase = params.get('fase');
+  var faseMap = {
+    flashcards: 'flashcards',
+    dialogue:   'dialogue',
+    alphabet:   'alphabet',
+    spelling:   'spelling',
+    speech:     'speech',
+    quiz:       'quiz'
+  };
+  if (fase && faseMap[fase]) {
+    document.getElementById('btnVoltar').href = 'planner-adulto-1.html';
+    var nomeFase = faseMap[fase];
+    var pill = document.querySelector('.pill[onclick*="' + nomeFase + '"]');
+    if (pill) show(nomeFase, pill);
+  }
+})();
 </script>
 </body>
 </html>
