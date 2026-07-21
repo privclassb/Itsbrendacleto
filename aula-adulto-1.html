@@ -148,6 +148,7 @@
 
   .btn-voltar { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.15); border: 1.5px solid rgba(255,255,255,.3); border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer; text-decoration: none; width: fit-content; margin: 0 auto 14px; }
   .btn-voltar:hover { background: rgba(255,255,255,.25); }
+  .planner-mode .pills { display: none; }
 </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -631,6 +632,7 @@ initFlashcards();
     quiz:       'quiz'
   };
   if (fase && faseMap[fase]) {
+    document.body.classList.add('planner-mode');
     document.getElementById('btnVoltar').href = 'planner-adulto-1.html';
     var nomeFase = faseMap[fase];
     var pill = document.querySelector('.pill[onclick*="' + nomeFase + '"]');
