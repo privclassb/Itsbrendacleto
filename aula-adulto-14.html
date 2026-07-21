@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lição 14 · I Want To... · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+  --brown-dk: #2C1A0E;
+  --brown:    #5C3A1E;
+  --brown-md: #8B5E3C;
+  --brown-lt: #C4956A;
+  --cream:    #FAF7F4;
+  --sand:     #EDE5DA;
+  --sand-md:  #D9CCBC;
+  --white:    #FFFFFF;
+  --text:     #2C1A0E;
+  --text-md:  #7A5C40;
+  --text-lt:  #A88B70;
+  --ok:       #3D7A5E;
+  --ok-lt:    #EAF4EF;
+  --fail:     #963030;
+  --fail-lt:  #FAEAEA;
+  --warn-lt:  #FFF8E8;
+  --warn:     #8B6914;
+  --r: 14px;
+  --rs: 9px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+.header { background: var(--brown-dk); padding: 32px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%); pointer-events:none; }
+.btn-back { position:relative; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 14px; font-size:13px; font-weight:500; color:#fff; text-decoration:none; transition:all .2s; margin-bottom:16px; }
+.btn-back:hover { background: rgba(255,255,255,.22); }
+.brand { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--brown-lt); position:relative; margin-bottom:14px; }
+.h-eyebrow { font-size:.7rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.38); position:relative; margin-bottom:7px; }
+.h-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
+.h-title em { font-style:italic; color:var(--brown-lt); }
+.h-desc { font-size:.76rem; color:rgba(255,255,255,.38); margin-top:9px; position:relative; letter-spacing:.04em; }
+
+.day-nav-wrap { background:var(--brown-dk); padding:0 16px 20px; position:sticky; top:0; z-index:100; }
+.day-nav { display:flex; gap:6px; overflow-x:auto; scrollbar-width:none; max-width:680px; margin:0 auto; }
+.day-nav::-webkit-scrollbar { display:none; }
+.day-pill { flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.12); color:rgba(255,255,255,.5); padding:8px 16px; border-radius:20px; cursor:pointer; transition:all .2s; white-space:nowrap; }
+.day-pill:hover { background:rgba(255,255,255,.13); color:rgba(255,255,255,.8); }
+.day-pill.on { background:var(--brown-lt); border-color:var(--brown-lt); color:var(--brown-dk); }
+.day-pill-name { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; font-weight:500; }
+.day-pill-label { font-size:.68rem; font-weight:500; opacity:.7; }
+.day-pill.on .day-pill-label { opacity:1; }
+.day-pill.done .day-pill-name::after { content:' ✓'; color:var(--brown-lt); }
+.day-pill.on.done .day-pill-name::after { color:var(--brown-dk); }
+
+.main { max-width:680px; margin:0 auto; padding:24px 16px 56px; }
+.day-sec { display:none; }
+.day-sec.on { display:block; }
+
+.day-header { margin-bottom:20px; }
+.day-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.day-weekday { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); margin-bottom:3px; }
+.day-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
+.day-done-btn { flex-shrink:0; background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; color:var(--text-md); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-top:4px; }
+.day-done-btn:hover { background:var(--sand-md); }
+.day-done-btn.on { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.day-intro { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; font-size:.82rem; color:var(--text-md); line-height:1.6; }
+.day-intro strong { color:var(--brown-dk); font-weight:600; }
+
+.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(44,26,14,.06); overflow:hidden; margin-bottom:14px; }
+.block-head { padding:14px 18px; border-bottom:1px solid var(--sand); display:flex; align-items:center; gap:11px; }
+.block-icon { width:36px; height:36px; border-radius:9px; background:var(--sand); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.block-title { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
+.block-sub { font-size:.71rem; color:var(--text-lt); margin-top:1px; }
+.block-body { padding:16px 18px; }
+
+.task-list { display:flex; flex-direction:column; gap:8px; padding-left:18px; }
+.task-list li { font-size:.82rem; color:var(--text); line-height:1.55; padding-left:4px; }
+.task-list li a { color:var(--brown-md); text-decoration:underline; text-underline-offset:2px; font-weight:500; }
+.task-list li a:hover { color:var(--brown-dk); }
+.plain-list { display:flex; flex-direction:column; gap:6px; padding-left:18px; margin-bottom:14px; }
+.plain-list li { font-size:.82rem; color:var(--text-md); line-height:1.5; }
+
+.notes-area { width:100%; min-height:80px; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 13px; font-family:'DM Sans',sans-serif; font-size:.82rem; color:var(--text); resize:vertical; outline:none; background:var(--cream); transition:border-color .2s; line-height:1.55; }
+.notes-area:focus { border-color:var(--brown-lt); }
+.notes-area::placeholder { color:var(--text-lt); font-size:.78rem; }
+.starter-chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
+.starter-chip { background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:5px 12px; font-size:.74rem; color:var(--text-md); cursor:pointer; transition:all .15s; }
+.starter-chip:hover { background:var(--sand-md); color:var(--brown-dk); }
+
+/* FLASHCARDS */
+.fc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(120px,1fr)); gap:9px; }
+.fc { perspective:700px; cursor:pointer; height:100px; }
+.fc-in { width:100%; height:100%; transition:transform .48s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d; position:relative; }
+.fc.flip .fc-in { transform:rotateY(180deg); }
+.fc-f, .fc-b { position:absolute; inset:0; border-radius:var(--rs); backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; border:1.5px solid transparent; }
+.fc-f { background:var(--sand); border-color:var(--sand-md); }
+.fc-b { background:var(--brown-dk); border-color:var(--brown-dk); transform:rotateY(180deg); }
+.fc-en { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:.9rem; color:var(--brown-dk); line-height:1.25; }
+.fc-f .fc-pt { font-size:.66rem; color:var(--text-lt); margin-top:3px; }
+.fc-b .fc-pt { font-family:'Cormorant Garamond',serif; font-size:.82rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
+.fc-b .fc-en-back { font-size:.7rem; color:rgba(255,255,255,.55); margin-top:3px; }
+.fc-tap { font-size:.58rem; color:var(--text-lt); margin-top:5px; letter-spacing:.03em; }
+.audio-btn { background:var(--brown-lt); border:none; cursor:pointer; border-radius:50%; width:23px; height:23px; display:flex; align-items:center; justify-content:center; font-size:.62rem; margin-top:5px; transition:transform .15s,background .2s; flex-shrink:0; }
+.audio-btn:hover { transform:scale(1.15); background:var(--brown); }
+
+/* TO-DO LIST */
+.todo-type-row { display:flex; gap:8px; margin-bottom:12px; }
+.todo-type-btn { flex:1; background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:8px; font-size:.8rem; font-weight:600; cursor:pointer; color:var(--text-md); transition:all .15s; }
+.todo-type-btn.sel.want { background:var(--brown-dk); color:#fff; border-color:var(--brown-dk); }
+.todo-type-btn.sel.need { background:var(--fail); color:#fff; border-color:var(--fail); }
+.todo-add-row { display:flex; gap:8px; margin-bottom:14px; }
+.todo-input { flex:1; border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:9px 12px; font-family:'DM Sans',sans-serif; font-size:.85rem; color:var(--text); background:var(--white); outline:none; }
+.todo-input:focus { border-color:var(--brown-lt); }
+.todo-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--sand); }
+.todo-row:last-child { border-bottom:none; }
+.todo-text { flex:1; font-size:.85rem; color:var(--text); }
+.todo-tag { font-family:'DM Mono',monospace; font-size:.62rem; text-transform:uppercase; padding:3px 8px; border-radius:10px; flex-shrink:0; }
+.todo-tag-want { background:var(--sand); color:var(--brown-dk); }
+.todo-tag-need { background:var(--fail-lt); color:var(--fail); }
+.todo-why { font-size:.72rem; color:var(--text-lt); font-style:italic; margin-top:2px; }
+.btn-next { background:var(--brown-dk); color:#fff; border:none; border-radius:var(--rs); padding:10px 26px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.82rem; cursor:pointer; display:inline-block; transition:background .2s; }
+.btn-next:hover { background:var(--brown); }
+
+/* READING */
+.reading-text { background:var(--sand); border-radius:var(--rs); padding:16px; font-size:.87rem; color:var(--text); line-height:1.75; margin-bottom:14px; font-style:italic; }
+
+/* ASK & ANSWER ACCORDION */
+.qa-item { border:1.5px solid var(--sand-md); border-radius:var(--rs); margin-bottom:8px; overflow:hidden; }
+.qa-q { padding:12px 14px; font-weight:600; color:var(--brown-dk); cursor:pointer; display:flex; justify-content:space-between; align-items:center; font-size:.86rem; background:var(--white); transition:background .15s; }
+.qa-q:hover { background:var(--sand); }
+.qa-chevron { transition:transform .2s; color:var(--text-lt); flex-shrink:0; margin-left:8px; }
+.qa-item.open .qa-chevron { transform:rotate(180deg); }
+.qa-a { max-height:0; overflow:hidden; transition:max-height .25s ease; background:var(--sand); font-size:.82rem; color:var(--text-md); line-height:1.5; }
+.qa-item.open .qa-a { max-height:200px; padding:10px 14px; }
+
+/* WANT OR NEED GRID */
+.wn-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--sand); flex-wrap:wrap; }
+.wn-row:last-child { border-bottom:none; }
+.wn-text { flex:1; font-size:.84rem; color:var(--text); min-width:180px; }
+.wn-btns { display:flex; gap:6px; }
+.wn-btn { background:var(--white); border:1.5px solid var(--sand-md); border-radius:16px; padding:6px 14px; font-size:.76rem; font-weight:600; cursor:pointer; color:var(--text-md); transition:all .15s; }
+.wn-btn:hover { border-color:var(--brown-lt); }
+.wn-btn.ok { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
+.wn-btn.fail { background:var(--fail-lt); border-color:var(--fail); color:var(--fail); }
+.wn-btn:disabled { cursor:default; }
+.wn-reveal { flex-basis:100%; font-size:.78rem; color:var(--text-lt); font-style:italic; margin-top:4px; }
+
+/* MATCHER */
+.match-wrap { display:flex; gap:14px; justify-content:center; }
+.match-col { display:flex; flex-direction:column; gap:8px; flex:1; max-width:220px; }
+.match-item { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:11px 10px; font-size:.8rem; font-weight:500; color:var(--text); cursor:pointer; text-align:center; transition:all .18s; }
+.match-item:hover { border-color:var(--brown-lt); background:var(--sand); }
+.match-item.sel { border-color:var(--brown-dk); background:var(--brown-dk); color:#fff; }
+.match-item.ok { border-color:var(--ok); background:var(--ok-lt); color:var(--ok); pointer-events:none; }
+.match-item.fail { border-color:var(--fail); background:var(--fail-lt); color:var(--fail); }
+.match-status { text-align:center; margin-top:14px; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-lt); }
+.match-win { text-align:center; padding:13px; background:var(--ok-lt); border-radius:var(--rs); margin-top:12px; display:none; }
+.match-win.on { display:block; }
+.match-win-t { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
+
+/* AUDIO RECORDER */
+.rec-controls { display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
+.btn-rec { background:var(--fail); color:#fff; border:none; border-radius:24px; padding:11px 22px; font-family:'DM Sans',sans-serif; font-weight:600; font-size:.84rem; cursor:pointer; transition:all .2s; }
+.btn-rec:hover { background:#7a2626; }
+.btn-rec.stop { background:var(--brown-dk); }
+.btn-rec.stop:hover { background:var(--brown); }
+.rec-player { text-align:center; }
+.rec-msg { text-align:center; font-size:.78rem; color:var(--text-lt); margin-top:8px; }
+.btn-sm { background:var(--sand); border:none; border-radius:8px; padding:6px 13px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.71rem; cursor:pointer; color:var(--text-md); transition:background .2s; }
+.btn-sm:hover { background:var(--sand-md); }
+
+.footer { text-align:center; padding:18px 16px 30px; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.09em; color:var(--text-lt); text-transform:uppercase; border-top:1px solid var(--sand); margin-top:8px; }
+
+@media(max-width:400px){
+  .fc-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<div class="header">
+  <a href="dashboard-adulto.html" class="btn-back">← Voltar</a>
+  <div class="brand">itsbrendacleto · adults</div>
+  <div class="h-eyebrow">Study Planner · Lição 14</div>
+  <div class="h-title">I <em>Want To...</em></div>
+  <div class="h-desc">To Want · To Need</div>
+</div>
+
+<div class="day-nav-wrap">
+  <div class="day-nav">
+    <div class="day-pill on" onclick="showDay('mon',this)" id="pill-mon"><span class="day-pill-name">Mon</span><span class="day-pill-label">To-Do</span></div>
+    <div class="day-pill" onclick="showDay('tue',this)" id="pill-tue"><span class="day-pill-name">Tue</span><span class="day-pill-label">Reading</span></div>
+    <div class="day-pill" onclick="showDay('wed',this)" id="pill-wed"><span class="day-pill-name">Wed</span><span class="day-pill-label">Video</span></div>
+    <div class="day-pill" onclick="showDay('thu',this)" id="pill-thu"><span class="day-pill-name">Thu</span><span class="day-pill-label">Interview</span></div>
+    <div class="day-pill" onclick="showDay('fri',this)" id="pill-fri"><span class="day-pill-name">Fri</span><span class="day-pill-label">Weekend</span></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- SEGUNDA -->
+  <div class="day-sec on" id="day-mon">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Segunda-feira · Monday</div><div class="day-title">My To-Do List</div></div>
+        <button class="day-done-btn" id="done-mon" onclick="toggleDone('mon')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Crie uma to-do list para essa semana. Escreva as coisas que quer e que precisa fazer usando "to want" e "to need". <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Revise os Cards abaixo.</li>
+          <li>Adicione tarefas à sua to-do list, marcando "Want" ou "Need".</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎯</div><div><div class="block-title">Want & Need Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📝</div><div><div class="block-title">My To-Do List</div><div class="block-sub">Marque cada tarefa como Want ou Need</div></div></div>
+      <div class="block-body">
+        <div class="todo-type-row">
+          <button class="todo-type-btn want sel" id="todo-type-want" onclick="selectTodoType('want')">I want to...</button>
+          <button class="todo-type-btn need" id="todo-type-need" onclick="selectTodoType('need')">I need to...</button>
+        </div>
+        <div class="todo-add-row">
+          <input type="text" class="todo-input" id="todo-input" placeholder="Ex: buy groceries, travel to the beach...">
+          <button class="btn-next" onclick="addTodo()">+ Add</button>
+        </div>
+        <div id="todo-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TERÇA -->
+  <div class="day-sec" id="day-tue">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Terça-feira · Tuesday</div><div class="day-title">Tom's Dream</div></div>
+        <button class="day-done-btn" id="done-tue" onclick="toggleDone('tue')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Leia o texto abaixo e faça as atividades propostas. Pesquise as palavras que não conhece. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Leia o texto abaixo.</li>
+          <li>Confira as respostas no "Ask & Answer".</li>
+          <li>Complete cada frase com Want ou Need.</li>
+          <li>Combine as palavras com o significado certo.</li>
+          <li>Responda sobre você mesmo(a).</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📖</div><div><div class="block-title">Texto: Tom's Dream</div><div class="block-sub">Pesquise as palavras que não conhece</div></div></div>
+      <div class="block-body">
+        <div class="reading-text">Tom wants to travel to Japan next year. He loves Japanese food and culture, and his dream is to see Mount Fuji and visit Tokyo Disneyland. However, he needs to save a lot of money because the trip is expensive. Tom works at a small company, so he tries to save part of his salary every month. He also needs to renew his passport and take English classes before traveling, because he wants to communicate better when he gets there. Sometimes Tom feels tired because he studies and works hard, but he keeps going because he really wants to make his dream come true.</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">💬</div><div><div class="block-title">Ask & Answer</div><div class="block-sub">Toque na pergunta pra ver a resposta</div></div></div>
+      <div class="block-body">
+        <div id="qa-list"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✅</div><div><div class="block-title">Want or Need?</div><div class="block-sub">Complete cada frase sobre o Tom</div></div></div>
+      <div class="block-body">
+        <div id="wn-grid"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🔗</div><div><div class="block-title">Vocabulary Matcher</div><div class="block-sub">Combine a palavra com o significado certo</div></div></div>
+      <div class="block-body">
+        <div class="match-wrap">
+          <div class="match-col" id="match-col-a"></div>
+          <div class="match-col" id="match-col-b"></div>
+        </div>
+        <div class="match-status" id="match-status">0 / 5 pares</div>
+        <div class="match-win" id="match-win"><div class="match-win-t">✓ Todos os pares combinados!</div></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">✍️</div><div><div class="block-title">Express Yourself</div><div class="block-sub">Escreva sobre você</div></div></div>
+      <div class="block-body">
+        <textarea class="notes-area" placeholder="What do you want to do next year? What do you need to do to make it happen?"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUARTA -->
+  <div class="day-sec" id="day-wed">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quarta-feira · Wednesday</div><div class="day-title">Want vs Need</div></div>
+        <button class="day-done-btn" id="done-wed" onclick="toggleDone('wed')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Assista ao vídeo e faça as atividades propostas. Depois, fale sobre o que você quer x o que precisa fazer. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem e use o link abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Assista ao <a href="https://vm.tiktok.com/ZMAHNLtXY/" target="_blank">vídeo ↗</a>.</li>
+          <li>Responda as perguntas sobre o vídeo.</li>
+          <li>Grave um áudio sobre o que você quer x o que precisa fazer.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎬</div><div><div class="block-title">Video Activities</div><div class="block-sub">Responda depois de assistir</div></div></div>
+      <div class="block-body">
+        <ol class="plain-list">
+          <li>What does the woman want to do?</li>
+          <li>What does she really do?</li>
+          <li>Do you feel like her sometimes? Why?</li>
+        </ol>
+        <textarea class="notes-area" placeholder="Escreva suas respostas aqui..."></textarea>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎙️</div><div><div class="block-title">Your Turn</div><div class="block-sub">Grave falando sobre want x need</div></div></div>
+      <div class="block-body">
+        <div class="reading-text" style="margin-bottom:14px">Exemplo: "What I want to do: I want to travel to the beach and relax all day. What I really do: I need to work and clean the house."</div>
+        <div class="starter-chips" id="want-need-chips"></div>
+        <div class="rec-controls">
+          <button class="btn-rec" id="rec-start-btn" onclick="startRecording()">🔴 Gravar</button>
+          <button class="btn-rec stop" id="rec-stop-btn" onclick="stopRecording()" style="display:none">⏹ Parar</button>
+        </div>
+        <div class="rec-player" id="rec-player" style="display:none">
+          <audio id="rec-audio" controls style="width:100%"></audio>
+          <div style="text-align:center"><button class="btn-sm" onclick="resetRecording()" style="margin-top:8px">↩ Gravar novamente</button></div>
+        </div>
+        <div class="rec-msg" id="rec-msg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUINTA -->
+  <div class="day-sec" id="day-thu">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Quinta-feira · Thursday</div><div class="day-title">Interview</div></div>
+        <button class="day-done-btn" id="done-thu" onclick="toggleDone('thu')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Entreviste um amigo ou familiar e anote sobre a to-do list da semana dele(a), usando "to want" e "to need" e a regra de he/she. <strong>Marque a etapa concluída!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Siga a ordem abaixo</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Use as perguntas sugeridas abaixo, se quiser.</li>
+          <li>Entreviste alguém sobre a to-do list da semana dele(a).</li>
+          <li>Anote as perguntas e respostas.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">💬</div><div><div class="block-title">Perguntas sugeridas</div><div class="block-sub">Lembre-se da regra de he/she (wants/needs)</div></div></div>
+      <div class="block-body">
+        <ol class="plain-list" id="interview-prompts"></ol>
+        <textarea class="notes-area" style="min-height:120px" placeholder="Anote as perguntas e respostas da entrevista aqui..."></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- SEXTA -->
+  <div class="day-sec" id="day-fri">
+    <div class="day-header">
+      <div class="day-header-top">
+        <div><div class="day-weekday">Sexta-feira · Friday</div><div class="day-title">Weekend Planner</div></div>
+        <button class="day-done-btn" id="done-fri" onclick="toggleDone('fri')">○ Concluído</button>
+      </div>
+      <div class="day-intro">Planeje seu final de semana, colocando as coisas que quer fazer e as que precisa. Vá além: explique o porquê de cada uma. <strong>O segredo da fluência é a constância!</strong></div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">📋</div><div><div class="block-title">Tarefas do dia</div><div class="block-sub">Revisão final da semana</div></div></div>
+      <div class="block-body">
+        <ol class="task-list">
+          <li>Adicione as atividades do seu final de semana.</li>
+          <li>Explique o porquê de cada uma.</li>
+          <li>Revise os Cards da semana.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🗓️</div><div><div class="block-title">Weekend Planner</div><div class="block-sub">Want ou Need + o porquê</div></div></div>
+      <div class="block-body">
+        <div class="todo-type-row">
+          <button class="todo-type-btn want sel" id="weekend-type-want" onclick="selectWeekendType('want')">I want to...</button>
+          <button class="todo-type-btn need" id="weekend-type-need" onclick="selectWeekendType('need')">I need to...</button>
+        </div>
+        <div class="todo-add-row">
+          <input type="text" class="todo-input" id="weekend-input" placeholder="Ex: go to the beach, clean the house...">
+        </div>
+        <div class="todo-add-row">
+          <input type="text" class="todo-input" id="weekend-why" placeholder="Por quê? (ex: because I need to relax)">
+          <button class="btn-next" onclick="addWeekend()">+ Add</button>
+        </div>
+        <div id="weekend-list"></div>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head"><div class="block-icon">🎯</div><div><div class="block-title">Revisão de Want & Need</div><div class="block-sub">Relembre todos os cartões da semana</div></div></div>
+      <div class="block-body"><div class="fc-grid" id="fc-grid-fri"></div></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">itsbrendacleto · material exclusivo · reprodução não autorizada</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', {
+  auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } }
+});
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, { user: Object.assign({}, real.data.session.user, { id: __previewAs }) });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, { get: function (t, prop) { if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); }; return function () { return p; }; } });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) { qb[m] = function () { return __previewNoop(); }; });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as'); sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+var LESSON_ID = 'adulto-l1-a14';
+var DAYS = ['mon','tue','wed','thu','fri'];
+var userId = null;
+var doneDays = {};
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+async function loadDoneDays() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    userId = session.user.id;
+    var { data: rows } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', userId).like('lesson_id', LESSON_ID + '-%');
+    (rows || []).forEach(function (r) { var day = r.lesson_id.replace(LESSON_ID + '-', ''); if (DAYS.indexOf(day) >= 0) doneDays[day] = true; });
+    DAYS.forEach(function (d) {
+      if (doneDays[d]) {
+        document.getElementById('done-' + d).classList.add('on');
+        document.getElementById('done-' + d).textContent = '✓ Concluído';
+        document.getElementById('pill-' + d).classList.add('done');
+      }
+    });
+  } catch (e) { console.error('Erro ao carregar progresso:', e); }
+}
+
+// ── DATA ─────────────────────────────────────────────────────────────────────
+var FC = [
+  {en:'To want',         pt:'Querer'},
+  {en:'To need',         pt:'Precisar'},
+  {en:'I want to...',    pt:'Eu quero...'},
+  {en:'I need to...',    pt:'Eu preciso...'},
+  {en:'Dream',           pt:'Sonho'},
+  {en:'To save money',   pt:'Economizar dinheiro'},
+  {en:'To keep going',   pt:'Continuar / não desistir'},
+  {en:'To renew',        pt:'Renovar'},
+  {en:'Expensive',       pt:'Caro'},
+  {en:'To-do list',      pt:'Lista de tarefas'}
+];
+
+var QA = [
+  {q:'What does Tom want to do next year?',                     a:'He wants to travel to Japan.'},
+  {q:'Why does Tom need to save money?',                        a:'Because the trip is expensive.'},
+  {q:'Where does Tom work?',                                    a:'He works at a small company.'},
+  {q:'What other things does Tom need to do before traveling?', a:'He needs to renew his passport and take English classes.'},
+  {q:'Why does Tom take English classes?',                      a:'Because he wants to communicate better when he gets there.'},
+  {q:'How does Tom feel sometimes?',                             a:'He feels tired.'},
+  {q:'Does Tom give up on his dream? Why or why not?',          a:"No, he doesn't. He keeps going because he really wants to make his dream come true."}
+];
+
+var WN_SENTENCES = [
+  {text:'Tom ___ travel to Japan.',                     ans:'want',  full:'Tom wants to travel to Japan.'},
+  {text:'He ___ save money every month.',               ans:'need',  full:'He needs to save money every month.'},
+  {text:'Tom ___ renew his passport.',                  ans:'need',  full:'Tom needs to renew his passport.'},
+  {text:'He ___ take English classes.',                 ans:'need',  full:'He needs to take English classes.'},
+  {text:'Tom ___ see Mount Fuji and visit Tokyo Disneyland.', ans:'want', full:'Tom wants to see Mount Fuji and visit Tokyo Disneyland.'},
+  {text:'He ___ work hard to make his dream come true.', ans:'need', full:'He needs to work hard to make his dream come true.'}
+];
+
+var MATCH_VOCAB = [
+  {en:'Dream',       pt:'sonho'},
+  {en:'Save money',  pt:'economizar dinheiro'},
+  {en:'Keep going',  pt:'continuar / não desistir'},
+  {en:'Renew',       pt:'renovar'},
+  {en:'Expensive',   pt:'caro'}
+];
+
+var WANT_NEED_STARTERS = ['What I want to do:', 'What I really do:'];
+
+var INTERVIEW_PROMPTS = [
+  'What do you want to do this week?',
+  'What do you need to do this week?',
+  'Does he/she want to travel somewhere?',
+  'What does he/she need to buy?',
+  'Does he/she need to study for something?'
+];
+
+function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
+function shuffle(arr) { var a = arr.slice(); a.sort(function(){ return Math.random()-.5; }); return a; }
+
+// ── NAVIGATION ─────────────────────────────────────────────────────────────
+var inited = {};
+function showDay(id, pill) {
+  document.querySelectorAll('.day-sec').forEach(function(s){ s.classList.remove('on'); });
+  document.querySelectorAll('.day-pill').forEach(function(p){ p.classList.remove('on'); });
+  document.getElementById('day-'+id).classList.add('on');
+  pill.classList.add('on');
+  if (!inited[id]) { inited[id]=true; INIT[id](); }
+}
+var INIT = {
+  mon: function(){ buildFC('fc-grid', FC); },
+  tue: function(){ initQA(); initWN(); initMatch(); },
+  wed: function(){ initWantNeedChips(); },
+  thu: function(){ initInterviewPrompts(); },
+  fri: function(){ initWeekend(); buildFC('fc-grid-fri', FC); }
+};
+
+// ── FLASHCARDS ─────────────────────────────────────────────────────────────
+function buildFC(gridId, data) {
+  var g = document.getElementById(gridId);
+  if (!g) return;
+  g.innerHTML='';
+  data.forEach(function(fc, i) {
+    var d = document.createElement('div');
+    d.className='fc'; d.id=gridId+'-'+i;
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><div class="fc-en">'+fc.en+'</div><div class="fc-pt">'+fc.pt+'</div><button class="audio-btn">🔊</button><div class="fc-tap">toque para girar</div></div><div class="fc-b"><div class="fc-pt">'+fc.pt+'</div><div class="fc-en-back">'+fc.en+'</div></div></div>';
+    d.addEventListener('click', function(){ d.classList.toggle('flip'); });
+    d.querySelector('.audio-btn').addEventListener('click', function(e){ e.stopPropagation(); speak(fc.en.replace('...','')); });
+    g.appendChild(d);
+  });
+}
+inited['mon']=true;
+buildFC('fc-grid', FC);
+
+// ── MY TO-DO LIST ──────────────────────────────────────────────────────────────
+var todoItems = [];
+var todoTypeSel = 'want';
+function selectTodoType(type){
+  todoTypeSel = type;
+  document.getElementById('todo-type-want').classList.toggle('sel', type==='want');
+  document.getElementById('todo-type-need').classList.toggle('sel', type==='need');
+}
+function addTodo(){
+  var val = document.getElementById('todo-input').value.trim();
+  if (!val) return;
+  todoItems.push({text:val, type:todoTypeSel, done:false});
+  document.getElementById('todo-input').value='';
+  renderTodo();
+}
+function renderTodo(){
+  var list = document.getElementById('todo-list'); list.innerHTML='';
+  todoItems.forEach(function(item){
+    var row = document.createElement('div'); row.className='todo-row';
+    var chk = document.createElement('input'); chk.type='checkbox'; chk.checked = item.done;
+    var text = document.createElement('span'); text.className='todo-text'; text.textContent = item.text;
+    if (item.done) text.style.textDecoration='line-through';
+    var tag = document.createElement('span'); tag.className='todo-tag todo-tag-'+item.type; tag.textContent = item.type==='want' ? 'Want' : 'Need';
+    chk.addEventListener('change', function(){ item.done = !item.done; renderTodo(); });
+    row.appendChild(chk); row.appendChild(text); row.appendChild(tag);
+    list.appendChild(row);
+  });
+}
+
+// ── ASK & ANSWER ──────────────────────────────────────────────────────────────
+function initQA(){
+  var c = document.getElementById('qa-list'); c.innerHTML='';
+  QA.forEach(function(item, i){
+    var div = document.createElement('div'); div.className='qa-item'; div.id='qa-'+i;
+    div.innerHTML = '<div class="qa-q">'+item.q+'<span class="qa-chevron">▾</span></div><div class="qa-a">'+item.a+'</div>';
+    div.querySelector('.qa-q').addEventListener('click', function(){ div.classList.toggle('open'); });
+    c.appendChild(div);
+  });
+}
+
+// ── WANT OR NEED? GRID ─────────────────────────────────────────────────────────
+function initWN(){
+  var c = document.getElementById('wn-grid'); c.innerHTML='';
+  WN_SENTENCES.forEach(function(s, i){
+    var row = document.createElement('div'); row.className='wn-row'; row.id='wn-row-'+i;
+    row.innerHTML = '<div class="wn-text">'+s.text+'</div><div class="wn-btns"><button class="wn-btn" data-ans="want">Want</button><button class="wn-btn" data-ans="need">Need</button></div>';
+    var btns = row.querySelectorAll('.wn-btn');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){
+        if (row.dataset.answered) return;
+        row.dataset.answered = '1';
+        btns.forEach(function(x){ x.disabled=true; });
+        var reveal = document.createElement('div'); reveal.className='wn-reveal';
+        if (b.dataset.ans === s.ans) { b.classList.add('ok'); reveal.textContent='✓ '+s.full; }
+        else {
+          b.classList.add('fail');
+          btns.forEach(function(x){ if (x.dataset.ans===s.ans) x.classList.add('ok'); });
+          reveal.textContent='A resposta certa é: '+s.full;
+        }
+        row.appendChild(reveal);
+      });
+    });
+    c.appendChild(row);
+  });
+}
+
+// ── VOCABULARY MATCHER ────────────────────────────────────────────────────────
+var matchSelA=null, matchSelB=null, matchPairs=0;
+function initMatch() {
+  matchSelA=null; matchSelB=null; matchPairs=0;
+  document.getElementById('match-win').classList.remove('on');
+  document.getElementById('match-status').textContent='0 / '+MATCH_VOCAB.length+' pares';
+
+  var ens = MATCH_VOCAB.map(function(g,i){ return {label:g.en, id:i}; });
+  var pts = MATCH_VOCAB.map(function(g,i){ return {label:g.pt, id:i}; });
+  pts = shuffle(pts);
+
+  var colA = document.getElementById('match-col-a'); colA.innerHTML='';
+  var colB = document.getElementById('match-col-b'); colB.innerHTML='';
+
+  ens.forEach(function(c) {
+    var el = document.createElement('div');
+    el.className='match-item'; el.textContent=c.label; el.dataset.id=c.id;
+    el.addEventListener('click', function(){ selectMatch('a', el, c.id); });
+    colA.appendChild(el);
+  });
+  pts.forEach(function(p) {
+    var el = document.createElement('div');
+    el.className='match-item'; el.textContent=p.label; el.dataset.id=p.id;
+    el.addEventListener('click', function(){ selectMatch('b', el, p.id); });
+    colB.appendChild(el);
+  });
+}
+function selectMatch(side, el, id) {
+  if (el.classList.contains('ok')) return;
+  if (side === 'a') {
+    if (matchSelA) matchSelA.el.classList.remove('sel');
+    matchSelA = { el: el, id: id }; el.classList.add('sel');
+  } else {
+    if (matchSelB) matchSelB.el.classList.remove('sel');
+    matchSelB = { el: el, id: id }; el.classList.add('sel');
+  }
+  if (matchSelA && matchSelB) {
+    if (matchSelA.id === matchSelB.id) {
+      matchSelA.el.classList.remove('sel'); matchSelB.el.classList.remove('sel');
+      matchSelA.el.classList.add('ok'); matchSelB.el.classList.add('ok');
+      matchPairs++;
+      document.getElementById('match-status').textContent=matchPairs+' / '+MATCH_VOCAB.length+' pares';
+      matchSelA=null; matchSelB=null;
+      if (matchPairs === MATCH_VOCAB.length) document.getElementById('match-win').classList.add('on');
+    } else {
+      var a = matchSelA.el, b = matchSelB.el;
+      a.classList.add('fail'); b.classList.add('fail');
+      setTimeout(function(){
+        a.classList.remove('sel','fail'); b.classList.remove('sel','fail');
+        matchSelA=null; matchSelB=null;
+      }, 700);
+    }
+  }
+}
+
+// ── WANT VS NEED (AUDIO RECORDER) ─────────────────────────────────────────────
+var mediaRecorder=null, recordedChunks=[], mediaStream=null;
+function initWantNeedChips(){
+  var c = document.getElementById('want-need-chips'); c.innerHTML='';
+  WANT_NEED_STARTERS.forEach(function(s){
+    var chip=document.createElement('div'); chip.className='starter-chip'; chip.textContent=s;
+    chip.addEventListener('click', function(){ speak(s, 0.85); });
+    c.appendChild(chip);
+  });
+}
+async function startRecording(){
+  var msg=document.getElementById('rec-msg');
+  if (!navigator.mediaDevices || !window.MediaRecorder) { msg.textContent='Gravação de áudio não disponível neste navegador.'; return; }
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({audio:true});
+    recordedChunks=[];
+    mediaRecorder = new MediaRecorder(mediaStream);
+    mediaRecorder.ondataavailable = function(e){ if(e.data.size>0) recordedChunks.push(e.data); };
+    mediaRecorder.onstop = function(){
+      var blob = new Blob(recordedChunks, {type:'audio/webm'});
+      var url = URL.createObjectURL(blob);
+      var audio = document.getElementById('rec-audio');
+      audio.src = url;
+      document.getElementById('rec-player').style.display='block';
+      mediaStream.getTracks().forEach(function(t){ t.stop(); });
+    };
+    mediaRecorder.start();
+    document.getElementById('rec-start-btn').style.display='none';
+    document.getElementById('rec-stop-btn').style.display='inline-block';
+    msg.textContent='🔴 Gravando... fale sobre o que você quer x precisa fazer.';
+  } catch(e){ msg.textContent='Não foi possível acessar o microfone. Verifique as permissões.'; }
+}
+function stopRecording(){
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+  document.getElementById('rec-stop-btn').style.display='none';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-msg').textContent='✓ Gravação concluída! Ouça abaixo.';
+}
+function resetRecording(){
+  document.getElementById('rec-player').style.display='none';
+  document.getElementById('rec-msg').textContent='';
+  document.getElementById('rec-start-btn').style.display='inline-block';
+  document.getElementById('rec-stop-btn').style.display='none';
+}
+
+// ── INTERVIEW PROMPTS ─────────────────────────────────────────────────────────
+function initInterviewPrompts(){
+  var c = document.getElementById('interview-prompts'); c.innerHTML='';
+  INTERVIEW_PROMPTS.forEach(function(p){
+    var li = document.createElement('li'); li.textContent = p;
+    c.appendChild(li);
+  });
+}
+
+// ── WEEKEND PLANNER ────────────────────────────────────────────────────────────
+var weekendItems = [];
+var weekendTypeSel = 'want';
+function selectWeekendType(type){
+  weekendTypeSel = type;
+  document.getElementById('weekend-type-want').classList.toggle('sel', type==='want');
+  document.getElementById('weekend-type-need').classList.toggle('sel', type==='need');
+}
+function initWeekend(){
+  weekendItems = [];
+  weekendTypeSel = 'want';
+  document.getElementById('weekend-type-want').classList.add('sel');
+  document.getElementById('weekend-type-need').classList.remove('sel');
+  document.getElementById('weekend-list').innerHTML='';
+}
+function addWeekend(){
+  var val = document.getElementById('weekend-input').value.trim();
+  var why = document.getElementById('weekend-why').value.trim();
+  if (!val) return;
+  weekendItems.push({text:val, type:weekendTypeSel, why:why, done:false});
+  document.getElementById('weekend-input').value='';
+  document.getElementById('weekend-why').value='';
+  renderWeekend();
+}
+function renderWeekend(){
+  var list = document.getElementById('weekend-list'); list.innerHTML='';
+  weekendItems.forEach(function(item){
+    var row = document.createElement('div'); row.className='todo-row'; row.style.flexWrap='wrap';
+    var chk = document.createElement('input'); chk.type='checkbox'; chk.checked = item.done;
+    var textWrap = document.createElement('div'); textWrap.style.flex='1';
+    var text = document.createElement('div'); text.className='todo-text'; text.textContent = item.text;
+    if (item.done) text.style.textDecoration='line-through';
+    textWrap.appendChild(text);
+    if (item.why) { var why = document.createElement('div'); why.className='todo-why'; why.textContent = item.why; textWrap.appendChild(why); }
+    var tag = document.createElement('span'); tag.className='todo-tag todo-tag-'+item.type; tag.textContent = item.type==='want' ? 'Want' : 'Need';
+    chk.addEventListener('change', function(){ item.done = !item.done; renderWeekend(); });
+    row.appendChild(chk); row.appendChild(textWrap); row.appendChild(tag);
+    list.appendChild(row);
+  });
+}
+
+// ── DAY DONE ─────────────────────────────────────────────────────────────────
+async function toggleDone(id){
+  var btn=document.getElementById('done-'+id);
+  var pill=document.getElementById('pill-'+id);
+  var on=btn.classList.toggle('on');
+  btn.textContent=on?'✓ Concluído':'○ Concluído';
+  pill.classList.toggle('done',on);
+
+  try {
+    if (!userId) {
+      var { data } = await sb.auth.getSession();
+      userId = data && data.session && data.session.user.id;
+    }
+    if (!userId) return;
+    var dayLessonId = LESSON_ID + '-' + id;
+    if (on) {
+      doneDays[id] = true;
+      await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: dayLessonId, completed_at: new Date().toISOString() });
+    } else {
+      delete doneDays[id];
+      await sb.from('lesson_progress').delete().eq('user_id', userId).eq('lesson_id', dayLessonId);
+    }
+    var allDone = DAYS.every(function (d) { return doneDays[d]; });
+    if (allDone) await sb.from('lesson_progress').upsert({ user_id: userId, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do dia:', e); }
+}
+
+loadDoneDays();
+</script>
+</body>
+</html>
