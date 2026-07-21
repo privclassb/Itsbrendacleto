@@ -3687,14 +3687,12 @@
     return `<div class="makeup-history-banner">📅 Reagendamento de <strong>${origLabel}</strong> para <strong>${newLabel}</strong>${madeAt ? ' · marcado em ' + madeAt : ''}</div>`;
   }
 
-  // ---- Histórico de alterações de data/horário de uma aula ----
+  // ---- Histórico de mudança de data de uma aula (só quando a data muda, não horário) ----
 
   async function logRescheduleIfChanged(logId, oldLog, newVals) {
     if (!oldLog) return;
     const dateChanged = (oldLog.class_date || null) !== (newVals.class_date || null);
-    const startChanged = (oldLog.start_time || null) !== (newVals.start_time || null);
-    const endChanged = (oldLog.end_time || null) !== (newVals.end_time || null);
-    if (!dateChanged && !startChanged && !endChanged) return;
+    if (!dateChanged) return;
 
     const { data: { session } } = await sb.auth.getSession();
     await withAuthRetry(() => sb.from('class_log_reschedule_history').insert({
