@@ -1517,13 +1517,39 @@
       warningEl.style.display = 'none';
     }
 
+    // Todas as consultas independentes disparam de uma vez em paralelo, em vez de
+    // uma esperando a outra terminar — é isso que fazia o modal demorar tanto pra abrir.
+    let statusQuery = sb.from('class_logs').select('status');
+    statusQuery = turma
+      ? statusQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
+      : statusQuery.eq('student_id', studentId);
+
+    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: true }).order('start_time', { ascending: true });
+    classQuery = turma
+      ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
+      : classQuery.eq('student_id', studentId);
+
+    const contractHistoryPromise = currentUserIsBrenda ? loadContractHistory(studentId) : Promise.resolve();
+
+    const [
+      { data: teacher },
+      { data: guardianRows },
+      { data: payments },
+      { data: allStatusRows },
+      { data: logs },
+      { data: studentReports }
+    ] = await Promise.all([
+      student.teacher_id ? sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle() : Promise.resolve({ data: null }),
+      sb.from('profiles').select('full_name, email').eq('guardian_of', studentId),
+      currentUserIsBrenda ? sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: true }) : Promise.resolve({ data: null }),
+      statusQuery,
+      classQuery,
+      sb.from('reports').select('*').eq('student_id', studentId)
+    ]);
+    await contractHistoryPromise;
+
     // Dados
-    let teacherName = '—';
-    if (student.teacher_id) {
-      const { data: teacher } = await sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle();
-      teacherName = teacher?.full_name || '—';
-    }
-    const { data: guardianRows } = await sb.from('profiles').select('full_name, email').eq('guardian_of', studentId);
+    const teacherName = teacher?.full_name || '—';
     const guardian = (guardianRows && guardianRows[0]) || null;
     const createdAt = student.created_at ? new Date(student.created_at).toLocaleDateString('pt-BR') : '—';
     const contractStart = student.contract_start ? new Date(student.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
@@ -1562,7 +1588,6 @@
       <div class="detail-row"><span class="detail-label">Parcela mensal</span><span class="detail-value">${fee}</span></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${PAYMENT_STATUS_LABEL[student.payment_status || 'em_dia']}</span></div>`;
 
-    const { data: payments } = await sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: true });
     const paymentsListEl = document.getElementById('profilePaymentsList');
     const newLancamentoBtn = `<button class="btn-sm" onclick="openLancamento(null, '${studentId}')" style="margin-top:10px;">+ Novo lançamento</button>`;
     if (!payments || payments.length === 0) {
@@ -1590,16 +1615,9 @@
       } else {
         alertEl.style.display = 'none';
       }
-
-      await loadContractHistory(studentId);
     }
 
     // Aulas
-    let statusQuery = sb.from('class_logs').select('status');
-    statusQuery = turma
-      ? statusQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
-      : statusQuery.eq('student_id', studentId);
-    const { data: allStatusRows } = await statusQuery;
     const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
     (allStatusRows || []).forEach(r => { if (statusCounts[r.status] !== undefined) statusCounts[r.status]++; });
     document.getElementById('profileAulasStats').innerHTML = `
@@ -1609,16 +1627,10 @@
       <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>
       <span class="aula-stat-chip">🎉 ${statusCounts.feriado + statusCounts.recesso} feriado/recesso</span>`;
 
-    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: true }).order('start_time', { ascending: true });
-    classQuery = turma
-      ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
-      : classQuery.eq('student_id', studentId);
-    const { data: logs } = await classQuery;
     const logsListEl = document.getElementById('profileClassLogsList');
     profileClassLogsCache = logs || [];
     renderReposicoesInto(profileClassLogsCache, 'profileReposicoesAReporList', 'profileReposicoesFeitasList');
 
-    const { data: studentReports } = await sb.from('reports').select('*').eq('student_id', studentId);
     profileReportsByClassLog = {};
     (studentReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
 
@@ -3396,8 +3408,16 @@
           </div>`).join('')
       : '<div class="empty-reports">Nenhum aluno matriculado ainda.</div>';
 
-    const { data: logs } = await sb.from('class_logs').select('*').eq('turma_id', turmaId)
-      .order('class_date', { ascending: true }).order('start_time', { ascending: true });
+    const memberIds = members.map(s => s.id);
+
+    // Busca aulas da turma e relatórios dos alunos em paralelo (um não depende do outro)
+    const [{ data: logs }, { data: reportsForTurma }] = await Promise.all([
+      sb.from('class_logs').select('*').eq('turma_id', turmaId)
+        .order('class_date', { ascending: true }).order('start_time', { ascending: true }),
+      memberIds.length
+        ? sb.from('reports').select('id, student_id, class_log_id, is_published').in('student_id', memberIds)
+        : Promise.resolve({ data: [] })
+    ]);
     turmaProfileClassLogsCache = logs || [];
     renderReposicoesInto(turmaProfileClassLogsCache, 'turmaProfileReposicoesAReporList', 'turmaProfileReposicoesFeitasList');
 
@@ -3409,11 +3429,6 @@
       <span class="aula-stat-chip">🔄 ${statusCounts.reagendada} reagendadas</span>
       <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>
       <span class="aula-stat-chip">🎉 ${statusCounts.feriado + statusCounts.recesso} feriado/recesso</span>`;
-
-    const memberIds = members.map(s => s.id);
-    const { data: reportsForTurma } = memberIds.length
-      ? await sb.from('reports').select('id, student_id, class_log_id, is_published').in('student_id', memberIds)
-      : { data: [] };
 
     const logIds = turmaProfileClassLogsCache.map(l => l.id);
     const { data: attendanceForTurma } = logIds.length
@@ -3577,11 +3592,13 @@
     }
 
     closeTurmaClassReport();
-    await openTurmaProfile(currentProfileTurmaId);
-    await loadReports(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
-    await loadAgendaWeek();
-    await loadEquipeWeek();
+    await Promise.all([
+      openTurmaProfile(currentProfileTurmaId),
+      loadReports(session.user.id, currentUserIsBrenda),
+      loadAulasHoje(session.user.id, currentUserIsBrenda),
+      loadAgendaWeek(),
+      loadEquipeWeek()
+    ]);
   }
 
   function openTurmaStudents(turmaId) {
@@ -3955,15 +3972,13 @@
 
     closeRescheduleFixed();
     const { data: { session } } = await sb.auth.getSession();
-    if (rescheduleTarget.type === 'turma') {
-      await openTurmaProfile(rescheduleTarget.id);
-    } else {
-      await openStudentProfile(rescheduleTarget.id);
-    }
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id);
-    await loadAgendaWeek();
-    await loadEquipeWeek();
+    await Promise.all([
+      rescheduleTarget.type === 'turma' ? openTurmaProfile(rescheduleTarget.id) : openStudentProfile(rescheduleTarget.id),
+      loadClassLogs(session.user.id, currentUserIsBrenda),
+      loadAulasHoje(session.user.id),
+      loadAgendaWeek(),
+      loadEquipeWeek()
+    ]);
     alert(logs.length + ' aula(s) remarcada(s) com sucesso.');
   }
 
@@ -4591,10 +4606,12 @@
 
     closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAgendaWeek();
-    await loadEquipeWeek();
+    await Promise.all([
+      loadAulasHoje(session.user.id, currentUserIsBrenda),
+      loadClassLogs(session.user.id, currentUserIsBrenda),
+      loadAgendaWeek(),
+      loadEquipeWeek()
+    ]);
   }
 
   async function deleteClassLogFromModal() {
@@ -4605,10 +4622,12 @@
     if (error) { alert('Erro ao excluir registro.'); return; }
     closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAgendaWeek();
-    await loadEquipeWeek();
+    await Promise.all([
+      loadAulasHoje(session.user.id, currentUserIsBrenda),
+      loadClassLogs(session.user.id, currentUserIsBrenda),
+      loadAgendaWeek(),
+      loadEquipeWeek()
+    ]);
   }
 
   // ---- Relatório vinculado a uma aula específica (a partir da página do aluno) ----
@@ -4703,11 +4722,13 @@
     await logRescheduleIfChanged(classLogId, oldLog, { class_date: date, start_time: startTime, end_time: endTime });
 
     closeClassReport();
-    await openStudentProfile(studentId);
-    await loadReports(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
-    await loadAgendaWeek();
-    await loadEquipeWeek();
+    await Promise.all([
+      openStudentProfile(studentId),
+      loadReports(session.user.id, currentUserIsBrenda),
+      loadAulasHoje(session.user.id, currentUserIsBrenda),
+      loadAgendaWeek(),
+      loadEquipeWeek()
+    ]);
   }
 
   async function deleteClassReport() {
@@ -4720,9 +4741,11 @@
     if (error) { alert('Erro ao excluir anotação: ' + error.message); return; }
 
     closeClassReport();
-    await openStudentProfile(studentId);
     const { data: { session } } = await sb.auth.getSession();
-    await loadReports(session.user.id, currentUserIsBrenda);
+    await Promise.all([
+      openStudentProfile(studentId),
+      loadReports(session.user.id, currentUserIsBrenda)
+    ]);
   }
 
   async function deleteClassFromReport() {
@@ -4736,11 +4759,13 @@
     if (error) { alert('Erro ao excluir aula: ' + error.message); return; }
 
     closeClassReport();
-    await openStudentProfile(studentId);
     const { data: { session } } = await sb.auth.getSession();
-    await loadReports(session.user.id, currentUserIsBrenda);
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await Promise.all([
+      openStudentProfile(studentId),
+      loadReports(session.user.id, currentUserIsBrenda),
+      loadClassLogs(session.user.id, currentUserIsBrenda),
+      loadAulasHoje(session.user.id, currentUserIsBrenda)
+    ]);
   }
 
   async function deleteClassFromTurmaReport() {
@@ -4755,12 +4780,15 @@
 
     closeTurmaClassReport();
     const { data: { session } } = await sb.auth.getSession();
+    const refreshPromises = [
+      loadReports(session.user.id, currentUserIsBrenda),
+      loadClassLogs(session.user.id, currentUserIsBrenda),
+      loadAulasHoje(session.user.id, currentUserIsBrenda)
+    ];
     if (currentProfileTurmaId && document.getElementById('modalTurmaProfile').classList.contains('open')) {
-      await openTurmaProfile(currentProfileTurmaId);
+      refreshPromises.push(openTurmaProfile(currentProfileTurmaId));
     }
-    await loadReports(session.user.id, currentUserIsBrenda);
-    await loadClassLogs(session.user.id, currentUserIsBrenda);
-    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await Promise.all(refreshPromises);
   }
 
   // ---- Financeiro ----
