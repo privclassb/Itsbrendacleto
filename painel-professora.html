@@ -3206,13 +3206,18 @@
       query = query.gte('created_at', monthStart).lt('created_at', monthEnd);
     }
 
-    const { data: reports, error } = await query;
+    const { data: rawReports, error } = await query;
 
     if (error) {
       listEl.innerHTML = '<div class="empty-reports">Erro ao carregar relatórios.</div>';
       return;
     }
-    if (!reports || reports.length === 0) {
+    // Alguns relatórios por aula antigos (de antes do vínculo por class_log_id existir) não têm
+    // class_log_id preenchido — filtra também pelo padrão de título "Aula de DD/MM/AAAA" pra pegar esses casos.
+    const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
+    const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
+
+    if (reports.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal encontrado com esse filtro.</div>';
       return;
     }
