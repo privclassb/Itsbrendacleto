@@ -306,14 +306,15 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     </div>
 
     <div class="block">
-      <div class="block-head"><div class="block-icon">🎤</div><div><div class="block-title">Question Builder</div><div class="block-sub">Escolha do/does, sujeito e verbo — monte pelo menos 6 perguntas</div></div></div>
+      <div class="block-head"><div class="block-icon">🎤</div><div><div class="block-title">Question Builder</div><div class="block-sub">Escolha do/does e sujeito, digite o verbo — monte pelo menos 6 perguntas</div></div></div>
       <div class="block-body">
         <div class="qb-form">
           <div class="qb-row">
             <select class="qb-select" id="qb-aux"></select>
             <select class="qb-select" id="qb-subject"></select>
-            <select class="qb-select" id="qb-verb"></select>
           </div>
+          <input type="text" class="qb-input" id="qb-verb" placeholder="verbo (ex: like, have, work as... pode pesquisar outros!)">
+          <div class="starter-chips" id="qb-verb-chips"></div>
           <input type="text" class="qb-input" id="qb-complement" placeholder="complemento (ex: pizza, in Brazil, soccer...)">
         </div>
         <button class="btn-next" id="qb-add-btn" onclick="addQuestion()">+ Adicionar pergunta</button>
@@ -592,8 +593,13 @@ function initQB(){
   ['Do','Does'].forEach(function(a){ var o=document.createElement('option'); o.textContent=a; auxSel.appendChild(o); });
   var subjSel = document.getElementById('qb-subject'); subjSel.innerHTML='';
   SUBJECTS.forEach(function(s,i){ var o=document.createElement('option'); o.value=i; o.textContent=s.label; subjSel.appendChild(o); });
-  var verbSel = document.getElementById('qb-verb'); verbSel.innerHTML='';
-  CELEB_VERBS.forEach(function(v){ var o=document.createElement('option'); o.textContent=v; verbSel.appendChild(o); });
+  document.getElementById('qb-verb').value='';
+  var chipsWrap = document.getElementById('qb-verb-chips'); chipsWrap.innerHTML='';
+  CELEB_VERBS.forEach(function(v){
+    var chip=document.createElement('div'); chip.className='starter-chip'; chip.textContent=v;
+    chip.addEventListener('click', function(){ document.getElementById('qb-verb').value=v; document.getElementById('qb-verb').focus(); });
+    chipsWrap.appendChild(chip);
+  });
   document.getElementById('qb-list').innerHTML='';
   document.getElementById('qb-count').textContent='0 / 6 perguntas';
   document.getElementById('qb-add-btn').disabled=false;
@@ -603,9 +609,14 @@ function addQuestion(){
   if (builtQuestions.length >= 6) return;
   var aux = document.getElementById('qb-aux').value;
   var subj = SUBJECTS[parseInt(document.getElementById('qb-subject').value,10)];
-  var verb = document.getElementById('qb-verb').value;
+  var verb = document.getElementById('qb-verb').value.trim();
   var comp = document.getElementById('qb-complement').value.trim() || 'pizza';
   var fb = document.getElementById('qb-fb');
+  if (!verb) {
+    fb.textContent = '❌ Digite um verbo para montar a pergunta (pode pesquisar no dicionário!).';
+    fb.className = 'qfb on fail';
+    return;
+  }
   if (aux !== subj.aux) {
     fb.textContent = '❌ Com "'+subj.label+'" use "'+subj.aux+'", não "'+aux+'".';
     fb.className = 'qfb on fail';
@@ -617,6 +628,7 @@ function addQuestion(){
   var item = document.createElement('div'); item.className='qb-item'; item.textContent=(builtQuestions.length)+'. '+q;
   list.appendChild(item);
   document.getElementById('qb-count').textContent=builtQuestions.length+' / 6 perguntas';
+  document.getElementById('qb-verb').value='';
   document.getElementById('qb-complement').value='';
   fb.textContent = '✓ Correto!';
   fb.className = 'qfb on ok';
