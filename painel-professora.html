@@ -4898,6 +4898,7 @@
     const { error } = await sb.from('payments').update(updates).eq('id', id);
     if (error) { alert('Erro ao atualizar: ' + error.message); return; }
     await loadFinanceiro();
+    await renderNotifications(allStudents);
   }
 
   async function openLancamento(id, presetStudentId) {
@@ -5004,6 +5005,7 @@
 
     closeLancamento();
     await loadFinanceiro();
+    await renderNotifications(allStudents);
     if (currentProfileStudentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
       await openStudentProfile(currentProfileStudentId);
     }
@@ -5017,6 +5019,7 @@
     if (error) { alert('Erro ao excluir: ' + error.message); return; }
     closeLancamento();
     await loadFinanceiro();
+    await renderNotifications(allStudents);
     if (currentProfileStudentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
       await openStudentProfile(currentProfileStudentId);
     }
