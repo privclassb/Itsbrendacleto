@@ -134,11 +134,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .order-chip:hover { border-color:var(--brown-lt); background:var(--sand); }
 .order-chip.sel { background:var(--brown-dk); color:#fff; border-color:var(--brown-dk); }
 .itin-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
-.itin-row { display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--sand); }
+.itin-row { display:flex; flex-direction:column; gap:6px; padding:11px 0; border-bottom:1px solid var(--sand); }
 .itin-row:last-child { border-bottom:none; }
-.itin-place { font-family:'DM Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-lt); width:90px; flex-shrink:0; }
-.itin-inp { flex:1; border:1.5px solid var(--sand-md); border-radius:8px; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:.8rem; color:var(--text); outline:none; background:var(--cream); }
+.itin-row-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.itin-place { font-family:'DM Mono',monospace; font-size:.72rem; text-transform:uppercase; letter-spacing:.03em; color:var(--text-lt); }
+.itin-art-toggle { display:flex; gap:6px; }
+.itin-art-btn { background:var(--white); border:1.5px solid var(--sand-md); border-radius:14px; padding:4px 12px; font-family:'DM Sans',sans-serif; font-size:.72rem; font-weight:600; color:var(--text); cursor:pointer; transition:all .15s; }
+.itin-art-btn:hover { border-color:var(--brown-lt); }
+.itin-art-btn.sel { background:var(--brown-dk); color:#fff; border-color:var(--brown-dk); }
+.itin-inp { width:100%; border:1.5px solid var(--sand-md); border-radius:8px; padding:7px 10px; font-family:'DM Sans',sans-serif; font-size:.8rem; color:var(--text); outline:none; background:var(--cream); }
 .itin-inp:focus { border-color:var(--brown-lt); }
+.itin-fb { font-size:.72rem; font-weight:500; color:var(--fail); display:none; }
+.itin-fb.on { display:block; }
 .madlib-result { margin-top:12px; background:var(--sand); border-radius:var(--rs); padding:14px; font-size:.86rem; line-height:1.6; color:var(--text-md); display:none; }
 .madlib-result.on { display:block; }
 
@@ -299,7 +306,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         <div><div class="day-weekday">Quarta-feira · Wednesday</div><div class="day-title">City Itinerary</div></div>
         <button class="day-done-btn" id="done-wed" onclick="toggleDone('wed')">○ Concluído</button>
       </div>
-      <div class="day-intro">Crie um roteiro para um amigo que nunca visitou sua cidade. Fale sobre os lugares que ele precisa ir e o que fazer em cada um deles. <strong>Marque a etapa concluída!</strong></div>
+      <div class="day-intro">Crie um roteiro para um amigo que nunca visitou sua cidade. Fale sobre os lugares que ele precisa ir e o que fazer em cada um deles. Lembre-se: lugares como "the park" usam <strong>the</strong>, mas lugares como "downtown" não usam. <strong>Marque a etapa concluída!</strong></div>
     </div>
 
     <div class="block">
@@ -307,14 +314,14 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
       <div class="block-body">
         <ol class="task-list">
           <li>Escolha os lugares do roteiro.</li>
-          <li>Edite a atividade sugerida pra cada lugar, se quiser.</li>
+          <li>Para cada lugar, escolha "the" ou "—" e escreva a atividade.</li>
           <li>Toque em "Ver meu roteiro" pra ver o resultado.</li>
         </ol>
       </div>
     </div>
 
     <div class="block">
-      <div class="block-head"><div class="block-icon">🗺️</div><div><div class="block-title">City Itinerary Builder</div><div class="block-sub">Escolha os lugares do roteiro</div></div></div>
+      <div class="block-head"><div class="block-icon">🗺️</div><div><div class="block-title">City Itinerary Builder</div><div class="block-sub">Escolha os lugares, decida "the" e escreva a atividade</div></div></div>
       <div class="block-body">
         <div class="itin-grid" id="itin-grid"></div>
         <div id="itin-list"></div>
@@ -515,12 +522,13 @@ var QUESTIONS_6 = [
 ];
 
 var PLACES_ACTIVITIES = [
-  {place:'Park',       activity:'go for a walk'},
-  {place:'Restaurant', activity:'try local food'},
-  {place:'Museum',     activity:'learn about local history'},
-  {place:'Beach',      activity:'relax and swim'},
-  {place:'Mall',       activity:'go shopping'},
-  {place:'Cinema',     activity:'watch a movie'}
+  {place:'Park',       article:true},
+  {place:'Restaurant', article:true},
+  {place:'Museum',     article:true},
+  {place:'Beach',      article:true},
+  {place:'Mall',       article:true},
+  {place:'Cinema',     article:true},
+  {place:'Downtown',   article:false}
 ];
 
 var PLACE_MATCH = [
@@ -618,9 +626,9 @@ function initItinerary(){
     var el = document.createElement('div'); el.className='order-chip'; el.textContent = p.place;
     el.addEventListener('click', function(){
       el.classList.toggle('sel');
-      var idx = itineraryItems.findIndex ? itineraryItems.findIndex(function(it){ return it.place===p.place; }) : -1;
-      if (idx === -1) { for (var k=0;k<itineraryItems.length;k++) { if (itineraryItems[k].place===p.place) { idx=k; break; } } }
-      if (el.classList.contains('sel')) { if (idx===-1) itineraryItems.push({place:p.place, activity:p.activity}); }
+      var idx = -1;
+      for (var k=0;k<itineraryItems.length;k++) { if (itineraryItems[k].place===p.place) { idx=k; break; } }
+      if (el.classList.contains('sel')) { if (idx===-1) itineraryItems.push({place:p.place, article:p.article, articleChosen:null, activity:''}); }
       else { if (idx!==-1) itineraryItems.splice(idx,1); }
       renderItinList();
     });
@@ -633,20 +641,48 @@ function renderItinList(){
   var list = document.getElementById('itin-list'); list.innerHTML='';
   itineraryItems.forEach(function(item){
     var row = document.createElement('div'); row.className='itin-row';
+
+    var top = document.createElement('div'); top.className='itin-row-top';
     var label = document.createElement('div'); label.className='itin-place'; label.textContent = item.place;
-    var inp = document.createElement('input'); inp.type='text'; inp.className='itin-inp'; inp.value = item.activity;
+    var toggle = document.createElement('div'); toggle.className='itin-art-toggle';
+    var btnThe = document.createElement('button'); btnThe.type='button'; btnThe.className='itin-art-btn'+(item.articleChosen===true?' sel':''); btnThe.textContent='the';
+    var btnNone = document.createElement('button'); btnNone.type='button'; btnNone.className='itin-art-btn'+(item.articleChosen===false?' sel':''); btnNone.textContent='—';
+    btnThe.addEventListener('click', function(){ item.articleChosen=true; renderItinList(); });
+    btnNone.addEventListener('click', function(){ item.articleChosen=false; renderItinList(); });
+    toggle.appendChild(btnThe); toggle.appendChild(btnNone);
+    top.appendChild(label); top.appendChild(toggle);
+
+    var inp = document.createElement('input'); inp.type='text'; inp.className='itin-inp'; inp.placeholder='o que fazer lá? (ex: try local food)'; inp.value = item.activity;
     inp.addEventListener('input', function(){ item.activity = inp.value; });
-    row.appendChild(label); row.appendChild(inp);
+
+    var fb = document.createElement('div'); fb.className='itin-fb';
+
+    row.appendChild(top); row.appendChild(inp); row.appendChild(fb);
     list.appendChild(row);
   });
 }
 function genItinerary(){
   var r = document.getElementById('itin-result');
   if (itineraryItems.length===0) { r.textContent='Escolha pelo menos um lugar primeiro!'; r.classList.add('on'); return; }
+
+  var rows = document.querySelectorAll('.itin-row');
+  var allValid = true;
+  itineraryItems.forEach(function(item, idx){
+    var fb = rows[idx].querySelector('.itin-fb');
+    var errors = [];
+    if (item.articleChosen === null) errors.push('Escolha "the" ou "—".');
+    else if (item.articleChosen !== item.article) errors.push(item.article ? 'Use "the" com '+item.place+'.' : '"'+item.place+'" não usa "the".');
+    if (!item.activity || !item.activity.trim()) errors.push('Escreva uma atividade.');
+    if (errors.length) { fb.textContent = '❌ '+errors.join(' '); fb.classList.add('on'); allValid = false; }
+    else { fb.classList.remove('on'); }
+  });
+  if (!allValid) { r.classList.remove('on'); return; }
+
   var TRANSITIONS = ['First,','Then,','After that,','Next,','Finally,'];
   var lines = itineraryItems.map(function(item, i){
     var t = TRANSITIONS[Math.min(i, TRANSITIONS.length-1)];
-    return t+' go to the '+item.place+' to '+(item.activity||'explore')+'.';
+    var artText = item.article ? 'the ' : '';
+    return t+' go to '+artText+item.place+' to '+item.activity.trim()+'.';
   });
   r.textContent = lines.join(' ');
   r.classList.add('on');
