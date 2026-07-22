@@ -502,6 +502,10 @@
     /* Lista de relatórios existentes */
     .report-list { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
     .report-list-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .report-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .report-filters .form-select { width: auto; flex: 1; min-width: 140px; padding: 8px 12px; font-size: 13px; }
+    .report-filters .btn-report-action { background: var(--cream); border: 1.5px solid var(--sand); color: var(--muted); }
+    .report-filters .btn-report-action:hover { border-color: var(--brown); color: var(--brown); }
     .report-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
     .report-row:last-child { border-bottom: none; }
     .report-row-info { flex: 1; }
@@ -931,6 +935,13 @@
 
     <div class="report-list">
       <div class="report-list-title">Relatórios enviados</div>
+      <div class="report-filters">
+        <input type="month" class="form-select" id="reportFilterMonth" onchange="loadReports(currentReportsTeacherId, currentReportsSeeAll)" />
+        <select class="form-select" id="reportFilterTeacher" onchange="loadReports(currentReportsTeacherId, currentReportsSeeAll)" style="display:none;">
+          <option value="">Todas as professoras</option>
+        </select>
+        <button class="btn-report-action" onclick="clearReportFilters()">Limpar filtros</button>
+      </div>
       <div id="reportsList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
@@ -2447,6 +2458,10 @@
   // Track if Brenda for use in createStudent
   let currentUserIsBrenda = false;
 
+  // Track params of the last loadReports() call so filter controls can re-trigger it
+  let currentReportsTeacherId = null;
+  let currentReportsSeeAll = false;
+
   async function editStudent(studentId) {
     const student = allStudents.find(s => s.id === studentId);
     if (!student) return;
@@ -3158,9 +3173,38 @@
   }
 
   async function loadReports(teacherId, seeAll) {
+    currentReportsTeacherId = teacherId;
+    currentReportsSeeAll = seeAll;
+
+    const teacherSel = document.getElementById('reportFilterTeacher');
+    if (seeAll) {
+      teacherSel.style.display = '';
+      if (!teacherSel.dataset.populated) {
+        teacherSel.innerHTML = '<option value="">Todas as professoras</option>' +
+          allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
+        teacherSel.dataset.populated = '1';
+      }
+    } else {
+      teacherSel.style.display = 'none';
+      teacherSel.value = '';
+    }
+
     const listEl = document.getElementById('reportsList');
-    let query = sb.from('reports').select('*').order('created_at', { ascending: false });
-    if (!seeAll) query = query.eq('created_by', teacherId);
+    // Só relatórios mensais (sem class_log_id) — os relatórios por aula ficam no perfil do aluno/turma
+    let query = sb.from('reports').select('*').is('class_log_id', null).order('created_at', { ascending: false });
+    if (!seeAll) {
+      query = query.eq('created_by', teacherId);
+    } else if (teacherSel.value) {
+      query = query.eq('created_by', teacherSel.value);
+    }
+
+    const monthVal = document.getElementById('reportFilterMonth').value; // "YYYY-MM"
+    if (monthVal) {
+      const [y, m] = monthVal.split('-').map(Number);
+      const monthStart = new Date(Date.UTC(y, m - 1, 1)).toISOString();
+      const monthEnd = new Date(Date.UTC(y, m, 1)).toISOString();
+      query = query.gte('created_at', monthStart).lt('created_at', monthEnd);
+    }
 
     const { data: reports, error } = await query;
 
@@ -3169,7 +3213,7 @@
       return;
     }
     if (!reports || reports.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório criado ainda.</div>';
+      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal encontrado com esse filtro.</div>';
       return;
     }
 
@@ -3236,6 +3280,12 @@
     if (error) { alert('Erro ao excluir relatório.'); return; }
     const { data: { session } } = await sb.auth.getSession();
     await loadReports(session.user.id, currentUserIsBrenda);
+  }
+
+  function clearReportFilters() {
+    document.getElementById('reportFilterMonth').value = '';
+    document.getElementById('reportFilterTeacher').value = '';
+    loadReports(currentReportsTeacherId, currentReportsSeeAll);
   }
 
   // ---- Turmas ----
