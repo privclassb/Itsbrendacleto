@@ -380,6 +380,24 @@
     </div>
   </div>
 
+  <!-- RESET PASSWORD FORM (após clicar no link do e-mail) -->
+  <div id="resetPasswordForm" style="display:none;">
+    <h2>Defina sua nova senha</h2>
+    <p class="subtitle">Escolha uma nova senha para sua conta.</p>
+
+    <div class="form-group">
+      <label for="newPassword">Nova senha</label>
+      <input type="password" id="newPassword" placeholder="••••••••" />
+    </div>
+
+    <div class="form-group">
+      <label for="newPasswordConfirm">Confirme a nova senha</label>
+      <input type="password" id="newPasswordConfirm" placeholder="••••••••" />
+    </div>
+
+    <button class="btn-primary" id="resetPasswordBtn">Salvar nova senha</button>
+  </div>
+
   <!-- PROFILE PICKER -->
   <div id="pickerForm" style="display:none;">
     <h2>Qual perfil você quer acessar?</h2>
@@ -398,6 +416,7 @@
   // ─── DOM refs ──────────────────────────────────────────────────────
   const loginForm    = document.getElementById('loginForm');
   const forgotForm   = document.getElementById('forgotForm');
+  const resetPasswordForm = document.getElementById('resetPasswordForm');
   const pickerForm    = document.getElementById('pickerForm');
   const msgBox       = document.getElementById('message');
 
@@ -413,10 +432,11 @@
 
   function showForm(form) {
     clearMsg();
-    loginForm.style.display    = 'none';
-    forgotForm.style.display   = 'none';
-    pickerForm.style.display   = 'none';
-    form.style.display         = 'block';
+    loginForm.style.display          = 'none';
+    forgotForm.style.display         = 'none';
+    resetPasswordForm.style.display  = 'none';
+    pickerForm.style.display         = 'none';
+    form.style.display               = 'block';
   }
 
   // ─── Navigation ────────────────────────────────────────────────────
@@ -456,7 +476,9 @@
     btn.disabled = true;
     btn.innerHTML = '<span class="loading"></span>Enviando...';
 
-    const { error } = await sb.auth.resetPasswordForEmail(email);
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
 
     if (error) {
       showMsg('Erro ao enviar e-mail. Tente novamente.', 'error');
@@ -466,6 +488,31 @@
 
     btn.disabled = false;
     btn.textContent = 'Enviar link';
+  });
+
+  // ─── Set new password (depois de clicar no link do e-mail) ─────────
+  document.getElementById('resetPasswordBtn').addEventListener('click', async () => {
+    const newPassword        = document.getElementById('newPassword').value;
+    const newPasswordConfirm = document.getElementById('newPasswordConfirm').value;
+    const btn                = document.getElementById('resetPasswordBtn');
+
+    if (!newPassword || newPassword.length < 6) { showMsg('A senha precisa ter pelo menos 6 caracteres.', 'error'); return; }
+    if (newPassword !== newPasswordConfirm) { showMsg('As senhas não coincidem.', 'error'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>Salvando...';
+
+    const { data, error } = await sb.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      showMsg('Erro ao salvar a nova senha. Tente pedir o link de novo.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Salvar nova senha';
+      return;
+    }
+
+    showMsg('Senha atualizada! Entrando...', 'success');
+    await redirect(data.user);
   });
 
   // ─── Redirect by role ──────────────────────────────────────────────
@@ -529,9 +576,15 @@
     showForm(pickerForm);
   }
 
-  // Escuta login bem-sucedido
+  // Escuta login bem-sucedido / link de recuperação de senha
+  let isPasswordRecovery = false;
   sb.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    if (event === 'PASSWORD_RECOVERY') {
+      isPasswordRecovery = true;
+      showForm(resetPasswordForm);
+      return;
+    }
+    if (event === 'SIGNED_IN' && session && !isPasswordRecovery) {
       await redirect(session.user);
     }
   });
