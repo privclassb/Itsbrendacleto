@@ -11,6 +11,10 @@ name: Notificações push
         description: 'Só mostra o que seria enviado, sem mandar nada de verdade'
         type: boolean
         default: false
+      test_email:
+        description: 'Preenchendo isso, ignora os 4 lembretes reais e manda só uma notificação de teste pra esse e-mail'
+        type: string
+        default: ''
 
 jobs:
   send-notifications:
@@ -25,4 +29,5 @@ jobs:
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           ONESIGNAL_REST_API_KEY: ${{ secrets.ONESIGNAL_REST_API_KEY }}
           DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          TEST_EMAIL: ${{ github.event.inputs.test_email || '' }}
         run: node scripts/send-notifications.js

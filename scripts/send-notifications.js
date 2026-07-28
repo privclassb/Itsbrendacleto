@@ -212,7 +212,24 @@ async function monthlyReportReminders(now) {
   return sent;
 }
 
+// ─── Envio de teste avulso (não mexe em nenhum dos 4 lembretes reais) ───
+async function sendTestPush(email) {
+  const rows = await sb(`profiles?select=id,full_name&email=eq.${encodeURIComponent(email)}`);
+  if (!rows.length) {
+    console.log(`Nenhum perfil encontrado com o e-mail ${email}`);
+    return;
+  }
+  await sendPush([rows[0].id], 'Teste de notificação 🔔', 'Se você recebeu essa mensagem, as notificações do itsbrendacleto estão funcionando!');
+  console.log(`Teste enviado pra ${rows[0].full_name || email}`);
+}
+
 async function main() {
+  const testEmail = process.env.TEST_EMAIL;
+  if (testEmail) {
+    await sendTestPush(testEmail);
+    return;
+  }
+
   const now = nowParts();
   console.log(`Rodando notificações às ${now.date} ${now.time} (America/Sao_Paulo)${DRY_RUN ? ' [DRY_RUN]' : ''}`);
 
