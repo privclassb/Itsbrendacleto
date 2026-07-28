@@ -6,6 +6,7 @@
   <title>Painel da Professora | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -705,6 +706,16 @@
       });
     }
   </script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: '58dbb455-e1d0-4871-9919-bdf37b56aafe',
+        serviceWorkerPath: 'sw.js',
+        serviceWorkerParam: { scope: '/Itsbrendacleto/' }
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -728,6 +739,13 @@
       <h1>Olá, <span id="teacherName">Professora</span> 👋</h1>
       <p>Aqui está o resumo dos seus alunos hoje.</p>
     </div>
+  </div>
+  <div id="pushPermBanner" style="display:none;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:12px 16px;margin-top:4px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+    <span>🔔 Ative as notificações pra receber lembretes de aula e relatório direto no celular.</span>
+    <span style="display:flex;gap:8px;">
+      <button type="button" onclick="ativarNotificacoesPush()" style="background:#fff;color:var(--brown,#5C4033);border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">Ativar</button>
+      <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;cursor:pointer;">Agora não</button>
+    </span>
   </div>
 </div>
 
@@ -1137,6 +1155,25 @@
       lock: async (_name, _acquireTimeout, fn) => fn(),
     }
   });
+
+  // ---- Notificações push ----
+  function ativarNotificacoesPush() {
+    document.getElementById('pushPermBanner').style.display = 'none';
+    function ask(OneSignal) {
+      OneSignal.Notifications.requestPermission().catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
+    }
+    if (window.OneSignal && window.OneSignal.Notifications) {
+      ask(window.OneSignal);
+    } else if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(ask);
+    }
+  }
+  (function () {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      document.getElementById('pushPermBanner').style.display = 'flex';
+    }
+  })();
 
   // Professoras conhecidas
   const TEACHERS = {

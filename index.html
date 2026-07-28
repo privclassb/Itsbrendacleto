@@ -557,9 +557,6 @@
         try {
           await OneSignal.login(user.id);
           await OneSignal.User.addTag('role', role);
-          if (OneSignal.Notifications.permission !== true) {
-            await OneSignal.Notifications.requestPermission();
-          }
         } catch (e) { console.warn('OneSignal login falhou:', e); }
       });
     }
