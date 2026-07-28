@@ -231,24 +231,6 @@
 </main>
 
 <script>
-  function ativarNotificacoesPush() {
-    document.getElementById('pushPermBanner').style.display = 'none';
-    function ask(OneSignal) {
-      OneSignal.Notifications.requestPermission().catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
-    }
-    if (window.OneSignal && window.OneSignal.Notifications) {
-      ask(window.OneSignal);
-    } else if (window.OneSignalDeferred) {
-      OneSignalDeferred.push(ask);
-    }
-  }
-  (function () {
-    if (!('Notification' in window)) return;
-    if (Notification.permission === 'default') {
-      document.getElementById('pushPermBanner').style.display = 'flex';
-    }
-  })();
-
   const SURL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
   const SKEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
   const sb = supabase.createClient(SURL, SKEY, {
@@ -260,6 +242,37 @@
       lock: async (_name, _acquireTimeout, fn) => fn(),
     }
   });
+
+  // ---- Notificações push ----
+  var __pushUserId = null;
+  function ativarNotificacoesPush() {
+    document.getElementById('pushPermBanner').style.display = 'none';
+    function ask(OneSignal) {
+      (__pushUserId ? OneSignal.login(__pushUserId) : Promise.resolve())
+        .then(function () { return OneSignal.Notifications.requestPermission(); })
+        .catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
+    }
+    if (window.OneSignal && window.OneSignal.Notifications) {
+      ask(window.OneSignal);
+    } else if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(ask);
+    }
+  }
+  (async function () {
+    if (!('Notification' in window)) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      __pushUserId = session.user.id;
+      if (window.OneSignalDeferred) {
+        OneSignalDeferred.push(function (OneSignal) {
+          OneSignal.login(__pushUserId).catch(function (e) { console.warn('OneSignal login falhou:', e); });
+        });
+      }
+    }
+    if (Notification.permission === 'default') {
+      document.getElementById('pushPermBanner').style.display = 'flex';
+    }
+  })();
 
   // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
   var __previewAs = sessionStorage.getItem('__preview_as');
