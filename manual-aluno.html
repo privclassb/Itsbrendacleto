@@ -234,6 +234,37 @@
 
   <div class="manual-section" data-section="10">
     <div class="manual-section-header" onclick="toggleSection(this)">
+      <div class="manual-section-icon">🔊</div>
+      <div class="manual-section-title">Melhorar a voz do áudio (pronúncia)</div>
+      <div class="manual-section-chevron">▾</div>
+    </div>
+    <div class="manual-section-body">
+      <div class="manual-section-body-inner">
+        <p>O botão de áudio (🔊) usa a voz de leitura em inglês que já vem instalada no seu celular ou computador. Às vezes o aparelho traz, por padrão, uma voz de qualidade ruim — mas dá pra trocar isso nas configurações, e o efeito vale pra qualquer aula que use áudio.</p>
+
+        <button type="button" onclick="testVoiceNow()" style="width:100%;padding:12px;background:var(--brown);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--white);cursor:pointer;margin-bottom:6px;">🔊 Testar a voz do meu aparelho agora</button>
+        <div id="voiceTestInfo" style="font-size:12px;color:var(--muted);margin-bottom:14px;"></div>
+
+        <div class="highlight-box">
+          <b>📱 iPhone</b><br>
+          Ajustes → Acessibilidade → Conteúdo Falado → Vozes → English → escolha uma voz e toque no ícone de download ao lado dela para baixar a versão <b>"Enhanced"</b> ou <b>"Premium"</b> (soa bem mais natural que a voz padrão). Depois, toque na voz baixada para selecioná-la.
+        </div>
+        <div class="highlight-box">
+          <b>🤖 Android</b><br>
+          Ajustes → Sistema (ou Acessibilidade, varia por aparelho) → Idiomas e entrada → Conversão de texto em voz → escolha o mecanismo <b>"Google Text-to-Speech"</b> → toque no ícone de engrenagem ao lado → Instalar dados de voz → English (US) → depois de instalado, use o botão "Ouvir um exemplo" ali mesmo pra conferir.
+        </div>
+        <div class="highlight-box">
+          <b>💻 Computador</b><br>
+          No Chrome, normalmente já vem uma voz boa do Google automaticamente quando você está conectado à internet. Se estiver estranha, vale checar se o Chrome está atualizado.
+        </div>
+
+        <p>Depois de ajustar, feche o app e abra de novo pra garantir que a voz nova foi aplicada.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="manual-section" data-section="11">
+    <div class="manual-section-header" onclick="toggleSection(this)">
       <div class="manual-section-icon">💬</div>
       <div class="manual-section-title">Ficou com alguma dúvida?</div>
       <div class="manual-section-chevron">▾</div>
@@ -252,6 +283,23 @@
   function toggleSection(headerEl) {
     var section = headerEl.closest('.manual-section');
     section.classList.toggle('open');
+  }
+
+  // ---- Teste de voz (mesma lógica de seleção usada nas aulas) ----
+  var __ttsVoice=null;
+  function __pickTtsVoice(){ if(!window.speechSynthesis) return null; var voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;}); if(!en.length) return null; var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i; var normal=en.filter(function(v){return !NOVELTY.test(v.name);}); var base=normal.length?normal:en; var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';}); var pool=exact.length?exact:base; var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0]; return pref||pool[0]; }
+  if(window.speechSynthesis){ __ttsVoice=__pickTtsVoice(); window.speechSynthesis.onvoiceschanged=function(){ __ttsVoice=__pickTtsVoice(); }; }
+
+  function testVoiceNow() {
+    var info = document.getElementById('voiceTestInfo');
+    if (!window.speechSynthesis) { info.textContent = 'Esse navegador não tem leitura de voz disponível.'; return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance("Hello! This is how your voice sounds today.");
+    u.lang = 'en-US';
+    if (__ttsVoice) u.voice = __ttsVoice;
+    u.rate = 0.9;
+    window.speechSynthesis.speak(u);
+    info.textContent = __ttsVoice ? ('Voz atual do seu aparelho: ' + __ttsVoice.name) : 'Não encontrei uma voz em inglês instalada no seu aparelho.';
   }
 
   // ---- Banner "Ver como aluno" (Brenda em modo visualização) ----
