@@ -1158,15 +1158,29 @@
   var __pushUserId = null;
   function ativarNotificacoesPush() {
     document.getElementById('pushPermBanner').style.display = 'none';
+    alert('Passo 1: botão clicado. Vendo se o OneSignal já carregou...');
     function ask(OneSignal) {
+      alert('Passo 2: OneSignal carregado. Pedindo permissão agora...');
       (__pushUserId ? OneSignal.login(__pushUserId) : Promise.resolve())
-        .then(function () { return OneSignal.Notifications.requestPermission(); })
-        .catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
+        .then(function () {
+          alert('Passo 3: login OK. Chamando requestPermission()...');
+          return OneSignal.Notifications.requestPermission();
+        })
+        .then(function () {
+          alert('Passo 4: requestPermission() terminou sem erro. Permissão atual: ' + Notification.permission);
+        })
+        .catch(function (e) { alert('ERRO: ' + (e && e.message ? e.message : JSON.stringify(e))); });
     }
     if (window.OneSignal && window.OneSignal.Notifications) {
       ask(window.OneSignal);
     } else if (window.OneSignalDeferred) {
+      alert('OneSignal ainda não carregou, entrando na fila...');
       OneSignalDeferred.push(ask);
+      setTimeout(function () {
+        if (!window.OneSignal) alert('10s depois: OneSignal AINDA não carregou. Provavelmente é isso que está travando.');
+      }, 10000);
+    } else {
+      alert('ERRO: window.OneSignalDeferred nem existe. O script do OneSignal não foi injetado na página.');
     }
   }
   (async function () {
