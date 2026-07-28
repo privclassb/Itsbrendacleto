@@ -46,6 +46,12 @@ function daysBetween(isoA, isoB) {
   return (new Date(isoB) - new Date(isoA)) / 86400000;
 }
 
+function dateNDaysBefore(dateStr, n) {
+  const d = new Date(`${dateStr}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() - n);
+  return d.toISOString().slice(0, 10);
+}
+
 async function sb(path, opts = {}) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
     ...opts,
@@ -143,9 +149,13 @@ async function practiceNudges(now) {
 }
 
 // ─── 3. Relatório de aula pendente (professora) ─────────────────────────
+const REPORT_LOOKBACK_DAYS = 7;
+const MAX_DATES_IN_MESSAGE = 5;
+
 async function classReportReminders(now) {
+  const sinceDate = dateNDaysBefore(now.date, REPORT_LOOKBACK_DAYS);
   const logs = await sb(
-    `class_logs?select=id,class_date,created_by&status=eq.realizada&report_reminder_sent_at=is.null&class_date=lt.${now.date}`
+    `class_logs?select=id,class_date,created_by&status=eq.realizada&report_reminder_sent_at=is.null&class_date=lt.${now.date}&class_date=gte.${sinceDate}`
   );
   if (!logs.length) return 0;
   const ids = logs.map((l) => l.id).join(',');
@@ -160,7 +170,9 @@ async function classReportReminders(now) {
   }
   const nowIso = new Date().toISOString();
   for (const [teacherId, teacherLogs] of Object.entries(byTeacher)) {
-    const dates = teacherLogs.map((l) => l.class_date).join(', ');
+    const shown = teacherLogs.slice(0, MAX_DATES_IN_MESSAGE).map((l) => l.class_date).join(', ');
+    const extra = teacherLogs.length - MAX_DATES_IN_MESSAGE;
+    const dates = extra > 0 ? `${shown} e mais ${extra}` : shown;
     const msg = teacherLogs.length === 1
       ? `A aula de ${dates} ainda está sem relatório.`
       : `${teacherLogs.length} aulas ainda estão sem relatório: ${dates}.`;
