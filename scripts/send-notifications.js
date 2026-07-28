@@ -94,7 +94,7 @@ async function sendPush(externalIds, heading, content) {
   });
   const body = await res.text();
   if (!res.ok) throw new Error(`OneSignal -> ${res.status}: ${body}`);
-  console.log('push enviado pra', externalIds.length, 'destinatário(s):', heading);
+  console.log('push enviado pra', externalIds.length, 'destinatário(s):', heading, '| resposta OneSignal:', body);
 }
 
 // ─── 1. Lembrete de aula em 1h (aluno) ──────────────────────────────────
@@ -213,12 +213,25 @@ async function monthlyReportReminders(now) {
 }
 
 // ─── Envio de teste avulso (não mexe em nenhum dos 4 lembretes reais) ───
+async function checkSubscription(externalId) {
+  try {
+    const res = await fetch(`https://api.onesignal.com/apps/${ONESIGNAL_APP_ID}/users/by/external_id/${externalId}`, {
+      headers: { 'Authorization': `Basic ${ONESIGNAL_REST_API_KEY}` }
+    });
+    const body = await res.text();
+    console.log('Consulta de inscrição no OneSignal (status ' + res.status + '):', body);
+  } catch (e) {
+    console.log('Não consegui consultar a inscrição:', e.message);
+  }
+}
+
 async function sendTestPush(email) {
   const rows = await sb(`profiles?select=id,full_name&email=eq.${encodeURIComponent(email)}`);
   if (!rows.length) {
     console.log(`Nenhum perfil encontrado com o e-mail ${email}`);
     return;
   }
+  await checkSubscription(rows[0].id);
   await sendPush([rows[0].id], 'Teste de notificação 🔔', 'Se você recebeu essa mensagem, as notificações do itsbrendacleto estão funcionando!');
   console.log(`Teste enviado pra ${rows[0].full_name || email}`);
 }
