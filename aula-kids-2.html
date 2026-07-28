@@ -425,7 +425,10 @@ var MISSION=['Pratique os <strong>flashcards de feelings</strong> e ouça cada e
 // Letter sounds handled by speakLetter directly
 var NW={6:'six',7:'seven',8:'eight',9:'nine',10:'ten',11:'eleven',12:'twelve'};
 
-function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=.85;window.speechSynthesis.speak(u);}
+var __ttsVoice=null;
+function __pickTtsVoice(){if(!window.speechSynthesis)return null;var voices=window.speechSynthesis.getVoices();if(!voices.length)return null;var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;});if(!en.length)return null;var exact=en.filter(function(v){return v.lang.toLowerCase()==='en-us';});var pool=exact.length?exact:en;var pref=pool.filter(function(v){return /google|natural|online|enhanced|premium/i.test(v.name);})[0];return pref||pool[0];}
+if(window.speechSynthesis){__ttsVoice=__pickTtsVoice();window.speechSynthesis.onvoiceschanged=function(){__ttsVoice=__pickTtsVoice();};}
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(__ttsVoice)u.voice=__ttsVoice;u.rate=.85;window.speechSynthesis.speak(u);}
 function spkL(l){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();

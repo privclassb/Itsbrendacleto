@@ -602,7 +602,10 @@ var QUIZ = [
   {q:'She ___ karate twice a week.',                          ctx:'Play, Go or Do?', opts:['plays','goes','does'], c:2}
 ];
 
-function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
+var __ttsVoice=null;
+function __pickTtsVoice(){ if(!window.speechSynthesis) return null; var voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;}); if(!en.length) return null; var exact=en.filter(function(v){return v.lang.toLowerCase()==='en-us';}); var pool=exact.length?exact:en; var pref=pool.filter(function(v){return /google|natural|online|enhanced|premium/i.test(v.name);})[0]; return pref||pool[0]; }
+if(window.speechSynthesis){ __ttsVoice=__pickTtsVoice(); window.speechSynthesis.onvoiceschanged=function(){ __ttsVoice=__pickTtsVoice(); }; }
+function speak(txt, rate) { if (!window.speechSynthesis) return; window.speechSynthesis.cancel(); var u = new SpeechSynthesisUtterance(txt); u.lang='en-US'; if(__ttsVoice) u.voice=__ttsVoice; u.rate=rate||0.85; window.speechSynthesis.speak(u); }
 
 // ── NAVIGATION ─────────────────────────────────────────────────────────────
 var inited = {};

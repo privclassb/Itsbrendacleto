@@ -128,10 +128,15 @@
     document.getElementById('tipText').textContent = w.tip;
   }
 
+  let __ttsVoice = null;
+  function __pickTtsVoice(){ if(!window.speechSynthesis) return null; const voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; const en=voices.filter(v=>v.lang&&v.lang.toLowerCase().indexOf('en')===0); if(!en.length) return null; const exact=en.filter(v=>v.lang.toLowerCase()==='en-us'); const pool=exact.length?exact:en; const pref=pool.find(v=>/google|natural|online|enhanced|premium/i.test(v.name)); return pref||pool[0]; }
+  if (window.speechSynthesis) { __ttsVoice = __pickTtsVoice(); window.speechSynthesis.onvoiceschanged = () => { __ttsVoice = __pickTtsVoice(); }; }
+
   document.getElementById('btnAudio').addEventListener('click', () => {
+    if (!window.speechSynthesis) return;
     const w = words[currentIdx];
     const u = new SpeechSynthesisUtterance(w.en.toLowerCase());
-    u.lang = 'en-US'; u.rate = 0.8; u.pitch = 1.1;
+    u.lang = 'en-US'; if (__ttsVoice) u.voice = __ttsVoice; u.rate = 0.8; u.pitch = 1.1;
     window.speechSynthesis.speak(u);
   });
 
