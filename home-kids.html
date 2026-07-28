@@ -6,6 +6,7 @@
   <title>Home | itsbrendacleto Kids</title>
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --rose: #F9A8C9; --mint: #7ECBA1; --lavender: #C3B1E1; --yellow: #FFD97D; --sky: #90C9F9; --cream: #FFF8F0; --text: #3D2B1F; --white: #FFFFFF; --radius: 20px; }
@@ -105,6 +106,16 @@
       });
     }
   </script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: '58dbb455-e1d0-4871-9919-bdf37b56aafe',
+        serviceWorkerPath: 'sw.js',
+        serviceWorkerParam: { scope: '/Itsbrendacleto/' }
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -112,6 +123,14 @@
   <div class="header-brand">its<span>brenda</span>cleto</div>
   <button class="btn-logout" id="logoutBtn">Sair</button>
 </header>
+
+<div id="pushPermBanner" style="display:none;background:#FFF0F5;border-bottom:1px solid #F9A8C9;padding:10px 20px;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px;">
+  <span>🔔 Ative as notificações pra receber avisos de aula e de prática!</span>
+  <span style="display:flex;gap:8px;">
+    <button type="button" onclick="ativarNotificacoesPush()" style="background:#F9A8C9;color:#3D2B1F;border:none;border-radius:8px;padding:6px 14px;font-weight:800;cursor:pointer;font-size:13px;">Ativar</button>
+    <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#3D2B1F;border:1px solid #F9A8C9;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;">Agora não</button>
+  </span>
+</div>
 
 <div class="hero">
   <div class="avatar-wrap">
@@ -186,6 +205,24 @@
 </main>
 
 <script>
+  function ativarNotificacoesPush() {
+    document.getElementById('pushPermBanner').style.display = 'none';
+    function ask(OneSignal) {
+      OneSignal.Notifications.requestPermission().catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
+    }
+    if (window.OneSignal && window.OneSignal.Notifications) {
+      ask(window.OneSignal);
+    } else if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(ask);
+    }
+  }
+  (function () {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      document.getElementById('pushPermBanner').style.display = 'flex';
+    }
+  })();
+
   const SURL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
   const SKEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
   const sb = supabase.createClient(SURL, SKEY, {

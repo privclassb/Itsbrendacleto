@@ -6,6 +6,7 @@
   <title>Área do Responsável | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -199,6 +200,16 @@
       });
     }
   </script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: '58dbb455-e1d0-4871-9919-bdf37b56aafe',
+        serviceWorkerPath: 'sw.js',
+        serviceWorkerParam: { scope: '/Itsbrendacleto/' }
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -213,6 +224,14 @@
     <button class="btn-logout" id="logoutBtn">Sair</button>
   </div>
 </header>
+
+<div id="pushPermBanner" style="display:none;background:#FFF8E5;border-bottom:1px solid #F0D9A0;padding:10px 20px;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px;">
+  <span>🔔 Ative as notificações pra receber avisos sobre as aulas.</span>
+  <span style="display:flex;gap:8px;">
+    <button type="button" onclick="ativarNotificacoesPush()" style="background:#5C4033;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:13px;">Ativar</button>
+    <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#5C4033;border:1px solid #5C4033;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;">Agora não</button>
+  </span>
+</div>
 
 <div class="welcome-strip">
   <h1 id="welcomeTitle">Olá! 👋</h1>
@@ -303,6 +322,24 @@
 </div>
 
 <script>
+  function ativarNotificacoesPush() {
+    document.getElementById('pushPermBanner').style.display = 'none';
+    function ask(OneSignal) {
+      OneSignal.Notifications.requestPermission().catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
+    }
+    if (window.OneSignal && window.OneSignal.Notifications) {
+      ask(window.OneSignal);
+    } else if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(ask);
+    }
+  }
+  (function () {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'default') {
+      document.getElementById('pushPermBanner').style.display = 'flex';
+    }
+  })();
+
   const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
   const { createClient } = supabase;
