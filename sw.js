@@ -1,5 +1,3 @@
-importScripts('https://cdn.onesignal.com/sdks/OneSignalSDK.sw.js');
-
 const CACHE_NAME = 'ibc-static-v1';
 const STATIC_ASSETS = [
   'manifest.json',
