@@ -410,7 +410,7 @@ var MISSION = [
 // ── LETTER SOUNDS ────────────────────────────────────────────────────────────
 // Pronuncia cada letra individualmente em inglês americano
 var __ttsVoice=null;
-function __pickTtsVoice(){ if(!window.speechSynthesis) return null; var voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;}); if(!en.length) return null; var exact=en.filter(function(v){return v.lang.toLowerCase()==='en-us';}); var pool=exact.length?exact:en; var pref=pool.filter(function(v){return /google|natural|online|enhanced|premium/i.test(v.name);})[0]; return pref||pool[0]; }
+function __pickTtsVoice(){ if(!window.speechSynthesis) return null; var voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;}); if(!en.length) return null; var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i; var normal=en.filter(function(v){return !NOVELTY.test(v.name);}); var base=normal.length?normal:en; var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';}); var pool=exact.length?exact:base; var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0]; return pref||pool[0]; }
 if(window.speechSynthesis){ __ttsVoice=__pickTtsVoice(); window.speechSynthesis.onvoiceschanged=function(){ __ttsVoice=__pickTtsVoice(); }; }
 function speakLetter(l) {
   if (!window.speechSynthesis) return;

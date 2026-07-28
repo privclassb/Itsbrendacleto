@@ -153,7 +153,7 @@
   }
 
   let __ttsVoice = null;
-  function __pickTtsVoice(){ if(!window.speechSynthesis) return null; const voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; const en=voices.filter(v=>v.lang&&v.lang.toLowerCase().indexOf('en')===0); if(!en.length) return null; const exact=en.filter(v=>v.lang.toLowerCase()==='en-us'); const pool=exact.length?exact:en; const pref=pool.find(v=>/google|natural|online|enhanced|premium/i.test(v.name)); return pref||pool[0]; }
+  function __pickTtsVoice(){ if(!window.speechSynthesis) return null; const voices=window.speechSynthesis.getVoices(); if(!voices.length) return null; const en=voices.filter(v=>v.lang&&v.lang.toLowerCase().indexOf('en')===0); if(!en.length) return null; const NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i; const normal=en.filter(v=>!NOVELTY.test(v.name)); const base=normal.length?normal:en; const exact=base.filter(v=>v.lang.toLowerCase()==='en-us'); const pool=exact.length?exact:base; const pref=pool.find(v=>/siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'')); return pref||pool[0]; }
   if (window.speechSynthesis) { __ttsVoice = __pickTtsVoice(); window.speechSynthesis.onvoiceschanged = () => { __ttsVoice = __pickTtsVoice(); }; }
 
   document.getElementById('btnAudio').addEventListener('click', () => {
