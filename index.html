@@ -6,6 +6,7 @@
   <title>itsbrendacleto — Inglês para a Vida Real</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -326,6 +327,16 @@
       });
     }
   </script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: '58dbb455-e1d0-4871-9919-bdf37b56aafe',
+        serviceWorkerPath: 'sw.js',
+        serviceWorkerParam: { scope: '/Itsbrendacleto/' }
+      });
+    });
+  </script>
 </head>
 <body>
 
@@ -538,6 +549,20 @@
 
     const role = profile?.role || user.user_metadata?.role || 'adulto';
     console.log('Role final:', role, '| metadata:', user.user_metadata);
+
+    // Vincula esse usuário ao OneSignal, pra podermos mandar notificações
+    // direcionadas (lembrete de aula, prática) mais pra frente.
+    if (window.OneSignalDeferred) {
+      OneSignalDeferred.push(async function (OneSignal) {
+        try {
+          await OneSignal.login(user.id);
+          await OneSignal.User.addTag('role', role);
+          if (OneSignal.Notifications.permission !== true) {
+            await OneSignal.Notifications.requestPermission();
+          }
+        } catch (e) { console.warn('OneSignal login falhou:', e); }
+      });
+    }
 
     const ownDestination = ROLE_DESTINATION[role] || 'home-adulto.html';
 
