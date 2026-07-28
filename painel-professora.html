@@ -6,7 +6,7 @@
   <title>Painel da Professora | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer></script>
+  <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.page.js" defer onerror="window.__oneSignalScriptFailed = true;" onload="window.__oneSignalScriptFailed = false;"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1177,7 +1177,12 @@
       alert('OneSignal ainda não carregou, entrando na fila...');
       OneSignalDeferred.push(ask);
       setTimeout(function () {
-        if (!window.OneSignal) alert('10s depois: OneSignal AINDA não carregou. Provavelmente é isso que está travando.');
+        if (!window.OneSignal) {
+          var status = window.__oneSignalScriptFailed === true ? 'o ARQUIVO do OneSignal falhou ao carregar (bloqueado pela rede)' :
+                       window.__oneSignalScriptFailed === false ? 'o arquivo carregou OK, mas o OneSignal não terminou de iniciar' :
+                       'o arquivo nem tentou carregar ainda (pode ser MUITO lento)';
+          alert('10s depois: OneSignal AINDA não carregou. Diagnóstico: ' + status);
+        }
       }, 10000);
     } else {
       alert('ERRO: window.OneSignalDeferred nem existe. O script do OneSignal não foi injetado na página.');
