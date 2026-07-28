@@ -1,8 +1,10 @@
 name: Notificações push
 
 "on":
-  schedule:
-    - cron: '*/15 * * * *'
+  # Agendamento (cron) fica desligado até a Brenda confirmar o primeiro envio real.
+  # Pra ligar: descomentar as 2 linhas abaixo.
+  # schedule:
+  #   - cron: '*/15 * * * *'
   workflow_dispatch:
     inputs:
       dry_run:
