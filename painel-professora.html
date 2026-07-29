@@ -1167,7 +1167,13 @@
           return OneSignal.Notifications.requestPermission();
         })
         .then(function () {
-          alert('Passo 4: requestPermission() terminou sem erro. Permissão atual: ' + Notification.permission);
+          alert('Passo 4: requestPermission() terminou sem erro. Permissão atual: ' + Notification.permission + '. Vendo se a inscrição de fato existe: ' + JSON.stringify(OneSignal.User.PushSubscription.id));
+          if (!OneSignal.User.PushSubscription.id) {
+            alert('Passo 5: inscrição sem ID ainda, chamando optIn() manualmente...');
+            return OneSignal.User.PushSubscription.optIn().then(function () {
+              alert('Passo 6: optIn() terminou. ID da inscrição agora: ' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | opted in: ' + OneSignal.User.PushSubscription.optedIn);
+            });
+          }
         })
         .catch(function (e) { alert('ERRO: ' + (e && e.message ? e.message : JSON.stringify(e))); });
     }
