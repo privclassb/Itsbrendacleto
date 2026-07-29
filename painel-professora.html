@@ -1203,10 +1203,16 @@
         OneSignalDeferred.push(function (OneSignal) {
           OneSignal.login(__pushUserId).then(function () {
             alert('Estado atual: permission=' + Notification.permission + ' | id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
-            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.optedIn) {
-              alert('Permissão concedida, mas optedIn é falso. Chamando optIn() automaticamente...');
-              return OneSignal.User.PushSubscription.optIn().then(function () {
-                alert('optIn() automático terminou. id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
+            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.token) {
+              alert('Sem token ainda. Forçando optOut() + optIn() do zero...');
+              return OneSignal.User.PushSubscription.optOut().then(function () {
+                return new Promise(function (resolve) { setTimeout(resolve, 1000); });
+              }).then(function () {
+                return OneSignal.User.PushSubscription.optIn();
+              }).then(function () {
+                return new Promise(function (resolve) { setTimeout(resolve, 2000); });
+              }).then(function () {
+                alert('Depois de forçar de novo: id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
               });
             }
           }).catch(function (e) { alert('ERRO no login/optIn automático: ' + (e && e.message ? e.message : JSON.stringify(e))); });
