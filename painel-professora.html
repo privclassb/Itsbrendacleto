@@ -1160,40 +1160,15 @@
   var __pushUserId = null;
   function ativarNotificacoesPush() {
     document.getElementById('pushPermBanner').style.display = 'none';
-    alert('Passo 1: botão clicado. Vendo se o OneSignal já carregou...');
     function ask(OneSignal) {
-      alert('Passo 2: OneSignal carregado. Pedindo permissão agora...');
       (__pushUserId ? OneSignal.login(__pushUserId) : Promise.resolve())
-        .then(function () {
-          alert('Passo 3: login OK. Chamando requestPermission()...');
-          return OneSignal.Notifications.requestPermission();
-        })
-        .then(function () {
-          alert('Passo 4: requestPermission() terminou sem erro. Permissão atual: ' + Notification.permission + '. Vendo se a inscrição de fato existe: ' + JSON.stringify(OneSignal.User.PushSubscription.id));
-          if (!OneSignal.User.PushSubscription.id) {
-            alert('Passo 5: inscrição sem ID ainda, chamando optIn() manualmente...');
-            return OneSignal.User.PushSubscription.optIn().then(function () {
-              alert('Passo 6: optIn() terminou. ID da inscrição agora: ' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | opted in: ' + OneSignal.User.PushSubscription.optedIn);
-            });
-          }
-        })
-        .catch(function (e) { alert('ERRO: ' + (e && e.message ? e.message : JSON.stringify(e))); });
+        .then(function () { return OneSignal.Notifications.requestPermission(); })
+        .catch(function (e) { console.warn('Permissão de notificação falhou:', e); });
     }
     if (window.OneSignal && window.OneSignal.Notifications) {
       ask(window.OneSignal);
     } else if (window.OneSignalDeferred) {
-      alert('OneSignal ainda não carregou, entrando na fila...');
       OneSignalDeferred.push(ask);
-      setTimeout(function () {
-        if (!window.OneSignal) {
-          var status = window.__oneSignalScriptFailed === true ? 'o ARQUIVO do OneSignal falhou ao carregar (bloqueado pela rede)' :
-                       window.__oneSignalScriptFailed === false ? 'o arquivo carregou OK, mas o OneSignal não terminou de iniciar' :
-                       'o arquivo nem tentou carregar ainda (pode ser MUITO lento)';
-          alert('10s depois: OneSignal AINDA não carregou. Diagnóstico: ' + status);
-        }
-      }, 10000);
-    } else {
-      alert('ERRO: window.OneSignalDeferred nem existe. O script do OneSignal não foi injetado na página.');
     }
   }
   (async function () {
@@ -1203,21 +1178,7 @@
       __pushUserId = session.user.id;
       if (window.OneSignalDeferred) {
         OneSignalDeferred.push(function (OneSignal) {
-          OneSignal.login(__pushUserId).then(function () {
-            alert('Estado atual: permission=' + Notification.permission + ' | id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
-            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.token) {
-              alert('Sem token ainda. Forçando optOut() + optIn() do zero...');
-              return OneSignal.User.PushSubscription.optOut().then(function () {
-                return new Promise(function (resolve) { setTimeout(resolve, 1000); });
-              }).then(function () {
-                return OneSignal.User.PushSubscription.optIn();
-              }).then(function () {
-                return new Promise(function (resolve) { setTimeout(resolve, 2000); });
-              }).then(function () {
-                alert('Depois de forçar de novo: id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
-              });
-            }
-          }).catch(function (e) { alert('ERRO no login/optIn automático: ' + (e && e.message ? e.message : JSON.stringify(e))); });
+          OneSignal.login(__pushUserId).catch(function (e) { console.warn('OneSignal login falhou:', e); });
         });
       }
     }
