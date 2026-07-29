@@ -1201,7 +1201,14 @@
       __pushUserId = session.user.id;
       if (window.OneSignalDeferred) {
         OneSignalDeferred.push(function (OneSignal) {
-          OneSignal.login(__pushUserId).catch(function (e) { console.warn('OneSignal login falhou:', e); });
+          OneSignal.login(__pushUserId).then(function () {
+            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.id) {
+              alert('Permissão já concedida, mas inscrição sem ID. Chamando optIn() automaticamente...');
+              return OneSignal.User.PushSubscription.optIn().then(function () {
+                alert('optIn() automático terminou. ID da inscrição agora: ' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | opted in: ' + OneSignal.User.PushSubscription.optedIn);
+              });
+            }
+          }).catch(function (e) { alert('ERRO no login/optIn automático: ' + (e && e.message ? e.message : JSON.stringify(e))); });
         });
       }
     }
