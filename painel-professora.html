@@ -1202,10 +1202,11 @@
       if (window.OneSignalDeferred) {
         OneSignalDeferred.push(function (OneSignal) {
           OneSignal.login(__pushUserId).then(function () {
-            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.id) {
-              alert('Permissão já concedida, mas inscrição sem ID. Chamando optIn() automaticamente...');
+            alert('Estado atual: permission=' + Notification.permission + ' | id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
+            if (Notification.permission === 'granted' && !OneSignal.User.PushSubscription.optedIn) {
+              alert('Permissão concedida, mas optedIn é falso. Chamando optIn() automaticamente...');
               return OneSignal.User.PushSubscription.optIn().then(function () {
-                alert('optIn() automático terminou. ID da inscrição agora: ' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | opted in: ' + OneSignal.User.PushSubscription.optedIn);
+                alert('optIn() automático terminou. id=' + JSON.stringify(OneSignal.User.PushSubscription.id) + ' | optedIn=' + OneSignal.User.PushSubscription.optedIn + ' | token=' + JSON.stringify(OneSignal.User.PushSubscription.token));
               });
             }
           }).catch(function (e) { alert('ERRO no login/optIn automático: ' + (e && e.message ? e.message : JSON.stringify(e))); });
