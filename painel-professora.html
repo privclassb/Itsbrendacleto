@@ -787,7 +787,14 @@
 
     <!-- Aulas de hoje -->
     <div class="report-list" style="margin-bottom:24px;">
-      <div class="report-list-title">📅 Aulas de hoje</div>
+      <div class="report-list-title" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span>📅 <span id="aulasHojeLabel">Aulas de hoje</span></span>
+        <span style="display:flex;gap:4px;flex-shrink:0;">
+          <button type="button" onclick="shiftAulasHojeDay(-1)" title="Dia anterior" style="background:var(--cream);border:1px solid var(--sand);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;">←</button>
+          <button type="button" onclick="shiftAulasHojeDay(0, true)" title="Hoje" style="background:var(--cream);border:1px solid var(--sand);border-radius:8px;padding:0 10px;height:30px;cursor:pointer;font-size:12px;font-weight:600;">Hoje</button>
+          <button type="button" onclick="shiftAulasHojeDay(1)" title="Próximo dia" style="background:var(--cream);border:1px solid var(--sand);border-radius:8px;width:30px;height:30px;cursor:pointer;font-size:14px;">→</button>
+        </span>
+      </div>
       <div id="aulasHojeList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
@@ -4360,15 +4367,42 @@
     return null;
   }
 
-  async function loadAulasHoje(teacherId) {
-    const today = todayLocalISO();
-    const { data: allLogs, error } = await sb.from('class_logs').select('*').eq('class_date', today).order('start_time', { ascending: true });
-    const listEl = document.getElementById('aulasHojeList');
+  let aulasHojeDayOffset = 0;
 
-    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas de hoje.</div>'; return; }
+  function dateWithOffsetLocalISO(offsetDays) {
+    const d = new Date();
+    d.setDate(d.getDate() + offsetDays);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function shiftAulasHojeDay(delta, goToToday) {
+    aulasHojeDayOffset = goToToday ? 0 : aulasHojeDayOffset + delta;
+    sb.auth.getSession().then(({ data: { session } }) => {
+      if (session) loadAulasHoje(session.user.id);
+    });
+  }
+
+  async function loadAulasHoje(teacherId) {
+    const targetDate = dateWithOffsetLocalISO(aulasHojeDayOffset);
+    const { data: allLogs, error } = await sb.from('class_logs').select('*').eq('class_date', targetDate).order('start_time', { ascending: true });
+    const listEl = document.getElementById('aulasHojeList');
+    const labelEl = document.getElementById('aulasHojeLabel');
+
+    if (labelEl) {
+      if (aulasHojeDayOffset === 0) labelEl.textContent = 'Aulas de hoje';
+      else if (aulasHojeDayOffset === -1) labelEl.textContent = 'Aulas de ontem';
+      else if (aulasHojeDayOffset === 1) labelEl.textContent = 'Aulas de amanhã';
+      else {
+        const d = new Date();
+        d.setDate(d.getDate() + aulasHojeDayOffset);
+        labelEl.textContent = 'Aulas de ' + d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', weekday: 'short' });
+      }
+    }
+
+    if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar aulas.</div>'; return; }
 
     const logs = (allLogs || []).filter(l => teacherOfLog(l) === teacherId);
-    if (logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula agendada para hoje.</div>'; return; }
+    if (logs.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma aula agendada para esse dia.</div>'; return; }
 
     listEl.innerHTML = logs.map(l => {
       const turma = allTurmas.find(t => t.id === l.turma_id);
