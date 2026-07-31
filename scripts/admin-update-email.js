@@ -23,6 +23,7 @@ async function sb(path, opts = {}) {
     }
   });
   if (!res.ok) throw new Error(`Supabase ${opts.method || 'GET'} ${path} -> ${res.status}: ${await res.text()}`);
+  if (res.status === 204) return null;
   return res.json();
 }
 
