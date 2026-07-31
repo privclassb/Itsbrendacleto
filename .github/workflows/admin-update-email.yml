@@ -1,0 +1,28 @@
+name: Admin - Corrigir e-mail de login
+
+"on":
+  workflow_dispatch:
+    inputs:
+      student_query:
+        description: 'Nome do aluno (ou e-mail atual cadastrado)'
+        type: string
+        required: true
+      new_email:
+        description: 'E-mail correto'
+        type: string
+        required: true
+
+jobs:
+  update-email:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Corrigir e-mail
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STUDENT_QUERY: ${{ github.event.inputs.student_query }}
+          NEW_EMAIL: ${{ github.event.inputs.new_email }}
+        run: node scripts/admin-update-email.js
