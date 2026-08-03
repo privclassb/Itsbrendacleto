@@ -1550,6 +1550,7 @@
   let profileReportsByClassLog = {};
   let profileClassLogsCache = [];
   let profileAulasExpanded = false;
+  let profilePendentesExpanded = false;
 
   async function openStudentProfile(studentId) {
     const student = allStudents.find(s => s.id === studentId);
@@ -1696,12 +1697,14 @@
 
     profileClassLogsCache = logs || [];
     profileAulasExpanded = false;
+    profilePendentesExpanded = false;
     renderReposicoesInto(profileClassLogsCache, 'profileReposicoesAReporList', 'profileReposicoesFeitasList');
 
     profileReportsByClassLog = {};
     (studentReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
 
     renderProfileAulasList();
+    renderProfilePendentesList();
 
     // Progresso
     const progress = progressByStudent[studentId] || { activities: [], streak: 0, badges: [] };
@@ -1714,38 +1717,59 @@
     document.getElementById('modalStudentProfile').classList.add('open');
   }
 
+  function buildAulaLogRowHtml(l, linkedOriginalIds) {
+    const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+    const time = formatTimeRange(l);
+    const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+    const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
+    const report = profileReportsByClassLog[l.id];
+    const hasNote = !!report || !!(l.content && l.content.trim());
+    const reportBadge = hasNote
+      ? `<span class="report-status draft">📝 Anotado</span>`
+      : `<span class="report-status draft">➕ Anotar aula</span>`;
+    return `
+      <div class="aula-log-row" onclick="openClassReport('${l.id}', '${currentProfileStudentId}')">
+        <div class="aula-log-top">
+          <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
+          ${reportBadge}
+        </div>
+        ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
+      </div>`;
+  }
+
   function renderProfileAulasList() {
     const logsListEl = document.getElementById('profileClassLogsList');
-    const logs = profileClassLogsCache;
-    if (!logs || logs.length === 0) {
+    const logs = (profileClassLogsCache || []).filter(l => l.status !== 'pendente');
+    if (logs.length === 0) {
       logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
       return;
     }
-    const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
+    const linkedOriginalIds = new Set((profileClassLogsCache || []).filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
     const visibleLogs = profileAulasExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
-    const rowsHtml = visibleLogs.map(l => {
-      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
-      const time = formatTimeRange(l);
-      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-      const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
-      const report = profileReportsByClassLog[l.id];
-      const hasNote = !!report || !!(l.content && l.content.trim());
-      const reportBadge = hasNote
-        ? `<span class="report-status draft">📝 Anotado</span>`
-        : `<span class="report-status draft">➕ Anotar aula</span>`;
-      return `
-        <div class="aula-log-row" onclick="openClassReport('${l.id}', '${currentProfileStudentId}')">
-          <div class="aula-log-top">
-            <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
-            ${reportBadge}
-          </div>
-          ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
-        </div>`;
-    }).join('');
+    const rowsHtml = visibleLogs.map(l => buildAulaLogRowHtml(l, linkedOriginalIds)).join('');
     const moreBtn = (!profileAulasExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
       ? `<button class="btn-sm" onclick="profileAulasExpanded=true;renderProfileAulasList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
       : '';
     logsListEl.innerHTML = rowsHtml + moreBtn;
+  }
+
+  function renderProfilePendentesList() {
+    const listEl = document.getElementById('profilePendentesList');
+    const logs = (profileClassLogsCache || []).filter(l => l.status === 'pendente').sort((a, b) => {
+      if (a.class_date !== b.class_date) return a.class_date < b.class_date ? -1 : 1;
+      return (a.start_time || '') < (b.start_time || '') ? -1 : 1;
+    });
+    if (logs.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula pendente.</div>';
+      return;
+    }
+    const linkedOriginalIds = new Set((profileClassLogsCache || []).filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
+    const visibleLogs = profilePendentesExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
+    const rowsHtml = visibleLogs.map(l => buildAulaLogRowHtml(l, linkedOriginalIds)).join('');
+    const moreBtn = (!profilePendentesExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
+      ? `<button class="btn-sm" onclick="profilePendentesExpanded=true;renderProfilePendentesList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
+      : '';
+    listEl.innerHTML = rowsHtml + moreBtn;
   }
 
   function closeStudentProfile() {
@@ -3511,6 +3535,7 @@
   let turmaProfileReportsCache = [];
   let turmaProfileAttendanceCache = [];
   let turmaProfileAulasExpanded = false;
+  let turmaProfilePendentesExpanded = false;
 
   async function openTurmaProfile(turmaId) {
     const turma = allTurmas.find(t => t.id === turmaId);
@@ -3546,6 +3571,7 @@
     turmaProfileClassLogsCache = logs || [];
     turmaProfileReportsCache = reportsForTurma || [];
     turmaProfileAulasExpanded = false;
+    turmaProfilePendentesExpanded = false;
     renderReposicoesInto(turmaProfileClassLogsCache, 'turmaProfileReposicoesAReporList', 'turmaProfileReposicoesFeitasList');
 
     const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
@@ -3564,49 +3590,72 @@
     turmaProfileAttendanceCache = attendanceForTurma || [];
 
     renderTurmaProfileAulasList();
+    renderTurmaProfilePendentesList();
 
     document.getElementById('modalTurmaProfile').classList.add('open');
   }
 
+  function buildTurmaAulaLogRowHtml(l, members) {
+    const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+    const time = formatTimeRange(l);
+    const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+    const reportsForThis = turmaProfileReportsCache.filter(r => r.class_log_id === l.id);
+    const hasPrivateNote = !!(l.content && l.content.trim());
+    const badge = reportsForThis.length > 0
+      ? `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`
+      : (hasPrivateNote
+          ? `<span class="report-status draft">📝 Anotado</span>`
+          : `<span class="report-status draft">➕ Lançar relatório</span>`);
+    const attendanceRows = turmaProfileAttendanceCache.filter(a => a.class_log_id === l.id);
+    const presentCount = attendanceRows.filter(a => a.present).length;
+    const attendanceBadge = attendanceRows.length > 0
+      ? `<span class="report-status published">👥 ${presentCount}/${members.length} presentes</span>`
+      : '';
+    return `
+      <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
+        <div class="aula-log-top">
+          <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
+          <span style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${attendanceBadge}
+            ${badge}
+          </span>
+        </div>
+        ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
+      </div>`;
+  }
+
   function renderTurmaProfileAulasList() {
     const listEl = document.getElementById('turmaProfileClassLogsList');
-    const logs = turmaProfileClassLogsCache;
     const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
-    if (!logs || logs.length === 0) {
+    const logs = (turmaProfileClassLogsCache || []).filter(l => l.status !== 'pendente');
+    if (logs.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
       return;
     }
     const visibleLogs = turmaProfileAulasExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
-    const rowsHtml = visibleLogs.map(l => {
-      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
-      const time = formatTimeRange(l);
-      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-      const reportsForThis = turmaProfileReportsCache.filter(r => r.class_log_id === l.id);
-      const hasPrivateNote = !!(l.content && l.content.trim());
-      const badge = reportsForThis.length > 0
-        ? `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`
-        : (hasPrivateNote
-            ? `<span class="report-status draft">📝 Anotado</span>`
-            : `<span class="report-status draft">➕ Lançar relatório</span>`);
-      const attendanceRows = turmaProfileAttendanceCache.filter(a => a.class_log_id === l.id);
-      const presentCount = attendanceRows.filter(a => a.present).length;
-      const attendanceBadge = attendanceRows.length > 0
-        ? `<span class="report-status published">👥 ${presentCount}/${members.length} presentes</span>`
-        : '';
-      return `
-        <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
-          <div class="aula-log-top">
-            <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
-            <span style="display:flex;gap:6px;flex-wrap:wrap;">
-              ${attendanceBadge}
-              ${badge}
-            </span>
-          </div>
-          ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
-        </div>`;
-    }).join('');
+    const rowsHtml = visibleLogs.map(l => buildTurmaAulaLogRowHtml(l, members)).join('');
     const moreBtn = (!turmaProfileAulasExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
       ? `<button class="btn-sm" onclick="turmaProfileAulasExpanded=true;renderTurmaProfileAulasList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
+      : '';
+    listEl.innerHTML = rowsHtml + moreBtn;
+  }
+
+  function renderTurmaProfilePendentesList() {
+    const listEl = document.getElementById('turmaProfilePendentesList');
+    if (!listEl) return;
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const logs = (turmaProfileClassLogsCache || []).filter(l => l.status === 'pendente').sort((a, b) => {
+      if (a.class_date !== b.class_date) return a.class_date < b.class_date ? -1 : 1;
+      return (a.start_time || '') < (b.start_time || '') ? -1 : 1;
+    });
+    if (logs.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula pendente.</div>';
+      return;
+    }
+    const visibleLogs = turmaProfilePendentesExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
+    const rowsHtml = visibleLogs.map(l => buildTurmaAulaLogRowHtml(l, members)).join('');
+    const moreBtn = (!turmaProfilePendentesExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
+      ? `<button class="btn-sm" onclick="turmaProfilePendentesExpanded=true;renderTurmaProfilePendentesList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
       : '';
     listEl.innerHTML = rowsHtml + moreBtn;
   }
@@ -5706,6 +5755,7 @@
       <button class="profile-tab-btn active" data-ptab="dados" onclick="showProfileTab('dados')">👤 Dados</button>
       <button class="profile-tab-btn" id="profileTabFinanceiroBtn" data-ptab="financeiro" onclick="showProfileTab('financeiro')" style="display:none;">💰 Financeiro</button>
       <button class="profile-tab-btn" data-ptab="aulas" onclick="showProfileTab('aulas')">📝 Aulas</button>
+      <button class="profile-tab-btn" data-ptab="pendentes" onclick="showProfileTab('pendentes')">📋 Pendentes</button>
       <button class="profile-tab-btn" data-ptab="progresso" onclick="showProfileTab('progresso')">🏆 Progresso</button>
     </div>
 
@@ -5748,7 +5798,7 @@
 
       <div class="profile-section">
         <div class="profile-section-title">Aulas registradas</div>
-        <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela.</div>
+        <div class="modal-hint" style="margin-bottom:8px;">Aulas já feitas, canceladas ou reagendadas — a mais recente primeiro. Clique numa aula pra lançar ou editar o relatório dela.</div>
         <div class="aula-stats-row" id="profileAulasStats"></div>
         <button class="btn-sm" id="profileRescheduleFixedBtn" onclick="openRescheduleFixed('student', currentProfileStudentId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
         <div id="profileClassLogsList"></div>
@@ -5764,6 +5814,14 @@
         <div id="profileReposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
         <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
         <div id="profileReposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
+      </div>
+    </div>
+
+    <div class="profile-tab-panel" id="profileTabPanelPendentes">
+      <div class="profile-section" style="margin-top:16px;">
+        <div class="profile-section-title">Aulas pendentes</div>
+        <div class="modal-hint" style="margin-bottom:8px;">Aulas ainda não realizadas — a mais próxima primeiro.</div>
+        <div id="profilePendentesList"></div>
       </div>
     </div>
 
@@ -5858,7 +5916,7 @@
 
     <div class="profile-section">
       <div class="profile-section-title">Aulas registradas</div>
-      <div class="modal-hint" style="margin-bottom:8px;">Clique numa aula pra lançar ou editar o relatório dela pra toda a turma.</div>
+      <div class="modal-hint" style="margin-bottom:8px;">Aulas já feitas, canceladas ou reagendadas — a mais recente primeiro. Clique numa aula pra lançar ou editar o relatório dela pra toda a turma.</div>
       <div class="aula-stats-row" id="turmaProfileAulasStats"></div>
       <button class="btn-sm" id="turmaProfileRescheduleFixedBtn" onclick="openRescheduleFixed('turma', currentProfileTurmaId)" style="display:none;margin-top:6px;margin-bottom:10px;">🔁 Alterar dia/horário fixo</button>
       <div id="turmaProfileClassLogsList"></div>
@@ -5866,6 +5924,12 @@
         <button class="btn-sm" id="turmaProfileDeletePendingLogsBtn" onclick="deletePendingTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir aulas pendentes</button>
         <button class="btn-sm" id="turmaProfileDeleteAllLogsBtn" onclick="deleteAllTurmaClassLogs()" style="display:none;color:#C0392B;">🗑️ Excluir todas as aulas</button>
       </div>
+    </div>
+
+    <div class="profile-section">
+      <div class="profile-section-title">📋 Aulas pendentes</div>
+      <div class="modal-hint" style="margin-bottom:8px;">Aulas ainda não realizadas — a mais próxima primeiro.</div>
+      <div id="turmaProfilePendentesList"></div>
     </div>
 
     <div class="profile-section">
