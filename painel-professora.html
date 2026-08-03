@@ -1545,9 +1545,11 @@
     feriado: 'Feriado', recesso: 'Recesso'
   };
 
+  const AULAS_LIST_PAGE_SIZE = 8;
   let currentProfileStudentId = null;
   let profileReportsByClassLog = {};
   let profileClassLogsCache = [];
+  let profileAulasExpanded = false;
 
   async function openStudentProfile(studentId) {
     const student = allStudents.find(s => s.id === studentId);
@@ -1589,7 +1591,7 @@
       ? statusQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
       : statusQuery.eq('student_id', studentId);
 
-    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: true }).order('start_time', { ascending: true });
+    let classQuery = sb.from('class_logs').select('*').order('class_date', { ascending: false }).order('start_time', { ascending: false });
     classQuery = turma
       ? classQuery.or(`student_id.eq.${studentId},turma_id.eq.${turma.id}`)
       : classQuery.eq('student_id', studentId);
@@ -1692,37 +1694,14 @@
       <span class="aula-stat-chip">❌ ${statusCounts.cancelada + statusCounts.cancelada_falta} canceladas</span>
       <span class="aula-stat-chip">🎉 ${statusCounts.feriado + statusCounts.recesso} feriado/recesso</span>`;
 
-    const logsListEl = document.getElementById('profileClassLogsList');
     profileClassLogsCache = logs || [];
+    profileAulasExpanded = false;
     renderReposicoesInto(profileClassLogsCache, 'profileReposicoesAReporList', 'profileReposicoesFeitasList');
 
     profileReportsByClassLog = {};
     (studentReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
 
-    if (!logs || logs.length === 0) {
-      logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
-    } else {
-      const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
-      logsListEl.innerHTML = logs.map(l => {
-        const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
-        const time = formatTimeRange(l);
-        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-        const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
-        const report = profileReportsByClassLog[l.id];
-        const hasNote = !!report || !!(l.content && l.content.trim());
-        const reportBadge = hasNote
-          ? `<span class="report-status draft">📝 Anotado</span>`
-          : `<span class="report-status draft">➕ Anotar aula</span>`;
-        return `
-          <div class="aula-log-row" onclick="openClassReport('${l.id}', '${studentId}')">
-            <div class="aula-log-top">
-              <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
-              ${reportBadge}
-            </div>
-            ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
-          </div>`;
-      }).join('');
-    }
+    renderProfileAulasList();
 
     // Progresso
     const progress = progressByStudent[studentId] || { activities: [], streak: 0, badges: [] };
@@ -1733,6 +1712,40 @@
       <div class="detail-row"><span class="detail-label">Atividades concluídas</span><span class="detail-value">${progress.activities.length}</span></div>`;
 
     document.getElementById('modalStudentProfile').classList.add('open');
+  }
+
+  function renderProfileAulasList() {
+    const logsListEl = document.getElementById('profileClassLogsList');
+    const logs = profileClassLogsCache;
+    if (!logs || logs.length === 0) {
+      logsListEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
+      return;
+    }
+    const linkedOriginalIds = new Set(logs.filter(l => l.makeup_for_id).map(l => l.makeup_for_id));
+    const visibleLogs = profileAulasExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
+    const rowsHtml = visibleLogs.map(l => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = formatTimeRange(l);
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      const needsMakeupBadge = (l.needs_makeup && !linkedOriginalIds.has(l.id)) ? ' · 🔄 A repor' : (l.makeup_for_id ? ' · 🔄 Reposição' : '');
+      const report = profileReportsByClassLog[l.id];
+      const hasNote = !!report || !!(l.content && l.content.trim());
+      const reportBadge = hasNote
+        ? `<span class="report-status draft">📝 Anotado</span>`
+        : `<span class="report-status draft">➕ Anotar aula</span>`;
+      return `
+        <div class="aula-log-row" onclick="openClassReport('${l.id}', '${currentProfileStudentId}')">
+          <div class="aula-log-top">
+            <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}${needsMakeupBadge}</span>
+            ${reportBadge}
+          </div>
+          ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
+        </div>`;
+    }).join('');
+    const moreBtn = (!profileAulasExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
+      ? `<button class="btn-sm" onclick="profileAulasExpanded=true;renderProfileAulasList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
+      : '';
+    logsListEl.innerHTML = rowsHtml + moreBtn;
   }
 
   function closeStudentProfile() {
@@ -3495,6 +3508,9 @@
 
   let currentProfileTurmaId = null;
   let turmaProfileClassLogsCache = [];
+  let turmaProfileReportsCache = [];
+  let turmaProfileAttendanceCache = [];
+  let turmaProfileAulasExpanded = false;
 
   async function openTurmaProfile(turmaId) {
     const turma = allTurmas.find(t => t.id === turmaId);
@@ -3522,12 +3538,14 @@
     // Busca aulas da turma e relatórios dos alunos em paralelo (um não depende do outro)
     const [{ data: logs }, { data: reportsForTurma }] = await Promise.all([
       sb.from('class_logs').select('*').eq('turma_id', turmaId)
-        .order('class_date', { ascending: true }).order('start_time', { ascending: true }),
+        .order('class_date', { ascending: false }).order('start_time', { ascending: false }),
       memberIds.length
         ? sb.from('reports').select('id, student_id, class_log_id, is_published').in('student_id', memberIds)
         : Promise.resolve({ data: [] })
     ]);
     turmaProfileClassLogsCache = logs || [];
+    turmaProfileReportsCache = reportsForTurma || [];
+    turmaProfileAulasExpanded = false;
     renderReposicoesInto(turmaProfileClassLogsCache, 'turmaProfileReposicoesAReporList', 'turmaProfileReposicoesFeitasList');
 
     const statusCounts = { pendente: 0, realizada: 0, cancelada: 0, cancelada_falta: 0, reagendada: 0, feriado: 0, recesso: 0 };
@@ -3543,42 +3561,54 @@
     const { data: attendanceForTurma } = logIds.length
       ? await sb.from('class_attendance').select('class_log_id, present').in('class_log_id', logIds)
       : { data: [] };
+    turmaProfileAttendanceCache = attendanceForTurma || [];
 
-    const listEl = document.getElementById('turmaProfileClassLogsList');
-    if (turmaProfileClassLogsCache.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
-    } else {
-      listEl.innerHTML = turmaProfileClassLogsCache.map(l => {
-        const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
-        const time = formatTimeRange(l);
-        const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-        const reportsForThis = (reportsForTurma || []).filter(r => r.class_log_id === l.id);
-        const hasPrivateNote = !!(l.content && l.content.trim());
-        const badge = reportsForThis.length > 0
-          ? `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`
-          : (hasPrivateNote
-              ? `<span class="report-status draft">📝 Anotado</span>`
-              : `<span class="report-status draft">➕ Lançar relatório</span>`);
-        const attendanceRows = (attendanceForTurma || []).filter(a => a.class_log_id === l.id);
-        const presentCount = attendanceRows.filter(a => a.present).length;
-        const attendanceBadge = attendanceRows.length > 0
-          ? `<span class="report-status published">👥 ${presentCount}/${members.length} presentes</span>`
-          : '';
-        return `
-          <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
-            <div class="aula-log-top">
-              <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
-              <span style="display:flex;gap:6px;flex-wrap:wrap;">
-                ${attendanceBadge}
-                ${badge}
-              </span>
-            </div>
-            ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
-          </div>`;
-      }).join('');
-    }
+    renderTurmaProfileAulasList();
 
     document.getElementById('modalTurmaProfile').classList.add('open');
+  }
+
+  function renderTurmaProfileAulasList() {
+    const listEl = document.getElementById('turmaProfileClassLogsList');
+    const logs = turmaProfileClassLogsCache;
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    if (!logs || logs.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
+      return;
+    }
+    const visibleLogs = turmaProfileAulasExpanded ? logs : logs.slice(0, AULAS_LIST_PAGE_SIZE);
+    const rowsHtml = visibleLogs.map(l => {
+      const date = new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR');
+      const time = formatTimeRange(l);
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      const reportsForThis = turmaProfileReportsCache.filter(r => r.class_log_id === l.id);
+      const hasPrivateNote = !!(l.content && l.content.trim());
+      const badge = reportsForThis.length > 0
+        ? `<span class="report-status ${reportsForThis.length >= members.length && members.length > 0 ? 'published' : 'draft'}">📄 ${reportsForThis.length}/${members.length} alunos</span>`
+        : (hasPrivateNote
+            ? `<span class="report-status draft">📝 Anotado</span>`
+            : `<span class="report-status draft">➕ Lançar relatório</span>`);
+      const attendanceRows = turmaProfileAttendanceCache.filter(a => a.class_log_id === l.id);
+      const presentCount = attendanceRows.filter(a => a.present).length;
+      const attendanceBadge = attendanceRows.length > 0
+        ? `<span class="report-status published">👥 ${presentCount}/${members.length} presentes</span>`
+        : '';
+      return `
+        <div class="aula-log-row" onclick="openTurmaClassReport('${l.id}')">
+          <div class="aula-log-top">
+            <span class="aula-log-date">${date}${time ? ' ' + time : ''} · ${statusLabel}</span>
+            <span style="display:flex;gap:6px;flex-wrap:wrap;">
+              ${attendanceBadge}
+              ${badge}
+            </span>
+          </div>
+          ${l.content ? `<div class="aula-log-content">${l.content}</div>` : ''}
+        </div>`;
+    }).join('');
+    const moreBtn = (!turmaProfileAulasExpanded && logs.length > AULAS_LIST_PAGE_SIZE)
+      ? `<button class="btn-sm" onclick="turmaProfileAulasExpanded=true;renderTurmaProfileAulasList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
+      : '';
+    listEl.innerHTML = rowsHtml + moreBtn;
   }
 
   function closeTurmaProfile() {
@@ -3999,6 +4029,8 @@
     document.getElementById('rescheduleFixedWeekday').value = String(new Date().getDay());
     document.getElementById('rescheduleFixedStartTime').value = '';
     document.getElementById('rescheduleFixedEndTime').value = '';
+    document.getElementById('rescheduleFixedMode').value = 'both';
+    onRescheduleFixedModeChange();
 
     document.getElementById('modalRescheduleFixed').classList.add('open');
   }
@@ -4007,7 +4039,14 @@
     document.getElementById('modalRescheduleFixed').classList.remove('open');
   }
 
+  function onRescheduleFixedModeChange() {
+    const mode = document.getElementById('rescheduleFixedMode').value;
+    document.getElementById('rescheduleFixedWeekdayRow').style.display = (mode === 'time') ? 'none' : 'block';
+    document.getElementById('rescheduleFixedTimeRow').style.display = (mode === 'day') ? 'none' : 'flex';
+  }
+
   async function saveRescheduleFixed() {
+    const mode = document.getElementById('rescheduleFixedMode').value;
     const fromDate = document.getElementById('rescheduleFixedFromDate').value;
     const weekday = parseInt(document.getElementById('rescheduleFixedWeekday').value, 10);
     const startTime = document.getElementById('rescheduleFixedStartTime').value || null;
@@ -4020,7 +4059,12 @@
       errEl.style.display = 'block';
       return;
     }
-    if (!startTime) {
+    if (mode !== 'time' && Number.isNaN(weekday)) {
+      errEl.textContent = 'Informe o novo dia da semana.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (mode !== 'day' && !startTime) {
       errEl.textContent = 'Informe o novo horário de início.';
       errEl.style.display = 'block';
       return;
@@ -4047,31 +4091,33 @@
 
     // Gera as novas datas a partir do próximo dia da semana escolhido, uma por semana,
     // mantendo a mesma quantidade de aulas que já estava pendente
-    const d = new Date(fromDate + 'T00:00:00');
-    while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
-    const newDates = [];
-    for (let i = 0; i < logs.length; i++) {
-      newDates.push(d.toISOString().slice(0, 10));
-      d.setDate(d.getDate() + 7);
+    let newDates = null;
+    if (mode !== 'time') {
+      const d = new Date(fromDate + 'T00:00:00');
+      while (d.getDay() !== weekday) d.setDate(d.getDate() + 1);
+      newDates = [];
+      for (let i = 0; i < logs.length; i++) {
+        newDates.push(d.toISOString().slice(0, 10));
+        d.setDate(d.getDate() + 7);
+      }
     }
 
     let failCount = 0;
     for (let i = 0; i < logs.length; i++) {
       const oldLog = { class_date: logs[i].class_date, start_time: logs[i].start_time, end_time: logs[i].end_time };
-      const { data: updData, error: updErr } = await sb.from('class_logs').update({
-        class_date: newDates[i],
-        start_time: startTime,
-        end_time: endTime
-      }).eq('id', logs[i].id).select();
+      const updates = {};
+      if (mode !== 'time') updates.class_date = newDates[i];
+      if (mode !== 'day') { updates.start_time = startTime; updates.end_time = endTime; }
+      const { data: updData, error: updErr } = await sb.from('class_logs').update(updates).eq('id', logs[i].id).select();
       if (updErr || !updData || updData.length === 0) {
         failCount++;
       } else {
-        await logRescheduleIfChanged(logs[i].id, oldLog, { class_date: newDates[i], start_time: startTime, end_time: endTime });
+        await logRescheduleIfChanged(logs[i].id, oldLog, { ...oldLog, ...updates });
       }
     }
 
     btn.disabled = false;
-    btn.textContent = 'Aplicar novo dia/horário';
+    btn.textContent = 'Aplicar';
 
     if (failCount > 0) {
       errEl.textContent = failCount + ' de ' + logs.length + ' aula(s) não foram atualizadas. Tente novamente.';
@@ -4410,10 +4456,13 @@
       const time = formatTimeRange(l) || 'sem horário';
       const badgeClass = 'status-' + l.status;
       const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      const nameOnClick = turma
+        ? `event.stopPropagation();closeTurmaProfile();openTurmaProfile('${turma.id}')`
+        : (student ? `event.stopPropagation();openStudentProfile('${student.id}')` : '');
       return `
         <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
           <div class="report-row-info">
-            <div class="report-row-student">${who}</div>
+            <div class="report-row-student"${nameOnClick ? ` style="text-decoration:underline;" onclick="${nameOnClick}"` : ''}>${who}</div>
             <div class="report-row-title">${time}</div>
             ${names ? `<div class="report-row-title" style="font-size:12px;">${names}</div>` : ''}
           </div>
@@ -5736,14 +5785,23 @@
   <div class="modal-box">
     <div class="modal-title">Alterar dia/horário fixo</div>
     <div class="modal-sub" id="rescheduleFixedWho"></div>
-    <div class="modal-hint" style="margin-bottom:14px;">Remarca todas as aulas <strong>pendentes</strong> a partir da data escolhida pro novo dia da semana e horário, mantendo a mesma quantidade de aulas. Aulas já realizadas ou canceladas não são alteradas.</div>
+    <div class="modal-hint" style="margin-bottom:14px;">Remarca todas as aulas <strong>pendentes</strong> a partir da data escolhida, mantendo a mesma quantidade de aulas. Aulas já realizadas ou canceladas não são alteradas.</div>
+
+    <div class="modal-row">
+      <label class="modal-label">O que você quer alterar?</label>
+      <select class="modal-select" id="rescheduleFixedMode" onchange="onRescheduleFixedModeChange()">
+        <option value="both">Dia da semana e horário</option>
+        <option value="day">Somente o dia da semana</option>
+        <option value="time">Somente o horário</option>
+      </select>
+    </div>
 
     <div class="modal-row">
       <label class="modal-label">A partir de qual data</label>
       <input type="date" class="modal-input" id="rescheduleFixedFromDate" />
     </div>
 
-    <div class="modal-row">
+    <div class="modal-row" id="rescheduleFixedWeekdayRow">
       <label class="modal-label">Novo dia da semana</label>
       <select class="modal-select" id="rescheduleFixedWeekday">
         <option value="1">Segunda-feira</option>
@@ -5756,7 +5814,7 @@
       </select>
     </div>
 
-    <div class="modal-row" style="display:flex;gap:10px;">
+    <div class="modal-row" id="rescheduleFixedTimeRow" style="display:flex;gap:10px;">
       <div style="flex:1;">
         <label class="modal-label">Novo horário início</label>
         <input type="time" class="modal-input" id="rescheduleFixedStartTime" onchange="autofillEndTime(this, 'rescheduleFixedEndTime')" />
@@ -5771,7 +5829,7 @@
 
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeRescheduleFixed()">Cancelar</button>
-      <button class="btn-modal-save" id="btnSaveRescheduleFixed" onclick="saveRescheduleFixed()">Aplicar novo dia/horário</button>
+      <button class="btn-modal-save" id="btnSaveRescheduleFixed" onclick="saveRescheduleFixed()">Aplicar</button>
     </div>
   </div>
 </div>
