@@ -157,10 +157,12 @@
       border: 2px solid var(--sand);
     }
     .lesson-dot.done { background: var(--mint); border-color: var(--mint); }
+    .lesson-dot.partial { background: var(--rose); border-color: var(--rose); }
 
     .lesson-info { flex: 1; }
     .lesson-number { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 2px; }
     .lesson-title { font-size: 15px; font-weight: 600; color: var(--text); }
+    .lesson-partial-label { font-size: 12px; font-weight: 600; color: var(--rose); margin-top: 2px; }
     .lesson-arrow { font-size: 18px; color: var(--sand); }
 
     .teacher-strip {
@@ -398,7 +400,12 @@
     // Progresso
     const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
     const completed = (progress || []).map(p => p.lesson_id);
-    document.getElementById('statAulas').textContent = completed.length;
+    // Cada lição salva uma linha por dia (mon/tue/wed/thu/fri) e só uma linha
+    // extra com o ID "puro" da aula quando todos os dias são concluídos —
+    // "completed" (usado pros checks de aula feita) precisa ter tudo, mas o
+    // total exibido só deve contar as linhas com ID puro (aulas completas de verdade).
+    const completedLessonsCount = completed.filter(id => /^adulto-l\d+-(a\d+|workout)$/.test(id)).length;
+    document.getElementById('statAulas').textContent = completedLessonsCount;
 
     // Renderiza levels
     renderLevels(userLevel, completed);
@@ -458,6 +465,8 @@
 
       levelData.lessons.forEach(lesson => {
         const isDone = completed.includes(lesson.id);
+        const daysDone = completed.filter(id => id.startsWith(lesson.id + '-')).length;
+        const isPartial = !isDone && daysDone > 0;
 
         if (!lesson.ready) {
           const item = document.createElement('div');
@@ -480,10 +489,11 @@
         item.href = lesson.href;
         item.className = 'lesson-item' + (isDone ? ' completed' : '') + (isPastLevel ? ' review-item' : '');
         item.innerHTML = `
-          <div class="lesson-dot ${isDone ? 'done' : ''}">${isDone ? '✅' : lesson.emoji}</div>
+          <div class="lesson-dot ${isDone ? 'done' : (isPartial ? 'partial' : '')}">${isDone ? '✅' : (isPartial ? '🔶' : lesson.emoji)}</div>
           <div class="lesson-info">
             <div class="lesson-number">${lesson.number} · ${levelData.title}</div>
             <div class="lesson-title">${lesson.title}</div>
+            ${isPartial ? `<div class="lesson-partial-label">${daysDone}/5 dias feitos</div>` : ''}
           </div>
           <div class="lesson-arrow">›</div>
         `;

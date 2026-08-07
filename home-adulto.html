@@ -344,7 +344,10 @@
 
     // Aulas
     const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
-    const aulas = (progress || []).length;
+    // Cada lição salva uma linha por dia (mon/tue/wed/thu/fri) e só uma linha
+    // extra com o ID "puro" da aula quando todos os dias são concluídos —
+    // contar todas as linhas infla o total; só as com ID puro contam como aula completa.
+    const aulas = (progress || []).filter(p => /^adulto-l\d+-(a\d+|workout)$/.test(p.lesson_id)).length;
     document.getElementById('heroAulas').textContent = aulas;
     document.getElementById('progressText').textContent = aulas + ' aulas';
     document.getElementById('progressFill').style.width = Math.min(aulas * 10, 100) + '%';

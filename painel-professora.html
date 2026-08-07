@@ -2049,7 +2049,10 @@
     if (student.role === 'kids') {
       return activities.filter(a => /^kids-m\d+-a\d+$/.test(a.lesson_id)).length;
     }
-    return activities.length;
+    // Cada lição salva uma linha por dia (mon/tue/wed/thu/fri) e só uma linha
+    // extra com o ID "puro" da aula quando todos os dias são concluídos —
+    // contar activities.length direto inclui essas linhas de dia e infla o total.
+    return activities.filter(a => /^adulto-l\d+-(a\d+|workout)$/.test(a.lesson_id)).length;
   }
 
   function renderStudents(students) {
