@@ -47,6 +47,16 @@
     .streak-value { font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--white); display: block; }
     .streak-label { font-size: 14px; color: rgba(255,255,255,0.7); font-weight: 500; margin-top: 4px; }
     .streak-emoji { font-size: 32px; margin-bottom: 8px; display: block; }
+
+    .points-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-top: 24px; }
+    .points-hint { font-size: 12px; color: var(--muted); margin-bottom: 16px; margin-top: -8px; }
+    .points-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+    .points-row:last-child { border-bottom: none; }
+    .points-icon { font-size: 22px; flex-shrink: 0; width: 32px; text-align: center; }
+    .points-info { flex: 1; }
+    .points-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .points-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .points-value { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--brown); flex-shrink: 0; text-align: right; white-space: nowrap; }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -159,6 +169,35 @@
     <span class="streak-emoji">🔥</span>
     <span class="streak-value" id="streakValue">0</span>
     <div class="streak-label">dias consecutivos de estudo</div>
+  </div>
+
+  <div class="points-card">
+    <div class="card-title">Como funciona a pontuação</div>
+    <div class="points-hint">Vale pro ranking do mês, lá na Comunidade 🏆</div>
+    <div class="points-row">
+      <span class="points-icon">📝</span>
+      <div class="points-info">
+        <div class="points-name">Exercícios completos</div>
+        <div class="points-desc">o que mais vale — pratique bastante!</div>
+      </div>
+      <span class="points-value">10 pts cada</span>
+    </div>
+    <div class="points-row">
+      <span class="points-icon">🔥</span>
+      <div class="points-info">
+        <div class="points-name">Dias de sequência</div>
+        <div class="points-desc">acesse e estude todo dia</div>
+      </div>
+      <span class="points-value">5 pts cada</span>
+    </div>
+    <div class="points-row">
+      <span class="points-icon">🎓</span>
+      <div class="points-info">
+        <div class="points-name">Presença em aula</div>
+        <div class="points-desc">conforme sua taxa de presença no mês</div>
+      </div>
+      <span class="points-value">até 15 pts</span>
+    </div>
   </div>
 
 </main>

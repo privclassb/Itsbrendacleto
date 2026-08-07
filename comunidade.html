@@ -305,12 +305,15 @@
       }
     });
 
+    // Exercícios valem mais (é o que mais importa pro aprendizado), sequência
+    // vale menos que exercícios, e presença vale o menos — pra ser justo, já
+    // que só estar presente exige menos esforço do que estudar por conta própria.
     // Presença conta como taxa (%), não como quantidade bruta de aulas — assim quem tem
     // 1 aula por semana não fica em desvantagem contra quem tem 3+ aulas por semana.
     const ranked = students.map(s => {
       const sc = scoreMap[s.id];
       const attendanceRate = sc.classesScheduled > 0 ? sc.classesAttended / sc.classesScheduled : null;
-      const attendancePoints = attendanceRate !== null ? Math.round(attendanceRate * 30) : 0;
+      const attendancePoints = attendanceRate !== null ? Math.round(attendanceRate * 15) : 0;
       const points = sc.activities * 10 + sc.activeDays * 5 + attendancePoints;
       return Object.assign({}, s, sc, { attendanceRate, points });
     }).sort((a, b) => b.points - a.points);
