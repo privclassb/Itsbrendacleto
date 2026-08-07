@@ -1,33 +1,15 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="adulto">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>itsbrendacleto — Inglês para a Vida Real</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="design-system.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --cream: #FAF7F2;
-      --sand: #EDE8DF;
-      --brown: #5C4033;
-      --brown-light: #8B6355;
-      --mint: #A8C5B5;
-      --rose: #E8A598;
-      --text: #2C1F1A;
-      --text-muted: #7A6560;
-      --white: #FFFFFF;
-      --radius: 16px;
-      --shadow: 0 4px 24px rgba(92,64,51,0.10);
-    }
-
     body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--cream);
-      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -55,213 +37,19 @@
     }
 
     .card {
-      background: var(--white);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 48px 40px;
       width: 100%;
       max-width: 420px;
       position: relative;
       z-index: 1;
     }
 
-    .brand {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-
-    .brand-name {
-      font-family: 'DM Serif Display', serif;
-      font-size: 28px;
-      color: var(--brown);
-      letter-spacing: -0.5px;
-      display: block;
-    }
-
-    .brand-tagline {
-      font-size: 13px;
-      color: var(--text-muted);
-      font-weight: 400;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      margin-top: 4px;
-    }
-
-    .divider-dot {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 0 auto 32px;
-      justify-content: center;
-    }
-    .divider-dot span {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--mint);
-      display: inline-block;
-    }
-    .divider-dot span:nth-child(2) { background: var(--rose); }
-    .divider-dot span:nth-child(3) { background: var(--brown-light); opacity: 0.4; }
-
     h2 {
-      font-family: 'DM Serif Display', serif;
+      font-family: var(--font-display);
       font-size: 22px;
-      color: var(--text);
+      color: var(--color-text);
       margin-bottom: 6px;
       font-weight: 400;
     }
-
-    .subtitle {
-      font-size: 14px;
-      color: var(--text-muted);
-      margin-bottom: 28px;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="text"] {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid var(--sand);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      color: var(--text);
-      background: var(--cream);
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: var(--mint);
-      box-shadow: 0 0 0 3px rgba(168,197,181,0.2);
-      background: var(--white);
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 14px;
-      background: var(--brown);
-      color: var(--white);
-      border: none;
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.1s;
-      margin-top: 8px;
-    }
-
-    .btn-primary:hover { background: var(--brown-light); }
-    .btn-primary:active { transform: scale(0.98); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-    .or-divider {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 20px 0;
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-    .or-divider::before,
-    .or-divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--sand);
-    }
-
-    .btn-google {
-      width: 100%;
-      padding: 13px;
-      background: var(--white);
-      color: var(--text);
-      border: 1.5px solid var(--sand);
-      border-radius: 10px;
-      font-family: 'DM Sans', sans-serif;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: background 0.2s, border-color 0.2s;
-    }
-
-    .btn-google:hover {
-      background: var(--cream);
-      border-color: var(--brown-light);
-    }
-
-    .google-icon {
-      width: 18px; height: 18px;
-    }
-
-    .toggle-link {
-      text-align: center;
-      margin-top: 24px;
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .toggle-link a {
-      color: var(--brown);
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-    }
-
-    .toggle-link a:hover { text-decoration: underline; }
-
-    .message {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 13px;
-      margin-bottom: 16px;
-      display: none;
-    }
-
-    .message.error {
-      background: #FFF0EE;
-      color: #C0392B;
-      border: 1px solid #F5C6C2;
-      display: block;
-    }
-
-    .message.success {
-      background: #EFF7F3;
-      color: #1E7E4A;
-      border: 1px solid #B8DEC9;
-      display: block;
-    }
-
-    .loading {
-      display: inline-block;
-      width: 16px; height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      vertical-align: middle;
-      margin-right: 6px;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
 
     /* Forgot password */
     .forgot {
@@ -271,32 +59,11 @@
     }
     .forgot a {
       font-size: 12px;
-      color: var(--text-muted);
+      color: var(--color-text-muted);
       text-decoration: none;
       cursor: pointer;
     }
-    .forgot a:hover { color: var(--brown); }
-
-    /* Profile picker */
-    .profile-option {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 16px 18px;
-      background: var(--cream);
-      border: 1.5px solid var(--sand);
-      border-radius: 12px;
-      cursor: pointer;
-      text-align: left;
-      font-family: 'DM Sans', sans-serif;
-      transition: background 0.2s, border-color 0.2s;
-      margin-bottom: 12px;
-    }
-    .profile-option:hover { background: var(--white); border-color: var(--mint); }
-    .profile-option-icon { font-size: 24px; flex-shrink: 0; }
-    .profile-option-title { font-size: 15px; font-weight: 600; color: var(--text); }
-    .profile-option-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .forgot a:hover { color: var(--color-primary); }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
