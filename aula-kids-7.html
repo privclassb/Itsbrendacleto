@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula 7 · Let's Play Sports! · itsbrendacleto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+    --brown1:#7A4A2B;
+    --brown2:#5A331B;
+    --grass1:#8BC34A;
+    --grass2:#5B9E2E;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito Sans', sans-serif;
+    color:var(--dark);
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 40px);
+    background-color:#fff;
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Nunito', sans-serif; margin:0; }
+
+  .btn-voltar{display:none;align-items:center;gap:6px;background:rgba(0,0,0,0.3);border:none;border-radius:0;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-decoration:none;width:100%;position:relative;z-index:9999;pointer-events:all !important;}
+  .btn-voltar:active{background:rgba(0,0,0,0.5);}
+  .planner-mode .pills{display:none;}
+  .planner-mode .btn-voltar{display:block;}
+
+  header{
+    background:linear-gradient(135deg, var(--brown1), var(--brown2));
+    color:#fff;
+    padding:22px 16px 18px;
+    border-radius:0 0 24px 24px;
+    text-align:center;
+  }
+  header .tag{
+    font-size:12px; font-weight:800; background:rgba(255,255,255,.18);
+    display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  header h1{ font-size:24px; font-weight:900; }
+  header .sub{ font-size:14px; opacity:.9; margin-top:4px; }
+
+  nav.pills{
+    display:flex; gap:8px; overflow-x:auto; padding:14px 12px 4px;
+    -webkit-overflow-scrolling:touch;
+  }
+  nav.pills::-webkit-scrollbar{ display:none; }
+  nav.pills button{
+    flex:0 0 auto; border:none; background:#f1f1f1; color:var(--dark);
+    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px;
+    padding:9px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;
+  }
+  nav.pills button.active{ background:var(--blue); color:#fff; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 16px 60px; }
+  section{ display:none; animation:fade .25s ease; }
+  section.show{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-title{ font-size:20px; font-weight:900; margin:14px 0 4px; }
+  .section-hint{ font-size:14px; color:#666; margin-bottom:14px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .card{
+    background:var(--card-color, var(--pink)); border-radius:16px; padding:14px;
+    text-align:center; cursor:pointer; border:none; font-family:'Nunito Sans',sans-serif;
+    transition:transform .1s;
+  }
+  .card:active{ transform:scale(.96); }
+  .card .emoji{ font-size:34px; display:block; margin-bottom:6px; }
+  .card .en{ font-weight:800; font-size:15px; }
+  .card .pt{ font-size:12px; opacity:.75; }
+
+  .btn{ border:none; border-radius:14px; padding:12px 18px; font-weight:800; font-size:14px; cursor:pointer; background:var(--blue); color:#fff; }
+  .btn.secondary{ background:#eee; color:var(--dark); }
+
+  .how-box{
+    background:#eef7fb; border-left:4px solid var(--blue); border-radius:10px;
+    padding:12px 14px; font-size:14px; line-height:1.6; margin-bottom:14px; color:var(--dark);
+  }
+  .how-example{ display:block; margin-top:8px; font-style:italic; color:#555; font-size:13px; }
+  .draft-feedback{ text-align:center; font-weight:800; font-size:14px; min-height:20px; color:#d9534f; margin-bottom:6px; }
+  .draft-bucket small{ font-weight:600; font-size:11px; opacity:.75; }
+  .story-recap{
+    background:#fff; border-radius:12px; padding:16px; font-size:15px; line-height:1.7; margin-bottom:16px;
+  }
+  .story-textarea{
+    width:100%; min-height:110px; border:2px solid #ddd; border-radius:12px; padding:12px;
+    font-family:'Nunito Sans',sans-serif; font-size:15px; resize:vertical; margin-bottom:12px;
+  }
+  .check-issue{ background:var(--coral); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; }
+  .check-ok{ background:var(--mint); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; }
+
+  /* Penalty Shootout */
+  .field{
+    background:linear-gradient(180deg, var(--grass1), var(--grass2));
+    border-radius:18px; padding:20px; text-align:center; position:relative; overflow:hidden; margin-bottom:14px;
+  }
+  .goal{
+    width:160px; height:80px; margin:0 auto 14px; border:6px solid #fff; border-radius:6px;
+    background:repeating-linear-gradient(0deg, rgba(255,255,255,.15) 0 8px, transparent 8px 16px);
+    position:relative;
+  }
+  .ball{ font-size:36px; position:absolute; left:50%; bottom:-40px; transform:translateX(-50%); transition:all .5s ease; }
+  .ball.shoot{ bottom:30px; }
+  .shoot-sentence{
+    background:#fff; border-radius:14px; padding:16px; font-size:18px; font-weight:800;
+    margin-bottom:14px; min-height:60px; display:flex; align-items:center; justify-content:center;
+  }
+  .shoot-buttons{ display:flex; gap:12px; justify-content:center; }
+  .shoot-buttons button{ border:none; border-radius:14px; padding:14px 20px; font-weight:900; font-size:15px; cursor:pointer; }
+  .btn-shoot{ background:var(--yellow); }
+  .btn-save{ background:var(--coral); }
+  .scoreboard{ color:#fff; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .shoot-result{ font-weight:900; font-size:18px; color:#fff; min-height:26px; }
+
+  /* Team Draft */
+  .draft-card{
+    background:var(--yellow); border-radius:14px; padding:16px; text-align:center;
+    font-weight:800; font-size:17px; margin-bottom:14px; cursor:pointer;
+  }
+  .draft-card.selected{ outline:3px solid var(--blue); }
+  .draft-buckets{ display:flex; gap:10px; margin-bottom:16px; }
+  .draft-bucket{
+    flex:1; border:none; border-radius:14px; padding:12px; font-weight:800; font-size:14px; cursor:pointer;
+  }
+  .bucket-plays{ background:var(--mint); }
+  .bucket-notplays{ background:var(--coral); }
+  .rosters{ display:flex; gap:10px; }
+  .roster{ flex:1; background:#f6f6f6; border-radius:14px; padding:12px; min-height:120px; }
+  .roster h4{ font-size:13px; margin-bottom:8px; }
+  .roster .name{ background:#fff; border-radius:8px; padding:6px 8px; margin-bottom:6px; font-size:13px; font-weight:700; }
+  .draft-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
+
+  /* Sports Story */
+  .story-panel{
+    background:var(--lavender); border-radius:18px; padding:24px; text-align:center; margin-bottom:14px;
+  }
+  .story-emoji{ font-size:56px; margin-bottom:10px; }
+  .story-opt{
+    display:block; width:100%; text-align:left; background:#fff; border:none;
+    border-radius:12px; padding:14px; margin-bottom:10px; font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .story-opt.correct{ background:var(--mint); }
+  .story-opt.incorrect{ background:var(--coral); }
+  .story-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
+
+  /* Quiz */
+  .quiz-progress{ height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:16px; }
+  .quiz-progress-bar{ height:100%; background:var(--blue); width:0%; transition:.3s; }
+  .quiz-q{ font-size:18px; font-weight:800; margin-bottom:14px; }
+  .quiz-opt{
+    display:block; width:100%; text-align:left; background:#f6f6f6; border:none;
+    border-radius:12px; padding:14px; margin-bottom:10px; font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .quiz-opt.correct{ background:var(--mint); }
+  .quiz-opt.incorrect{ background:var(--coral); }
+  .quiz-final{ text-align:center; padding:30px 0; }
+  .quiz-final .score{ font-size:42px; font-weight:900; color:var(--blue); }
+
+  /* Missao */
+  .mission-item{
+    display:flex; align-items:center; gap:12px; background:#f6f6f6; border-radius:14px;
+    padding:14px; margin-bottom:10px; cursor:pointer;
+  }
+  .mission-item.done{ background:#dff5e6; }
+  .mission-check{
+    width:26px; height:26px; border-radius:50%; border:2px solid #bbb;
+    display:flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto;
+  }
+  .mission-item.done .mission-check{ background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
+  .mission-label{ font-weight:700; font-size:15px; }
+
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .badge-card{ background:#fff; border-radius:24px; padding:30px 24px; text-align:center; max-width:340px; position:relative; overflow:hidden; }
+  .badge-trophy{ font-size:70px; animation:bounce 1s infinite; }
+  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  .badge-card h2{ font-size:22px; margin:10px 0 4px; }
+  .badge-card p{ font-size:14px; color:#666; margin-bottom:16px; }
+  .confetti{ position:absolute; top:-10px; font-size:18px; animation:fall 2.2s linear forwards; }
+  @keyframes fall{ to{ transform:translateY(420px) rotate(360deg); opacity:0; } }
+  .share-btn{ background:var(--pink); color:#fff; border:none; border-radius:14px; padding:12px 20px; font-weight:800; cursor:pointer; }
+  .close-btn{ background:none; border:none; color:#999; margin-top:10px; font-weight:700; cursor:pointer; }
+</style>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#5C4033" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        setInterval(function () { reg.update(); }, 60000);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') reg.update();
+        });
+      }).catch(function () {});
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      var active = document.activeElement;
+      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+      if (isTyping) {
+        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+      } else {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+</head>
+<body>
+
+<a class="btn-voltar" id="btnVoltar" href="planner-kids-7.html">← Voltar para a lista</a>
+
+<header>
+  <div class="tag">⭐ KIDS EDITION · AULA 7</div>
+  <h1>⚽ Let's Play Sports!</h1>
+  <div class="sub">Homework practice · itsbrendacleto</div>
+</header>
+
+<nav class="pills" id="pills"></nav>
+
+<main>
+
+  <section id="vocab">
+    <div class="section-title">🃏 Vocabulary</div>
+    <div class="section-hint">Tap a card to hear it!</div>
+    <div class="grid" id="vocabGrid"></div>
+  </section>
+
+  <section id="shoot">
+    <div class="section-title">🥅 Penalty Shootout!</div>
+    <div class="how-box">
+      <b>Como jogar:</b> vai aparecer uma frase em inglês. Leia com atenção!<br>
+      ⚽ Se a frase estiver <b>CERTA</b>, toque em <b>SHOOT!</b> pra chutar o gol.<br>
+      🧤 Se a frase estiver <b>ERRADA</b>, toque em <b>SAVE!</b> pra defender.<br>
+      <span class="how-example">Ex: "He plays Soccer." está certa → SHOOT! ⚽ &nbsp;|&nbsp; "She play Tennis." está errada (faltou o -s) → SAVE! 🧤</span>
+    </div>
+    <div class="field">
+      <div class="scoreboard" id="shootScore">Goals: 0 / 0</div>
+      <div class="goal"><div class="ball" id="ball">⚽</div></div>
+      <div class="shoot-result" id="shootResult"></div>
+    </div>
+    <div class="shoot-sentence" id="shootSentence"></div>
+    <div class="shoot-buttons">
+      <button class="btn-shoot" id="btnShoot">⚽ SHOOT!</button>
+      <button class="btn-save" id="btnSave">🧤 SAVE!</button>
+    </div>
+  </section>
+
+  <section id="draft">
+    <div class="section-title">🏅 Team Draft</div>
+    <div class="how-box">
+      <b>Como jogar:</b> vai aparecer uma frase sobre um jogador.<br>
+      A frase diz que a pessoa <b>joga</b> o esporte ou <b>não joga</b>?<br>
+      Toque no time certo pra "contratar" esse jogador!<br>
+      <span class="how-example">Ex: "Leo plays Soccer." → ele JOGA → time ✅ Plays Team<br>"Mia doesn't play Tennis." → ela NÃO JOGA → time ❌ Doesn't Play Team</span>
+    </div>
+    <div class="draft-progress" id="draftProgress"></div>
+    <div class="draft-card" id="draftCard"></div>
+    <div class="draft-feedback" id="draftFeedback"></div>
+    <div class="draft-buckets">
+      <button class="draft-bucket bucket-plays" id="bucketPlays">✅ Plays Team<br><small>(joga)</small></button>
+      <button class="draft-bucket bucket-notplays" id="bucketNotPlays">❌ Doesn't Play Team<br><small>(não joga)</small></button>
+    </div>
+    <div class="rosters">
+      <div class="roster"><h4>✅ Plays Team</h4><div id="rosterPlays"></div></div>
+      <div class="roster"><h4>❌ Doesn't Play Team</h4><div id="rosterNotPlays"></div></div>
+    </div>
+  </section>
+
+  <section id="story">
+    <div class="section-title">🎬 Sports Story</div>
+    <div class="section-hint">Pick the correct sentence to continue the story!</div>
+    <div class="story-progress" id="storyProgress"></div>
+    <div class="story-panel">
+      <div class="story-emoji" id="storyEmoji"></div>
+      <div id="storyOptions"></div>
+    </div>
+
+    <div id="storyWriteBox" style="display:none;">
+      <div class="section-title" style="font-size:17px;">✍️ Agora é sua vez!</div>
+      <div class="how-box">
+        Escreva uma historinha parecida sobre a sua família! Conte quais esportes cada pessoa joga (ou não joga).<br>
+        <span class="how-example">Ex: "My mom plays Tennis. My dad doesn't play Soccer, he plays Basketball."</span>
+      </div>
+      <textarea id="storyTextarea" class="story-textarea" placeholder="Write 3-4 sentences about your family and sports..."></textarea>
+      <div class="row-btns">
+        <button class="btn" id="storyCheckBtn">✅ Check my story!</button>
+      </div>
+      <div class="how-box" style="background:#fff8e6; margin-top:10px;">
+        💡 Esse é um verificador de dicas simples — ele procura errinhos comuns de terceira pessoa e negativa, mas não é uma correção perfeita como a de um professor. Mostre sua história pra Nathalia depois! 😊
+      </div>
+      <div id="storyCheckResult"></div>
+    </div>
+  </section>
+
+  <section id="quiz">
+    <div class="section-title">❓ Quiz</div>
+    <div class="quiz-progress"><div class="quiz-progress-bar" id="quizBar"></div></div>
+    <div id="quizBody"></div>
+  </section>
+
+  <section id="missao">
+    <div class="section-title">🎯 Missão</div>
+    <div class="section-hint">Mark each activity as you finish it!</div>
+    <div id="missionList"></div>
+  </section>
+
+</main>
+
+<div class="overlay" id="badgeOverlay">
+  <div class="badge-card" id="badgeCard">
+    <div class="badge-trophy">🏆</div>
+    <h2>You did it!</h2>
+    <p>You finished Aula 7 — Let's Play Sports! 🎉</p>
+    <button class="share-btn" id="shareBtn">📤 Share</button><br>
+    <button class="close-btn" id="closeBadge">Close</button>
+  </div>
+</div>
+
+<script>
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
+
+// ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+var __previewAs = sessionStorage.getItem('__preview_as');
+if (__previewAs) {
+  var __origGetSession = sb.auth.getSession.bind(sb.auth);
+  sb.auth.getSession = async function () {
+    var real = await __origGetSession();
+    if (real && real.data && real.data.session) {
+      real.data.session = Object.assign({}, real.data.session, {
+        user: Object.assign({}, real.data.session.user, { id: __previewAs })
+      });
+    }
+    return real;
+  };
+  var __previewNoop = function () {
+    var p = new Proxy(function () {}, {
+      get: function (t, prop) {
+        if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+        return function () { return p; };
+      }
+    });
+    return p;
+  };
+  var __origFrom = sb.from.bind(sb);
+  sb.from = function (table) {
+    var qb = __origFrom(table);
+    ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+      qb[m] = function () { return __previewNoop(); };
+    });
+    return qb;
+  };
+  if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+  var __insertPreviewBanner = function () {
+    if (document.getElementById('previewModeBanner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'previewModeBanner';
+    banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+    var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+    banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+      '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+    document.body.insertBefore(banner, document.body.firstChild);
+  };
+  if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'previewExitBtn') {
+      sessionStorage.removeItem('__preview_as');
+      sessionStorage.removeItem('__preview_name');
+      window.location.href = 'painel-professora.html';
+    }
+  });
+}
+
+async function saveQuizScore(lessonId, score, total) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: lessonId, score: score, score_total: total, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
+}
+
+/* ---------------- UTILS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function speak(text, rate){
+  const u = new SpeechSynthesisUtterance(text.toLowerCase());
+  u.lang = 'en-US';
+  u.rate = rate || 0.85;
+  u.pitch = 1.05;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+
+/* ---------------- DATA ---------------- */
+const sports = [
+  {en:'Soccer', pt:'Futebol', emoji:'⚽'},
+  {en:'Basketball', pt:'Basquete', emoji:'🏀'},
+  {en:'Volleyball', pt:'Vôlei', emoji:'🏐'},
+  {en:'Tennis', pt:'Tênis', emoji:'🎾'},
+  {en:'Hockey', pt:'Hockey', emoji:'🏒'},
+  {en:'Baseball', pt:'Beisebol', emoji:'⚾'}
+];
+const cardColors = ['pink','mint','lavender','yellow','coral','blue'];
+
+const shootRounds = [
+  {text:'He plays Soccer.', correct:true},
+  {text:'She play Tennis.', correct:false},
+  {text:"He doesn't play Hockey.", correct:true},
+  {text:"She don't play Baseball.", correct:false},
+  {text:'They plays Basketball.', correct:false},
+  {text:'I play Volleyball.', correct:true},
+  {text:"He doesn't plays Soccer.", correct:false},
+  {text:'She plays Basketball.', correct:true}
+];
+
+const draftPlayers = [
+  {text:'Leo plays Basketball.', team:'plays'},
+  {text:"Mia doesn't play Tennis.", team:'notplays'},
+  {text:'Sam plays Soccer.', team:'plays'},
+  {text:"Ana doesn't play Hockey.", team:'notplays'},
+  {text:'Theo plays Baseball.', team:'plays'},
+  {text:"Zoe doesn't play Volleyball.", team:'notplays'}
+];
+
+const storyPanels = [
+  {emoji:'⚽😃', options:['Leo plays Soccer on Saturday.','Leo play Soccer on Saturday.'], answer:0},
+  {emoji:'🏀😅', options:["He don't play Basketball.","He doesn't play Basketball."], answer:1},
+  {emoji:'🎾🙋', options:['His sister plays Tennis.','His sister play Tennis.'], answer:0},
+  {emoji:'🏒🎉', options:["They doesn't play Hockey together.","They don't play Hockey together."], answer:1}
+];
+
+const quizQuestions = [
+  {q:'Complete: He ___ Soccer.', options:['play','plays'], answer:1},
+  {q:'Complete: They ___ Basketball.', options:['play','plays'], answer:0},
+  {q:'Which is correct?', options:["She don't play Tennis","She doesn't play Tennis","She not play Tennis"], answer:1},
+  {q:'Which is correct?', options:["He doesn't plays Hockey","He doesn't play Hockey","He don't plays Hockey"], answer:1},
+  {q:'Complete: I ___ Volleyball.', options:['play','plays'], answer:0},
+  {q:'What’s the correct negative of "She plays Baseball"?', options:["She doesn't plays Baseball","She doesn't play Baseball","She don't play Baseball"], answer:1},
+  {q:'Complete: We ___ Soccer every day.', options:['play','plays'], answer:0},
+  {q:'Which is correct?', options:['He plays Basketball','He play Basketball','He playing Basketball'], answer:0}
+];
+
+const missionTasks = [
+  {id:'shoot', label:'🥅 Play Penalty Shootout!'},
+  {id:'draft', label:'🏅 Play Team Draft'},
+  {id:'story', label:'🎬 Finish the Sports Story'},
+  {id:'quiz', label:'❓ Finish the Quiz'}
+];
+
+/* ---------------- NAV ---------------- */
+const sections = ['vocab','shoot','draft','story','quiz','missao'];
+const pillLabels = {vocab:'🃏 Vocab', shoot:'🥅 Shootout', draft:'🏅 Draft', story:'🎬 Story', quiz:'❓ Quiz', missao:'🎯 Missão'};
+const pillsNav = document.getElementById('pills');
+sections.forEach(name=>{
+  const b = document.createElement('button');
+  b.textContent = pillLabels[name];
+  b.addEventListener('click', ()=>show(name));
+  b.dataset.name = name;
+  pillsNav.appendChild(b);
+});
+function show(name){
+  sections.forEach(s=> document.getElementById(s).classList.toggle('show', s===name));
+  Array.from(pillsNav.children).forEach(b=> b.classList.toggle('active', b.dataset.name===name));
+}
+show('vocab');
+
+/* ---------------- VOCAB ---------------- */
+const vocabGrid = document.getElementById('vocabGrid');
+sports.forEach((s,i)=>{
+  const card = document.createElement('button');
+  card.className = 'card';
+  card.style.setProperty('--card-color', `var(--${cardColors[i % cardColors.length]})`);
+  card.innerHTML = `<span class="emoji">${s.emoji}</span><span class="en">${s.en}</span><br><span class="pt">${s.pt}</span>`;
+  card.addEventListener('click', ()=> speak(s.en));
+  vocabGrid.appendChild(card);
+});
+
+/* ---------------- PENALTY SHOOTOUT ---------------- */
+let shootOrder = shuffle(shootRounds), shootIndex = 0, shootGoals = 0, shootLock = false;
+function renderShoot(){
+  shootLock = false;
+  document.getElementById('shootResult').textContent = '';
+  document.getElementById('ball').classList.remove('shoot');
+  document.getElementById('ball').style.opacity = 1;
+  if(shootIndex >= shootOrder.length){
+    document.getElementById('shootSentence').textContent = '🎉 Game over!';
+    document.getElementById('shootScore').textContent = `Final Score — Goals: ${shootGoals} / ${shootOrder.length}`;
+    document.getElementById('btnShoot').style.display = 'none';
+    document.getElementById('btnSave').style.display = 'none';
+    markDone('shoot');
+    return;
+  }
+  document.getElementById('btnShoot').style.display = 'inline-block';
+  document.getElementById('btnSave').style.display = 'inline-block';
+  document.getElementById('shootSentence').textContent = shootOrder[shootIndex].text;
+  document.getElementById('shootScore').textContent = `Goals: ${shootGoals} / ${shootIndex}`;
+}
+function answerShoot(choseShoot){
+  if(shootLock) return;
+  shootLock = true;
+  const round = shootOrder[shootIndex];
+  const isRight = (choseShoot && round.correct) || (!choseShoot && !round.correct);
+  const ball = document.getElementById('ball');
+  const resultEl = document.getElementById('shootResult');
+  if(choseShoot){
+    ball.classList.add('shoot');
+  }
+  if(isRight){
+    shootGoals++;
+    resultEl.textContent = choseShoot ? '⚽ GOOOAL! 🎉' : '🧤 Great save!';
+  } else {
+    resultEl.textContent = choseShoot ? '🧤 Blocked! That was wrong.' : '⚽ Oops, that was correct!';
+  }
+  setTimeout(()=>{
+    shootIndex++;
+    renderShoot();
+  }, 1000);
+}
+document.getElementById('btnShoot').addEventListener('click', ()=> answerShoot(true));
+document.getElementById('btnSave').addEventListener('click', ()=> answerShoot(false));
+renderShoot();
+
+/* ---------------- TEAM DRAFT ---------------- */
+let draftOrder = shuffle(draftPlayers), draftIndex = 0;
+function renderDraft(){
+  document.getElementById('draftProgress').textContent = `Player ${Math.min(draftIndex+1, draftOrder.length)} of ${draftOrder.length}`;
+  const cardEl = document.getElementById('draftCard');
+  if(draftIndex >= draftOrder.length){
+    cardEl.textContent = '🎉 All players drafted!';
+    document.getElementById('bucketPlays').style.display = 'none';
+    document.getElementById('bucketNotPlays').style.display = 'none';
+    markDone('draft');
+    return;
+  }
+  cardEl.textContent = draftOrder[draftIndex].text;
+}
+function draftAnswer(team){
+  const player = draftOrder[draftIndex];
+  const fb = document.getElementById('draftFeedback');
+  if(team === player.team){
+    fb.textContent = '';
+    const rosterEl = document.getElementById(team==='plays' ? 'rosterPlays' : 'rosterNotPlays');
+    const nameEl = document.createElement('div');
+    nameEl.className = 'name';
+    nameEl.textContent = player.text.split(' ')[0];
+    rosterEl.appendChild(nameEl);
+    draftIndex++;
+    renderDraft();
+  } else {
+    const cardEl = document.getElementById('draftCard');
+    cardEl.style.background = '#FFB3A7';
+    fb.textContent = player.team === 'plays'
+      ? '🤔 Essa frase é afirmativa — a pessoa JOGA! Tente o outro time.'
+      : '🤔 Essa frase é negativa — a pessoa NÃO JOGA! Tente o outro time.';
+    setTimeout(()=>{ cardEl.style.background = ''; }, 300);
+  }
+}
+document.getElementById('bucketPlays').addEventListener('click', ()=> draftAnswer('plays'));
+document.getElementById('bucketNotPlays').addEventListener('click', ()=> draftAnswer('notplays'));
+renderDraft();
+
+/* ---------------- SPORTS STORY ---------------- */
+let storyIndex = 0;
+const storyChosen = [];
+function renderStory(){
+  document.getElementById('storyProgress').textContent = `Panel ${Math.min(storyIndex+1, storyPanels.length)} of ${storyPanels.length}`;
+  if(storyIndex >= storyPanels.length){
+    const recapText = storyPanels.map((p,i)=> `${p.emoji} ${p.options[p.answer]}`).join('<br>');
+    document.getElementById('storyEmoji').textContent = '🎬 The End!';
+    document.getElementById('storyOptions').innerHTML = `<div class="story-recap">${recapText}</div>`;
+    document.getElementById('storyWriteBox').style.display = 'block';
+    markDone('story');
+    return;
+  }
+  const p = storyPanels[storyIndex];
+  document.getElementById('storyEmoji').textContent = p.emoji;
+  const opts = document.getElementById('storyOptions');
+  opts.innerHTML = '';
+  p.options.forEach((opt, i)=>{
+    const b = document.createElement('button');
+    b.className = 'story-opt';
+    b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      Array.from(opts.children).forEach(el=>el.disabled=true);
+      if(i === p.answer){
+        b.classList.add('correct');
+        setTimeout(()=>{ storyIndex++; renderStory(); }, 800);
+      } else {
+        b.classList.add('incorrect');
+        opts.children[p.answer].classList.add('correct');
+        setTimeout(()=>{ storyIndex++; renderStory(); }, 1200);
+      }
+    });
+    opts.appendChild(b);
+  });
+}
+renderStory();
+
+/* ---------------- STORY WRITING CHECKER ---------------- */
+document.getElementById('storyCheckBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('storyTextarea').value.trim();
+  const resultBox = document.getElementById('storyCheckResult');
+  resultBox.innerHTML = '';
+  if(text.length < 5){
+    resultBox.innerHTML = '<div class="check-issue">✏️ Escreva pelo menos uma frase primeiro!</div>';
+    return;
+  }
+  const lower = text.toLowerCase().replace(/[‘’ʼ]/g, "'");
+  const issues = [];
+  if(/\b(he|she|it)\s+play\b/.test(lower)){
+    issues.push('👉 Com <b>he/she/it</b>, use <b>plays</b> (com -s)! Ex: "He plays Soccer."');
+  }
+  if(/\b(he|she|it)\s+don'?t\b/.test(lower)){
+    issues.push('👉 Com <b>he/she/it</b>, use <b>doesn\'t</b> em vez de "don\'t"! Ex: "She doesn\'t play Tennis."');
+  }
+  if(/\b(i|you|we|they)\s+plays\b/.test(lower)){
+    issues.push('👉 Com <b>I/you/we/they</b>, use <b>play</b> sem o -s! Ex: "They play Basketball."');
+  }
+  if(/\b(i|you|we|they)\s+doesn'?t\b/.test(lower)){
+    issues.push('👉 Com <b>I/you/we/they</b>, use <b>don\'t</b> em vez de "doesn\'t"!');
+  }
+  const hasSport = sports.some(s => lower.includes(s.en.toLowerCase()));
+  if(!hasSport){
+    issues.push('👉 Não encontrei nenhum esporte na sua história — inclua pelo menos um! ⚽🏀🎾');
+  }
+  if(issues.length === 0){
+    resultBox.innerHTML = '<div class="check-ok">🎉 Muito bem! Não encontrei nenhum errinho comum. Mostre pra sua professora!</div>';
+    markDone('story');
+  } else {
+    resultBox.innerHTML = issues.map(i=>`<div class="check-issue">${i}</div>`).join('');
+  }
+});
+
+/* ---------------- QUIZ ---------------- */
+let quizIndex = 0, quizScore = 0;
+function renderQuiz(){
+  const body = document.getElementById('quizBody');
+  document.getElementById('quizBar').style.width = `${(quizIndex/quizQuestions.length)*100}%`;
+  if(quizIndex >= quizQuestions.length){
+    body.innerHTML = `<div class="quiz-final"><div class="score">${quizScore}/${quizQuestions.length}</div><p>Great work! 🎉</p><button class="btn" id="quizRestart">🔄 Try Again</button></div>`;
+    document.getElementById('quizBar').style.width = '100%';
+    document.getElementById('quizRestart').addEventListener('click', ()=>{
+      quizIndex = 0; quizScore = 0; renderQuiz();
+    });
+    saveQuizScore('kids-l1-a7-quiz', quizScore, quizQuestions.length);
+    markDone('quiz');
+    return;
+  }
+  const q = quizQuestions[quizIndex];
+  body.innerHTML = `<div class="quiz-q">${q.q}</div>`;
+  q.options.forEach((opt,i)=>{
+    const b = document.createElement('button');
+    b.className = 'quiz-opt';
+    b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      Array.from(body.querySelectorAll('.quiz-opt')).forEach(el=>el.disabled=true);
+      if(i === q.answer){
+        b.classList.add('correct');
+        quizScore++;
+      } else {
+        b.classList.add('incorrect');
+        body.querySelectorAll('.quiz-opt')[q.answer].classList.add('correct');
+      }
+      setTimeout(()=>{ quizIndex++; renderQuiz(); }, 800);
+    });
+    body.appendChild(b);
+  });
+}
+renderQuiz();
+
+/* ---------------- MISSAO ---------------- */
+const missionState = {};
+function renderMission(){
+  const list = document.getElementById('missionList');
+  list.innerHTML = '';
+  missionTasks.forEach(t=>{
+    const done = !!missionState[t.id];
+    const div = document.createElement('div');
+    div.className = 'mission-item' + (done ? ' done' : '');
+    div.innerHTML = `<div class="mission-check">${done ? '✓' : ''}</div><div class="mission-label">${t.label}</div>`;
+    div.addEventListener('click', ()=>{
+      missionState[t.id] = !missionState[t.id];
+      renderMission();
+      checkAllDone();
+    });
+    list.appendChild(div);
+  });
+}
+function markDone(id){
+  missionState[id] = true;
+  renderMission();
+  checkAllDone();
+}
+function checkAllDone(){
+  if(missionTasks.every(t=>missionState[t.id])){
+    document.getElementById('badgeOverlay').classList.add('show');
+    launchConfetti();
+  }
+}
+renderMission();
+
+/* ---------------- BADGE / CONFETTI ---------------- */
+function launchConfetti(){
+  const card = document.getElementById('badgeCard');
+  const emojis = ['🎉','⚽','🏆','🎈','✨'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100 + '%';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    card.appendChild(c);
+    setTimeout(()=>c.remove(), 2500);
+  }
+}
+document.getElementById('closeBadge').addEventListener('click', ()=>{
+  document.getElementById('badgeOverlay').classList.remove('show');
+});
+document.getElementById('shareBtn').addEventListener('click', async ()=>{
+  const text = "I finished Aula 7 — Let's Play Sports! 🎉⚽ #itsbrendacleto";
+  if(navigator.share){
+    try{ await navigator.share({text}); }catch(e){}
+  } else {
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Copied! Paste it on your Instagram story 📲');
+    }catch(e){
+      alert(text);
+    }
+  }
+});
+
+// ── PLANNER MODE ───────────────────────────────────────────────────────────
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fase = params.get('fase');
+  var validFases = ['vocab','shoot','draft','story','quiz'];
+  if (fase && validFases.indexOf(fase) !== -1) {
+    document.body.classList.add('planner-mode');
+    show(fase);
+  }
+})();
+</script>
+</body>
+</html>
