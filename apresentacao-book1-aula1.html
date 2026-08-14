@@ -41,8 +41,9 @@
   }
   .slide.text li .term { text-align: left; }
   .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
-  .slide.text ul.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
-  .slide.text ul.cols-2 li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
+  .cols-2-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
+  .cols-2-wrap ul { max-width: none; }
+  .cols-2-wrap li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
 
   .listen-btn {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--sand); color: var(--brown);
@@ -152,22 +153,23 @@ const SLIDES = [
     eyebrow: 'Vocabulário',
     title: 'Greetings',
     columns: 2,
+    rows: 4,
     items: [
       { en: 'Good morning', pt: 'Bom dia' },
-      { en: 'Hi / Hi there', pt: 'Oi' },
       { en: 'Good afternoon', pt: 'Boa tarde' },
-      { en: 'Hello', pt: 'Olá' },
       { en: 'Good evening', pt: 'Boa noite (chegada)' },
-      { en: "What's up?", pt: 'E aí' },
       { en: 'Good night', pt: 'Boa noite (saída)' },
+      { en: 'Hi / Hi there', pt: 'Oi' },
+      { en: 'Hello', pt: 'Olá' },
+      { en: "What's up?", pt: 'E aí' },
       { en: 'Nice to meet you!', pt: 'Prazer em conhecê-lo' },
       { en: 'Nice to meet you too', pt: 'Prazer também' }
     ]
   },
   {
     type: 'text',
-    eyebrow: "What is your name? · Qual é o seu nome?",
-    title: 'Answering',
+    eyebrow: 'Qual é o seu nome?',
+    title: 'What is your name?',
     items: [
       { en: 'My name is Brenda', pt: null },
       { en: "My name's Brenda", pt: null },
@@ -197,8 +199,8 @@ const SLIDES = [
   },
   {
     type: 'text',
-    eyebrow: 'How do you spell your name? · Como se soletra/escreve seu nome?',
-    title: 'Spelling',
+    eyebrow: 'Como se soletra/escreve seu nome?',
+    title: 'How do you spell your name?',
     items: [
       { en: 'First name', pt: 'Primeiro nome' },
       { en: 'Middle name', pt: 'Nome do meio' },
@@ -244,13 +246,24 @@ function renderSlide(s) {
       <h1>${s.title}</h1>
       ${s.sub ? `<div class="sub">${s.sub}</div>` : ''}`;
   } else if (s.type === 'text') {
-    const body = s.items
-      ? `<ul class="${s.columns === 2 ? 'cols-2' : ''}">${s.items.map(i => `
-          <li>
-            <span class="term">${i.en}${i.pt ? ' — ' + i.pt : ''}</span>
-            <button class="listen-btn" type="button" data-speak="${escapeAttr(i.en)}" aria-label="Ouvir pronúncia">${SPEAKER_ICON}</button>
-          </li>`).join('')}</ul>`
-      : `<p>${s.paragraph || ''}</p>`;
+    const itemHtml = (i) => `
+      <li>
+        <span class="term">${i.en}${i.pt ? ' — ' + i.pt : ''}</span>
+        <button class="listen-btn" type="button" data-speak="${escapeAttr(i.en)}" aria-label="Ouvir pronúncia">${SPEAKER_ICON}</button>
+      </li>`;
+    let body;
+    if (s.items && s.columns === 2) {
+      const split = s.rows || Math.ceil(s.items.length / 2);
+      const col1 = s.items.slice(0, split), col2 = s.items.slice(split);
+      body = `<div class="cols-2-wrap">
+        <ul>${col1.map(itemHtml).join('')}</ul>
+        <ul>${col2.map(itemHtml).join('')}</ul>
+      </div>`;
+    } else if (s.items) {
+      body = `<ul>${s.items.map(itemHtml).join('')}</ul>`;
+    } else {
+      body = `<p>${s.paragraph || ''}</p>`;
+    }
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}

@@ -41,8 +41,9 @@
   }
   .slide.text li .term { text-align: left; }
   .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
-  .slide.text ul.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
-  .slide.text ul.cols-2 li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
+  .cols-2-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
+  .cols-2-wrap ul { max-width: none; }
+  .cols-2-wrap li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
 
   .listen-btn {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--sand); color: var(--brown);
@@ -150,6 +151,10 @@
   — cada item tem um botãozinho de ouvir (clique pra tocar a pronúncia em inglês).
   — ou, pra parágrafo corrido em vez de lista, use "paragraph" no lugar de "items" (sem áudio).
   — pra listas longas (mais de 6 itens), adicione "columns: 2" pra caber em duas colunas.
+    A ordem da lista é a ordem de leitura na tela: de cima a baixo na 1ª coluna,
+    depois de cima a baixo na 2ª. Por padrão a lista é dividida ao meio; se o
+    agrupamento não for par (ex.: 4 itens numa coluna e 5 na outra), defina
+    "rows: 4" (o número de itens da 1ª coluna) pra controlar onde quebra.
 
   { type: 'grid', eyebrow: 'Pronúncia', title: 'The Alphabet', items: ['A','B','C', ...] }
   — grade de itens curtos (letras, números etc.), um por quadradinho. Clique num item pra ouvir.
@@ -244,13 +249,24 @@ function renderSlide(s) {
       <h1>${s.title}</h1>
       ${s.sub ? `<div class="sub">${s.sub}</div>` : ''}`;
   } else if (s.type === 'text') {
-    const body = s.items
-      ? `<ul class="${s.columns === 2 ? 'cols-2' : ''}">${s.items.map(i => `
-          <li>
-            <span class="term">${i.en}${i.pt ? ' — ' + i.pt : ''}</span>
-            <button class="listen-btn" type="button" data-speak="${escapeAttr(i.en)}" aria-label="Ouvir pronúncia">${SPEAKER_ICON}</button>
-          </li>`).join('')}</ul>`
-      : `<p>${s.paragraph || ''}</p>`;
+    const itemHtml = (i) => `
+      <li>
+        <span class="term">${i.en}${i.pt ? ' — ' + i.pt : ''}</span>
+        <button class="listen-btn" type="button" data-speak="${escapeAttr(i.en)}" aria-label="Ouvir pronúncia">${SPEAKER_ICON}</button>
+      </li>`;
+    let body;
+    if (s.items && s.columns === 2) {
+      const split = s.rows || Math.ceil(s.items.length / 2);
+      const col1 = s.items.slice(0, split), col2 = s.items.slice(split);
+      body = `<div class="cols-2-wrap">
+        <ul>${col1.map(itemHtml).join('')}</ul>
+        <ul>${col2.map(itemHtml).join('')}</ul>
+      </div>`;
+    } else if (s.items) {
+      body = `<ul>${s.items.map(itemHtml).join('')}</ul>`;
+    } else {
+      body = `<p>${s.paragraph || ''}</p>`;
+    }
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}
