@@ -236,7 +236,7 @@
   <a href="home-adulto.html" style="background:rgba(255,255,255,0.15);border:1.5px solid rgba(255,255,255,0.3);border-radius:8px;padding:5px 12px;font-family:DM Sans,sans-serif;font-size:13px;color:rgba(255,255,255,0.8);text-decoration:none;">← Voltar</a>
   <div class="header-brand">itsbrendacleto</div>
   <div class="header-right">
-    <div class="streak-pill">🔥 <span id="streakCount">0</span> dias</div>
+    <div class="streak-pill"><span id="streakCount">0</span> dias</div>
     <button class="btn-logout" id="logoutBtn">Sair</button>
   </div>
 </header>
@@ -245,7 +245,7 @@
   <div class="hero-inner">
     <div class="hero-greeting">Welcome back</div>
     <div class="hero-name" id="heroName">Carregando...</div>
-    <div class="hero-sub" id="heroSub">Continue de onde parou. Cada aula te aproxima da fluência. 💪</div>
+    <div class="hero-sub" id="heroSub">Continue de onde parou. Cada aula te aproxima da fluência.</div>
   </div>
 </div>
 
@@ -395,7 +395,7 @@
     const userLevel = profile?.level || 1;
 
     document.getElementById('heroName').textContent = name + '.';
-    document.getElementById('heroSub').textContent = 'Você está no Level ' + userLevel + '. Continue assim! 💪';
+    document.getElementById('heroSub').textContent = 'Você está no Level ' + userLevel + '. Continue assim!';
 
     // Progresso
     const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
@@ -459,7 +459,7 @@
       const list = document.getElementById('list-level-' + levelData.level);
 
       if (isNextLevel) {
-        list.innerHTML = `<div class="coming-soon">🔒 Complete o ${levelData.level === userLevel + 1 ? 'Level ' + (levelData.level - 1) : 'nível anterior'} para desbloquear</div>`;
+        list.innerHTML = `<div class="coming-soon">Complete o ${levelData.level === userLevel + 1 ? 'Level ' + (levelData.level - 1) : 'nível anterior'} para desbloquear</div>`;
         return;
       }
 

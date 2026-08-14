@@ -217,14 +217,14 @@
     <div class="header-tag">Responsável</div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <a class="btn-logout" href="manual-aluno.html" style="text-decoration:none;">📘 Manual</a>
-    <button class="btn-logout" id="switchProfileBtn" style="display:none;">🔄 Trocar perfil</button>
+    <a class="btn-logout" href="manual-aluno.html" style="text-decoration:none;">Manual</a>
+    <button class="btn-logout" id="switchProfileBtn" style="display:none;">Trocar perfil</button>
     <button class="btn-logout" id="logoutBtn">Sair</button>
   </div>
 </header>
 
 <div id="pushPermBanner" style="display:none;background:#FFF8E5;border-bottom:1px solid #F0D9A0;padding:10px 20px;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px;">
-  <span>🔔 Ative as notificações pra receber avisos sobre as aulas.</span>
+  <span>Ative as notificações pra receber avisos sobre as aulas.</span>
   <span style="display:flex;gap:8px;">
     <button type="button" onclick="ativarNotificacoesPush()" style="background:#5C4033;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:13px;">Ativar</button>
     <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#5C4033;border:1px solid #5C4033;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;">Agora não</button>
@@ -232,12 +232,12 @@
 </div>
 
 <div class="welcome-strip">
-  <h1 id="welcomeTitle">Olá! 👋</h1>
+  <h1 id="welcomeTitle">Olá!</h1>
   <p id="welcomeSub">Aqui está o acompanhamento do seu filho(a).</p>
 </div>
 
 <main>
-  <div class="section-title">📊 Progresso</div>
+  <div class="section-title">Progresso</div>
   <div class="card">
     <div class="progress-summary">
       <div class="progress-summary-chip">
@@ -252,7 +252,7 @@
     <div id="progressActivitiesList"></div>
   </div>
 
-  <div class="section-title">📅 Agenda de aulas</div>
+  <div class="section-title">Agenda de aulas</div>
   <div class="card">
     <div class="agenda-subtitle">Próximas</div>
     <div id="agendaUpcomingList"><div class="empty-msg">Carregando...</div></div>
@@ -260,7 +260,7 @@
     <div id="agendaHistoryList"><div class="empty-msg">Carregando...</div></div>
   </div>
 
-  <div class="section-title">🔄 Reposições</div>
+  <div class="section-title">Reposições</div>
   <div class="card">
     <div class="agenda-subtitle" id="repoPendingTitle">A repor</div>
     <div id="repoPendingList"><div class="empty-msg">Carregando...</div></div>
@@ -268,22 +268,22 @@
     <div id="repoDoneList"><div class="empty-msg">Carregando...</div></div>
   </div>
 
-  <div class="section-title">📁 Relatórios</div>
+  <div class="section-title">Relatórios</div>
   <div class="card" id="reportsCard">
     <div class="empty-msg">Carregando...</div>
   </div>
 
-  <div class="section-title">💳 Financeiro</div>
+  <div class="section-title">Financeiro</div>
   <div class="card">
     <div id="paymentsList"><div class="empty-msg">Carregando...</div></div>
   </div>
 
-  <div class="section-title">🧾 Recibo de pagamento</div>
+  <div class="section-title">Recibo de pagamento</div>
   <div class="card">
     <div class="empty-msg" id="receiptEmptyMsg" style="display:none;">Nenhuma parcela paga encontrada ainda.</div>
     <div id="receiptFormWrap" style="display:none;">
       <select id="receiptMonthSelect" class="receipt-select"></select>
-      <button class="btn-generate-receipt" onclick="openReceiptModal()">🧾 Gerar recibo</button>
+      <button class="btn-generate-receipt" onclick="openReceiptModal()">Gerar recibo</button>
     </div>
   </div>
 </main>
@@ -314,7 +314,7 @@
     </div>
     <div class="receipt-actions no-print">
       <button class="btn-receipt-close" onclick="closeReceiptModal()">Fechar</button>
-      <button class="btn-receipt-print" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+      <button class="btn-receipt-print" onclick="window.print()">Imprimir / Salvar PDF</button>
     </div>
   </div>
 </div>
@@ -449,7 +449,7 @@
 
     const { data: student } = await sb.from('profiles').select('*').eq('id', profile.guardian_of).maybeSingle();
 
-    document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Responsável') + '! 👋';
+    document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Responsável') + '!';
     document.getElementById('welcomeSub').textContent = student
       ? 'Acompanhamento de ' + (student.full_name || 'seu filho(a)') + '.'
       : 'Aluno vinculado não encontrado.';
@@ -542,7 +542,7 @@
     document.getElementById('repoDoneTitle').textContent = `Já feitas (${repoDone.length})`;
 
     document.getElementById('repoPendingList').innerHTML = repoPending.length
-      ? repoPending.map(renderRepoPendingRow).join('') : '<div class="empty-msg">Nenhuma reposição pendente. 🎉</div>';
+      ? repoPending.map(renderRepoPendingRow).join('') : '<div class="empty-msg">Nenhuma reposição pendente.</div>';
     document.getElementById('repoDoneList').innerHTML = repoDone.length
       ? repoDone.map(renderRepoDoneRow).join('') : '<div class="empty-msg">Nenhuma reposição feita ainda.</div>';
   }

@@ -718,7 +718,7 @@ body {
         <div class="block-icon">🃏</div>
         <div>
           <div class="block-title">Vocabulary Cards</div>
-          <div class="block-sub">Toque para girar · 🔊 para ouvir</div>
+          <div class="block-sub">Toque para girar · para ouvir</div>
         </div>
       </div>
       <div class="block-body">
@@ -807,7 +807,7 @@ body {
           <li>Pratique as frases na seção de Pronúncia abaixo.</li>
           <li>Escreva seu próprio diálogo de apresentação (nome, soletração, origem).</li>
           <li>Grave um áudio lendo seu diálogo completo.</li>
-          <li>Envie o áudio para seu/sua teacher. 🎙</li>
+          <li>Envie o áudio para seu/sua teacher.</li>
         </ol>
       </div>
     </div>
@@ -908,7 +908,7 @@ body {
         </div>
         <span class="spell-label">Seu nome</span>
         <input class="spell-input" id="spell-inp" type="text" placeholder="Digite seu nome aqui..." />
-        <button class="spell-btn" onclick="doSpell()">🔊 Soletrar meu nome</button>
+        <button class="spell-btn" onclick="doSpell()">Soletrar meu nome</button>
         <div class="spell-res" id="spell-res"></div>
       </div>
     </div>
@@ -984,7 +984,7 @@ body {
           <li>Releia o diálogo John & Emma sem ouvir o áudio.</li>
           <li>Apresente-se em inglês de 3 formas diferentes em voz alta.</li>
           <li>Pratique conversação com um parceiro de estudos, se possível.</li>
-          <li>Grave um áudio final e envie para seu/sua teacher. 🎙</li>
+          <li>Grave um áudio final e envie para seu/sua teacher.</li>
         </ol>
       </div>
     </div>
@@ -1012,7 +1012,7 @@ body {
       </div>
       <div class="block-body">
         <div class="pron-intro" style="margin-bottom:0">
-          <strong>Desafio final da semana:</strong> apresente-se em inglês de 3 formas diferentes, incluindo seu nome completo soletrado. Se tiver um parceiro de estudos, pratiquem o diálogo John & Emma trocando os papéis. Grave um áudio final e envie para seu/sua teacher! 🎙
+          <strong>Desafio final da semana:</strong> apresente-se em inglês de 3 formas diferentes, incluindo seu nome completo soletrado. Se tiver um parceiro de estudos, pratiquem o diálogo John & Emma trocando os papéis. Grave um áudio final e envie para seu/sua teacher!
         </div>
       </div>
     </div>
@@ -1071,7 +1071,7 @@ var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_p
       banner.id = 'previewModeBanner';
       banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
-      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+      banner.innerHTML = 'Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
         '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
       document.body.insertBefore(banner, document.body.firstChild);
     };
@@ -1287,7 +1287,7 @@ function initPron() {
       '<div class="pron-phrase">'+p.phrase+'</div>'+
       '<div class="pron-pt">'+p.pt+'</div>'+
       '<div class="pron-actions">'+
-        '<button class="btn-listen">🔊 Ouvir</button>'+
+        '<button class="btn-listen">Ouvir</button>'+
         (SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>'
             : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+
       '</div>'+
@@ -1396,7 +1396,7 @@ function answerQ(chosen){
   var q=QUIZ[qCur]; var btns=document.querySelectorAll('.qopt');
   btns.forEach(function(b){b.disabled=true;}); btns[q.c].classList.add('ok');
   var fb=document.getElementById('qfb');
-  if(chosen===q.c){ qScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  if(chosen===q.c){ qScore++; fb.textContent = '✓ Correto!'; fb.className='qfb on ok'; }
   else{ btns[chosen].classList.add('fail'); fb.textContent='A resposta correta é: '+q.opts[q.c]; fb.className='qfb on fail'; }
   document.getElementById('qnxt').style.display='inline-block';
 }

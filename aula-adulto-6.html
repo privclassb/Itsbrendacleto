@@ -272,7 +272,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     </div>
 
     <div class="block">
-      <div class="block-head"><div class="block-icon">⚽</div><div><div class="block-title">Sports Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-head"><div class="block-icon">⚽</div><div><div class="block-title">Sports Cards</div><div class="block-sub">Toque para girar · para ouvir</div></div></div>
       <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
     </div>
 
@@ -331,15 +331,15 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
         <div class="sort-status" id="sort-status">0 / 9 organizados</div>
         <div class="sort-buckets">
           <div class="sort-bucket" onclick="chooseBucket('play')">
-            <div class="sort-bucket-label">▶️ To Play</div>
+            <div class="sort-bucket-label">▶To Play</div>
             <div class="sort-bucket-items" id="sort-bucket-play-items"></div>
           </div>
           <div class="sort-bucket" onclick="chooseBucket('go')">
-            <div class="sort-bucket-label">🏃 To Go</div>
+            <div class="sort-bucket-label">To Go</div>
             <div class="sort-bucket-items" id="sort-bucket-go-items"></div>
           </div>
           <div class="sort-bucket" onclick="chooseBucket('do')">
-            <div class="sort-bucket-label">🧘 To Do</div>
+            <div class="sort-bucket-label">To Do</div>
             <div class="sort-bucket-items" id="sort-bucket-do-items"></div>
           </div>
         </div>
@@ -509,7 +509,7 @@ var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_p
       banner.id = 'previewModeBanner';
       banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
-      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      banner.innerHTML = 'Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
       document.body.insertBefore(banner, document.body.firstChild);
     };
     if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
@@ -669,7 +669,7 @@ function chooseBucket(cat){
     s.sorted = true; sortedCount++;
     var item = document.createElement('div'); item.className='order-log-item'; item.textContent = s.word;
     document.getElementById('sort-bucket-'+cat+'-items').appendChild(item);
-    fb.textContent = sortedCount===SPORTS.length ? '🎉 Você organizou todas as palavras!' : '✓ "'+s.word+'" vai com "to '+cat+'"!';
+    fb.textContent = sortedCount===SPORTS.length ? 'Você organizou todas as palavras!' : '✓ "'+s.word+'" vai com "to '+cat+'"!';
     fb.className='qfb on ok';
     document.getElementById('sort-status').textContent = sortedCount+' / '+SPORTS.length+' organizados';
   } else {
@@ -735,7 +735,7 @@ async function startRecording(){
     mediaRecorder.start();
     document.getElementById('rec-start-btn').style.display='none';
     document.getElementById('rec-stop-btn').style.display='inline-block';
-    msg.textContent='🔴 Gravando... fale sobre um esporte que você gosta.';
+    msg.textContent='Gravando... fale sobre um esporte que você gosta.';
   } catch(e){ msg.textContent='Não foi possível acessar o microfone. Verifique as permissões.'; }
 }
 function stopRecording(){
@@ -761,7 +761,7 @@ function initPron() {
     var fbId='pfb-'+i, btnId='psb-'+i;
     var item = document.createElement('div');
     item.className='pron-item';
-    item.innerHTML='<div class="pron-phrase">'+p.phrase+'</div><div class="pron-pt">'+p.pt+'</div><div class="pron-actions"><button class="btn-listen">🔊 Ouvir</button>'+(SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>' : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+'</div><div class="pron-fb" id="'+fbId+'"></div>';
+    item.innerHTML='<div class="pron-phrase">'+p.phrase+'</div><div class="pron-pt">'+p.pt+'</div><div class="pron-actions"><button class="btn-listen">Ouvir</button>'+(SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>' : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+'</div><div class="pron-fb" id="'+fbId+'"></div>';
     item.querySelector('.btn-listen').addEventListener('click', function(){ speak(p.phrase, 0.8); });
     container.appendChild(item);
     if (!SR) return;
@@ -814,7 +814,7 @@ function answerQ(chosen){
   var q=QUIZ[qCur]; var btns=document.querySelectorAll('.qopt');
   btns.forEach(function(b){b.disabled=true;}); btns[q.c].classList.add('ok');
   var fb=document.getElementById('qfb');
-  if(chosen===q.c){ qScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  if(chosen===q.c){ qScore++; fb.textContent = '✓ Correto!'; fb.className='qfb on ok'; }
   else{ btns[chosen].classList.add('fail'); fb.textContent='A resposta correta é: '+q.opts[q.c]; fb.className='qfb on fail'; }
   document.getElementById('qnxt').style.display='inline-block';
 }

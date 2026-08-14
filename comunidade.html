@@ -126,19 +126,19 @@
 <div class="hero">
   <div class="hero-inner">
     <div class="hero-label">Juntos no aprendizado</div>
-    <div class="hero-title">Comunidade 👥</div>
+    <div class="hero-title">Comunidade</div>
   </div>
 </div>
 
 <main>
-  <div class="section-title">🏆 Ranking do mês</div>
+  <div class="section-title">Ranking do mês</div>
   <div class="card">
     <div class="rank-note" id="rankingMonthLabel"></div>
     <div id="rankingList"><div class="empty-msg">Carregando...</div></div>
     <div id="myRankNote"></div>
   </div>
 
-  <div class="section-title">📝 Mural</div>
+  <div class="section-title">Mural</div>
   <div class="card">
     <div class="composer-row">
       <div id="composerAvatar" class="composer-avatar-fallback">?</div>
@@ -148,7 +148,7 @@
         <div class="composer-actions">
           <div>
             <input type="file" id="postImageInput" accept="image/*" />
-            <label for="postImageInput" class="post-photo-btn">📷 Foto</label>
+            <label for="postImageInput" class="post-photo-btn">Foto</label>
           </div>
           <button class="btn-publish" id="publishPostBtn" onclick="createPost()">Publicar</button>
         </div>
@@ -326,7 +326,7 @@
     const myRankEl = document.getElementById('myRankNote');
 
     if (!ranked.length || ranked.every(r => r.points === 0)) {
-      list.innerHTML = '<div class="empty-msg">Ainda não há atividade este mês. Complete aulas, mantenha sua sequência e participe das aulas para aparecer aqui! 🚀</div>';
+      list.innerHTML = '<div class="empty-msg">Ainda não há atividade este mês. Complete aulas, mantenha sua sequência e participe das aulas para aparecer aqui!</div>';
     } else {
       const top = ranked.slice(0, 3);
       const medals = ['🥇', '🥈', '🥉'];
@@ -365,7 +365,7 @@
     const listEl = document.getElementById('postsList');
 
     if (!posts || posts.length === 0) {
-      listEl.innerHTML = '<div class="empty-msg">Nenhum post ainda. Seja a primeira pessoa a compartilhar! ✨</div>';
+      listEl.innerHTML = '<div class="empty-msg">Nenhum post ainda. Seja a primeira pessoa a compartilhar!</div>';
       return;
     }
 
@@ -420,7 +420,7 @@
               ${isLiked ? '❤️' : '🤍'} <span id="likeCount-${p.id}">${likeCount}</span>
             </button>
             <button class="post-action-btn" onclick="toggleComments('${p.id}')">
-              💬 <span id="commentCount-${p.id}">${commentCount}</span> comentários
+              <span id="commentCount-${p.id}">${commentCount}</span> comentários
             </button>
           </div>
           <div class="comments-box" id="comments-${p.id}"></div>

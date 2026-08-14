@@ -233,7 +233,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     </div>
 
     <div class="block">
-      <div class="block-head"><div class="block-icon">🏠</div><div><div class="block-title">Live & Work Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-head"><div class="block-icon">🏠</div><div><div class="block-title">Live & Work Cards</div><div class="block-sub">Toque para girar · para ouvir</div></div></div>
       <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
     </div>
   </div>
@@ -347,9 +347,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <div class="riddle-text" id="iv-q" style="font-family:'Cormorant Garamond',serif;font-size:1.1rem"></div>
         </div>
         <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;flex-wrap:wrap">
-          <button class="btn-listen" onclick="ivListenQ()">🔊 Ouvir pergunta</button>
+          <button class="btn-listen" onclick="ivListenQ()">Ouvir pergunta</button>
           <button class="btn-speak" id="iv-mic-btn" onclick="ivRecordAnswer()">🎙 Gravar resposta</button>
-          <button class="btn-sm" onclick="toggleModel()">💡 Ver resposta modelo</button>
+          <button class="btn-sm" onclick="toggleModel()">Ver resposta modelo</button>
         </div>
         <div class="pron-fb on" id="iv-transcript" style="min-height:20px"></div>
         <div class="iv-model-box" id="iv-model-box"><div class="iv-model-label">Resposta modelo:</div><div id="iv-model"></div></div>
@@ -357,7 +357,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
           <button class="btn-sm" id="iv-prev" onclick="ivPrev()" style="display:none">← Anterior</button>
           <button class="btn-next" id="iv-next" onclick="ivNext()">Próxima pergunta →</button>
         </div>
-        <div class="qfb ok" id="iv-done" style="margin-top:12px">🎉 Você praticou todas as perguntas da entrevista!</div>
+        <div class="qfb ok" id="iv-done" style="margin-top:12px">Você praticou todas as perguntas da entrevista!</div>
       </div>
     </div>
   </div>
@@ -438,7 +438,7 @@ var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_p
       banner.id = 'previewModeBanner';
       banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
-      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      banner.innerHTML = 'Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
       document.body.insertBefore(banner, document.body.firstChild);
     };
     if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
@@ -672,7 +672,7 @@ function answerConj(chosen, btn, correct){
   var btns = document.querySelectorAll('#conj-opts .qopt');
   btns.forEach(function(b){ b.disabled=true; if (b.textContent===correct) b.classList.add('ok'); });
   var fb = document.getElementById('conj-fb');
-  if (chosen===correct){ conjScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  if (chosen===correct){ conjScore++; fb.textContent = '✓ Correto!'; fb.className='qfb on ok'; }
   else { btn.classList.add('fail'); fb.textContent='A forma certa é "'+correct+'".'; fb.className='qfb on fail'; }
   document.getElementById('conj-score').textContent='Acertos: '+conjScore;
   conjCur++;

@@ -262,7 +262,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     </div>
 
     <div class="block">
-      <div class="block-head"><div class="block-icon">💼</div><div><div class="block-title">Job Cards</div><div class="block-sub">Toque para girar · 🔊 para ouvir</div></div></div>
+      <div class="block-head"><div class="block-icon">💼</div><div><div class="block-title">Job Cards</div><div class="block-sub">Toque para girar · para ouvir</div></div></div>
       <div class="block-body"><div class="fc-grid" id="fc-grid"></div></div>
     </div>
   </div>
@@ -428,7 +428,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
     <div class="block">
       <div class="block-head"><div class="block-icon">🗣️</div><div><div class="block-title">Conversation Challenge</div><div class="block-sub">Pratique em voz alta — sozinho ou com um parceiro</div></div></div>
       <div class="block-body">
-        <div class="pron-intro" style="margin-bottom:0"><strong>Desafio final da semana:</strong> apresente sua profissão e a de 2 familiares em voz alta, de 3 formas diferentes. Grave um áudio final e envie para seu/sua teacher! 🎙</div>
+        <div class="pron-intro" style="margin-bottom:0"><strong>Desafio final da semana:</strong> apresente sua profissão e a de 2 familiares em voz alta, de 3 formas diferentes. Grave um áudio final e envie para seu/sua teacher!</div>
       </div>
     </div>
   </div>
@@ -470,7 +470,7 @@ var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_p
       banner.id = 'previewModeBanner';
       banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
-      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      banner.innerHTML = 'Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' + '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
       document.body.insertBefore(banner, document.body.firstChild);
     };
     if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
@@ -663,7 +663,7 @@ function initSB(){ sbCur=0; sbScore=0; renderSBSentence(); }
 function renderSBSentence(){
   if (sbCur>=SENTENCES.length){
     document.getElementById('sb-progress').textContent='Desafio completo!';
-    document.getElementById('sb-area').innerHTML='<div class="qfb on ok" style="text-align:center">🎉 Você completou todas as frases! Acertos: '+sbScore+' / '+SENTENCES.length+'</div>';
+    document.getElementById('sb-area').innerHTML='<div class="qfb on ok" style="text-align:center">Você completou todas as frases! Acertos: '+sbScore+' / '+SENTENCES.length+'</div>';
     return;
   }
   document.getElementById('sb-progress').textContent='Frase '+(sbCur+1)+' / '+SENTENCES.length;
@@ -740,7 +740,7 @@ async function startRecording(){
     mediaRecorder.start();
     document.getElementById('rec-start-btn').style.display='none';
     document.getElementById('rec-stop-btn').style.display='inline-block';
-    msg.textContent='🔴 Gravando... fale o texto acima.';
+    msg.textContent='Gravando... fale o texto acima.';
   } catch(e){ msg.textContent='Não foi possível acessar o microfone. Verifique as permissões.'; }
 }
 function stopRecording(){
@@ -766,7 +766,7 @@ function initPron() {
     var fbId='pfb-'+i, btnId='psb-'+i;
     var item = document.createElement('div');
     item.className='pron-item';
-    item.innerHTML='<div class="pron-phrase">'+p.phrase+'</div><div class="pron-pt">'+p.pt+'</div><div class="pron-actions"><button class="btn-listen">🔊 Ouvir</button>'+(SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>' : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+'</div><div class="pron-fb" id="'+fbId+'"></div>';
+    item.innerHTML='<div class="pron-phrase">'+p.phrase+'</div><div class="pron-pt">'+p.pt+'</div><div class="pron-actions"><button class="btn-listen">Ouvir</button>'+(SR ? '<button class="btn-speak" id="'+btnId+'">🎙 Falar</button>' : '<span style="font-size:.72rem;color:var(--text-lt)">Reconhecimento não disponível neste navegador</span>')+'</div><div class="pron-fb" id="'+fbId+'"></div>';
     item.querySelector('.btn-listen').addEventListener('click', function(){ speak(p.phrase, 0.8); });
     container.appendChild(item);
     if (!SR) return;
@@ -819,7 +819,7 @@ function answerQ(chosen){
   var q=QUIZ[qCur]; var btns=document.querySelectorAll('.qopt');
   btns.forEach(function(b){b.disabled=true;}); btns[q.c].classList.add('ok');
   var fb=document.getElementById('qfb');
-  if(chosen===q.c){ qScore++; fb.textContent='✓ Correto!'; fb.className='qfb on ok'; }
+  if(chosen===q.c){ qScore++; fb.textContent = '✓ Correto!'; fb.className='qfb on ok'; }
   else{ btns[chosen].classList.add('fail'); fb.textContent='A resposta correta é: '+q.opts[q.c]; fb.className='qfb on fail'; }
   document.getElementById('qnxt').style.display='inline-block';
 }
