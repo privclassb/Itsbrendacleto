@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Material de Aula | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+    .hero-sub { font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    .folder-group { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+    .folder-group-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 22px; cursor: pointer; user-select: none; }
+    .folder-group-name { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); font-weight: 400; }
+    .folder-group-badge { font-size: 11px; font-weight: 600; color: var(--muted); background: var(--cream); border-radius: 99px; padding: 3px 10px; margin-left: 10px; }
+    .folder-group-chevron { font-size: 13px; color: var(--muted); transition: transform 0.15s; }
+    .folder-group.open .folder-group-chevron { transform: rotate(90deg); }
+    .folder-group-body { display: none; padding: 0 22px 20px; }
+    .folder-group.open .folder-group-body { display: block; }
+
+    .lesson-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--cream); border-radius: 12px; margin-bottom: 8px; text-decoration: none; transition: background 0.15s; }
+    .lesson-item:hover { background: var(--sand); }
+    .lesson-item .emoji { font-size: 20px; flex-shrink: 0; }
+    .lesson-item .name { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    .empty-msg { text-align: center; padding: 24px 10px; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <a href="painel-professora.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Material de Aula</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Pra apresentar em sala</div>
+    <div class="hero-title">Material de Aula 🎬</div>
+    <div class="hero-sub">Apresentações prontas pra abrir na TV/projetor — sem precisar do Canva.</div>
+  </div>
+</div>
+
+<main id="folders">
+  <div class="folder-group open">
+    <div class="folder-group-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="folder-group-name">📘 Book 1<span class="folder-group-badge">0</span></span>
+      <span class="folder-group-chevron">▶</span>
+    </div>
+    <div class="folder-group-body">
+      <div class="empty-msg">Nenhuma aula publicada ainda — a migração começa por aqui! 🚀<br>Manda o conteúdo (Canva, print ou descrição) que a gente vai adicionando aula por aula.</div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  async function init(session) {
+    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+    if (!profile || profile.role !== 'professora') {
+      window.location.href = 'index.html';
+    }
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>
