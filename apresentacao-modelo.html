@@ -107,14 +107,12 @@
   .navbar {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 24px; background: rgba(0,0,0,0.35); backdrop-filter: blur(6px);
-    opacity: 0; transition: opacity 0.25s ease;
+    padding: 14px 16px; background: rgba(0,0,0,0.4); backdrop-filter: blur(6px);
   }
-  .deck:hover .navbar, .navbar:focus-within, .navbar.show { opacity: 1; }
   .nav-btn {
     background: rgba(255,255,255,0.14); border: 1.5px solid rgba(255,255,255,0.3); color: #fff;
-    border-radius: 10px; padding: 10px 18px; font-family: 'DM Sans', sans-serif; font-weight: 600;
-    font-size: 14px; cursor: pointer; transition: background 0.15s;
+    border-radius: 10px; padding: 12px 20px; font-family: 'DM Sans', sans-serif; font-weight: 600;
+    font-size: 14px; cursor: pointer; transition: background 0.15s; min-height: 44px; touch-action: manipulation;
   }
   .nav-btn:hover { background: rgba(255,255,255,0.28); }
   .nav-btn:disabled { opacity: 0.35; cursor: not-allowed; }
@@ -347,6 +345,22 @@ document.addEventListener('keydown', (e) => {
   if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); goTo(current + 1); }
   else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); goTo(current - 1); }
   else if (e.key === 'f' || e.key === 'F') { toggleFullscreen(); }
+});
+
+// ---- Navegação por gesto (deslizar o dedo) no celular/tablet ----
+let touchStartX = null, touchStartY = null;
+deck.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+deck.addEventListener('touchend', (e) => {
+  if (touchStartX === null) return;
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  touchStartX = null;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+    if (dx < 0) goTo(current + 1); else goTo(current - 1);
+  }
 });
 
 function toggleFullscreen() {
