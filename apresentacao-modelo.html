@@ -57,10 +57,10 @@
   .slide.grid { background: var(--cream); }
   .slide.grid .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
   .slide.grid h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 32px; }
-  .letter-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; max-width: 980px; }
+  .letter-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; max-width: 1120px; }
   .letter-tile {
-    background: var(--white); border: none; border-radius: 12px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif; font-size: clamp(1.1rem, 2.2vw, 1.9rem); color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
+    background: var(--white); border: none; border-radius: 14px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 3.6vw, 3rem); color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
     cursor: pointer; transition: background 0.15s, color 0.15s;
   }
   .letter-tile:hover, .letter-tile:focus-visible { background: var(--mint); color: var(--white); }
@@ -275,7 +275,7 @@ function renderSlide(s) {
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}
-      <div class="letter-grid">${s.items.map(i => `<button class="letter-tile" type="button" data-speak="${escapeAttr(i)}">${i}</button>`).join('')}</div>`;
+      <div class="letter-grid">${s.items.map(i => `<button class="letter-tile" type="button" data-speak="${escapeAttr(i.toLowerCase())}">${i}</button>`).join('')}</div>`;
   } else if (s.type === 'match') {
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
