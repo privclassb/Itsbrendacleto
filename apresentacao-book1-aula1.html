@@ -44,9 +44,9 @@
   .slide.text li .term { text-align: left; overflow-wrap: break-word; min-width: 0; }
   .slide.text li .term strong { color: #B85C38; }
   .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
-  .cols-2-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
+  .cols-2-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; max-width: 1200px; }
   .cols-2-wrap ul { max-width: none; }
-  .cols-2-wrap li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
+  .cols-2-wrap li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; min-width: 0; }
 
   .listen-btn {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--sand); color: var(--brown);
@@ -54,8 +54,8 @@
   }
   .listen-btn:hover, .listen-btn:focus-visible { background: var(--mint); color: var(--white); }
   .listen-btn svg { width: 16px; height: 16px; }
-  .cols-2 .listen-btn { width: 30px; height: 30px; }
-  .cols-2 .listen-btn svg { width: 14px; height: 14px; }
+  .cols-2-wrap .listen-btn { width: 30px; height: 30px; }
+  .cols-2-wrap .listen-btn svg { width: 14px; height: 14px; }
 
   .slide.grid { background: var(--cream); }
   .slide.grid .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
@@ -125,12 +125,15 @@
 
   /* ---- Mobile / small screens ---- */
   @media (max-width: 700px) {
-    .slide { padding: 76px 5vw 92px; }
+    .slide { padding: 76px 4vw 92px; }
 
-    .cols-2-wrap { grid-template-columns: 1fr; gap: 10px; max-width: 100%; }
-    .cols-2-wrap li { font-size: 1.05rem; }
+    .cols-2-wrap { gap: 6px; max-width: 100%; }
+    .cols-2-wrap li { font-size: 0.82rem; padding: 8px 10px; flex-direction: column; align-items: flex-start; gap: 4px; }
+    .cols-2-wrap .listen-btn { width: 24px; height: 24px; }
+    .cols-2-wrap .listen-btn svg { width: 12px; height: 12px; }
 
-    .blanks-cols { flex-direction: column; gap: 16px; }
+    .blanks-cols { gap: 16px; }
+    .blank-line { font-size: 0.95rem; gap: 8px; }
     .blank-line .rule { flex: 1; width: auto; min-width: 24px; }
 
     .letter-grid, .match-grid { max-width: 100%; }
