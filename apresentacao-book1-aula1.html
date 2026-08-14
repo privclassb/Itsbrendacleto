@@ -39,7 +39,7 @@
     background: var(--white); border-radius: 16px; padding: 16px 18px 16px 32px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
     font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
-  .slide.text li .term { text-align: left; }
+  .slide.text li .term { text-align: left; overflow-wrap: break-word; min-width: 0; }
   .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
   .cols-2-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
   .cols-2-wrap ul { max-width: none; }
@@ -119,6 +119,32 @@
   .nav-count { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 600; letter-spacing: 0.5px; }
   .nav-right { display: flex; gap: 10px; align-items: center; }
   .nav-back { position: fixed; top: 14px; left: 14px; z-index: 51; text-decoration: none; }
+
+  /* ---- Mobile / small screens ---- */
+  @media (max-width: 700px) {
+    .slide {
+      padding: 76px 5vw 92px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .slide:not(.title) { justify-content: flex-start; }
+
+    .cols-2-wrap { grid-template-columns: 1fr; gap: 10px; max-width: 100%; }
+    .cols-2-wrap li { font-size: 1.05rem; }
+
+    .blanks-cols { flex-direction: column; gap: 16px; }
+    .blank-line .rule { flex: 1; width: auto; min-width: 24px; }
+
+    .letter-grid, .match-grid { max-width: 100%; }
+
+    .navbar { padding: 10px 10px; }
+    .nav-btn { padding: 10px 12px; font-size: 12.5px; white-space: nowrap; }
+    .nav-count { font-size: 11.5px; }
+    .nav-right { gap: 6px; }
+  }
+  @media (max-width: 380px) {
+    .nav-btn { padding: 9px 9px; font-size: 11px; }
+  }
 </style>
 </head>
 <body>
