@@ -36,22 +36,33 @@
   .slide.text h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 32px; }
   .slide.text ul { list-style: none; display: flex; flex-direction: column; gap: 18px; max-width: 900px; }
   .slide.text li {
-    background: var(--white); border-radius: 16px; padding: 20px 32px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
-    font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 600; display: flex; align-items: center; gap: 16px;
+    background: var(--white); border-radius: 16px; padding: 16px 18px 16px 32px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
+    font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
-  .slide.text li .emoji { font-size: 1.4em; flex-shrink: 0; }
+  .slide.text li .term { text-align: left; }
   .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
   .slide.text ul.cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; max-width: 1200px; }
-  .slide.text ul.cols-2 li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 16px 22px; }
+  .slide.text ul.cols-2 li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; }
+
+  .listen-btn {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--sand); color: var(--brown);
+    display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.15s, color 0.15s;
+  }
+  .listen-btn:hover, .listen-btn:focus-visible { background: var(--mint); color: var(--white); }
+  .listen-btn svg { width: 16px; height: 16px; }
+  .cols-2 .listen-btn { width: 30px; height: 30px; }
+  .cols-2 .listen-btn svg { width: 14px; height: 14px; }
 
   .slide.grid { background: var(--cream); }
   .slide.grid .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
   .slide.grid h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 32px; }
   .letter-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 10px; max-width: 980px; }
   .letter-tile {
-    background: var(--white); border-radius: 12px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    background: var(--white); border: none; border-radius: 12px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
     font-family: 'DM Serif Display', serif; font-size: clamp(1.1rem, 2.2vw, 1.9rem); color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
+    cursor: pointer; transition: background 0.15s, color 0.15s;
   }
+  .letter-tile:hover, .letter-tile:focus-visible { background: var(--mint); color: var(--white); }
 
   .slide.match { background: var(--cream); }
   .slide.match .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
@@ -59,9 +70,10 @@
   .slide.match .hint { font-size: clamp(0.95rem, 1.7vw, 1.2rem); color: var(--muted); margin-bottom: 28px; max-width: 800px; }
   .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; }
   .match-card {
-    background: var(--white); border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
-    box-shadow: 0 4px 16px rgba(92,64,51,0.08);
+    background: var(--white); border: none; border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    box-shadow: 0 4px 16px rgba(92,64,51,0.08); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: box-shadow 0.15s;
   }
+  .match-card:hover, .match-card:focus-visible { box-shadow: 0 6px 20px rgba(92,64,51,0.16); }
   .match-badge {
     width: 44px; height: 44px; border-radius: 50%; background: var(--mint); color: var(--white);
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.15rem; font-family: 'DM Sans', sans-serif;
@@ -141,15 +153,15 @@ const SLIDES = [
     title: 'Greetings',
     columns: 2,
     items: [
-      { emoji: '🌅', text: 'Good morning — Bom dia' },
-      { emoji: '🙋', text: 'Hi / Hi there — Oi' },
-      { emoji: '☀️', text: 'Good afternoon — Boa tarde' },
-      { emoji: '😊', text: 'Hello — Olá' },
-      { emoji: '🌆', text: 'Good evening — Boa noite (chegada)' },
-      { emoji: '👋', text: "What's up? — E aí" },
-      { emoji: '🌙', text: 'Good night — Boa noite (saída)' },
-      { emoji: '🤝', text: 'Nice to meet you! — Prazer em conhecê-lo' },
-      { emoji: '🤝', text: 'Nice to meet you too — Prazer também' }
+      { en: 'Good morning', pt: 'Bom dia' },
+      { en: 'Hi / Hi there', pt: 'Oi' },
+      { en: 'Good afternoon', pt: 'Boa tarde' },
+      { en: 'Hello', pt: 'Olá' },
+      { en: 'Good evening', pt: 'Boa noite (chegada)' },
+      { en: "What's up?", pt: 'E aí' },
+      { en: 'Good night', pt: 'Boa noite (saída)' },
+      { en: 'Nice to meet you!', pt: 'Prazer em conhecê-lo' },
+      { en: 'Nice to meet you too', pt: 'Prazer também' }
     ]
   },
   {
@@ -157,10 +169,10 @@ const SLIDES = [
     eyebrow: "What is your name? · Qual é o seu nome?",
     title: 'Answering',
     items: [
-      { emoji: '💬', text: 'My name is Brenda' },
-      { emoji: '💬', text: "My name's Brenda" },
-      { emoji: '🙋', text: 'I am Brenda' },
-      { emoji: '🙋', text: "I'm Brenda" }
+      { en: 'My name is Brenda', pt: null },
+      { en: "My name's Brenda", pt: null },
+      { en: 'I am Brenda', pt: null },
+      { en: "I'm Brenda", pt: null }
     ]
   },
   {
@@ -188,10 +200,10 @@ const SLIDES = [
     eyebrow: 'How do you spell your name? · Como se soletra/escreve seu nome?',
     title: 'Spelling',
     items: [
-      { emoji: '🔤', text: 'First name — Primeiro nome' },
-      { emoji: '🔤', text: 'Middle name — Nome do meio' },
-      { emoji: '🔤', text: 'Last name — Último nome' },
-      { emoji: '🔤', text: 'Full name — Nome completo' }
+      { en: 'First name', pt: 'Primeiro nome' },
+      { en: 'Middle name', pt: 'Nome do meio' },
+      { en: 'Last name', pt: 'Último nome' },
+      { en: 'Full name', pt: 'Nome completo' }
     ]
   },
   {
@@ -202,6 +214,22 @@ const SLIDES = [
     count: 9
   }
 ];
+
+/* ---------------- ÁUDIO (ouvir pronúncia) ---------------- */
+function speak(text) {
+  if (!('speechSynthesis' in window) || !text) return;
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+function escapeAttr(str) {
+  const div = document.createElement('div');
+  div.textContent = str || '';
+  return div.innerHTML.replace(/"/g, '&quot;');
+}
+const SPEAKER_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 5V4L8 9H4z" fill="currentColor" stroke="none"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18 6a8.5 8.5 0 0 1 0 12"/></svg>';
 
 /* ---------------- RENDER ---------------- */
 const deck = document.getElementById('deck');
@@ -217,7 +245,11 @@ function renderSlide(s) {
       ${s.sub ? `<div class="sub">${s.sub}</div>` : ''}`;
   } else if (s.type === 'text') {
     const body = s.items
-      ? `<ul class="${s.columns === 2 ? 'cols-2' : ''}">${s.items.map(i => `<li><span class="emoji">${i.emoji || ''}</span><span>${i.text}</span></li>`).join('')}</ul>`
+      ? `<ul class="${s.columns === 2 ? 'cols-2' : ''}">${s.items.map(i => `
+          <li>
+            <span class="term">${i.en}${i.pt ? ' — ' + i.pt : ''}</span>
+            <button class="listen-btn" type="button" data-speak="${escapeAttr(i.en)}" aria-label="Ouvir pronúncia">${SPEAKER_ICON}</button>
+          </li>`).join('')}</ul>`
       : `<p>${s.paragraph || ''}</p>`;
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
@@ -227,17 +259,17 @@ function renderSlide(s) {
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}
-      <div class="letter-grid">${s.items.map(i => `<div class="letter-tile">${i}</div>`).join('')}</div>`;
+      <div class="letter-grid">${s.items.map(i => `<button class="letter-tile" type="button" data-speak="${escapeAttr(i)}">${i}</button>`).join('')}</div>`;
   } else if (s.type === 'match') {
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}
       ${s.hint ? `<div class="hint">${s.hint}</div>` : ''}
       <div class="match-grid">${s.items.map(i => `
-        <div class="match-card">
+        <button class="match-card" type="button" data-speak="${escapeAttr(i.name)}">
           <div class="match-badge">${i.letter}</div>
           <div class="name">${i.name}</div>
-        </div>`).join('')}</div>`;
+        </button>`).join('')}</div>`;
   } else if (s.type === 'blanks') {
     const half = Math.ceil(s.count / 2);
     const col = (from, to) => Array.from({ length: to - from + 1 }, (_, i) => from + i)
@@ -274,6 +306,11 @@ function renderSlide(s) {
 
 SLIDES.forEach(s => deck.appendChild(renderSlide(s)));
 const slideEls = Array.from(deck.children);
+
+deck.addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-speak]');
+  if (btn) speak(btn.dataset.speak);
+});
 
 let current = 0;
 function goTo(i) {
