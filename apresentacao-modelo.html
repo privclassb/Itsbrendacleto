@@ -12,41 +12,44 @@
     --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560;
     --white: #FFFFFF; --shadow: 0 8px 40px rgba(0,0,0,0.18);
   }
-  html, body { height: 100%; overflow: hidden; }
+  html, body { height: 100%; margin: 0; overflow: hidden; }
   body {
-    font-family: 'DM Sans', sans-serif; background: var(--brown); color: var(--text);
+    font-family: 'DM Sans', sans-serif; background: #241811; color: var(--text);
   }
 
-  /* ---- Slides ---- */
-  .deck { position: relative; width: 100vw; height: 100vh; }
+  /* ---- Slides ----
+     Canvas fixo de 1920x1080 (igual a uma apresentação/slide de verdade), escalado
+     via JS pra caber em qualquer tela sem cortar ou precisar rolar. */
+  .deck {
+    position: fixed; top: 50%; left: 50%; width: 1920px; height: 1080px;
+    transform-origin: center center; overflow: hidden;
+  }
   .slide {
     position: absolute; inset: 0; display: none;
-    align-items: center; justify-content: flex-start; flex-direction: column;
-    padding: 6vh 8vw; text-align: center;
-    overflow-y: auto; -webkit-overflow-scrolling: touch;
+    align-items: center; justify-content: center; flex-direction: column;
+    padding: 65px 154px; text-align: center; overflow: hidden;
   }
   .slide.active { display: flex; }
-  .slide-inner { margin: auto 0; width: 100%; display: flex; flex-direction: column; align-items: center; }
 
   .slide.title { background: linear-gradient(135deg, var(--brown), #3E2A1F); color: var(--white); }
-  .slide.title .eyebrow { font-size: 1.1rem; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
-  .slide.title h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2.4rem, 6vw, 5rem); line-height: 1.15; }
-  .slide.title .sub { margin-top: 20px; font-size: clamp(1.1rem, 2.4vw, 1.6rem); color: rgba(255,255,255,0.75); }
+  .slide.title .eyebrow { font-size: 18px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 18px; }
+  .slide.title h1 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 80px; line-height: 1.15; }
+  .slide.title .sub { margin-top: 20px; font-size: 26px; color: rgba(255,255,255,0.75); }
 
   .slide.text { background: var(--cream); }
-  .slide.text .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
-  .slide.text h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 32px; }
-  .slide.text ul { list-style: none; display: flex; flex-direction: column; gap: 18px; max-width: 900px; }
+  .slide.text .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
+  .slide.text h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 32px; }
+  .slide.text ul { list-style: none; display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
   .slide.text li {
     background: var(--white); border-radius: 16px; padding: 16px 18px 16px 32px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
-    font-size: clamp(1.2rem, 2.6vw, 1.8rem); font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    font-size: 29px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
   .slide.text li .term { text-align: left; overflow-wrap: break-word; min-width: 0; }
   .slide.text li .term strong { color: #B85C38; }
-  .slide.text p { font-size: clamp(1.2rem, 2.6vw, 1.9rem); line-height: 1.6; max-width: 900px; color: var(--text); }
+  .slide.text p { font-size: 30px; line-height: 1.6; max-width: 900px; color: var(--text); }
   .cols-2-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; max-width: 1200px; }
   .cols-2-wrap ul { max-width: none; }
-  .cols-2-wrap li { font-size: clamp(1rem, 1.9vw, 1.4rem); padding: 12px 14px 12px 22px; min-width: 0; }
+  .slide.text .cols-2-wrap li { font-size: 22px; padding: 10px 14px 10px 22px; min-width: 0; }
 
   .listen-btn {
     flex-shrink: 0; width: 34px; height: 34px; border-radius: 50%; border: none; background: var(--sand); color: var(--brown);
@@ -58,30 +61,30 @@
   .cols-2-wrap .listen-btn svg { width: 14px; height: 14px; }
 
   .slide.grid { background: var(--cream); }
-  .slide.grid .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
-  .slide.grid h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 32px; }
+  .slide.grid .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
+  .slide.grid h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 32px; }
   .letter-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; max-width: 1120px; }
   .letter-tile {
     background: var(--white); border: none; border-radius: 14px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif; font-size: clamp(1.8rem, 3.6vw, 3rem); color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
+    font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
     cursor: pointer; transition: background 0.15s, color 0.15s;
   }
   .letter-tile:hover, .letter-tile:focus-visible { background: var(--mint); color: var(--white); }
   .letter-tile.two-line { aspect-ratio: auto; min-height: 84px; flex-direction: column; gap: 3px; padding: 10px 6px; }
-  .letter-tile .tile-main { font-size: clamp(1.3rem, 2.4vw, 1.8rem); line-height: 1.1; }
-  .letter-tile .tile-sub { font-family: 'DM Sans', sans-serif; font-size: clamp(0.62rem, 1.1vw, 0.8rem); font-weight: 600; color: var(--muted); }
+  .letter-tile .tile-main { font-size: 29px; line-height: 1.1; }
+  .letter-tile .tile-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); }
   .letter-tile:hover .tile-sub, .letter-tile:focus-visible .tile-sub { color: rgba(255,255,255,0.85); }
 
   .slide.choice { background: var(--cream); }
-  .slide.choice .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
-  .slide.choice h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 10px; }
-  .slide.choice .hint { font-size: clamp(0.95rem, 1.7vw, 1.2rem); color: var(--muted); margin-bottom: 24px; max-width: 800px; }
+  .slide.choice .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
+  .slide.choice h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 10px; }
+  .slide.choice .hint { font-size: 19px; color: var(--muted); margin-bottom: 24px; max-width: 800px; }
   .choice-list { display: flex; flex-direction: column; gap: 10px; max-width: 620px; width: 100%; }
   .choice-row {
     background: var(--white); border-radius: 14px; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between;
     gap: 16px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
   }
-  .choice-name { font-weight: 600; font-size: clamp(1rem, 1.9vw, 1.3rem); color: var(--text); }
+  .choice-name { font-weight: 600; font-size: 21px; color: var(--text); }
   .choice-opts { display: flex; gap: 10px; }
   .choice-opt {
     background: var(--sand); border: none; border-radius: 10px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-weight: 700;
@@ -90,9 +93,9 @@
   .choice-opt:hover, .choice-opt:focus-visible { background: var(--mint); color: var(--white); }
 
   .slide.match { background: var(--cream); }
-  .slide.match .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
-  .slide.match h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(2rem, 4.2vw, 3.4rem); color: var(--text); margin-bottom: 10px; }
-  .slide.match .hint { font-size: clamp(0.95rem, 1.7vw, 1.2rem); color: var(--muted); margin-bottom: 28px; max-width: 800px; }
+  .slide.match .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
+  .slide.match h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 10px; }
+  .slide.match .hint { font-size: 19px; color: var(--muted); margin-bottom: 28px; max-width: 800px; }
   .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; }
   .match-card {
     background: var(--white); border: none; border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
@@ -103,19 +106,19 @@
     width: 44px; height: 44px; border-radius: 50%; background: var(--mint); color: var(--white);
     display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.15rem; font-family: 'DM Sans', sans-serif;
   }
-  .match-card .name { font-weight: 600; font-size: clamp(1rem, 1.9vw, 1.3rem); color: var(--text); }
+  .match-card .name { font-weight: 600; font-size: 21px; color: var(--text); }
 
   .slide.blanks { background: var(--cream); }
-  .slide.blanks .eyebrow { font-size: 1rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
-  .slide.blanks h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: clamp(1.8rem, 3.6vw, 3rem); color: var(--text); margin-bottom: 10px; max-width: 900px; }
-  .slide.blanks .example { font-size: clamp(1rem, 1.9vw, 1.3rem); color: var(--brown-light); font-weight: 700; margin-bottom: 28px; }
+  .slide.blanks .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
+  .slide.blanks h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 48px; color: var(--text); margin-bottom: 10px; max-width: 900px; }
+  .slide.blanks .example { font-size: 21px; color: var(--brown-light); font-weight: 700; margin-bottom: 28px; }
   .blanks-cols { display: flex; gap: 60px; }
   .blanks-col { display: flex; flex-direction: column; gap: 20px; }
-  .blank-line { display: flex; align-items: center; gap: 12px; font-size: clamp(1.1rem, 2vw, 1.5rem); color: var(--muted); font-weight: 600; }
+  .blank-line { display: flex; align-items: center; gap: 12px; font-size: 24px; color: var(--muted); font-weight: 600; }
   .blank-line .rule { width: 220px; border-bottom: 2px solid var(--sand); height: 1px; }
 
   .slide.image { background: var(--text); }
-  .slide.image img { max-width: 92vw; max-height: 74vh; border-radius: 16px; box-shadow: var(--shadow); object-fit: contain; }
+  .slide.image img { max-width: 96%; max-height: 96%; border-radius: 16px; box-shadow: var(--shadow); object-fit: contain; }
   .slide.image .caption { margin-top: 20px; color: rgba(255,255,255,0.7); font-size: 1.1rem; }
 
   .slide.video, .slide.embed { background: #111; }
@@ -125,7 +128,7 @@
   }
   .slide.embed .frame-wrap { aspect-ratio: 4 / 3; max-width: 700px; background: var(--white); }
   .slide.video iframe, .slide.embed iframe { width: 100%; height: 100%; border: 0; display: block; }
-  .slide.video .eyebrow, .slide.embed .eyebrow { color: rgba(255,255,255,0.65); margin-bottom: 16px; font-size: 1rem; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
+  .slide.video .eyebrow, .slide.embed .eyebrow { color: rgba(255,255,255,0.65); margin-bottom: 16px; font-size: 16px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; }
 
   /* ---- Nav bar ---- */
   .navbar {
@@ -143,24 +146,8 @@
   .nav-count { color: rgba(255,255,255,0.85); font-size: 14px; font-weight: 600; letter-spacing: 0.5px; }
   .nav-right { display: flex; gap: 10px; align-items: center; }
 
-  /* ---- Mobile / small screens ---- */
+  /* ---- Nav bar responsivo (fora do canvas escalado) ---- */
   @media (max-width: 700px) {
-    .slide { padding: 76px 4vw 92px; }
-
-    .cols-2-wrap { gap: 6px; max-width: 100%; }
-    .cols-2-wrap li { font-size: 0.82rem; padding: 8px 10px; flex-direction: column; align-items: flex-start; gap: 4px; }
-    .cols-2-wrap .listen-btn { width: 24px; height: 24px; }
-    .cols-2-wrap .listen-btn svg { width: 12px; height: 12px; }
-
-    .blanks-cols { gap: 16px; }
-    .blank-line { font-size: 0.95rem; gap: 8px; }
-    .blank-line .rule { flex: 1; width: auto; min-width: 24px; }
-
-    .letter-grid, .match-grid, .choice-list { max-width: 100%; }
-    .letter-grid:has(.two-line) { grid-template-columns: repeat(4, 1fr) !important; }
-    .choice-row { padding: 8px 14px; }
-    .choice-opt { padding: 7px 12px; font-size: 0.92rem; min-width: 42px; }
-
     .navbar { padding: 10px 10px; }
     .nav-btn { padding: 10px 12px; font-size: 12.5px; white-space: nowrap; }
     .nav-count { font-size: 11.5px; }
@@ -168,7 +155,6 @@
   }
   @media (max-width: 380px) {
     .nav-btn { padding: 9px 9px; font-size: 11px; }
-    .letter-grid:has(.two-line) { grid-template-columns: repeat(3, 1fr) !important; }
   }
 </style>
 </head>
@@ -396,12 +382,20 @@ function renderSlide(s) {
           : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;color:var(--muted);font-size:1.1rem;">Cole aqui o link de embed do Wordwall<br>(veja o comentário no topo do código)</div>`}
       </div>`;
   }
-  el.innerHTML = `<div class="slide-inner">${el.innerHTML}</div>`;
   return el;
 }
 
 SLIDES.forEach(s => deck.appendChild(renderSlide(s)));
 const slideEls = Array.from(deck.children);
+
+// ---- Escala o canvas fixo (1920x1080) pra caber na tela, tipo um slide de apresentação ----
+function fitStage() {
+  const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+  deck.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
+}
+fitStage();
+window.addEventListener('resize', fitStage);
+window.addEventListener('orientationchange', fitStage);
 
 deck.addEventListener('click', (e) => {
   const btn = e.target.closest('[data-speak]');
