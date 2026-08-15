@@ -1,302 +1,314 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aula 8 · My Family! · itsbrendacleto</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Aula 8 · My Family! · itsbrendacleto Kids</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{
-    --pink:#F2A7C3;
-    --mint:#A8E6CF;
-    --lavender:#C9A8E8;
-    --yellow:#FFD97D;
-    --coral:#FFB3A7;
-    --blue:#5BC4E8;
-    --dark:#3A3A3A;
-    --brown1:#7A4A2B;
-    --brown2:#5A331B;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Nunito Sans', sans-serif;
-    color:var(--dark);
-    background:
-      linear-gradient(#ffffffee,#ffffffee),
-      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 40px),
-      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 40px);
-    background-color:#fff;
-    min-height:100vh;
-  }
-  h1,h2,h3{ font-family:'Nunito', sans-serif; margin:0; }
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+  :root{--cream:#FDF6EE;--sand:#F0E4D0;--brown:#8B5943;--brown-dk:#5C3320;--rose:#F2A7C3;--rose-lt:#FDEAF3;--sky:#A8D8EA;--sky-lt:#E8F7FC;--mint:#A8E6CF;--mint-lt:#E8FAF2;--lav:#C9A8E8;--lav-lt:#F2ECFC;--sun:#FFD97D;--sun-lt:#FFFBEC;--coral:#FFB3A7;--coral-lt:#FFF0EE;--white:#FFFFFF;--text:#3A2A1E;--text-md:#7A5C4A;--r:18px;--rs:12px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+  .header{background:linear-gradient(135deg,var(--brown-dk),var(--brown));padding:28px 20px 32px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(242,167,195,.22),transparent 50%),radial-gradient(circle at 10% 80%,rgba(168,216,234,.18),transparent 50%);}
+  .brand{font-family:'Nunito',sans-serif;font-weight:900;font-size:.8rem;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;position:relative;margin-bottom:10px;}
+  .brand span{color:var(--rose);}
+  .h-emoji{font-size:3rem;display:block;position:relative;margin-bottom:6px;}
+  .h-num{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;position:relative;}
+  .h-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.5rem,5vw,2rem);color:#fff;line-height:1.15;position:relative;margin-top:4px;}
+  .h-title em{color:var(--rose);font-style:normal;}
+  .h-desc{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:8px;position:relative;}
+  .pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;position:relative;}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:.72rem;padding:5px 12px;border-radius:20px;cursor:pointer;transition:background .2s;}
+  .pill:hover,.pill.on{background:var(--rose);border-color:var(--rose);}
 
+  .main{padding:20px 16px 40px;max-width:600px;margin:0 auto;}
+  .sec{background:#fff;border-radius:var(--r);box-shadow:0 4px 20px rgba(139,89,67,.09);margin-bottom:16px;overflow:hidden;display:none;}
+  .sec.on{display:block;}
+  .ch{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--sand);}
+  .ci{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .ci.rose{background:var(--rose-lt);}.ci.lav{background:var(--lav-lt);}.ci.mint{background:var(--mint-lt);}.ci.sun{background:var(--sun-lt);}.ci.sky{background:var(--sky-lt);}.ci.coral{background:var(--coral-lt);}
+  .ct{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--brown-dk);}
+  .cs{font-size:.78rem;color:var(--text-md);margin-top:1px;}
+  .cb{padding:18px 20px;}
+
+  /* FLASHCARDS */
+  .fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .fc{perspective:600px;cursor:pointer;height:110px;}
+  .fc-in{width:100%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;}
+  .fc.flip .fc-in{transform:rotateY(180deg);}
+  .fc-f,.fc-b{position:absolute;inset:0;border-radius:var(--rs);backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;border:2px solid transparent;}
+  .fc-f{background:var(--sun-lt);border-color:var(--sun);}
+  .fc-b{background:var(--sky-lt);border-color:var(--sky);transform:rotateY(180deg);}
+  .fc-em{font-size:1.7rem;margin-bottom:4px;}
+  .fc-en{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--brown-dk);line-height:1.2;}
+  .fc-pt{font-size:.7rem;color:var(--text-md);margin-top:2px;}
+  .fc-tap{font-size:.6rem;color:var(--text-md);opacity:.7;margin-top:4px;}
+  .abtn{background:var(--sun);border:none;cursor:pointer;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.75rem;margin-top:4px;transition:transform .15s;}
+  .abtn:hover{transform:scale(1.18);}
+
+  /* WORD SEARCH */
+  .ws-status{text-align:center;font-family:'Nunito',sans-serif;font-weight:800;color:var(--brown-dk);min-height:22px;margin-bottom:10px;font-size:.86rem;}
+  .ws-wrap{display:flex;justify-content:center;margin-bottom:16px;overflow-x:auto;}
+  .ws-grid{display:grid;gap:2px;background:var(--sand);padding:4px;border-radius:var(--rs);}
+  .ws-cell{width:24px;height:24px;border:none;background:#fff;color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;font-size:.66rem;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:4px;padding:0;transition:all .15s;}
+  .ws-cell.selecting{background:var(--sun);}
+  .ws-cell.found{background:var(--mint);color:#1a5c3a;}
+  .ws-cell.wrong{background:var(--coral);}
+  .ws-wordbank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:14px;}
+  .ws-word{background:var(--sand);border-radius:var(--rs);padding:6px 12px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.76rem;color:var(--brown-dk);}
+  .ws-word.found{background:var(--mint-lt);border:1.5px solid var(--mint);text-decoration:line-through;opacity:.75;}
+  .ws-final{text-align:center;padding:6px 0 2px;}
+  .ws-final-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);margin-bottom:6px;}
+
+  /* QUESTION BUILDER (Build It) */
+  .sb-prog{font-size:.75rem;color:var(--text-md);font-weight:700;text-align:right;margin-bottom:8px;}
+  .sb-prompt{background:var(--sun-lt);border:2px solid var(--sun);border-radius:var(--rs);padding:12px 16px;text-align:center;margin-bottom:14px;}
+  .sb-prompt-text{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;color:var(--brown-dk);}
+  .sb-sentence{min-height:52px;background:var(--white);border:2.5px dashed var(--lav);border-radius:var(--rs);padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;}
+  .sb-slot{font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;color:var(--brown-dk);background:var(--lav-lt);border:2px solid var(--lav);border-radius:10px;padding:5px 12px;cursor:pointer;transition:all .2s;}
+  .sb-slot:hover{background:var(--lav);color:#fff;}
+  .sb-words{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+  .sb-word{font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;color:var(--brown-dk);background:var(--mint-lt);border:2px solid var(--mint);border-radius:10px;padding:6px 14px;cursor:pointer;transition:all .2s;user-select:none;}
+  .sb-word:hover{background:var(--mint);transform:scale(1.05);}
+  .sb-word.used{opacity:.35;pointer-events:none;}
+  .sb-actions{display:flex;gap:8px;}
+  .btn-check{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;flex:1;}
+  .btn-clear{background:var(--sand);color:var(--text-md);border:none;border-radius:var(--rs);padding:10px 16px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;}
+  .sb-fb{font-family:'Nunito',sans-serif;font-weight:800;font-size:.88rem;padding:10px;border-radius:var(--rs);text-align:center;margin-top:10px;display:none;}
+  .sb-fb.show{display:block;}.sb-fb.ok{background:var(--mint-lt);color:#2E7D5E;}.sb-fb.fail{background:var(--coral-lt);color:#b03025;}
+  .sb-final{text-align:center;padding:14px 0;}
+  .sb-final-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);margin-bottom:6px;}
+
+  /* ASK & ANSWER */
+  .ask-progress{text-align:center;font-size:.75rem;color:var(--text-md);margin-bottom:10px;font-weight:700;}
+  .ask-card{background:var(--lav-lt);border:2.5px solid var(--lav);border-radius:var(--r);padding:22px 18px;text-align:center;margin-bottom:14px;}
+  .ask-fact{font-family:'Nunito',sans-serif;font-weight:700;font-size:.92rem;color:var(--brown-dk);margin-bottom:14px;}
+  .ask-question{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.05rem;color:var(--brown-dk);margin-bottom:16px;}
+  .ask-blank{background:#fff;border-radius:8px;padding:2px 10px;border:2px dashed var(--lav);}
+  .ask-buttons{display:flex;gap:12px;justify-content:center;}
+  .ask-buttons button{border:none;border-radius:var(--rs);padding:12px 26px;font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;cursor:pointer;background:#fff;color:var(--brown-dk);transition:all .15s;}
+  .ask-buttons button:hover{transform:scale(1.05);}
+  .ask-buttons button.correct{background:var(--mint);color:#2E7D5E;}
+  .ask-buttons button.incorrect{background:var(--coral);color:#b03025;}
+  .ask-final{text-align:center;padding:14px 0;}
+  .ask-final-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);margin-bottom:6px;}
+  .btn-rt{background:var(--sand);color:var(--brown-dk);border:none;border-radius:var(--rs);padding:8px 18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;margin-top:12px;}
+
+  /* QUIZ */
+  .qprow{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .qpbar{flex:1;height:8px;background:var(--sand);border-radius:20px;overflow:hidden;}
+  .qpfill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--sun),var(--rose));transition:width .4s;}
+  .qplbl{font-size:.74rem;color:var(--text-md);font-weight:700;white-space:nowrap;}
+  .qq{background:var(--sun-lt);border:2px solid var(--sun);border-radius:var(--rs);padding:14px;text-align:center;margin-bottom:12px;}
+  .qq-txt{font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem;color:var(--brown-dk);}
+  .qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .qopt{background:#fff;border:2px solid var(--sand);border-radius:var(--rs);padding:10px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--text);text-align:center;transition:all .18s;line-height:1.25;}
+  .qopt:hover{border-color:var(--sun);background:var(--sun-lt);}
+  .qopt.ok{border-color:var(--mint);background:var(--mint-lt);color:#2E7D5E;}
+  .qopt.fail{border-color:var(--coral);background:var(--coral-lt);color:#b03025;}
+  .qopt:disabled{cursor:default;}
+  .qfb{text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;padding:9px;border-radius:var(--rs);margin-bottom:10px;display:none;}
+  .qfb.on{display:block;}.qfb.ok{background:var(--mint-lt);color:#2E7D5E;}.qfb.fail{background:var(--coral-lt);color:#b03025;}
+  .qnav{display:flex;justify-content:center;}
+  .btn-nx{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:9px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;display:none;}
+  .qres{text-align:center;padding:14px;display:none;}
+  .qres.on{display:block;}
+  .qres-em{font-size:2.8rem;display:block;margin-bottom:6px;}
+  .qres-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);}
+  .qres-s{color:var(--text-md);font-size:.83rem;margin-top:4px;}
+
+  /* BADGE */
+  .badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .4s;}
+  .badge-overlay.show{opacity:1;pointer-events:all;}
+  .badge-card{background:linear-gradient(160deg,#FFF9EC,#FFF0F8);border-radius:28px;padding:28px 22px 24px;max-width:310px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(92,51,32,.35);border:3px solid var(--sun);position:relative;overflow:hidden;animation:badgePop .5s cubic-bezier(.34,1.56,.64,1);}
+  .badge-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:var(--rose-lt);border-radius:50%;opacity:.6;}
+  .badge-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:var(--sun-lt);border-radius:50%;opacity:.6;}
+  @keyframes badgePop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+  .badge-stars{font-size:1.1rem;letter-spacing:4px;margin-bottom:8px;animation:starSpin 3s linear infinite;}
+  @keyframes starSpin{0%,100%{letter-spacing:4px}50%{letter-spacing:8px}}
+  .badge-shield{width:110px;height:110px;margin:0 auto 12px;position:relative;z-index:1;}
+  .badge-shield-bg{width:110px;height:110px;background:linear-gradient(135deg,var(--sun),#FFB347);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,179,71,.5),0 0 0 5px #fff,0 0 0 8px var(--sun);animation:shieldPulse 1.5s ease-in-out infinite;}
+  @keyframes shieldPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .badge-shield-em{font-size:3rem;}
+  .badge-ribbon{background:linear-gradient(90deg,var(--sun),var(--rose));color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 18px;border-radius:20px;display:inline-block;margin-bottom:10px;position:relative;z-index:1;}
+  .badge-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--brown-dk);line-height:1.15;margin-bottom:4px;position:relative;z-index:1;}
+  .badge-lesson{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--text-md);margin-bottom:12px;position:relative;z-index:1;}
+  .badge-divider{border:none;border-top:2px dashed var(--sun);margin:10px 0;position:relative;z-index:1;}
+  .badge-msg{font-size:.82rem;color:var(--text-md);line-height:1.55;margin-bottom:14px;position:relative;z-index:1;}
+  .badge-msg strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .badge-hashtag{font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;color:var(--lav);margin-bottom:16px;position:relative;z-index:1;}
+  .badge-btns{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .badge-btn-share{background:linear-gradient(135deg,var(--sun),var(--rose));color:var(--brown-dk);border:none;border-radius:var(--rs);padding:12px 20px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;transition:transform .15s;}
+  .badge-btn-share:hover{transform:translateY(-2px);}
+  .badge-btn-close{background:transparent;color:var(--text-md);border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;padding:6px;text-decoration:underline;}
+  .badge-confetti{position:fixed;pointer-events:none;animation:confettiFall linear forwards;z-index:1001;}
+  @keyframes confettiFall{0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(.5);opacity:0}}
+
+  /* MISSION */
+  .msn{background:var(--sun-lt);border:2.5px solid var(--sun);border-radius:var(--r);padding:16px;}
+  .msn-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .msn-ico{width:42px;height:42px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .msn-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:.92rem;color:var(--brown-dk);}
+  .msn-w{font-size:.73rem;color:var(--text-md);margin-top:1px;}
+  .msn-steps{display:flex;flex-direction:column;gap:8px;}
+  .mstep{display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;cursor:pointer;}
+  .stchk{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2.5px solid var(--sun);display:flex;align-items:center;justify-content:center;background:#fff;transition:all .2s;margin-top:1px;}
+  .stchk.on{background:var(--mint);border-color:var(--mint);}
+  .stchk.on::after{content:'✓';font-size:.72rem;color:#fff;font-weight:900;}
+  .stxt{font-size:.83rem;color:var(--text);line-height:1.4;}
+  .stxt strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .msn-rwd{display:flex;align-items:center;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;margin-top:10px;border:1.5px dashed var(--sun);}
+  .rwd-t{font-size:.78rem;color:var(--text-md);line-height:1.35;}
+  .rwd-t strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .footer{text-align:center;padding:22px 16px 30px;font-size:.72rem;color:var(--text-md);border-top:1.5px solid var(--sand);margin-top:8px;}
+  .footer strong{color:var(--brown);}
+  @media(max-width:400px){.qopts{grid-template-columns:1fr;}}
+
+  /* PLANNER MODE */
   .btn-voltar{display:none;align-items:center;gap:6px;background:rgba(0,0,0,0.3);border:none;border-radius:0;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-decoration:none;width:100%;position:relative;z-index:9999;pointer-events:all !important;}
   .btn-voltar:active{background:rgba(0,0,0,0.5);}
   .planner-mode .pills{display:none;}
   .planner-mode .btn-voltar{display:block;}
-
-  header{
-    background:linear-gradient(135deg, var(--brown1), var(--brown2));
-    color:#fff;
-    padding:22px 16px 18px;
-    border-radius:0 0 24px 24px;
-    text-align:center;
-  }
-  header .tag{
-    font-size:12px; font-weight:800; background:rgba(255,255,255,.18);
-    display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:8px;
-  }
-  header h1{ font-size:24px; font-weight:900; }
-  header .sub{ font-size:14px; opacity:.9; margin-top:4px; }
-
-  nav.pills{
-    display:flex; gap:8px; overflow-x:auto; padding:14px 12px 4px;
-    -webkit-overflow-scrolling:touch;
-  }
-  nav.pills::-webkit-scrollbar{ display:none; }
-  nav.pills button{
-    flex:0 0 auto; border:none; background:#f1f1f1; color:var(--dark);
-    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px;
-    padding:9px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;
-  }
-  nav.pills button.active{ background:var(--blue); color:#fff; }
-
-  main{ max-width:720px; margin:0 auto; padding:10px 16px 60px; }
-  section{ display:none; animation:fade .25s ease; }
-  section.show{ display:block; }
-  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  .section-title{ font-size:20px; font-weight:900; margin:14px 0 4px; }
-  .section-hint{ font-size:14px; color:#666; margin-bottom:14px; }
-  .how-box{
-    background:#eef7fb; border-left:4px solid var(--blue); border-radius:10px;
-    padding:12px 14px; font-size:14px; line-height:1.6; margin-bottom:14px; color:var(--dark);
-  }
-  .how-example{ display:block; margin-top:8px; font-style:italic; color:#555; font-size:13px; }
-
-  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-  .card{
-    background:var(--card-color, var(--pink)); border-radius:16px; padding:14px;
-    text-align:center; cursor:pointer; border:none; font-family:'Nunito Sans',sans-serif;
-    transition:transform .1s;
-  }
-  .card:active{ transform:scale(.96); }
-  .card .emoji{ font-size:32px; display:block; margin-bottom:6px; }
-  .card .en{ font-weight:800; font-size:14px; }
-  .card .pt{ font-size:11px; opacity:.75; }
-
-  .btn{ border:none; border-radius:14px; padding:12px 18px; font-weight:800; font-size:14px; cursor:pointer; background:var(--blue); color:#fff; }
-  .btn.secondary{ background:#eee; color:var(--dark); }
-
-  /* Word Search */
-  .ws-wrap{ display:flex; justify-content:center; margin-bottom:16px; }
-  .ws-grid{
-    display:grid;
-    gap:2px;
-    background:#ddd;
-    padding:4px;
-    border-radius:10px;
-  }
-  .ws-cell{
-    width:26px; height:26px; border:none; background:#fff; color:var(--dark);
-    font-weight:800; font-size:12px; display:flex; align-items:center; justify-content:center;
-    cursor:pointer; border-radius:4px; padding:0;
-  }
-  .ws-cell.selecting{ background:var(--yellow); }
-  .ws-cell.found{ background:var(--mint); color:#1a5c3a; }
-  .ws-cell.wrong{ background:var(--coral); }
-  .ws-wordbank{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:16px; }
-  .ws-word{
-    background:#f1f1f1; border-radius:10px; padding:6px 12px; font-weight:800; font-size:13px; color:var(--dark);
-  }
-  .ws-word.found{ background:var(--mint); text-decoration:line-through; opacity:.7; }
-  .ws-status{ text-align:center; font-weight:800; color:var(--blue); min-height:24px; }
-
-  /* Question Builder */
-  .build-target{
-    min-height:56px; background:#fff; border:2px dashed #ccc; border-radius:12px;
-    padding:10px; display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;
-  }
-  .chip{ background:var(--yellow); border:none; border-radius:20px; padding:8px 14px; font-weight:800; font-size:14px; cursor:pointer; }
-  .chip.placed{ background:var(--blue); color:#fff; }
-  .bank{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:14px; }
-  .row-btns{ display:flex; gap:10px; }
-  .build-progress{ font-size:13px; font-weight:700; color:#888; margin-bottom:10px; }
-  .feedback{ font-weight:800; margin-top:10px; font-size:15px; }
-  .feedback.ok{ color:#2e9e5b; }
-  .feedback.no{ color:#d9534f; }
-
-  /* Ask & Answer */
-  .ask-card{
-    background:var(--lavender); border-radius:18px; padding:22px; text-align:center; margin-bottom:14px;
-  }
-  .ask-fact{ font-size:17px; font-weight:700; margin-bottom:16px; }
-  .ask-question{ font-size:19px; font-weight:900; margin-bottom:16px; }
-  .ask-blank{ background:#fff; border-radius:8px; padding:2px 10px; }
-  .ask-buttons{ display:flex; gap:12px; justify-content:center; }
-  .ask-buttons button{ border:none; border-radius:14px; padding:14px 24px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; }
-  .ask-buttons button.correct{ background:var(--mint); }
-  .ask-buttons button.incorrect{ background:var(--coral); }
-  .ask-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
-
-  /* Quiz */
-  .quiz-progress{ height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:16px; }
-  .quiz-progress-bar{ height:100%; background:var(--blue); width:0%; transition:.3s; }
-  .quiz-q{ font-size:18px; font-weight:800; margin-bottom:14px; }
-  .quiz-opt{
-    display:block; width:100%; text-align:left; background:#f6f6f6; border:none;
-    border-radius:12px; padding:14px; margin-bottom:10px; font-size:15px; font-weight:700; cursor:pointer;
-  }
-  .quiz-opt.correct{ background:var(--mint); }
-  .quiz-opt.incorrect{ background:var(--coral); }
-  .quiz-final{ text-align:center; padding:30px 0; }
-  .quiz-final .score{ font-size:42px; font-weight:900; color:var(--blue); }
-
-  /* Missao */
-  .mission-item{
-    display:flex; align-items:center; gap:12px; background:#f6f6f6; border-radius:14px;
-    padding:14px; margin-bottom:10px; cursor:pointer;
-  }
-  .mission-item.done{ background:#dff5e6; }
-  .mission-check{
-    width:26px; height:26px; border-radius:50%; border:2px solid #bbb;
-    display:flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto;
-  }
-  .mission-item.done .mission-check{ background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
-  .mission-label{ font-weight:700; font-size:15px; }
-
-  .overlay{
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
-    align-items:center; justify-content:center; z-index:50; padding:20px;
-  }
-  .overlay.show{ display:flex; }
-  .badge-card{ background:#fff; border-radius:24px; padding:30px 24px; text-align:center; max-width:340px; position:relative; overflow:hidden; }
-  .badge-trophy{ font-size:70px; animation:bounce 1s infinite; }
-  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-  .badge-card h2{ font-size:22px; margin:10px 0 4px; }
-  .badge-card p{ font-size:14px; color:#666; margin-bottom:16px; }
-  .confetti{ position:absolute; top:-10px; font-size:18px; animation:fall 2.2s linear forwards; }
-  @keyframes fall{ to{ transform:translateY(420px) rotate(360deg); opacity:0; } }
-  .share-btn{ background:var(--pink); color:#fff; border:none; border-radius:14px; padding:12px 20px; font-weight:800; cursor:pointer; }
-  .close-btn{ background:none; border:none; color:#999; margin-top:10px; font-weight:700; cursor:pointer; }
 </style>
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#5C4033" />
-<link rel="icon" type="image/png" href="icons/icon-192.png" />
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').then(function (reg) {
-        setInterval(function () { reg.update(); }, 60000);
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'visible') reg.update();
-        });
-      }).catch(function () {});
-    });
-    navigator.serviceWorker.addEventListener('controllerchange', function () {
-      var active = document.activeElement;
-      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
-      if (isTyping) {
-        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
-      } else {
-        window.location.reload();
-      }
-    });
-  }
-</script>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 
 <a class="btn-voltar" id="btnVoltar" href="planner-kids-8.html">← Voltar para a lista</a>
-
-<header>
-  <div class="tag">⭐ KIDS EDITION · AULA 8</div>
-  <h1>👨‍👩‍👧‍👦 My Family!</h1>
-  <div class="sub">Homework practice · itsbrendacleto</div>
-</header>
-
-<nav class="pills" id="pills"></nav>
-
-<main>
-
-  <section id="vocab">
-    <div class="section-title">🃏 Vocabulary</div>
-    <div class="section-hint">Tap a card to hear it!</div>
-    <div class="grid" id="vocabGrid"></div>
-  </section>
-
-  <section id="search">
-    <div class="section-title">🔍 Word Search</div>
-    <div class="how-box">
-      Ache as palavras da família escondidas na grade! Toque na primeira letra da palavra e depois na última letra (na horizontal ou na vertical).
-    </div>
-    <div class="ws-status" id="wsStatus"></div>
-    <div class="ws-wrap"><div class="ws-grid" id="wsGrid"></div></div>
-    <div class="ws-wordbank" id="wsWordbank"></div>
-    <div class="row-btns" style="display:flex; justify-content:center;">
-      <button class="btn secondary" id="wsReset">🔄 New Puzzle</button>
-    </div>
-  </section>
-
-  <section id="build">
-    <div class="section-title">🧩 Question Builder</div>
-    <div class="how-box">
-      Transforme a frase afirmativa em uma pergunta completa! Toque nas palavras na ordem certa.
-    </div>
-    <div class="build-progress" id="buildProgress"></div>
-    <div class="build-target" id="buildTarget"></div>
-    <div class="bank" id="buildBank"></div>
-    <div class="row-btns">
-      <button class="btn" id="buildCheck">Check ✓</button>
-      <button class="btn secondary" id="buildClear">Clear</button>
-    </div>
-    <div class="feedback" id="buildFeedback"></div>
-  </section>
-
-  <section id="ask">
-    <div class="section-title">❓ Ask & Answer</div>
-    <div class="how-box">
-      Leia o fato. Depois, escolha se a pergunta começa com <b>Do</b> ou <b>Does</b>!
-    </div>
-    <div class="ask-progress" id="askProgress"></div>
-    <div class="ask-card">
-      <div class="ask-fact" id="askFact"></div>
-      <div class="ask-question" id="askQuestion"></div>
-      <div class="ask-buttons" id="askButtons"></div>
-    </div>
-  </section>
-
-  <section id="quiz">
-    <div class="section-title">❓ Quiz</div>
-    <div class="quiz-progress"><div class="quiz-progress-bar" id="quizBar"></div></div>
-    <div id="quizBody"></div>
-  </section>
-
-  <section id="missao">
-    <div class="section-title">🎯 Missão</div>
-    <div class="section-hint">Mark each activity as you finish it!</div>
-    <div id="missionList"></div>
-  </section>
-
-</main>
-
-<div class="overlay" id="badgeOverlay">
-  <div class="badge-card" id="badgeCard">
-    <div class="badge-trophy">🏆</div>
-    <h2>You did it!</h2>
-    <p>You finished Aula 8 — My Family! 🎉</p>
-    <button class="share-btn" id="shareBtn">📤 Share</button><br>
-    <button class="close-btn" id="closeBadge">Close</button>
+<div class="header">
+  <div class="brand">its<span>brenda</span>cleto · kids</div>
+  <span class="h-emoji">👨‍👩‍👧‍👦</span>
+  <div class="h-num">Aula 8 · Bloco 1</div>
+  <div class="h-title">My <em>Family!</em></div>
+  <div class="h-desc">Vocabulário da família · Do / Does</div>
+  <div class="pills">
+    <span class="pill on" onclick="show('vocab',this)">🃏 Vocab</span>
+    <span class="pill" onclick="show('search',this)">🔍 Search</span>
+    <span class="pill" onclick="show('build',this)">🧩 Build</span>
+    <span class="pill" onclick="show('ask',this)">❓ Ask</span>
+    <span class="pill" onclick="show('quiz',this)">❓ Quiz</span>
+    <span class="pill" onclick="show('mission',this)">🎯 Missão</span>
   </div>
 </div>
+
+<div class="main">
+
+  <!-- FLASHCARDS -->
+  <div class="sec on" id="sec-vocab">
+    <div class="ch"><div class="ci sun">🃏</div><div><div class="ct">Vocabulary</div><div class="cs">Toque no cartão · 🔊 para ouvir</div></div></div>
+    <div class="cb"><div class="fc-grid" id="fc-grid"></div></div>
+  </div>
+
+  <!-- WORD SEARCH -->
+  <div class="sec" id="sec-search">
+    <div class="ch"><div class="ci sky">🔍</div><div><div class="ct">Word Search</div><div class="cs">Ache as palavras da família escondidas na grade!</div></div></div>
+    <div class="cb">
+      <div class="ws-status" id="wsStatus"></div>
+      <div class="ws-wrap"><div class="ws-grid" id="wsGrid"></div></div>
+      <div class="ws-wordbank" id="wsWordbank"></div>
+      <div id="wsDone"></div>
+    </div>
+  </div>
+
+  <!-- QUESTION BUILDER -->
+  <div class="sec" id="sec-build">
+    <div class="ch"><div class="ci coral">🧩</div><div><div class="ct">Question Builder</div><div class="cs">Toque nas palavras na ordem certa para montar a pergunta!</div></div></div>
+    <div class="cb">
+      <div class="sb-prog" id="sb-prog"></div>
+      <div class="sb-prompt"><div class="sb-prompt-text" id="sb-prompt-text"></div></div>
+      <div class="sb-sentence" id="sb-sentence"></div>
+      <div class="sb-words" id="sb-words"></div>
+      <div class="sb-actions">
+        <button class="btn-check" onclick="checkSB()">✅ Verificar</button>
+        <button class="btn-clear" onclick="clearSB()">🗑️ Limpar</button>
+      </div>
+      <div class="sb-fb" id="sb-fb"></div>
+    </div>
+  </div>
+
+  <!-- ASK & ANSWER -->
+  <div class="sec" id="sec-ask">
+    <div class="ch"><div class="ci lav">❓</div><div><div class="ct">Ask & Answer</div><div class="cs">Leia o fato e escolha: a pergunta começa com Do ou Does?</div></div></div>
+    <div class="cb" id="ask-body"></div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="sec" id="sec-quiz">
+    <div class="ch"><div class="ci rose">❓</div><div><div class="ct">Quiz</div><div class="cs">My Family & Do/Does!</div></div></div>
+    <div class="cb">
+      <div class="qprow"><div class="qpbar"><div class="qpfill" id="qpf" style="width:0%"></div></div><span class="qplbl" id="qpl">0 / 12</span></div>
+      <div id="quiz-area"></div>
+      <div class="qres" id="qres">
+        <span class="qres-em" id="qres-em"></span>
+        <div class="qres-t" id="qres-t"></div>
+        <div class="qres-s" id="qres-s"></div>
+        <button class="btn-rt" onclick="initQuiz()">🔄 Jogar de novo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="sec" id="sec-mission">
+    <div class="ch"><div class="ci sun">🎯</div><div><div class="ct">Missão da Semana</div><div class="cs">Complete todas as etapas!</div></div></div>
+    <div class="cb">
+      <div class="msn">
+        <div class="msn-top"><div class="msn-ico">🎯</div><div><div class="msn-t">Sua missão dessa semana!</div><div class="msn-w">Aula 8 — My Family!</div></div></div>
+        <div class="msn-steps" id="msn-steps"></div>
+        <div class="msn-rwd"><span style="font-size:1.4rem">⭐</span><div class="rwd-t">Complete tudo e ganhe seu<br><strong>badge da jornada!</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BADGE -->
+<div class="badge-overlay" id="badge-overlay" onclick="closeBadge(event)">
+  <div class="badge-card">
+    <div class="badge-stars">⭐ ⭐ ⭐</div>
+    <div class="badge-shield"><div class="badge-shield-bg"><span class="badge-shield-em">👨‍👩‍👧‍👦</span></div></div>
+    <div class="badge-ribbon">itsbrendacleto · Kids</div>
+    <div class="badge-title">Missão<br>Completa! 🎉</div>
+    <div class="badge-lesson">Aula 8 — My Family!</div>
+    <hr class="badge-divider">
+    <div class="badge-msg">Parabéns! Você completou todas as atividades da Aula 8!<br><strong>Print esse badge e cole na sua coleção! 🖨️</strong></div>
+    <div class="badge-hashtag">#itsbrendacleto #kidsenglish</div>
+    <div class="badge-btns">
+      <button class="badge-btn-share" onclick="shareBadge()">📸 Compartilhar no Instagram!</button>
+      <button class="badge-btn-close" onclick="closeBadge()">fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Feito com 💛 por <strong>itsbrendacleto</strong> · Kids Edition</div>
 
 <script>
 var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
@@ -361,431 +373,405 @@ async function saveQuizScore(lessonId, score, total) {
   } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
 }
 
-/* ---------------- UTILS ---------------- */
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
+// ── DATA ──────────────────────────────────────────────────────────────────
+var familyWords = [
+  {en:'Mom', pt:'Mãe', em:'👩'},
+  {en:'Dad', pt:'Pai', em:'👨'},
+  {en:'Sister', pt:'Irmã', em:'👧'},
+  {en:'Brother', pt:'Irmão', em:'👦'},
+  {en:'Grandma', pt:'Avó', em:'👵'},
+  {en:'Grandpa', pt:'Avô', em:'👴'},
+  {en:'Aunt', pt:'Tia', em:'👩‍🦱'},
+  {en:'Uncle', pt:'Tio', em:'👨‍🦱'},
+  {en:'Cousin', pt:'Primo(a)', em:'🧑'},
+  {en:'Baby', pt:'Bebê', em:'👶'},
+  {en:'Dog', pt:'Cachorro', em:'🐶'},
+  {en:'Cat', pt:'Gato', em:'🐱'},
+  {en:'Fish', pt:'Peixe', em:'🐠'},
+  {en:'Bird', pt:'Pássaro', em:'🦜'}
+];
+
+var WS_SIZE = 12;
+var WS_WORDS = ['MOM','DAD','CAT','DOG','AUNT','UNCLE','SISTER','BROTHER'];
+
+var SB_SENTENCES = [
+  {words:['Does','she','have','a','dog','?'], correct:'Does she have a dog ?'},
+  {words:['Does','he','have','a','cat','?'],   correct:'Does he have a cat ?'},
+  {words:['Do','you','have','a','sister','?'], correct:'Do you have a sister ?'},
+  {words:['Do','they','have','a','cousin','?'],correct:'Do they have a cousin ?'},
+  {words:['Does','she','have','a','bird','?'], correct:'Does she have a bird ?'},
+  {words:['Does','he','have','a','fish','?'],  correct:'Does he have a fish ?'}
+];
+
+var ASK_ROUNDS = [
+  {fact:'Leo has a dog.', subject:'he', blankTail:'have a dog?', answer:'Does'},
+  {fact:'Mia and Sam have a cat.', subject:'they', blankTail:'have a cat?', answer:'Do'},
+  {fact:'You have a sister.', subject:'you', blankTail:'have a sister?', answer:'Do'},
+  {fact:'Grandma has a bird.', subject:'she', blankTail:'have a bird?', answer:'Does'},
+  {fact:'Your friends have pets.', subject:'your friends', blankTail:'have pets?', answer:'Do'},
+  {fact:'Your brother has a fish.', subject:'your brother', blankTail:'have a fish?', answer:'Does'},
+  {fact:'Grandpa has a cat.', subject:'he', blankTail:'have a cat?', answer:'Does'},
+  {fact:'I have a cousin.', subject:'I', blankTail:'have a cousin?', answer:'Do'},
+  {fact:'Mom and Dad have a dog.', subject:'your parents', blankTail:'have a dog?', answer:'Do'},
+  {fact:'Aunt Zoe has a baby.', subject:'she', blankTail:'have a baby?', answer:'Does'}
+];
+
+var QUIZ = [
+  {q:'Complete: He ___ a dog.', opts:['have','has'], c:1},
+  {q:'Complete: They ___ a cat.', opts:['have','has'], c:0},
+  {q:'Which is correct?', opts:["She don't have a brother","She doesn't have a brother","She not have a brother"], c:1},
+  {q:'Which is correct question?', opts:['Does you have a sister?','Do you have a sister?','Are you have a sister?'], c:1},
+  {q:'Which is correct question?', opts:['Do she have a dog?','Does she have a dog?','Does she has a dog?'], c:1},
+  {q:'Complete: I ___ a cousin.', opts:['have','has'], c:0},
+  {q:'What’s the correct negative of "He has a cat"?', opts:["He don't have a cat","He doesn't have a cat","He not has a cat"], c:1},
+  {q:'Which is correct?', opts:['She has a bird','She have a bird','She having a bird'], c:0},
+  {q:'Which is correct question?', opts:['Does they have a dog?','Do they have a dog?','Does them have a dog?'], c:1},
+  {q:'Which is correct question?', opts:['Does your brother has a fish?','Does your brother have a fish?','Do your brother have a fish?'], c:1},
+  {q:'Complete the question: ___ you have a pet?', opts:['Do','Does'], c:0},
+  {q:'Complete the question: ___ your grandma have a cat?', opts:['Do','Does'], c:1}
+];
+
+var MISSION = [
+  {id:'search', label:'Ache as palavras no <strong>Word Search</strong>'},
+  {id:'build',  label:'Monte as perguntas no <strong>Question Builder</strong>'},
+  {id:'ask',    label:'Jogue o <strong>Ask & Answer</strong>'},
+  {id:'quiz',   label:'Termine o <strong>Quiz</strong>'}
+];
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────
+var __ttsVoice=null;
+function __pickTtsVoice(){if(!window.speechSynthesis)return null;var voices=window.speechSynthesis.getVoices();if(!voices.length)return null;var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;});if(!en.length)return null;var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i;var normal=en.filter(function(v){return !NOVELTY.test(v.name);});var base=normal.length?normal:en;var sysDefault=base.filter(function(v){return v.default;})[0];if(sysDefault)return sysDefault;var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';});var pool=exact.length?exact:base;var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0];return pref||pool[0];}
+if(window.speechSynthesis){__ttsVoice=__pickTtsVoice();window.speechSynthesis.onvoiceschanged=function(){__ttsVoice=__pickTtsVoice();};}
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(__ttsVoice)u.voice=__ttsVoice;u.rate=.85;window.speechSynthesis.speak(u);}
+function shuffle(arr){return arr.slice().sort(function(){return Math.random()-.5;});}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+var inited={};
+function show(n,pill){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.pill').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('sec-'+n).classList.add('on');
+  if(pill) pill.classList.add('on');
+  if(!inited[n]){inited[n]=true;({vocab:initFC,search:initWS,build:initSB,ask:initAsk,quiz:initQuiz,mission:initMission})[n]();}
 }
-function speak(text, rate){
-  const u = new SpeechSynthesisUtterance(text.toLowerCase());
-  u.lang = 'en-US';
-  u.rate = rate || 0.85;
-  u.pitch = 1.05;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
+
+// ── FLASHCARDS ────────────────────────────────────────────────────────────
+function initFC(){renderFC();}
+function renderFC(){
+  var g=document.getElementById('fc-grid');g.innerHTML='';
+  familyWords.forEach(function(fc,i){
+    var d=document.createElement('div');d.className='fc';
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><span class="fc-em">'+fc.em+'</span><div class="fc-en">'+fc.en+'</div><button class="abtn" id="ab'+i+'">🔊</button><div class="fc-tap">toque para ver</div></div><div class="fc-b"><span class="fc-em">'+fc.em+'</span><div class="fc-en">'+fc.pt+'</div><div class="fc-pt">'+fc.en+'</div></div></div>';
+    d.addEventListener('click',function(){d.classList.toggle('flip');});
+    d.querySelector('.abtn').addEventListener('click',function(e){e.stopPropagation();speak(fc.en);});
+    g.appendChild(d);
+  });
 }
 
-/* ---------------- DATA ---------------- */
-const familyWords = [
-  {en:'Mom', pt:'Mãe', emoji:'👩'},
-  {en:'Dad', pt:'Pai', emoji:'👨'},
-  {en:'Sister', pt:'Irmã', emoji:'👧'},
-  {en:'Brother', pt:'Irmão', emoji:'👦'},
-  {en:'Grandma', pt:'Avó', emoji:'👵'},
-  {en:'Grandpa', pt:'Avô', emoji:'👴'},
-  {en:'Aunt', pt:'Tia', emoji:'👩\u200d🦱'},
-  {en:'Uncle', pt:'Tio', emoji:'👨\u200d🦱'},
-  {en:'Cousin', pt:'Primo(a)', emoji:'🧑'},
-  {en:'Baby', pt:'Bebê', emoji:'👶'},
-  {en:'Dog', pt:'Cachorro', emoji:'🐶'},
-  {en:'Cat', pt:'Gato', emoji:'🐱'},
-  {en:'Fish', pt:'Peixe', emoji:'🐠'},
-  {en:'Bird', pt:'Pássaro', emoji:'🦜'}
-];
-const cardColors = ['pink','mint','lavender','yellow','coral','blue'];
-
-const questionBuilderSentences = [
-  {affirmative:'She has a dog.', tokens:['Does','she','have','a','dog','?']},
-  {affirmative:'He has a cat.', tokens:['Does','he','have','a','cat','?']},
-  {affirmative:'You have a sister.', tokens:['Do','you','have','a','sister','?']},
-  {affirmative:'They have a cousin.', tokens:['Do','they','have','a','cousin','?']},
-  {affirmative:'She has a bird.', tokens:['Does','she','have','a','bird','?']},
-  {affirmative:'He has a fish.', tokens:['Does','he','have','a','fish','?']}
-];
-
-const askRounds = [
-  {fact:'Leo 👦 has a dog. 🐶', subject:'he', blankTail:'have a dog?', answer:'Does'},
-  {fact:'Mia and Sam 👧👦 have a cat. 🐱', subject:'they', blankTail:'have a cat?', answer:'Do'},
-  {fact:'You have a sister. 👧', subject:'you', blankTail:'have a sister?', answer:'Do'},
-  {fact:'Grandma 👵 has a bird. 🦜', subject:'she', blankTail:'have a bird?', answer:'Does'},
-  {fact:'Your friends 👫 have pets. 🐾', subject:'your friends', blankTail:'have pets?', answer:'Do'},
-  {fact:'Your brother 👦 has a fish. 🐠', subject:'your brother', blankTail:'have a fish?', answer:'Does'},
-  {fact:'Grandpa 👴 has a cat. 🐱', subject:'he', blankTail:'have a cat?', answer:'Does'},
-  {fact:'I have a cousin. 🧑', subject:'I', blankTail:'have a cousin?', answer:'Do'},
-  {fact:'Mom and Dad 👩👨 have a dog. 🐶', subject:'your parents', blankTail:'have a dog?', answer:'Do'},
-  {fact:'Aunt Zoe 👩\u200d🦱 has a baby. 👶', subject:'she', blankTail:'have a baby?', answer:'Does'}
-];
-
-const quizQuestions = [
-  {q:'Complete: He ___ a dog.', options:['have','has'], answer:1},
-  {q:'Complete: They ___ a cat.', options:['have','has'], answer:0},
-  {q:'Which is correct?', options:["She don't have a brother","She doesn't have a brother","She not have a brother"], answer:1},
-  {q:'Which is correct question?', options:['Does you have a sister?','Do you have a sister?','Are you have a sister?'], answer:1},
-  {q:'Which is correct question?', options:['Do she have a dog?','Does she have a dog?','Does she has a dog?'], answer:1},
-  {q:'Complete: I ___ a cousin.', options:['have','has'], answer:0},
-  {q:'What\u2019s the correct negative of "He has a cat"?', options:["He don't have a cat","He doesn't have a cat","He not has a cat"], answer:1},
-  {q:'Which is correct?', options:['She has a bird','She have a bird','She having a bird'], answer:0},
-  {q:'Which is correct question?', options:['Does they have a dog?','Do they have a dog?','Does them have a dog?'], answer:1},
-  {q:'Which is correct question?', options:['Does your brother has a fish?','Does your brother have a fish?','Do your brother have a fish?'], answer:1},
-  {q:'Complete the question: ___ you have a pet?', options:['Do','Does'], answer:0},
-  {q:'Complete the question: ___ your grandma have a cat?', options:['Do','Does'], answer:1}
-];
-
-const missionTasks = [
-  {id:'search', label:'🔍 Finish the Word Search'},
-  {id:'build', label:'🧩 Play Question Builder'},
-  {id:'ask', label:'❓ Play Ask & Answer'},
-  {id:'quiz', label:'❓ Finish the Quiz'}
-];
-
-/* ---------------- NAV ---------------- */
-const sections = ['vocab','search','build','ask','quiz','missao'];
-const pillLabels = {vocab:'🃏 Vocab', search:'🔍 Search', build:'🧩 Build', ask:'❓ Ask', quiz:'❓ Quiz', missao:'🎯 Missão'};
-const pillsNav = document.getElementById('pills');
-sections.forEach(name=>{
-  const b = document.createElement('button');
-  b.textContent = pillLabels[name];
-  b.addEventListener('click', ()=>show(name));
-  b.dataset.name = name;
-  pillsNav.appendChild(b);
-});
-function show(name){
-  sections.forEach(s=> document.getElementById(s).classList.toggle('show', s===name));
-  Array.from(pillsNav.children).forEach(b=> b.classList.toggle('active', b.dataset.name===name));
-}
-show('vocab');
-
-/* ---------------- VOCAB ---------------- */
-const vocabGrid = document.getElementById('vocabGrid');
-familyWords.forEach((s,i)=>{
-  const card = document.createElement('button');
-  card.className = 'card';
-  card.style.setProperty('--card-color', `var(--${cardColors[i % cardColors.length]})`);
-  card.innerHTML = `<span class="emoji">${s.emoji}</span><span class="en">${s.en}</span><br><span class="pt">${s.pt}</span>`;
-  card.addEventListener('click', ()=> speak(s.en));
-  vocabGrid.appendChild(card);
-});
-
-/* ---------------- WORD SEARCH ---------------- */
-const WS_SIZE = 12;
-const WS_WORDS = ['MOM','DAD','CAT','DOG','AUNT','UNCLE','SISTER','BROTHER'];
-let wsGridData = [], wsPlacements = [], wsFoundWords = new Set(), wsFirstCell = null;
-
+// ── WORD SEARCH ───────────────────────────────────────────────────────────
+var wsGridData=[],wsPlacements=[],wsFoundWords=new Set(),wsFirstCell=null;
+function initWS(){renderWordSearch();}
 function generateWordSearch(){
-  let ok = false;
-  for(let attempt=0; attempt<30 && !ok; attempt++){
-    wsGridData = Array.from({length:WS_SIZE}, ()=>Array(WS_SIZE).fill(null));
-    wsPlacements = [];
-    ok = true;
-    for(const word of WS_WORDS){
-      let placed = false;
-      for(let tries=0; tries<300 && !placed; tries++){
-        const dir = Math.random() < 0.5 ? 'H' : 'V';
-        const len = word.length;
-        const row = Math.floor(Math.random() * WS_SIZE);
-        const col = Math.floor(Math.random() * WS_SIZE);
-        if(dir === 'H' && col + len > WS_SIZE) continue;
-        if(dir === 'V' && row + len > WS_SIZE) continue;
-        const cells = [];
-        let fits = true;
-        for(let i=0;i<len;i++){
-          const r = dir === 'H' ? row : row + i;
-          const c = dir === 'H' ? col + i : col;
-          const existing = wsGridData[r][c];
-          if(existing && existing !== word[i]){ fits = false; break; }
+  var ok=false;
+  for(var attempt=0;attempt<30&&!ok;attempt++){
+    wsGridData=Array.from({length:WS_SIZE},function(){return Array(WS_SIZE).fill(null);});
+    wsPlacements=[];ok=true;
+    for(var wi=0;wi<WS_WORDS.length;wi++){
+      var word=WS_WORDS[wi],placed=false;
+      for(var tries=0;tries<300&&!placed;tries++){
+        var dir=Math.random()<0.5?'H':'V';
+        var len=word.length;
+        var row=Math.floor(Math.random()*WS_SIZE);
+        var col=Math.floor(Math.random()*WS_SIZE);
+        if(dir==='H'&&col+len>WS_SIZE)continue;
+        if(dir==='V'&&row+len>WS_SIZE)continue;
+        var cells=[],fits=true;
+        for(var i=0;i<len;i++){
+          var r=dir==='H'?row:row+i;
+          var c=dir==='H'?col+i:col;
+          var existing=wsGridData[r][c];
+          if(existing&&existing!==word[i]){fits=false;break;}
           cells.push([r,c]);
         }
         if(fits){
-          cells.forEach(([r,c], i) => { wsGridData[r][c] = word[i]; });
-          wsPlacements.push({ word, cells });
-          placed = true;
+          cells.forEach(function(cell,i){wsGridData[cell[0]][cell[1]]=word[i];});
+          wsPlacements.push({word:word,cells:cells});
+          placed=true;
         }
       }
-      if(!placed){ ok = false; break; }
+      if(!placed){ok=false;break;}
     }
   }
-  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  for(let r=0;r<WS_SIZE;r++){
-    for(let c=0;c<WS_SIZE;c++){
-      if(!wsGridData[r][c]) wsGridData[r][c] = letters[Math.floor(Math.random()*26)];
+  var letters='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  for(var r=0;r<WS_SIZE;r++){
+    for(var c=0;c<WS_SIZE;c++){
+      if(!wsGridData[r][c])wsGridData[r][c]=letters[Math.floor(Math.random()*26)];
     }
   }
 }
-
-function cellsKey(cells){
-  return cells.map(c=>c.join(',')).sort().join('|');
-}
-
+function cellsKey(cells){return cells.map(function(c){return c.join(',');}).sort().join('|');}
 function renderWordSearch(){
-  wsFoundWords = new Set();
-  wsFirstCell = null;
+  document.getElementById('wsDone').innerHTML='';
+  wsFoundWords=new Set();wsFirstCell=null;
   generateWordSearch();
-
-  const gridEl = document.getElementById('wsGrid');
-  gridEl.style.gridTemplateColumns = `repeat(${WS_SIZE}, 26px)`;
-  gridEl.innerHTML = '';
-  for(let r=0;r<WS_SIZE;r++){
-    for(let c=0;c<WS_SIZE;c++){
-      const btn = document.createElement('button');
-      btn.className = 'ws-cell';
-      btn.textContent = wsGridData[r][c];
-      btn.dataset.r = r;
-      btn.dataset.c = c;
-      btn.addEventListener('click', ()=> onWsCellClick(r, c, btn));
+  var gridEl=document.getElementById('wsGrid');
+  gridEl.style.display='grid';
+  gridEl.style.gridTemplateColumns='repeat('+WS_SIZE+', 24px)';
+  gridEl.innerHTML='';
+  for(var r=0;r<WS_SIZE;r++){
+    for(var c=0;c<WS_SIZE;c++){
+      var btn=document.createElement('button');
+      btn.className='ws-cell';
+      btn.textContent=wsGridData[r][c];
+      btn.dataset.r=r;btn.dataset.c=c;
+      (function(rr,cc,b){b.addEventListener('click',function(){onWsCellClick(rr,cc,b);});})(r,c,btn);
       gridEl.appendChild(btn);
     }
   }
-
-  const bank = document.getElementById('wsWordbank');
-  bank.innerHTML = '';
-  WS_WORDS.forEach(w=>{
-    const chip = document.createElement('div');
-    chip.className = 'ws-word';
-    chip.textContent = w;
-    chip.dataset.word = w;
+  var bank=document.getElementById('wsWordbank');
+  bank.style.display='flex';
+  bank.innerHTML='';
+  WS_WORDS.forEach(function(w){
+    var chip=document.createElement('div');
+    chip.className='ws-word';chip.textContent=w;chip.dataset.word=w;
     bank.appendChild(chip);
   });
-  document.getElementById('wsStatus').textContent = `Found: 0 / ${WS_WORDS.length}`;
+  document.getElementById('wsStatus').textContent='Found: 0 / '+WS_WORDS.length;
 }
-
-function getCellBtn(r,c){
-  return document.querySelector(`.ws-cell[data-r="${r}"][data-c="${c}"]`);
-}
-
-function onWsCellClick(r, c, btn){
-  if(wsFirstCell === null){
-    wsFirstCell = {r, c};
-    btn.classList.add('selecting');
-    return;
-  }
-  const first = wsFirstCell;
-  wsFirstCell = null;
-  getCellBtn(first.r, first.c).classList.remove('selecting');
-
-  let pathCells = [];
-  if(first.r === r){
-    const lo = Math.min(first.c, c), hi = Math.max(first.c, c);
-    for(let cc=lo; cc<=hi; cc++) pathCells.push([r, cc]);
-  } else if(first.c === c){
-    const lo = Math.min(first.r, r), hi = Math.max(first.r, r);
-    for(let rr=lo; rr<=hi; rr++) pathCells.push([rr, c]);
-  } else {
-    return; // not a straight line, ignore
-  }
-
-  const key = cellsKey(pathCells);
-  const match = wsPlacements.find(p => !wsFoundWords.has(p.word) && cellsKey(p.cells) === key);
-
+function getCellBtn(r,c){return document.querySelector('.ws-cell[data-r="'+r+'"][data-c="'+c+'"]');}
+function onWsCellClick(r,c,btn){
+  if(wsFirstCell===null){wsFirstCell={r:r,c:c};btn.classList.add('selecting');return;}
+  var first=wsFirstCell;wsFirstCell=null;
+  getCellBtn(first.r,first.c).classList.remove('selecting');
+  var pathCells=[];
+  if(first.r===r){
+    var lo=Math.min(first.c,c),hi=Math.max(first.c,c);
+    for(var cc=lo;cc<=hi;cc++)pathCells.push([r,cc]);
+  } else if(first.c===c){
+    var lo2=Math.min(first.r,r),hi2=Math.max(first.r,r);
+    for(var rr=lo2;rr<=hi2;rr++)pathCells.push([rr,c]);
+  } else { return; }
+  var key=cellsKey(pathCells);
+  var match=wsPlacements.find(function(p){return !wsFoundWords.has(p.word)&&cellsKey(p.cells)===key;});
   if(match){
     wsFoundWords.add(match.word);
-    match.cells.forEach(([rr,cc]) => getCellBtn(rr,cc).classList.add('found'));
-    const chip = document.querySelector(`.ws-word[data-word="${match.word}"]`);
-    if(chip) chip.classList.add('found');
-    document.getElementById('wsStatus').textContent = `Found: ${wsFoundWords.size} / ${WS_WORDS.length}`;
-    if(wsFoundWords.size === WS_WORDS.length){
-      document.getElementById('wsStatus').textContent = `🎉 You found all the words!`;
+    match.cells.forEach(function(cell){getCellBtn(cell[0],cell[1]).classList.add('found');});
+    var chip=document.querySelector('.ws-word[data-word="'+match.word+'"]');
+    if(chip)chip.classList.add('found');
+    document.getElementById('wsStatus').textContent='Found: '+wsFoundWords.size+' / '+WS_WORDS.length;
+    if(wsFoundWords.size===WS_WORDS.length){
+      document.getElementById('wsStatus').textContent='';
+      document.getElementById('wsGrid').style.display='none';
+      document.getElementById('wsWordbank').style.display='none';
+      document.getElementById('wsDone').innerHTML='<div class="ws-final"><div style="font-size:2.6rem;margin-bottom:6px">🎉</div><div class="ws-final-t">You found all the words!</div><button class="btn-rt" onclick="renderWordSearch()">🔄 New Puzzle</button></div>';
       markDone('search');
     }
   } else {
-    pathCells.forEach(([rr,cc]) => {
-      const cell = getCellBtn(rr,cc);
-      cell.classList.add('wrong');
-      setTimeout(()=> cell.classList.remove('wrong'), 350);
+    pathCells.forEach(function(cell){
+      var cellBtn=getCellBtn(cell[0],cell[1]);
+      cellBtn.classList.add('wrong');
+      setTimeout(function(){cellBtn.classList.remove('wrong');},350);
     });
   }
 }
-document.getElementById('wsReset').addEventListener('click', renderWordSearch);
-renderWordSearch();
 
-/* ---------------- QUESTION BUILDER ---------------- */
-let buildIndex = 0, currentPlaced = [];
-function renderBuild(){
-  const s = questionBuilderSentences[buildIndex];
-  document.getElementById('buildProgress').textContent = `Sentence ${buildIndex+1} of ${questionBuilderSentences.length}: "${s.affirmative}"`;
-  document.getElementById('buildFeedback').textContent = '';
-  currentPlaced = [];
-  const bank = document.getElementById('buildBank');
-  const target = document.getElementById('buildTarget');
-  bank.innerHTML=''; target.innerHTML='';
-  const shuffled = shuffle(s.tokens.map((t,i)=>({t,i})));
-  shuffled.forEach(obj=>{
-    const chip = document.createElement('button');
-    chip.className = 'chip';
-    chip.textContent = obj.t;
-    chip.dataset.idx = obj.i;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      chip.classList.add('placed');
-      currentPlaced.push({t:obj.t, i:obj.i, el:chip});
-      const placedChip = document.createElement('button');
-      placedChip.className = 'chip placed';
-      placedChip.textContent = obj.t;
-      placedChip.addEventListener('click', ()=>{
-        target.removeChild(placedChip);
-        chip.classList.remove('placed');
-        currentPlaced = currentPlaced.filter(p=>p.el!==chip);
-      });
-      target.appendChild(placedChip);
+// ── QUESTION BUILDER ──────────────────────────────────────────────────────
+var sbIdx=0,sbSlots=[];
+function initSB(){sbIdx=0;renderSB();}
+function renderSB(){
+  if(sbIdx>=SB_SENTENCES.length){
+    document.getElementById('sb-prog').textContent='';
+    document.getElementById('sb-prompt-text').textContent='';
+    document.querySelector('.sb-prompt').style.display='none';
+    document.getElementById('sb-sentence').innerHTML='';
+    document.getElementById('sb-words').innerHTML='';
+    document.querySelector('.sb-actions').style.display='none';
+    document.getElementById('sb-fb').className='sb-fb show ok';
+    document.getElementById('sb-fb').innerHTML='<div style="font-size:2.6rem;margin-bottom:6px">🎉</div><div class="sb-final-t">You built all the questions!</div><button class="btn-rt" onclick="initSB()">🔄 Play Again</button>';
+    markDone('build');
+    return;
+  }
+  document.querySelector('.sb-prompt').style.display='block';
+  document.querySelector('.sb-actions').style.display='flex';
+  var s=SB_SENTENCES[sbIdx];
+  document.getElementById('sb-prog').textContent='Question '+(sbIdx+1)+' / '+SB_SENTENCES.length;
+  document.getElementById('sb-prompt-text').textContent='🧩 Monte a pergunta com as peças abaixo!';
+  document.getElementById('sb-fb').className='sb-fb';
+  sbSlots=[];
+  renderSBSentence();
+  var shuffled=shuffle(s.words);
+  var wordsEl=document.getElementById('sb-words');wordsEl.innerHTML='';
+  shuffled.forEach(function(w){
+    var b=document.createElement('div');b.className='sb-word';b.textContent=w;b.dataset.word=w;
+    b.addEventListener('click',function(){
+      if(b.classList.contains('used'))return;
+      sbSlots.push(w);b.classList.add('used');renderSBSentence();
     });
-    bank.appendChild(chip);
+    wordsEl.appendChild(b);
   });
 }
-document.getElementById('buildCheck').addEventListener('click', ()=>{
-  const s = questionBuilderSentences[buildIndex];
-  const built = currentPlaced.map(p=>p.t);
-  const correct = built.length === s.tokens.length && built.every((w,i)=>w===s.tokens[i]);
-  const fb = document.getElementById('buildFeedback');
-  if(correct){
-    fb.textContent = '✅ Correct!';
-    fb.className = 'feedback ok';
-    if(buildIndex === questionBuilderSentences.length - 1) markDone('build');
-    setTimeout(()=>{
-      buildIndex = (buildIndex+1) % questionBuilderSentences.length;
-      renderBuild();
-    }, 900);
-  } else {
-    fb.textContent = '🤔 Try again!';
-    fb.className = 'feedback no';
+function renderSBSentence(){
+  var el=document.getElementById('sb-sentence');el.innerHTML='';
+  sbSlots.forEach(function(w,i){
+    var d=document.createElement('div');d.className='sb-slot';d.textContent=w;
+    d.addEventListener('click',function(){removeFromSlot(i);});
+    el.appendChild(d);
+  });
+  if(sbSlots.length===0){
+    var hint=document.createElement('div');hint.style.cssText='font-size:.8rem;color:var(--text-md);opacity:.6;font-style:italic';hint.textContent='Toque nas palavras abaixo para montar a pergunta!';
+    el.appendChild(hint);
   }
-});
-document.getElementById('buildClear').addEventListener('click', renderBuild);
-renderBuild();
+}
+function removeFromSlot(idx){
+  var removed=sbSlots.splice(idx,1)[0];
+  var words=document.querySelectorAll('.sb-word');
+  for(var i=0;i<words.length;i++){
+    if(words[i].dataset.word===removed&&words[i].classList.contains('used')){words[i].classList.remove('used');break;}
+  }
+  renderSBSentence();
+}
+function clearSB(){
+  if(sbIdx>=SB_SENTENCES.length)return;
+  sbSlots=[];
+  document.querySelectorAll('.sb-word').forEach(function(b){b.classList.remove('used');});
+  renderSBSentence();
+  document.getElementById('sb-fb').className='sb-fb';
+}
+function checkSB(){
+  if(sbIdx>=SB_SENTENCES.length)return;
+  var s=SB_SENTENCES[sbIdx];
+  var answer=sbSlots.join(' ');
+  var fb=document.getElementById('sb-fb');
+  if(answer===s.correct){
+    fb.textContent='🎉 Perfeito! "'+s.correct.replace(' ?','?')+'"';
+    fb.className='sb-fb show ok';
+    speak(s.correct.replace(' ?','?'));
+    setTimeout(function(){sbIdx++;renderSB();},1200);
+  } else if(sbSlots.length<s.words.length){
+    fb.textContent='😅 Use todas as palavras!';
+    fb.className='sb-fb show fail';
+  } else {
+    fb.textContent='😅 Quase! A ordem correta é: "'+s.correct.replace(' ?','?')+'"';
+    fb.className='sb-fb show fail';
+    setTimeout(function(){sbIdx++;renderSB();},1800);
+  }
+}
 
-/* ---------------- ASK & ANSWER ---------------- */
-let askOrder = shuffle(askRounds), askIndex = 0;
+// ── ASK & ANSWER ──────────────────────────────────────────────────────────
+var askOrder=[],askIndex=0;
+function initAsk(){askOrder=shuffle(ASK_ROUNDS);askIndex=0;renderAsk();}
 function renderAsk(){
-  document.getElementById('askProgress').textContent = `Question ${Math.min(askIndex+1, askOrder.length)} of ${askOrder.length}`;
-  if(askIndex >= askOrder.length){
-    document.getElementById('askFact').textContent = '';
-    document.getElementById('askQuestion').textContent = '🎉 All done!';
-    document.getElementById('askButtons').innerHTML = '';
+  var body=document.getElementById('ask-body');
+  if(askIndex>=askOrder.length){
+    body.innerHTML='<div class="ask-final"><div style="font-size:2.6rem;margin-bottom:6px">🎉</div><div class="ask-final-t">You finished all rounds!</div><button class="btn-rt" onclick="initAsk()">🔄 Play Again</button></div>';
     markDone('ask');
     return;
   }
-  const r = askOrder[askIndex];
-  document.getElementById('askFact').textContent = r.fact;
-  document.getElementById('askQuestion').innerHTML = `<span class="ask-blank">___</span> ${r.subject} ${r.blankTail}`;
-  const btnBox = document.getElementById('askButtons');
-  btnBox.innerHTML = '';
-  shuffle(['Do','Does']).forEach(opt=>{
-    const b = document.createElement('button');
-    b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      Array.from(btnBox.children).forEach(el=>el.disabled=true);
-      if(opt === r.answer){
-        b.classList.add('correct');
-      } else {
-        b.classList.add('incorrect');
-      }
-      setTimeout(()=>{ askIndex++; renderAsk(); }, 900);
+  var r=askOrder[askIndex];
+  body.innerHTML=
+    '<div class="ask-progress">Question '+(askIndex+1)+' of '+askOrder.length+'</div>'+
+    '<div class="ask-card">'+
+      '<div class="ask-fact">'+r.fact+'</div>'+
+      '<div class="ask-question"><span class="ask-blank">___</span> '+r.subject+' '+r.blankTail+'</div>'+
+      '<div class="ask-buttons" id="ask-buttons"></div>'+
+    '</div>';
+  var btnBox=document.getElementById('ask-buttons');
+  shuffle(['Do','Does']).forEach(function(opt){
+    var b=document.createElement('button');
+    b.textContent=opt;
+    b.addEventListener('click',function(){
+      Array.from(btnBox.children).forEach(function(el){el.disabled=true;});
+      if(opt===r.answer){b.classList.add('correct');}else{b.classList.add('incorrect');}
+      setTimeout(function(){askIndex++;renderAsk();},900);
     });
     btnBox.appendChild(b);
   });
 }
-renderAsk();
 
-/* ---------------- QUIZ ---------------- */
-let quizIndex = 0, quizScore = 0;
-function renderQuiz(){
-  const body = document.getElementById('quizBody');
-  document.getElementById('quizBar').style.width = `${(quizIndex/quizQuestions.length)*100}%`;
-  if(quizIndex >= quizQuestions.length){
-    body.innerHTML = `<div class="quiz-final"><div class="score">${quizScore}/${quizQuestions.length}</div><p>Great work! 🎉</p><button class="btn" id="quizRestart">🔄 Try Again</button></div>`;
-    document.getElementById('quizBar').style.width = '100%';
-    document.getElementById('quizRestart').addEventListener('click', ()=>{
-      quizIndex = 0; quizScore = 0; renderQuiz();
-    });
-    saveQuizScore('kids-l1-a8-quiz', quizScore, quizQuestions.length);
-    markDone('quiz');
-    return;
-  }
-  const q = quizQuestions[quizIndex];
-  body.innerHTML = `<div class="quiz-q">${q.q}</div>`;
-  q.options.forEach((opt,i)=>{
-    const b = document.createElement('button');
-    b.className = 'quiz-opt';
-    b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      Array.from(body.querySelectorAll('.quiz-opt')).forEach(el=>el.disabled=true);
-      if(i === q.answer){
-        b.classList.add('correct');
-        quizScore++;
-      } else {
-        b.classList.add('incorrect');
-        body.querySelectorAll('.quiz-opt')[q.answer].classList.add('correct');
-      }
-      setTimeout(()=>{ quizIndex++; renderQuiz(); }, 800);
-    });
-    body.appendChild(b);
-  });
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+var qC=0,qS=0,qD=false;
+function initQuiz(){qC=0;qS=0;qD=false;document.getElementById('qres').classList.remove('on');document.getElementById('quiz-area').innerHTML='';renderQ();}
+function renderQ(){
+  var q=QUIZ[qC],tot=QUIZ.length;
+  document.getElementById('qpf').style.width=(qC/tot*100)+'%';
+  document.getElementById('qpl').textContent=qC+' / '+tot;
+  var area=document.getElementById('quiz-area');
+  area.innerHTML='<div class="qq"><div class="qq-txt">'+q.q+'</div></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div><div class="qnav"><button class="btn-nx" id="qnx">'+(qC+1<tot?'Próxima ➡️':'Ver resultado 🏆')+'</button></div>';
+  var opts=document.getElementById('qopts');
+  q.opts.forEach(function(o,i){var b=document.createElement('button');b.className='qopt';b.textContent=o;b.addEventListener('click',function(){ansQ(i);});opts.appendChild(b);});
+  document.getElementById('qnx').addEventListener('click',nxtQ);qD=false;
 }
-renderQuiz();
+function ansQ(ch){
+  if(qD)return;qD=true;var q=QUIZ[qC];
+  var bs=document.querySelectorAll('.qopt');bs.forEach(function(b){b.disabled=true;});
+  bs[q.c].classList.add('ok');
+  var fb=document.getElementById('qfb');
+  if(ch===q.c){qS++;fb.textContent='🎉 Correto! Muito bem!';fb.className='qfb on ok';}
+  else{bs[ch].classList.add('fail');fb.textContent='😅 A resposta é: '+q.opts[q.c];fb.className='qfb on fail';}
+  document.getElementById('qnx').style.display='inline-block';
+}
+function nxtQ(){
+  qC++;
+  if(qC>=QUIZ.length){
+    document.getElementById('quiz-area').innerHTML='';
+    document.getElementById('qpf').style.width='100%';
+    document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;
+    var p=qS/QUIZ.length;
+    document.getElementById('qres-em').textContent=p===1?'🏆':p>=.6?'🌟':'💪';
+    document.getElementById('qres-t').textContent=p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';
+    document.getElementById('qres-s').textContent='Você acertou '+qS+' de '+QUIZ.length+' perguntas!';
+    document.getElementById('qres').classList.add('on');
+    saveQuizScore('kids-l1-a8-quiz',qS,QUIZ.length);
+    markDone('quiz');
+  } else{renderQ();}
+}
 
-/* ---------------- MISSAO ---------------- */
-const missionState = {};
+// ── MISSION ───────────────────────────────────────────────────────────────
+var missionState={};
+function initMission(){renderMission();}
 function renderMission(){
-  const list = document.getElementById('missionList');
-  list.innerHTML = '';
-  missionTasks.forEach(t=>{
-    const done = !!missionState[t.id];
-    const div = document.createElement('div');
-    div.className = 'mission-item' + (done ? ' done' : '');
-    div.innerHTML = `<div class="mission-check">${done ? '✓' : ''}</div><div class="mission-label">${t.label}</div>`;
-    div.addEventListener('click', ()=>{
-      missionState[t.id] = !missionState[t.id];
+  var el=document.getElementById('msn-steps');el.innerHTML='';
+  MISSION.forEach(function(t){
+    var done=!!missionState[t.id];
+    var div=document.createElement('div');
+    div.className='mstep';
+    div.innerHTML='<div class="stchk'+(done?' on':'')+'"></div><div class="stxt">'+t.label+'</div>';
+    div.addEventListener('click',function(){
+      missionState[t.id]=!missionState[t.id];
       renderMission();
       checkAllDone();
     });
-    list.appendChild(div);
+    el.appendChild(div);
   });
 }
 function markDone(id){
-  missionState[id] = true;
-  renderMission();
+  if(missionState[id])return;
+  missionState[id]=true;
+  if(document.getElementById('msn-steps'))renderMission();
   checkAllDone();
 }
 function checkAllDone(){
-  if(missionTasks.every(t=>missionState[t.id])){
-    document.getElementById('badgeOverlay').classList.add('show');
-    launchConfetti();
+  if(MISSION.every(function(t){return missionState[t.id];})){
+    setTimeout(showBadge,400);
   }
 }
-renderMission();
 
-/* ---------------- BADGE / CONFETTI ---------------- */
-function launchConfetti(){
-  const card = document.getElementById('badgeCard');
-  const emojis = ['🎉','👨‍👩‍👧‍👦','🐶','🎈','✨'];
-  for(let i=0;i<24;i++){
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    c.style.left = Math.random()*100 + '%';
-    c.style.animationDelay = (Math.random()*0.6)+'s';
-    card.appendChild(c);
-    setTimeout(()=>c.remove(), 2500);
-  }
+// ── BADGE ─────────────────────────────────────────────────────────────────
+var confettiEmos=['👨‍👩‍👧‍👦','⭐','🎉','🐶','✨'];
+var badgeShown=false;
+function launchConfetti(){for(var i=0;i<18;i++){setTimeout(function(){var c=document.createElement('div');c.className='badge-confetti';c.textContent=confettiEmos[Math.floor(Math.random()*confettiEmos.length)];c.style.left=Math.random()*100+'vw';c.style.top='-30px';c.style.fontSize=(1+Math.random())+'rem';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},4000);},i*120);}}
+function showBadge(){
+  if(badgeShown)return;
+  badgeShown=true;
+  document.getElementById('badge-overlay').classList.add('show');
+  launchConfetti();
 }
-document.getElementById('closeBadge').addEventListener('click', ()=>{
-  document.getElementById('badgeOverlay').classList.remove('show');
-});
-document.getElementById('shareBtn').addEventListener('click', async ()=>{
-  const text = "I finished Aula 8 — My Family! 🎉👨\u200d👩\u200d👧\u200d👦 #itsbrendacleto";
-  if(navigator.share){
-    try{ await navigator.share({text}); }catch(e){}
-  } else {
-    try{
-      await navigator.clipboard.writeText(text);
-      alert('Copied! Paste it on your Instagram story 📲');
-    }catch(e){
-      alert(text);
-    }
-  }
-});
+function closeBadge(e){if(!e||e.target===document.getElementById('badge-overlay'))document.getElementById('badge-overlay').classList.remove('show');}
+function shareBadge(){var text='Acabei de completar a Aula 8 do @itsbrendacleto Kids! 👨‍👩‍👧‍👦 Inglês para a Vida Real — desde criança! #itsbrendacleto #kidsenglish';if(navigator.share){navigator.share({title:'itsbrendacleto Kids — Aula 8 Badge',text:text}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText(text).then(function(){alert('Texto copiado! Cole no Instagram 📸');}).catch(function(){alert('Compartilhe: '+text);});}}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+inited['vocab']=true;
+renderFC();
 
 // ── PLANNER MODE ───────────────────────────────────────────────────────────
 (function() {
@@ -794,7 +780,8 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
   var validFases = ['vocab','search','build','ask','quiz'];
   if (fase && validFases.indexOf(fase) !== -1) {
     document.body.classList.add('planner-mode');
-    show(fase);
+    var pill = document.querySelector('.pill[onclick*="\'' + fase + '\'"]');
+    show(fase, pill);
   }
 })();
 </script>
