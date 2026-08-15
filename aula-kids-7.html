@@ -1,345 +1,363 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aula 7 · Let's Play Sports! · itsbrendacleto</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<title>Aula 7 · Let's Play Sports! · itsbrendacleto Kids</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{
-    --pink:#F2A7C3;
-    --mint:#A8E6CF;
-    --lavender:#C9A8E8;
-    --yellow:#FFD97D;
-    --coral:#FFB3A7;
-    --blue:#5BC4E8;
-    --dark:#3A3A3A;
-    --brown1:#7A4A2B;
-    --brown2:#5A331B;
-    --grass1:#8BC34A;
-    --grass2:#5B9E2E;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    font-family:'Nunito Sans', sans-serif;
-    color:var(--dark);
-    background:
-      linear-gradient(#ffffffee,#ffffffee),
-      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 40px),
-      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 40px);
-    background-color:#fff;
-    min-height:100vh;
-  }
-  h1,h2,h3{ font-family:'Nunito', sans-serif; margin:0; }
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:ital,wght@0,400;0,600;1,400&display=swap');
+  :root{--cream:#FDF6EE;--sand:#F0E4D0;--brown:#8B5943;--brown-dk:#5C3320;--rose:#F2A7C3;--rose-lt:#FDEAF3;--sky:#A8D8EA;--sky-lt:#E8F7FC;--mint:#A8E6CF;--mint-lt:#E8FAF2;--lav:#C9A8E8;--lav-lt:#F2ECFC;--sun:#FFD97D;--sun-lt:#FFFBEC;--coral:#FFB3A7;--coral-lt:#FFF0EE;--white:#FFFFFF;--text:#3A2A1E;--text-md:#7A5C4A;--r:18px;--rs:12px;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
+  .header{background:linear-gradient(135deg,var(--brown-dk),var(--brown));padding:28px 20px 32px;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(242,167,195,.22),transparent 50%),radial-gradient(circle at 10% 80%,rgba(168,216,234,.18),transparent 50%);}
+  .brand{font-family:'Nunito',sans-serif;font-weight:900;font-size:.8rem;color:rgba(255,255,255,.55);letter-spacing:1px;text-transform:uppercase;position:relative;margin-bottom:10px;}
+  .brand span{color:var(--rose);}
+  .h-emoji{font-size:3rem;display:block;position:relative;margin-bottom:6px;}
+  .h-num{font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;color:rgba(255,255,255,.6);text-transform:uppercase;letter-spacing:.8px;position:relative;}
+  .h-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:clamp(1.5rem,5vw,2rem);color:#fff;line-height:1.15;position:relative;margin-top:4px;}
+  .h-title em{color:var(--rose);font-style:normal;}
+  .h-desc{font-size:.85rem;color:rgba(255,255,255,.65);margin-top:8px;position:relative;}
+  .pills{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:16px;position:relative;}
+  .pill{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:.72rem;padding:5px 12px;border-radius:20px;cursor:pointer;transition:background .2s;}
+  .pill:hover,.pill.on{background:var(--rose);border-color:var(--rose);}
 
+  .main{padding:20px 16px 40px;max-width:600px;margin:0 auto;}
+  .sec{background:#fff;border-radius:var(--r);box-shadow:0 4px 20px rgba(139,89,67,.09);margin-bottom:16px;overflow:hidden;display:none;}
+  .sec.on{display:block;}
+  .ch{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1.5px solid var(--sand);}
+  .ci{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .ci.rose{background:var(--rose-lt);}.ci.lav{background:var(--lav-lt);}.ci.mint{background:var(--mint-lt);}.ci.sun{background:var(--sun-lt);}.ci.sky{background:var(--sky-lt);}.ci.coral{background:var(--coral-lt);}
+  .ct{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:var(--brown-dk);}
+  .cs{font-size:.78rem;color:var(--text-md);margin-top:1px;}
+  .cb{padding:18px 20px;}
+
+  /* FLASHCARDS */
+  .fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;}
+  .fc{perspective:600px;cursor:pointer;height:110px;}
+  .fc-in{width:100%;height:100%;transition:transform .5s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d;position:relative;}
+  .fc.flip .fc-in{transform:rotateY(180deg);}
+  .fc-f,.fc-b{position:absolute;inset:0;border-radius:var(--rs);backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;text-align:center;border:2px solid transparent;}
+  .fc-f{background:var(--sun-lt);border-color:var(--sun);}
+  .fc-b{background:var(--sky-lt);border-color:var(--sky);transform:rotateY(180deg);}
+  .fc-em{font-size:1.7rem;margin-bottom:4px;}
+  .fc-en{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--brown-dk);line-height:1.2;}
+  .fc-pt{font-size:.7rem;color:var(--text-md);margin-top:2px;}
+  .fc-tap{font-size:.6rem;color:var(--text-md);opacity:.7;margin-top:4px;}
+  .abtn{background:var(--sun);border:none;cursor:pointer;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.75rem;margin-top:4px;transition:transform .15s;}
+  .abtn:hover{transform:scale(1.18);}
+
+  /* HOW-TO BOX */
+  .how-box{background:var(--sky-lt);border-left:4px solid var(--sky);border-radius:var(--rs);padding:12px 14px;font-size:.8rem;line-height:1.6;color:var(--text);margin-bottom:14px;}
+  .how-box b{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .how-example{display:block;margin-top:8px;font-style:italic;color:var(--text-md);font-size:.75rem;}
+
+  /* PENALTY SHOOTOUT */
+  .pk-field{background:linear-gradient(180deg,#8BC34A,#5B9E2E);border-radius:var(--r);padding:20px 16px;text-align:center;position:relative;overflow:hidden;margin-bottom:14px;}
+  .pk-score{color:#fff;font-family:'Nunito',sans-serif;font-weight:900;font-size:.86rem;margin-bottom:10px;text-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .pk-goal{width:150px;height:76px;margin:0 auto 12px;border:6px solid #fff;border-radius:6px;background:repeating-linear-gradient(0deg,rgba(255,255,255,.15) 0 8px,transparent 8px 16px);position:relative;}
+  .pk-ball{font-size:32px;position:absolute;left:50%;bottom:-38px;transform:translateX(-50%);transition:all .5s ease;}
+  .pk-ball.shoot{bottom:28px;}
+  .pk-result{font-family:'Nunito',sans-serif;font-weight:900;font-size:1rem;color:#fff;min-height:24px;text-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .pk-sentence{background:#fff;border-radius:var(--rs);padding:16px;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--brown-dk);margin-bottom:14px;min-height:56px;display:flex;align-items:center;justify-content:center;text-align:center;}
+  .pk-buttons{display:flex;gap:12px;justify-content:center;}
+  .pk-buttons button{border:none;border-radius:var(--rs);padding:13px 20px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.88rem;cursor:pointer;transition:transform .15s;}
+  .pk-buttons button:active{transform:scale(.96);}
+  .btn-pk-shoot{background:var(--sun);color:var(--brown-dk);}
+  .btn-pk-save{background:var(--coral);color:#7a2318;}
+  .pk-final{text-align:center;padding:14px 0;display:none;}
+  .pk-final-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);margin-bottom:6px;}
+
+  /* TEAM DRAFT */
+  .dr-progress{text-align:center;font-size:.75rem;color:var(--text-md);font-weight:700;margin-bottom:10px;}
+  .dr-card{background:var(--sun-lt);border:2.5px solid var(--sun);border-radius:var(--r);padding:20px 16px;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:1rem;color:var(--brown-dk);margin-bottom:12px;transition:background .2s;}
+  .dr-feedback{text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;color:#b03025;min-height:20px;margin-bottom:8px;}
+  .dr-buckets{display:flex;gap:10px;margin-bottom:16px;}
+  .dr-bucket{flex:1;border:none;border-radius:var(--rs);padding:12px 8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;cursor:pointer;line-height:1.3;transition:transform .15s;}
+  .dr-bucket:active{transform:scale(.97);}
+  .dr-bucket small{display:block;font-weight:600;font-size:.68rem;opacity:.75;margin-top:2px;}
+  .bucket-plays{background:var(--mint);color:#1a5c3a;}
+  .bucket-notplays{background:var(--coral);color:#7a2318;}
+  .dr-rosters{display:flex;gap:10px;}
+  .dr-roster{flex:1;background:var(--cream);border:1.5px solid var(--sand);border-radius:var(--rs);padding:10px;min-height:100px;}
+  .dr-roster h4{font-family:'Nunito',sans-serif;font-weight:800;font-size:.7rem;color:var(--text-md);margin-bottom:6px;}
+  .dr-name{background:#fff;border-radius:8px;padding:5px 8px;margin-bottom:5px;font-size:.72rem;font-weight:700;color:var(--brown-dk);}
+  .dr-final{text-align:center;padding:14px 0;}
+  .dr-final-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);margin-bottom:6px;}
+
+  /* SPORTS STORY */
+  .st-progress{text-align:center;font-size:.75rem;color:var(--text-md);font-weight:700;margin-bottom:10px;}
+  .st-panel{background:var(--lav-lt);border:2.5px solid var(--lav);border-radius:var(--r);padding:22px 18px;text-align:center;margin-bottom:14px;}
+  .st-emoji{font-size:2.6rem;margin-bottom:10px;}
+  .st-opt{display:block;width:100%;text-align:left;background:#fff;border:2px solid transparent;border-radius:var(--rs);padding:12px 14px;margin-bottom:9px;font-family:'Nunito Sans',sans-serif;font-size:.86rem;font-weight:700;color:var(--text);cursor:pointer;transition:all .15s;}
+  .st-opt:hover{border-color:var(--lav);}
+  .st-opt.correct{background:var(--mint-lt);border-color:var(--mint);color:#2E7D5E;}
+  .st-opt.incorrect{background:var(--coral-lt);border-color:var(--coral);color:#b03025;}
+  .st-recap{background:#fff;border-radius:var(--rs);padding:16px;font-size:.85rem;line-height:1.75;color:var(--text);text-align:left;}
+  .st-write-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:.95rem;color:var(--brown-dk);margin:18px 0 10px;}
+  .st-textarea{width:100%;min-height:100px;border:2px solid var(--sand);border-radius:var(--rs);padding:12px;font-family:'Nunito Sans',sans-serif;font-size:.86rem;color:var(--text);resize:vertical;margin-bottom:10px;}
+  .st-textarea:focus{outline:none;border-color:var(--lav);}
+  .st-check-tip{background:var(--sun-lt);border-left:4px solid var(--sun);border-radius:var(--rs);padding:10px 12px;font-size:.76rem;line-height:1.5;color:var(--text-md);margin-top:10px;}
+  .st-issue{background:var(--coral-lt);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;font-size:.8rem;font-weight:700;color:#b03025;}
+  .st-ok{background:var(--mint-lt);border-radius:var(--rs);padding:10px 12px;margin-bottom:8px;font-size:.8rem;font-weight:700;color:#2E7D5E;}
+
+  /* BUTTONS */
+  .btn-check{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:10px 20px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;}
+  .btn-rt{background:var(--sand);color:var(--brown-dk);border:none;border-radius:var(--rs);padding:8px 18px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;cursor:pointer;margin-top:12px;}
+
+  /* QUIZ */
+  .qprow{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .qpbar{flex:1;height:8px;background:var(--sand);border-radius:20px;overflow:hidden;}
+  .qpfill{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--sun),var(--rose));transition:width .4s;}
+  .qplbl{font-size:.74rem;color:var(--text-md);font-weight:700;white-space:nowrap;}
+  .qq{background:var(--sun-lt);border:2px solid var(--sun);border-radius:var(--rs);padding:14px;text-align:center;margin-bottom:12px;}
+  .qq-txt{font-family:'Nunito',sans-serif;font-weight:800;font-size:.92rem;color:var(--brown-dk);}
+  .qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+  .qopt{background:#fff;border:2px solid var(--sand);border-radius:var(--rs);padding:10px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;color:var(--text);text-align:center;transition:all .18s;line-height:1.25;}
+  .qopt:hover{border-color:var(--sun);background:var(--sun-lt);}
+  .qopt.ok{border-color:var(--mint);background:var(--mint-lt);color:#2E7D5E;}
+  .qopt.fail{border-color:var(--coral);background:var(--coral-lt);color:#b03025;}
+  .qopt:disabled{cursor:default;}
+  .qfb{text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;padding:9px;border-radius:var(--rs);margin-bottom:10px;display:none;}
+  .qfb.on{display:block;}.qfb.ok{background:var(--mint-lt);color:#2E7D5E;}.qfb.fail{background:var(--coral-lt);color:#b03025;}
+  .qnav{display:flex;justify-content:center;}
+  .btn-nx{background:var(--brown-dk);color:#fff;border:none;border-radius:var(--rs);padding:9px 22px;font-family:'Nunito',sans-serif;font-weight:800;font-size:.85rem;cursor:pointer;display:none;}
+  .qres{text-align:center;padding:14px;display:none;}
+  .qres.on{display:block;}
+  .qres-em{font-size:2.8rem;display:block;margin-bottom:6px;}
+  .qres-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.1rem;color:var(--brown-dk);}
+  .qres-s{color:var(--text-md);font-size:.83rem;margin-top:4px;}
+
+  /* BADGE */
+  .badge-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;opacity:0;pointer-events:none;transition:opacity .4s;}
+  .badge-overlay.show{opacity:1;pointer-events:all;}
+  .badge-card{background:linear-gradient(160deg,#FFF9EC,#FFF0F8);border-radius:28px;padding:28px 22px 24px;max-width:310px;width:100%;text-align:center;box-shadow:0 16px 48px rgba(92,51,32,.35);border:3px solid var(--sun);position:relative;overflow:hidden;animation:badgePop .5s cubic-bezier(.34,1.56,.64,1);}
+  .badge-card::before{content:'';position:absolute;top:-30px;right:-30px;width:100px;height:100px;background:var(--rose-lt);border-radius:50%;opacity:.6;}
+  .badge-card::after{content:'';position:absolute;bottom:-20px;left:-20px;width:80px;height:80px;background:var(--sun-lt);border-radius:50%;opacity:.6;}
+  @keyframes badgePop{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(0deg);opacity:1}}
+  .badge-stars{font-size:1.1rem;letter-spacing:4px;margin-bottom:8px;animation:starSpin 3s linear infinite;}
+  @keyframes starSpin{0%,100%{letter-spacing:4px}50%{letter-spacing:8px}}
+  .badge-shield{width:110px;height:110px;margin:0 auto 12px;position:relative;z-index:1;}
+  .badge-shield-bg{width:110px;height:110px;background:linear-gradient(135deg,var(--sun),#FFB347);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(255,179,71,.5),0 0 0 5px #fff,0 0 0 8px var(--sun);animation:shieldPulse 1.5s ease-in-out infinite;}
+  @keyframes shieldPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+  .badge-shield-em{font-size:3rem;}
+  .badge-ribbon{background:linear-gradient(90deg,var(--sun),var(--rose));color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:900;font-size:.78rem;letter-spacing:1.5px;text-transform:uppercase;padding:5px 18px;border-radius:20px;display:inline-block;margin-bottom:10px;position:relative;z-index:1;}
+  .badge-title{font-family:'Nunito',sans-serif;font-weight:900;font-size:1.5rem;color:var(--brown-dk);line-height:1.15;margin-bottom:4px;position:relative;z-index:1;}
+  .badge-lesson{font-family:'Nunito',sans-serif;font-weight:800;font-size:.82rem;color:var(--text-md);margin-bottom:12px;position:relative;z-index:1;}
+  .badge-divider{border:none;border-top:2px dashed var(--sun);margin:10px 0;position:relative;z-index:1;}
+  .badge-msg{font-size:.82rem;color:var(--text-md);line-height:1.55;margin-bottom:14px;position:relative;z-index:1;}
+  .badge-msg strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .badge-hashtag{font-family:'Nunito',sans-serif;font-weight:800;font-size:.78rem;color:var(--lav);margin-bottom:16px;position:relative;z-index:1;}
+  .badge-btns{display:flex;flex-direction:column;gap:8px;position:relative;z-index:1;}
+  .badge-btn-share{background:linear-gradient(135deg,var(--sun),var(--rose));color:var(--brown-dk);border:none;border-radius:var(--rs);padding:12px 20px;font-family:'Nunito',sans-serif;font-weight:900;font-size:.9rem;cursor:pointer;transition:transform .15s;}
+  .badge-btn-share:hover{transform:translateY(-2px);}
+  .badge-btn-close{background:transparent;color:var(--text-md);border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:.8rem;cursor:pointer;padding:6px;text-decoration:underline;}
+  .badge-confetti{position:fixed;pointer-events:none;animation:confettiFall linear forwards;z-index:1001;}
+  @keyframes confettiFall{0%{transform:translateY(-30px) rotate(0deg) scale(1);opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(.5);opacity:0}}
+
+  /* MISSION */
+  .msn{background:var(--sun-lt);border:2.5px solid var(--sun);border-radius:var(--r);padding:16px;}
+  .msn-top{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .msn-ico{width:42px;height:42px;border-radius:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+  .msn-t{font-family:'Nunito',sans-serif;font-weight:900;font-size:.92rem;color:var(--brown-dk);}
+  .msn-w{font-size:.73rem;color:var(--text-md);margin-top:1px;}
+  .msn-steps{display:flex;flex-direction:column;gap:8px;}
+  .mstep{display:flex;align-items:flex-start;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;cursor:pointer;}
+  .stchk{width:22px;height:22px;border-radius:50%;flex-shrink:0;border:2.5px solid var(--sun);display:flex;align-items:center;justify-content:center;background:#fff;transition:all .2s;margin-top:1px;}
+  .stchk.on{background:var(--mint);border-color:var(--mint);}
+  .stchk.on::after{content:'✓';font-size:.72rem;color:#fff;font-weight:900;}
+  .stxt{font-size:.83rem;color:var(--text);line-height:1.4;}
+  .stxt strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .msn-rwd{display:flex;align-items:center;gap:10px;background:#fff;border-radius:var(--rs);padding:10px 12px;margin-top:10px;border:1.5px dashed var(--sun);}
+  .rwd-t{font-size:.78rem;color:var(--text-md);line-height:1.35;}
+  .rwd-t strong{color:var(--brown-dk);font-family:'Nunito',sans-serif;font-weight:800;}
+  .footer{text-align:center;padding:22px 16px 30px;font-size:.72rem;color:var(--text-md);border-top:1.5px solid var(--sand);margin-top:8px;}
+  .footer strong{color:var(--brown);}
+  @media(max-width:400px){.qopts{grid-template-columns:1fr;}}
+
+  /* PLANNER MODE */
   .btn-voltar{display:none;align-items:center;gap:6px;background:rgba(0,0,0,0.3);border:none;border-radius:0;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-decoration:none;width:100%;position:relative;z-index:9999;pointer-events:all !important;}
   .btn-voltar:active{background:rgba(0,0,0,0.5);}
   .planner-mode .pills{display:none;}
   .planner-mode .btn-voltar{display:block;}
-
-  header{
-    background:linear-gradient(135deg, var(--brown1), var(--brown2));
-    color:#fff;
-    padding:22px 16px 18px;
-    border-radius:0 0 24px 24px;
-    text-align:center;
-  }
-  header .tag{
-    font-size:12px; font-weight:800; background:rgba(255,255,255,.18);
-    display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:8px;
-  }
-  header h1{ font-size:24px; font-weight:900; }
-  header .sub{ font-size:14px; opacity:.9; margin-top:4px; }
-
-  nav.pills{
-    display:flex; gap:8px; overflow-x:auto; padding:14px 12px 4px;
-    -webkit-overflow-scrolling:touch;
-  }
-  nav.pills::-webkit-scrollbar{ display:none; }
-  nav.pills button{
-    flex:0 0 auto; border:none; background:#f1f1f1; color:var(--dark);
-    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px;
-    padding:9px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;
-  }
-  nav.pills button.active{ background:var(--blue); color:#fff; }
-
-  main{ max-width:720px; margin:0 auto; padding:10px 16px 60px; }
-  section{ display:none; animation:fade .25s ease; }
-  section.show{ display:block; }
-  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  .section-title{ font-size:20px; font-weight:900; margin:14px 0 4px; }
-  .section-hint{ font-size:14px; color:#666; margin-bottom:14px; }
-
-  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-  .card{
-    background:var(--card-color, var(--pink)); border-radius:16px; padding:14px;
-    text-align:center; cursor:pointer; border:none; font-family:'Nunito Sans',sans-serif;
-    transition:transform .1s;
-  }
-  .card:active{ transform:scale(.96); }
-  .card .emoji{ font-size:34px; display:block; margin-bottom:6px; }
-  .card .en{ font-weight:800; font-size:15px; }
-  .card .pt{ font-size:12px; opacity:.75; }
-
-  .btn{ border:none; border-radius:14px; padding:12px 18px; font-weight:800; font-size:14px; cursor:pointer; background:var(--blue); color:#fff; }
-  .btn.secondary{ background:#eee; color:var(--dark); }
-
-  .how-box{
-    background:#eef7fb; border-left:4px solid var(--blue); border-radius:10px;
-    padding:12px 14px; font-size:14px; line-height:1.6; margin-bottom:14px; color:var(--dark);
-  }
-  .how-example{ display:block; margin-top:8px; font-style:italic; color:#555; font-size:13px; }
-  .draft-feedback{ text-align:center; font-weight:800; font-size:14px; min-height:20px; color:#d9534f; margin-bottom:6px; }
-  .draft-bucket small{ font-weight:600; font-size:11px; opacity:.75; }
-  .story-recap{
-    background:#fff; border-radius:12px; padding:16px; font-size:15px; line-height:1.7; margin-bottom:16px;
-  }
-  .story-textarea{
-    width:100%; min-height:110px; border:2px solid #ddd; border-radius:12px; padding:12px;
-    font-family:'Nunito Sans',sans-serif; font-size:15px; resize:vertical; margin-bottom:12px;
-  }
-  .check-issue{ background:var(--coral); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; }
-  .check-ok{ background:var(--mint); border-radius:10px; padding:10px 12px; margin-bottom:8px; font-size:14px; font-weight:700; }
-
-  /* Penalty Shootout */
-  .field{
-    background:linear-gradient(180deg, var(--grass1), var(--grass2));
-    border-radius:18px; padding:20px; text-align:center; position:relative; overflow:hidden; margin-bottom:14px;
-  }
-  .goal{
-    width:160px; height:80px; margin:0 auto 14px; border:6px solid #fff; border-radius:6px;
-    background:repeating-linear-gradient(0deg, rgba(255,255,255,.15) 0 8px, transparent 8px 16px);
-    position:relative;
-  }
-  .ball{ font-size:36px; position:absolute; left:50%; bottom:-40px; transform:translateX(-50%); transition:all .5s ease; }
-  .ball.shoot{ bottom:30px; }
-  .shoot-sentence{
-    background:#fff; border-radius:14px; padding:16px; font-size:18px; font-weight:800;
-    margin-bottom:14px; min-height:60px; display:flex; align-items:center; justify-content:center;
-  }
-  .shoot-buttons{ display:flex; gap:12px; justify-content:center; }
-  .shoot-buttons button{ border:none; border-radius:14px; padding:14px 20px; font-weight:900; font-size:15px; cursor:pointer; }
-  .btn-shoot{ background:var(--yellow); }
-  .btn-save{ background:var(--coral); }
-  .scoreboard{ color:#fff; font-weight:900; font-size:15px; margin-bottom:10px; }
-  .shoot-result{ font-weight:900; font-size:18px; color:#fff; min-height:26px; }
-
-  /* Team Draft */
-  .draft-card{
-    background:var(--yellow); border-radius:14px; padding:16px; text-align:center;
-    font-weight:800; font-size:17px; margin-bottom:14px; cursor:pointer;
-  }
-  .draft-card.selected{ outline:3px solid var(--blue); }
-  .draft-buckets{ display:flex; gap:10px; margin-bottom:16px; }
-  .draft-bucket{
-    flex:1; border:none; border-radius:14px; padding:12px; font-weight:800; font-size:14px; cursor:pointer;
-  }
-  .bucket-plays{ background:var(--mint); }
-  .bucket-notplays{ background:var(--coral); }
-  .rosters{ display:flex; gap:10px; }
-  .roster{ flex:1; background:#f6f6f6; border-radius:14px; padding:12px; min-height:120px; }
-  .roster h4{ font-size:13px; margin-bottom:8px; }
-  .roster .name{ background:#fff; border-radius:8px; padding:6px 8px; margin-bottom:6px; font-size:13px; font-weight:700; }
-  .draft-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
-
-  /* Sports Story */
-  .story-panel{
-    background:var(--lavender); border-radius:18px; padding:24px; text-align:center; margin-bottom:14px;
-  }
-  .story-emoji{ font-size:56px; margin-bottom:10px; }
-  .story-opt{
-    display:block; width:100%; text-align:left; background:#fff; border:none;
-    border-radius:12px; padding:14px; margin-bottom:10px; font-size:15px; font-weight:700; cursor:pointer;
-  }
-  .story-opt.correct{ background:var(--mint); }
-  .story-opt.incorrect{ background:var(--coral); }
-  .story-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
-
-  /* Quiz */
-  .quiz-progress{ height:8px; background:#eee; border-radius:4px; overflow:hidden; margin-bottom:16px; }
-  .quiz-progress-bar{ height:100%; background:var(--blue); width:0%; transition:.3s; }
-  .quiz-q{ font-size:18px; font-weight:800; margin-bottom:14px; }
-  .quiz-opt{
-    display:block; width:100%; text-align:left; background:#f6f6f6; border:none;
-    border-radius:12px; padding:14px; margin-bottom:10px; font-size:15px; font-weight:700; cursor:pointer;
-  }
-  .quiz-opt.correct{ background:var(--mint); }
-  .quiz-opt.incorrect{ background:var(--coral); }
-  .quiz-final{ text-align:center; padding:30px 0; }
-  .quiz-final .score{ font-size:42px; font-weight:900; color:var(--blue); }
-
-  /* Missao */
-  .mission-item{
-    display:flex; align-items:center; gap:12px; background:#f6f6f6; border-radius:14px;
-    padding:14px; margin-bottom:10px; cursor:pointer;
-  }
-  .mission-item.done{ background:#dff5e6; }
-  .mission-check{
-    width:26px; height:26px; border-radius:50%; border:2px solid #bbb;
-    display:flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto;
-  }
-  .mission-item.done .mission-check{ background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
-  .mission-label{ font-weight:700; font-size:15px; }
-
-  .overlay{
-    display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
-    align-items:center; justify-content:center; z-index:50; padding:20px;
-  }
-  .overlay.show{ display:flex; }
-  .badge-card{ background:#fff; border-radius:24px; padding:30px 24px; text-align:center; max-width:340px; position:relative; overflow:hidden; }
-  .badge-trophy{ font-size:70px; animation:bounce 1s infinite; }
-  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
-  .badge-card h2{ font-size:22px; margin:10px 0 4px; }
-  .badge-card p{ font-size:14px; color:#666; margin-bottom:16px; }
-  .confetti{ position:absolute; top:-10px; font-size:18px; animation:fall 2.2s linear forwards; }
-  @keyframes fall{ to{ transform:translateY(420px) rotate(360deg); opacity:0; } }
-  .share-btn{ background:var(--pink); color:#fff; border:none; border-radius:14px; padding:12px 20px; font-weight:800; cursor:pointer; }
-  .close-btn{ background:none; border:none; color:#999; margin-top:10px; font-weight:700; cursor:pointer; }
 </style>
-<link rel="manifest" href="manifest.json" />
-<meta name="theme-color" content="#5C4033" />
-<link rel="icon" type="image/png" href="icons/icon-192.png" />
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-<meta name="mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js').then(function (reg) {
-        setInterval(function () { reg.update(); }, 60000);
-        document.addEventListener('visibilitychange', function () {
-          if (document.visibilityState === 'visible') reg.update();
-        });
-      }).catch(function () {});
-    });
-    navigator.serviceWorker.addEventListener('controllerchange', function () {
-      var active = document.activeElement;
-      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
-      if (isTyping) {
-        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
-      } else {
-        window.location.reload();
-      }
-    });
-  }
-</script>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
 </head>
 <body>
 
 <a class="btn-voltar" id="btnVoltar" href="planner-kids-7.html">← Voltar para a lista</a>
-
-<header>
-  <div class="tag">⭐ KIDS EDITION · AULA 7</div>
-  <h1>⚽ Let's Play Sports!</h1>
-  <div class="sub">Homework practice · itsbrendacleto</div>
-</header>
-
-<nav class="pills" id="pills"></nav>
-
-<main>
-
-  <section id="vocab">
-    <div class="section-title">🃏 Vocabulary</div>
-    <div class="section-hint">Tap a card to hear it!</div>
-    <div class="grid" id="vocabGrid"></div>
-  </section>
-
-  <section id="shoot">
-    <div class="section-title">🥅 Penalty Shootout!</div>
-    <div class="how-box">
-      <b>Como jogar:</b> vai aparecer uma frase em inglês. Leia com atenção!<br>
-      ⚽ Se a frase estiver <b>CERTA</b>, toque em <b>SHOOT!</b> pra chutar o gol.<br>
-      🧤 Se a frase estiver <b>ERRADA</b>, toque em <b>SAVE!</b> pra defender.<br>
-      <span class="how-example">Ex: "He plays Soccer." está certa → SHOOT! ⚽ &nbsp;|&nbsp; "She play Tennis." está errada (faltou o -s) → SAVE! 🧤</span>
-    </div>
-    <div class="field">
-      <div class="scoreboard" id="shootScore">Goals: 0 / 0</div>
-      <div class="goal"><div class="ball" id="ball">⚽</div></div>
-      <div class="shoot-result" id="shootResult"></div>
-    </div>
-    <div class="shoot-sentence" id="shootSentence"></div>
-    <div class="shoot-buttons">
-      <button class="btn-shoot" id="btnShoot">⚽ SHOOT!</button>
-      <button class="btn-save" id="btnSave">🧤 SAVE!</button>
-    </div>
-  </section>
-
-  <section id="draft">
-    <div class="section-title">🏅 Team Draft</div>
-    <div class="how-box">
-      <b>Como jogar:</b> vai aparecer uma frase sobre um jogador.<br>
-      A frase diz que a pessoa <b>joga</b> o esporte ou <b>não joga</b>?<br>
-      Toque no time certo pra "contratar" esse jogador!<br>
-      <span class="how-example">Ex: "Leo plays Soccer." → ele JOGA → time ✅ Plays Team<br>"Mia doesn't play Tennis." → ela NÃO JOGA → time ❌ Doesn't Play Team</span>
-    </div>
-    <div class="draft-progress" id="draftProgress"></div>
-    <div class="draft-card" id="draftCard"></div>
-    <div class="draft-feedback" id="draftFeedback"></div>
-    <div class="draft-buckets">
-      <button class="draft-bucket bucket-plays" id="bucketPlays">✅ Plays Team<br><small>(joga)</small></button>
-      <button class="draft-bucket bucket-notplays" id="bucketNotPlays">❌ Doesn't Play Team<br><small>(não joga)</small></button>
-    </div>
-    <div class="rosters">
-      <div class="roster"><h4>✅ Plays Team</h4><div id="rosterPlays"></div></div>
-      <div class="roster"><h4>❌ Doesn't Play Team</h4><div id="rosterNotPlays"></div></div>
-    </div>
-  </section>
-
-  <section id="story">
-    <div class="section-title">🎬 Sports Story</div>
-    <div class="section-hint">Pick the correct sentence to continue the story!</div>
-    <div class="story-progress" id="storyProgress"></div>
-    <div class="story-panel">
-      <div class="story-emoji" id="storyEmoji"></div>
-      <div id="storyOptions"></div>
-    </div>
-
-    <div id="storyWriteBox" style="display:none;">
-      <div class="section-title" style="font-size:17px;">✍️ Agora é sua vez!</div>
-      <div class="how-box">
-        Escreva uma historinha parecida sobre a sua família! Conte quais esportes cada pessoa joga (ou não joga).<br>
-        <span class="how-example">Ex: "My mom plays Tennis. My dad doesn't play Soccer, he plays Basketball."</span>
-      </div>
-      <textarea id="storyTextarea" class="story-textarea" placeholder="Write 3-4 sentences about your family and sports..."></textarea>
-      <div class="row-btns">
-        <button class="btn" id="storyCheckBtn">✅ Check my story!</button>
-      </div>
-      <div class="how-box" style="background:#fff8e6; margin-top:10px;">
-        💡 Esse é um verificador de dicas simples — ele procura errinhos comuns de terceira pessoa e negativa, mas não é uma correção perfeita como a de um professor. Mostre sua história pra Nathalia depois! 😊
-      </div>
-      <div id="storyCheckResult"></div>
-    </div>
-  </section>
-
-  <section id="quiz">
-    <div class="section-title">❓ Quiz</div>
-    <div class="quiz-progress"><div class="quiz-progress-bar" id="quizBar"></div></div>
-    <div id="quizBody"></div>
-  </section>
-
-  <section id="missao">
-    <div class="section-title">🎯 Missão</div>
-    <div class="section-hint">Mark each activity as you finish it!</div>
-    <div id="missionList"></div>
-  </section>
-
-</main>
-
-<div class="overlay" id="badgeOverlay">
-  <div class="badge-card" id="badgeCard">
-    <div class="badge-trophy">🏆</div>
-    <h2>You did it!</h2>
-    <p>You finished Aula 7 — Let's Play Sports! 🎉</p>
-    <button class="share-btn" id="shareBtn">📤 Share</button><br>
-    <button class="close-btn" id="closeBadge">Close</button>
+<div class="header">
+  <div class="brand">its<span>brenda</span>cleto · kids</div>
+  <span class="h-emoji">⚽</span>
+  <div class="h-num">Aula 7 · Bloco 1</div>
+  <div class="h-title">Let's <em>Play Sports!</em></div>
+  <div class="h-desc">Esportes · Simple Present (afirmativa e negativa)</div>
+  <div class="pills">
+    <span class="pill on" onclick="show('vocab',this)">🃏 Vocab</span>
+    <span class="pill" onclick="show('shoot',this)">🥅 Shootout</span>
+    <span class="pill" onclick="show('draft',this)">🏅 Draft</span>
+    <span class="pill" onclick="show('story',this)">🎬 Story</span>
+    <span class="pill" onclick="show('quiz',this)">❓ Quiz</span>
+    <span class="pill" onclick="show('missao',this)">🎯 Missão</span>
   </div>
 </div>
+
+<div class="main">
+
+  <!-- FLASHCARDS -->
+  <div class="sec on" id="sec-vocab">
+    <div class="ch"><div class="ci sun">🃏</div><div><div class="ct">Vocabulary</div><div class="cs">Toque no cartão · 🔊 para ouvir</div></div></div>
+    <div class="cb"><div class="fc-grid" id="fc-grid"></div></div>
+  </div>
+
+  <!-- PENALTY SHOOTOUT -->
+  <div class="sec" id="sec-shoot">
+    <div class="ch"><div class="ci mint">🥅</div><div><div class="ct">Penalty Shootout!</div><div class="cs">Leia a frase: ela está certa ou errada?</div></div></div>
+    <div class="cb">
+      <div class="how-box">
+        <b>Como jogar:</b> vai aparecer uma frase em inglês. Leia com atenção!<br>
+        ⚽ Se a frase estiver <b>CERTA</b>, toque em <b>SHOOT!</b> pra chutar o gol.<br>
+        🧤 Se a frase estiver <b>ERRADA</b>, toque em <b>SAVE!</b> pra defender.
+        <span class="how-example">Ex: "He plays Soccer." está certa → SHOOT! ⚽ &nbsp;|&nbsp; "She play Tennis." está errada (faltou o -s) → SAVE! 🧤</span>
+      </div>
+      <div class="pk-field">
+        <div class="pk-score" id="pkScore">Goals: 0 / 0</div>
+        <div class="pk-goal"><div class="pk-ball" id="pkBall">⚽</div></div>
+        <div class="pk-result" id="pkResult"></div>
+      </div>
+      <div class="pk-sentence" id="pkSentence"></div>
+      <div class="pk-buttons" id="pkButtons">
+        <button class="btn-pk-shoot" id="btnShoot">⚽ SHOOT!</button>
+        <button class="btn-pk-save" id="btnSave">🧤 SAVE!</button>
+      </div>
+      <div class="pk-final" id="pkFinal"></div>
+    </div>
+  </div>
+
+  <!-- TEAM DRAFT -->
+  <div class="sec" id="sec-draft">
+    <div class="ch"><div class="ci sun">🏅</div><div><div class="ct">Team Draft</div><div class="cs">A pessoa joga ou não joga o esporte?</div></div></div>
+    <div class="cb">
+      <div class="how-box">
+        <b>Como jogar:</b> vai aparecer uma frase sobre um jogador.<br>
+        A frase diz que a pessoa <b>joga</b> o esporte ou <b>não joga</b>?<br>
+        Toque no time certo pra "contratar" esse jogador!
+        <span class="how-example">Ex: "Leo plays Soccer." → ele JOGA → time ✅ Plays Team<br>"Mia doesn't play Tennis." → ela NÃO JOGA → time ❌ Doesn't Play Team</span>
+      </div>
+      <div class="dr-progress" id="drProgress"></div>
+      <div class="dr-card" id="drCard"></div>
+      <div class="dr-feedback" id="drFeedback"></div>
+      <div class="dr-buckets" id="drBuckets">
+        <button class="dr-bucket bucket-plays" id="bucketPlays">✅ Plays Team<br><small>(joga)</small></button>
+        <button class="dr-bucket bucket-notplays" id="bucketNotPlays">❌ Doesn't Play Team<br><small>(não joga)</small></button>
+      </div>
+      <div class="dr-rosters">
+        <div class="dr-roster"><h4>✅ Plays Team</h4><div id="rosterPlays"></div></div>
+        <div class="dr-roster"><h4>❌ Doesn't Play Team</h4><div id="rosterNotPlays"></div></div>
+      </div>
+      <div class="dr-final" id="drFinal" style="display:none;"></div>
+    </div>
+  </div>
+
+  <!-- SPORTS STORY -->
+  <div class="sec" id="sec-story">
+    <div class="ch"><div class="ci lav">🎬</div><div><div class="ct">Sports Story</div><div class="cs">Escolha a frase certa pra continuar a história!</div></div></div>
+    <div class="cb">
+      <div class="st-progress" id="stProgress"></div>
+      <div class="st-panel">
+        <div class="st-emoji" id="stEmoji"></div>
+        <div id="stOptions"></div>
+      </div>
+      <div id="stWriteBox" style="display:none;">
+        <div class="st-write-title">✍️ Agora é sua vez!</div>
+        <div class="how-box">
+          Escreva uma historinha parecida sobre a sua família! Conte quais esportes cada pessoa joga (ou não joga).
+          <span class="how-example">Ex: "My mom plays Tennis. My dad doesn't play Soccer, he plays Basketball."</span>
+        </div>
+        <textarea id="stTextarea" class="st-textarea" placeholder="Write 3-4 sentences about your family and sports..."></textarea>
+        <button class="btn-check" id="stCheckBtn">✅ Check my story!</button>
+        <div class="st-check-tip">💡 Esse é um verificador de dicas simples — ele procura errinhos comuns de terceira pessoa e negativa, mas não é uma correção perfeita como a de um professor. Mostre sua história pra Nathalia depois! 😊</div>
+        <div id="stCheckResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="sec" id="sec-quiz">
+    <div class="ch"><div class="ci rose">❓</div><div><div class="ct">Quiz</div><div class="cs">Sports & Simple Present!</div></div></div>
+    <div class="cb">
+      <div class="qprow"><div class="qpbar"><div class="qpfill" id="qpf" style="width:0%"></div></div><span class="qplbl" id="qpl">0 / 8</span></div>
+      <div id="quiz-area"></div>
+      <div class="qres" id="qres">
+        <span class="qres-em" id="qres-em"></span>
+        <div class="qres-t" id="qres-t"></div>
+        <div class="qres-s" id="qres-s"></div>
+        <button class="btn-rt" onclick="initQuiz()">🔄 Jogar de novo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION -->
+  <div class="sec" id="sec-missao">
+    <div class="ch"><div class="ci sun">🎯</div><div><div class="ct">Missão da Semana</div><div class="cs">Complete todas as etapas!</div></div></div>
+    <div class="cb">
+      <div class="msn">
+        <div class="msn-top"><div class="msn-ico">🎯</div><div><div class="msn-t">Sua missão dessa semana!</div><div class="msn-w">Aula 7 — Let's Play Sports!</div></div></div>
+        <div class="msn-steps" id="msn-steps"></div>
+        <div class="msn-rwd"><span style="font-size:1.4rem">⭐</span><div class="rwd-t">Complete tudo e ganhe seu<br><strong>badge da jornada!</strong></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BADGE -->
+<div class="badge-overlay" id="badge-overlay" onclick="closeBadge(event)">
+  <div class="badge-card">
+    <div class="badge-stars">⭐ ⭐ ⭐</div>
+    <div class="badge-shield"><div class="badge-shield-bg"><span class="badge-shield-em">⚽</span></div></div>
+    <div class="badge-ribbon">itsbrendacleto · Kids</div>
+    <div class="badge-title">Missão<br>Completa! 🎉</div>
+    <div class="badge-lesson">Aula 7 — Let's Play Sports!</div>
+    <hr class="badge-divider">
+    <div class="badge-msg">Parabéns! Você completou todas as atividades da Aula 7!<br><strong>Print esse badge e cole na sua coleção! 🖨️</strong></div>
+    <div class="badge-hashtag">#itsbrendacleto #kidsenglish</div>
+    <div class="badge-btns">
+      <button class="badge-btn-share" onclick="shareBadge()">📸 Compartilhar no Instagram!</button>
+      <button class="badge-btn-close" onclick="closeBadge()">fechar</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">Feito com 💛 por <strong>itsbrendacleto</strong> · Kids Edition</div>
 
 <script>
 var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
@@ -404,36 +422,17 @@ async function saveQuizScore(lessonId, score, total) {
   } catch (e) { console.error('Erro ao salvar progresso do quiz:', e); }
 }
 
-/* ---------------- UTILS ---------------- */
-function shuffle(arr){
-  const a = arr.slice();
-  for(let i=a.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [a[i],a[j]]=[a[j],a[i]];
-  }
-  return a;
-}
-function speak(text, rate){
-  const u = new SpeechSynthesisUtterance(text.toLowerCase());
-  u.lang = 'en-US';
-  u.rate = rate || 0.85;
-  u.pitch = 1.05;
-  speechSynthesis.cancel();
-  speechSynthesis.speak(u);
-}
-
-/* ---------------- DATA ---------------- */
-const sports = [
-  {en:'Soccer', pt:'Futebol', emoji:'⚽'},
-  {en:'Basketball', pt:'Basquete', emoji:'🏀'},
-  {en:'Volleyball', pt:'Vôlei', emoji:'🏐'},
-  {en:'Tennis', pt:'Tênis', emoji:'🎾'},
-  {en:'Hockey', pt:'Hockey', emoji:'🏒'},
-  {en:'Baseball', pt:'Beisebol', emoji:'⚾'}
+// ── DATA ──────────────────────────────────────────────────────────────────
+var sports = [
+  {en:'Soccer', pt:'Futebol', em:'⚽'},
+  {en:'Basketball', pt:'Basquete', em:'🏀'},
+  {en:'Volleyball', pt:'Vôlei', em:'🏐'},
+  {en:'Tennis', pt:'Tênis', em:'🎾'},
+  {en:'Hockey', pt:'Hockey', em:'🏒'},
+  {en:'Baseball', pt:'Beisebol', em:'⚾'}
 ];
-const cardColors = ['pink','mint','lavender','yellow','coral','blue'];
 
-const shootRounds = [
+var shootRounds = [
   {text:'He plays Soccer.', correct:true},
   {text:'She play Tennis.', correct:false},
   {text:"He doesn't play Hockey.", correct:true},
@@ -444,7 +443,7 @@ const shootRounds = [
   {text:'She plays Basketball.', correct:true}
 ];
 
-const draftPlayers = [
+var draftPlayers = [
   {text:'Leo plays Basketball.', team:'plays'},
   {text:"Mia doesn't play Tennis.", team:'notplays'},
   {text:'Sam plays Soccer.', team:'plays'},
@@ -453,173 +452,179 @@ const draftPlayers = [
   {text:"Zoe doesn't play Volleyball.", team:'notplays'}
 ];
 
-const storyPanels = [
+var storyPanels = [
   {emoji:'⚽😃', options:['Leo plays Soccer on Saturday.','Leo play Soccer on Saturday.'], answer:0},
   {emoji:'🏀😅', options:["He don't play Basketball.","He doesn't play Basketball."], answer:1},
   {emoji:'🎾🙋', options:['His sister plays Tennis.','His sister play Tennis.'], answer:0},
   {emoji:'🏒🎉', options:["They doesn't play Hockey together.","They don't play Hockey together."], answer:1}
 ];
 
-const quizQuestions = [
-  {q:'Complete: He ___ Soccer.', options:['play','plays'], answer:1},
-  {q:'Complete: They ___ Basketball.', options:['play','plays'], answer:0},
-  {q:'Which is correct?', options:["She don't play Tennis","She doesn't play Tennis","She not play Tennis"], answer:1},
-  {q:'Which is correct?', options:["He doesn't plays Hockey","He doesn't play Hockey","He don't plays Hockey"], answer:1},
-  {q:'Complete: I ___ Volleyball.', options:['play','plays'], answer:0},
-  {q:'What’s the correct negative of "She plays Baseball"?', options:["She doesn't plays Baseball","She doesn't play Baseball","She don't play Baseball"], answer:1},
-  {q:'Complete: We ___ Soccer every day.', options:['play','plays'], answer:0},
-  {q:'Which is correct?', options:['He plays Basketball','He play Basketball','He playing Basketball'], answer:0}
+var QUIZ = [
+  {q:'Complete: He ___ Soccer.', opts:['play','plays'], c:1},
+  {q:'Complete: They ___ Basketball.', opts:['play','plays'], c:0},
+  {q:'Which is correct?', opts:["She don't play Tennis","She doesn't play Tennis","She not play Tennis"], c:1},
+  {q:'Which is correct?', opts:["He doesn't plays Hockey","He doesn't play Hockey","He don't plays Hockey"], c:1},
+  {q:'Complete: I ___ Volleyball.', opts:['play','plays'], c:0},
+  {q:'What’s the correct negative of "She plays Baseball"?', opts:["She doesn't plays Baseball","She doesn't play Baseball","She don't play Baseball"], c:1},
+  {q:'Complete: We ___ Soccer every day.', opts:['play','plays'], c:0},
+  {q:'Which is correct?', opts:['He plays Basketball','He play Basketball','He playing Basketball'], c:0}
 ];
 
-const missionTasks = [
-  {id:'shoot', label:'🥅 Play Penalty Shootout!'},
-  {id:'draft', label:'🏅 Play Team Draft'},
-  {id:'story', label:'🎬 Finish the Sports Story'},
-  {id:'quiz', label:'❓ Finish the Quiz'}
+var MISSION = [
+  {id:'shoot', label:'Jogue o <strong>Penalty Shootout</strong>'},
+  {id:'draft', label:'Monte os times no <strong>Team Draft</strong>'},
+  {id:'story', label:'Termine a <strong>Sports Story</strong>'},
+  {id:'quiz',  label:'Termine o <strong>Quiz</strong>'}
 ];
 
-/* ---------------- NAV ---------------- */
-const sections = ['vocab','shoot','draft','story','quiz','missao'];
-const pillLabels = {vocab:'🃏 Vocab', shoot:'🥅 Shootout', draft:'🏅 Draft', story:'🎬 Story', quiz:'❓ Quiz', missao:'🎯 Missão'};
-const pillsNav = document.getElementById('pills');
-sections.forEach(name=>{
-  const b = document.createElement('button');
-  b.textContent = pillLabels[name];
-  b.addEventListener('click', ()=>show(name));
-  b.dataset.name = name;
-  pillsNav.appendChild(b);
-});
-function show(name){
-  sections.forEach(s=> document.getElementById(s).classList.toggle('show', s===name));
-  Array.from(pillsNav.children).forEach(b=> b.classList.toggle('active', b.dataset.name===name));
+// ── AUDIO ─────────────────────────────────────────────────────────────────
+var __ttsVoice=null;
+function __pickTtsVoice(){if(!window.speechSynthesis)return null;var voices=window.speechSynthesis.getVoices();if(!voices.length)return null;var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;});if(!en.length)return null;var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i;var normal=en.filter(function(v){return !NOVELTY.test(v.name);});var base=normal.length?normal:en;var sysDefault=base.filter(function(v){return v.default;})[0];if(sysDefault)return sysDefault;var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';});var pool=exact.length?exact:base;var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0];return pref||pool[0];}
+if(window.speechSynthesis){__ttsVoice=__pickTtsVoice();window.speechSynthesis.onvoiceschanged=function(){__ttsVoice=__pickTtsVoice();};}
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(__ttsVoice)u.voice=__ttsVoice;u.rate=.85;window.speechSynthesis.speak(u);}
+function shuffle(arr){return arr.slice().sort(function(){return Math.random()-.5;});}
+
+// ── NAV ───────────────────────────────────────────────────────────────────
+function show(n,pill){
+  document.querySelectorAll('.sec').forEach(function(s){s.classList.remove('on');});
+  document.querySelectorAll('.pill').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('sec-'+n).classList.add('on');
+  if(pill) pill.classList.add('on');
 }
-show('vocab');
 
-/* ---------------- VOCAB ---------------- */
-const vocabGrid = document.getElementById('vocabGrid');
-sports.forEach((s,i)=>{
-  const card = document.createElement('button');
-  card.className = 'card';
-  card.style.setProperty('--card-color', `var(--${cardColors[i % cardColors.length]})`);
-  card.innerHTML = `<span class="emoji">${s.emoji}</span><span class="en">${s.en}</span><br><span class="pt">${s.pt}</span>`;
-  card.addEventListener('click', ()=> speak(s.en));
-  vocabGrid.appendChild(card);
-});
+// ── FLASHCARDS ────────────────────────────────────────────────────────────
+function renderFC(){
+  var g=document.getElementById('fc-grid');g.innerHTML='';
+  sports.forEach(function(fc,i){
+    var d=document.createElement('div');d.className='fc';
+    d.innerHTML='<div class="fc-in"><div class="fc-f"><span class="fc-em">'+fc.em+'</span><div class="fc-en">'+fc.en+'</div><button class="abtn" id="ab'+i+'">🔊</button><div class="fc-tap">toque para ver</div></div><div class="fc-b"><span class="fc-em">'+fc.em+'</span><div class="fc-en">'+fc.pt+'</div><div class="fc-pt">'+fc.en+'</div></div></div>';
+    d.addEventListener('click',function(){d.classList.toggle('flip');});
+    d.querySelector('.abtn').addEventListener('click',function(e){e.stopPropagation();speak(fc.en);});
+    g.appendChild(d);
+  });
+}
+renderFC();
 
-/* ---------------- PENALTY SHOOTOUT ---------------- */
-let shootOrder = shuffle(shootRounds), shootIndex = 0, shootGoals = 0, shootLock = false;
+// ── PENALTY SHOOTOUT ──────────────────────────────────────────────────────
+var shootOrder=shuffle(shootRounds), shootIndex=0, shootGoals=0, pkLock=false;
 function renderShoot(){
-  shootLock = false;
-  document.getElementById('shootResult').textContent = '';
-  document.getElementById('ball').classList.remove('shoot');
-  document.getElementById('ball').style.opacity = 1;
-  if(shootIndex >= shootOrder.length){
-    document.getElementById('shootSentence').textContent = '🎉 Game over!';
-    document.getElementById('shootScore').textContent = `Final Score — Goals: ${shootGoals} / ${shootOrder.length}`;
-    document.getElementById('btnShoot').style.display = 'none';
-    document.getElementById('btnSave').style.display = 'none';
+  pkLock=false;
+  document.getElementById('pkResult').textContent='';
+  document.getElementById('pkBall').classList.remove('shoot');
+  if(shootIndex>=shootOrder.length){
+    document.getElementById('pkScore').textContent='Final Score — Goals: '+shootGoals+' / '+shootOrder.length;
+    document.getElementById('pkSentence').style.display='none';
+    document.getElementById('pkButtons').style.display='none';
+    document.getElementById('pkFinal').style.display='block';
+    document.getElementById('pkFinal').innerHTML='<div style="font-size:2.6rem;margin-bottom:6px">🎉</div><div class="pk-final-t">Game over! You scored '+shootGoals+' out of '+shootOrder.length+'!</div><button class="btn-rt" onclick="restartShoot()">🔄 Play Again</button>';
     markDone('shoot');
     return;
   }
-  document.getElementById('btnShoot').style.display = 'inline-block';
-  document.getElementById('btnSave').style.display = 'inline-block';
-  document.getElementById('shootSentence').textContent = shootOrder[shootIndex].text;
-  document.getElementById('shootScore').textContent = `Goals: ${shootGoals} / ${shootIndex}`;
+  document.getElementById('pkSentence').style.display='flex';
+  document.getElementById('pkButtons').style.display='flex';
+  document.getElementById('pkFinal').style.display='none';
+  document.getElementById('pkSentence').textContent=shootOrder[shootIndex].text;
+  document.getElementById('pkScore').textContent='Goals: '+shootGoals+' / '+shootIndex;
 }
 function answerShoot(choseShoot){
-  if(shootLock) return;
-  shootLock = true;
-  const round = shootOrder[shootIndex];
-  const isRight = (choseShoot && round.correct) || (!choseShoot && !round.correct);
-  const ball = document.getElementById('ball');
-  const resultEl = document.getElementById('shootResult');
-  if(choseShoot){
-    ball.classList.add('shoot');
-  }
+  if(pkLock)return;
+  pkLock=true;
+  var round=shootOrder[shootIndex];
+  var isRight=(choseShoot&&round.correct)||(!choseShoot&&!round.correct);
+  var ball=document.getElementById('pkBall');
+  var resultEl=document.getElementById('pkResult');
+  if(choseShoot){ball.classList.add('shoot');}
   if(isRight){
     shootGoals++;
-    resultEl.textContent = choseShoot ? '⚽ GOOOAL! 🎉' : '🧤 Great save!';
+    resultEl.textContent=choseShoot?'⚽ GOOOAL! 🎉':'🧤 Great save!';
   } else {
-    resultEl.textContent = choseShoot ? '🧤 Blocked! That was wrong.' : '⚽ Oops, that was correct!';
+    resultEl.textContent=choseShoot?'🧤 Blocked! That was wrong.':'⚽ Oops, that was correct!';
   }
-  setTimeout(()=>{
-    shootIndex++;
-    renderShoot();
-  }, 1000);
+  setTimeout(function(){shootIndex++;renderShoot();},1000);
 }
-document.getElementById('btnShoot').addEventListener('click', ()=> answerShoot(true));
-document.getElementById('btnSave').addEventListener('click', ()=> answerShoot(false));
+function restartShoot(){shootOrder=shuffle(shootRounds);shootIndex=0;shootGoals=0;renderShoot();}
+document.getElementById('btnShoot').addEventListener('click',function(){answerShoot(true);});
+document.getElementById('btnSave').addEventListener('click',function(){answerShoot(false);});
 renderShoot();
 
-/* ---------------- TEAM DRAFT ---------------- */
-let draftOrder = shuffle(draftPlayers), draftIndex = 0;
+// ── TEAM DRAFT ────────────────────────────────────────────────────────────
+var draftOrder=shuffle(draftPlayers), draftIndex=0;
 function renderDraft(){
-  document.getElementById('draftProgress').textContent = `Player ${Math.min(draftIndex+1, draftOrder.length)} of ${draftOrder.length}`;
-  const cardEl = document.getElementById('draftCard');
-  if(draftIndex >= draftOrder.length){
-    cardEl.textContent = '🎉 All players drafted!';
-    document.getElementById('bucketPlays').style.display = 'none';
-    document.getElementById('bucketNotPlays').style.display = 'none';
+  document.getElementById('drProgress').textContent='Player '+Math.min(draftIndex+1,draftOrder.length)+' of '+draftOrder.length;
+  var cardEl=document.getElementById('drCard');
+  if(draftIndex>=draftOrder.length){
+    document.getElementById('drCard').style.display='none';
+    document.getElementById('drFeedback').textContent='';
+    document.getElementById('drBuckets').style.display='none';
+    document.getElementById('drFinal').style.display='block';
+    document.getElementById('drFinal').innerHTML='<div style="font-size:2.6rem;margin-bottom:6px">🎉</div><div class="dr-final-t">All players drafted!</div><button class="btn-rt" onclick="restartDraft()">🔄 Play Again</button>';
     markDone('draft');
     return;
   }
-  cardEl.textContent = draftOrder[draftIndex].text;
+  document.getElementById('drCard').style.display='block';
+  document.getElementById('drBuckets').style.display='flex';
+  document.getElementById('drFinal').style.display='none';
+  cardEl.textContent=draftOrder[draftIndex].text;
 }
 function draftAnswer(team){
-  const player = draftOrder[draftIndex];
-  const fb = document.getElementById('draftFeedback');
-  if(team === player.team){
-    fb.textContent = '';
-    const rosterEl = document.getElementById(team==='plays' ? 'rosterPlays' : 'rosterNotPlays');
-    const nameEl = document.createElement('div');
-    nameEl.className = 'name';
-    nameEl.textContent = player.text.split(' ')[0];
+  var player=draftOrder[draftIndex];
+  var fb=document.getElementById('drFeedback');
+  if(team===player.team){
+    fb.textContent='';
+    var rosterEl=document.getElementById(team==='plays'?'rosterPlays':'rosterNotPlays');
+    var nameEl=document.createElement('div');
+    nameEl.className='dr-name';
+    nameEl.textContent=player.text.split(' ')[0];
     rosterEl.appendChild(nameEl);
     draftIndex++;
     renderDraft();
   } else {
-    const cardEl = document.getElementById('draftCard');
-    cardEl.style.background = '#FFB3A7';
-    fb.textContent = player.team === 'plays'
+    var cardEl=document.getElementById('drCard');
+    cardEl.style.background=getComputedStyle(document.documentElement).getPropertyValue('--coral-lt');
+    fb.textContent=player.team==='plays'
       ? '🤔 Essa frase é afirmativa — a pessoa JOGA! Tente o outro time.'
       : '🤔 Essa frase é negativa — a pessoa NÃO JOGA! Tente o outro time.';
-    setTimeout(()=>{ cardEl.style.background = ''; }, 300);
+    setTimeout(function(){cardEl.style.background='';},300);
   }
 }
-document.getElementById('bucketPlays').addEventListener('click', ()=> draftAnswer('plays'));
-document.getElementById('bucketNotPlays').addEventListener('click', ()=> draftAnswer('notplays'));
+function restartDraft(){
+  draftOrder=shuffle(draftPlayers);draftIndex=0;
+  document.getElementById('rosterPlays').innerHTML='';
+  document.getElementById('rosterNotPlays').innerHTML='';
+  renderDraft();
+}
+document.getElementById('bucketPlays').addEventListener('click',function(){draftAnswer('plays');});
+document.getElementById('bucketNotPlays').addEventListener('click',function(){draftAnswer('notplays');});
 renderDraft();
 
-/* ---------------- SPORTS STORY ---------------- */
-let storyIndex = 0;
-const storyChosen = [];
+// ── SPORTS STORY ──────────────────────────────────────────────────────────
+var storyIndex=0;
 function renderStory(){
-  document.getElementById('storyProgress').textContent = `Panel ${Math.min(storyIndex+1, storyPanels.length)} of ${storyPanels.length}`;
-  if(storyIndex >= storyPanels.length){
-    const recapText = storyPanels.map((p,i)=> `${p.emoji} ${p.options[p.answer]}`).join('<br>');
-    document.getElementById('storyEmoji').textContent = '🎬 The End!';
-    document.getElementById('storyOptions').innerHTML = `<div class="story-recap">${recapText}</div>`;
-    document.getElementById('storyWriteBox').style.display = 'block';
+  document.getElementById('stProgress').textContent='Panel '+Math.min(storyIndex+1,storyPanels.length)+' of '+storyPanels.length;
+  if(storyIndex>=storyPanels.length){
+    var recapText=storyPanels.map(function(p){return p.emoji+' '+p.options[p.answer];}).join('<br>');
+    document.getElementById('stEmoji').textContent='🎬 The End!';
+    document.getElementById('stOptions').innerHTML='<div class="st-recap">'+recapText+'</div>';
+    document.getElementById('stWriteBox').style.display='block';
     markDone('story');
     return;
   }
-  const p = storyPanels[storyIndex];
-  document.getElementById('storyEmoji').textContent = p.emoji;
-  const opts = document.getElementById('storyOptions');
-  opts.innerHTML = '';
-  p.options.forEach((opt, i)=>{
-    const b = document.createElement('button');
-    b.className = 'story-opt';
-    b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      Array.from(opts.children).forEach(el=>el.disabled=true);
-      if(i === p.answer){
+  var p=storyPanels[storyIndex];
+  document.getElementById('stEmoji').textContent=p.emoji;
+  var opts=document.getElementById('stOptions');opts.innerHTML='';
+  p.options.forEach(function(opt,i){
+    var b=document.createElement('button');
+    b.className='st-opt';
+    b.textContent=opt;
+    b.addEventListener('click',function(){
+      Array.from(opts.children).forEach(function(el){el.disabled=true;});
+      if(i===p.answer){
         b.classList.add('correct');
-        setTimeout(()=>{ storyIndex++; renderStory(); }, 800);
+        setTimeout(function(){storyIndex++;renderStory();},800);
       } else {
         b.classList.add('incorrect');
         opts.children[p.answer].classList.add('correct');
-        setTimeout(()=>{ storyIndex++; renderStory(); }, 1200);
+        setTimeout(function(){storyIndex++;renderStory();},1200);
       }
     });
     opts.appendChild(b);
@@ -627,17 +632,17 @@ function renderStory(){
 }
 renderStory();
 
-/* ---------------- STORY WRITING CHECKER ---------------- */
-document.getElementById('storyCheckBtn').addEventListener('click', ()=>{
-  const text = document.getElementById('storyTextarea').value.trim();
-  const resultBox = document.getElementById('storyCheckResult');
-  resultBox.innerHTML = '';
-  if(text.length < 5){
-    resultBox.innerHTML = '<div class="check-issue">✏️ Escreva pelo menos uma frase primeiro!</div>';
+// ── STORY WRITING CHECKER ────────────────────────────────────────────────
+document.getElementById('stCheckBtn').addEventListener('click',function(){
+  var text=document.getElementById('stTextarea').value.trim();
+  var resultBox=document.getElementById('stCheckResult');
+  resultBox.innerHTML='';
+  if(text.length<5){
+    resultBox.innerHTML='<div class="st-issue">✏️ Escreva pelo menos uma frase primeiro!</div>';
     return;
   }
-  const lower = text.toLowerCase().replace(/[‘’ʼ]/g, "'");
-  const issues = [];
+  var lower=text.toLowerCase().replace(/[‘’ʼ]/g,"'");
+  var issues=[];
   if(/\b(he|she|it)\s+play\b/.test(lower)){
     issues.push('👉 Com <b>he/she/it</b>, use <b>plays</b> (com -s)! Ex: "He plays Soccer."');
   }
@@ -650,116 +655,99 @@ document.getElementById('storyCheckBtn').addEventListener('click', ()=>{
   if(/\b(i|you|we|they)\s+doesn'?t\b/.test(lower)){
     issues.push('👉 Com <b>I/you/we/they</b>, use <b>don\'t</b> em vez de "doesn\'t"!');
   }
-  const hasSport = sports.some(s => lower.includes(s.en.toLowerCase()));
+  var hasSport=sports.some(function(s){return lower.indexOf(s.en.toLowerCase())!==-1;});
   if(!hasSport){
     issues.push('👉 Não encontrei nenhum esporte na sua história — inclua pelo menos um! ⚽🏀🎾');
   }
-  if(issues.length === 0){
-    resultBox.innerHTML = '<div class="check-ok">🎉 Muito bem! Não encontrei nenhum errinho comum. Mostre pra sua professora!</div>';
+  if(issues.length===0){
+    resultBox.innerHTML='<div class="st-ok">🎉 Muito bem! Não encontrei nenhum errinho comum. Mostre pra sua professora!</div>';
     markDone('story');
   } else {
-    resultBox.innerHTML = issues.map(i=>`<div class="check-issue">${i}</div>`).join('');
+    resultBox.innerHTML=issues.map(function(i){return '<div class="st-issue">'+i+'</div>';}).join('');
   }
 });
 
-/* ---------------- QUIZ ---------------- */
-let quizIndex = 0, quizScore = 0;
-function renderQuiz(){
-  const body = document.getElementById('quizBody');
-  document.getElementById('quizBar').style.width = `${(quizIndex/quizQuestions.length)*100}%`;
-  if(quizIndex >= quizQuestions.length){
-    body.innerHTML = `<div class="quiz-final"><div class="score">${quizScore}/${quizQuestions.length}</div><p>Great work! 🎉</p><button class="btn" id="quizRestart">🔄 Try Again</button></div>`;
-    document.getElementById('quizBar').style.width = '100%';
-    document.getElementById('quizRestart').addEventListener('click', ()=>{
-      quizIndex = 0; quizScore = 0; renderQuiz();
-    });
-    saveQuizScore('kids-l1-a7-quiz', quizScore, quizQuestions.length);
-    markDone('quiz');
-    return;
-  }
-  const q = quizQuestions[quizIndex];
-  body.innerHTML = `<div class="quiz-q">${q.q}</div>`;
-  q.options.forEach((opt,i)=>{
-    const b = document.createElement('button');
-    b.className = 'quiz-opt';
-    b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      Array.from(body.querySelectorAll('.quiz-opt')).forEach(el=>el.disabled=true);
-      if(i === q.answer){
-        b.classList.add('correct');
-        quizScore++;
-      } else {
-        b.classList.add('incorrect');
-        body.querySelectorAll('.quiz-opt')[q.answer].classList.add('correct');
-      }
-      setTimeout(()=>{ quizIndex++; renderQuiz(); }, 800);
-    });
-    body.appendChild(b);
-  });
+// ── QUIZ ──────────────────────────────────────────────────────────────────
+var qC=0,qS=0,qD=false;
+function initQuiz(){qC=0;qS=0;qD=false;document.getElementById('qres').classList.remove('on');document.getElementById('quiz-area').innerHTML='';renderQ();}
+function renderQ(){
+  var q=QUIZ[qC],tot=QUIZ.length;
+  document.getElementById('qpf').style.width=(qC/tot*100)+'%';
+  document.getElementById('qpl').textContent=qC+' / '+tot;
+  var area=document.getElementById('quiz-area');
+  area.innerHTML='<div class="qq"><div class="qq-txt">'+q.q+'</div></div><div class="qopts" id="qopts"></div><div class="qfb" id="qfb"></div><div class="qnav"><button class="btn-nx" id="qnx">'+(qC+1<tot?'Próxima ➡️':'Ver resultado 🏆')+'</button></div>';
+  var opts=document.getElementById('qopts');
+  q.opts.forEach(function(o,i){var b=document.createElement('button');b.className='qopt';b.textContent=o;b.addEventListener('click',function(){ansQ(i);});opts.appendChild(b);});
+  document.getElementById('qnx').addEventListener('click',nxtQ);qD=false;
 }
-renderQuiz();
+function ansQ(ch){
+  if(qD)return;qD=true;var q=QUIZ[qC];
+  var bs=document.querySelectorAll('.qopt');bs.forEach(function(b){b.disabled=true;});
+  bs[q.c].classList.add('ok');
+  var fb=document.getElementById('qfb');
+  if(ch===q.c){qS++;fb.textContent='🎉 Correto! Muito bem!';fb.className='qfb on ok';}
+  else{bs[ch].classList.add('fail');fb.textContent='😅 A resposta é: '+q.opts[q.c];fb.className='qfb on fail';}
+  document.getElementById('qnx').style.display='inline-block';
+}
+function nxtQ(){
+  qC++;
+  if(qC>=QUIZ.length){
+    document.getElementById('quiz-area').innerHTML='';
+    document.getElementById('qpf').style.width='100%';
+    document.getElementById('qpl').textContent=QUIZ.length+' / '+QUIZ.length;
+    var p=qS/QUIZ.length;
+    document.getElementById('qres-em').textContent=p===1?'🏆':p>=.6?'🌟':'💪';
+    document.getElementById('qres-t').textContent=p===1?'Perfeito!':p>=.6?'Muito bem!':'Continue praticando!';
+    document.getElementById('qres-s').textContent='Você acertou '+qS+' de '+QUIZ.length+' perguntas!';
+    document.getElementById('qres').classList.add('on');
+    saveQuizScore('kids-l1-a7-quiz',qS,QUIZ.length);
+    markDone('quiz');
+  } else{renderQ();}
+}
+renderQ();
 
-/* ---------------- MISSAO ---------------- */
-const missionState = {};
+// ── MISSION ───────────────────────────────────────────────────────────────
+var missionState={};
 function renderMission(){
-  const list = document.getElementById('missionList');
-  list.innerHTML = '';
-  missionTasks.forEach(t=>{
-    const done = !!missionState[t.id];
-    const div = document.createElement('div');
-    div.className = 'mission-item' + (done ? ' done' : '');
-    div.innerHTML = `<div class="mission-check">${done ? '✓' : ''}</div><div class="mission-label">${t.label}</div>`;
-    div.addEventListener('click', ()=>{
-      missionState[t.id] = !missionState[t.id];
+  var el=document.getElementById('msn-steps');el.innerHTML='';
+  MISSION.forEach(function(t){
+    var done=!!missionState[t.id];
+    var div=document.createElement('div');
+    div.className='mstep';
+    div.innerHTML='<div class="stchk'+(done?' on':'')+'"></div><div class="stxt">'+t.label+'</div>';
+    div.addEventListener('click',function(){
+      missionState[t.id]=!missionState[t.id];
       renderMission();
       checkAllDone();
     });
-    list.appendChild(div);
+    el.appendChild(div);
   });
 }
 function markDone(id){
-  missionState[id] = true;
-  renderMission();
+  if(missionState[id])return;
+  missionState[id]=true;
+  if(document.getElementById('msn-steps'))renderMission();
   checkAllDone();
 }
 function checkAllDone(){
-  if(missionTasks.every(t=>missionState[t.id])){
-    document.getElementById('badgeOverlay').classList.add('show');
-    launchConfetti();
+  if(MISSION.every(function(t){return missionState[t.id];})){
+    setTimeout(showBadge,400);
   }
 }
 renderMission();
 
-/* ---------------- BADGE / CONFETTI ---------------- */
-function launchConfetti(){
-  const card = document.getElementById('badgeCard');
-  const emojis = ['🎉','⚽','🏆','🎈','✨'];
-  for(let i=0;i<24;i++){
-    const c = document.createElement('div');
-    c.className = 'confetti';
-    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-    c.style.left = Math.random()*100 + '%';
-    c.style.animationDelay = (Math.random()*0.6)+'s';
-    card.appendChild(c);
-    setTimeout(()=>c.remove(), 2500);
-  }
+// ── BADGE ─────────────────────────────────────────────────────────────────
+var confettiEmos=['⚽','⭐','🎉','🏆','✨'];
+var badgeShown=false;
+function launchConfetti(){for(var i=0;i<18;i++){setTimeout(function(){var c=document.createElement('div');c.className='badge-confetti';c.textContent=confettiEmos[Math.floor(Math.random()*confettiEmos.length)];c.style.left=Math.random()*100+'vw';c.style.top='-30px';c.style.fontSize=(1+Math.random())+'rem';c.style.animationDuration=(2+Math.random()*2)+'s';c.style.animationDelay=Math.random()*.5+'s';document.body.appendChild(c);setTimeout(function(){if(c.parentNode)c.parentNode.removeChild(c);},4000);},i*120);}}
+function showBadge(){
+  if(badgeShown)return;
+  badgeShown=true;
+  document.getElementById('badge-overlay').classList.add('show');
+  launchConfetti();
 }
-document.getElementById('closeBadge').addEventListener('click', ()=>{
-  document.getElementById('badgeOverlay').classList.remove('show');
-});
-document.getElementById('shareBtn').addEventListener('click', async ()=>{
-  const text = "I finished Aula 7 — Let's Play Sports! 🎉⚽ #itsbrendacleto";
-  if(navigator.share){
-    try{ await navigator.share({text}); }catch(e){}
-  } else {
-    try{
-      await navigator.clipboard.writeText(text);
-      alert('Copied! Paste it on your Instagram story 📲');
-    }catch(e){
-      alert(text);
-    }
-  }
-});
+function closeBadge(e){if(!e||e.target===document.getElementById('badge-overlay'))document.getElementById('badge-overlay').classList.remove('show');}
+function shareBadge(){var text='Acabei de completar a Aula 7 do @itsbrendacleto Kids! ⚽ Inglês para a Vida Real — desde criança! #itsbrendacleto #kidsenglish';if(navigator.share){navigator.share({title:'itsbrendacleto Kids — Aula 7 Badge',text:text}).catch(function(){});}else{navigator.clipboard&&navigator.clipboard.writeText(text).then(function(){alert('Texto copiado! Cole no Instagram 📸');}).catch(function(){alert('Compartilhe: '+text);});}}
 
 // ── PLANNER MODE ───────────────────────────────────────────────────────────
 (function() {
@@ -768,7 +756,8 @@ document.getElementById('shareBtn').addEventListener('click', async ()=>{
   var validFases = ['vocab','shoot','draft','story','quiz'];
   if (fase && validFases.indexOf(fase) !== -1) {
     document.body.classList.add('planner-mode');
-    show(fase);
+    var pill = document.querySelector('.pill[onclick*="\'' + fase + '\'"]');
+    show(fase, pill);
   }
 })();
 </script>
