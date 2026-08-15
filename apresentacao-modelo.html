@@ -39,15 +39,15 @@
   .slide.text { background: var(--cream); }
   .slide.text .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
   .slide.text h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 32px; }
-  .slide.text ul { list-style: none; display: flex; flex-direction: column; gap: 14px; max-width: 900px; }
+  .slide.text ul { list-style: none; display: flex; flex-direction: column; gap: 14px; width: 100%; max-width: 900px; }
   .slide.text li {
     background: var(--white); border-radius: 16px; padding: 16px 18px 16px 32px; box-shadow: 0 4px 16px rgba(92,64,51,0.08);
     font-size: 29px; font-weight: 600; display: flex; align-items: center; justify-content: space-between; gap: 16px;
   }
   .slide.text li .term { text-align: left; overflow-wrap: break-word; min-width: 0; }
   .slide.text li .term strong { color: #B85C38; }
-  .slide.text p { font-size: 30px; line-height: 1.6; max-width: 900px; color: var(--text); }
-  .cols-2-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; max-width: 1200px; }
+  .slide.text p { font-size: 30px; line-height: 1.6; width: 100%; max-width: 900px; color: var(--text); }
+  .cols-2-wrap { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px 24px; width: 100%; max-width: 1200px; }
   .cols-2-wrap ul { max-width: none; }
   .slide.text .cols-2-wrap li { font-size: 22px; padding: 10px 14px 10px 22px; min-width: 0; }
 
@@ -63,14 +63,14 @@
   .slide.grid { background: var(--cream); }
   .slide.grid .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
   .slide.grid h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 32px; }
-  .letter-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 14px; max-width: 1120px; }
+  .letter-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; width: 100%; max-width: 1120px; }
   .letter-tile {
-    background: var(--white); border: none; border-radius: 14px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Serif Display', serif; font-size: 48px; color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
+    background: var(--white); border: none; border-radius: 14px; flex: 0 0 148px; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif; font-size: 58px; color: var(--brown); box-shadow: 0 2px 10px rgba(92,64,51,0.08);
     cursor: pointer; transition: background 0.15s, color 0.15s;
   }
   .letter-tile:hover, .letter-tile:focus-visible { background: var(--mint); color: var(--white); }
-  .letter-tile.two-line { aspect-ratio: auto; min-height: 84px; flex-direction: column; gap: 3px; padding: 10px 6px; }
+  .letter-tile.two-line { flex-basis: 172px; aspect-ratio: auto; min-height: 100px; flex-direction: column; gap: 4px; padding: 10px 6px; }
   .letter-tile .tile-main { font-size: 29px; line-height: 1.1; }
   .letter-tile .tile-sub { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); }
   .letter-tile:hover .tile-sub, .letter-tile:focus-visible .tile-sub { color: rgba(255,255,255,0.85); }
@@ -96,7 +96,7 @@
   .slide.match .eyebrow { font-size: 16px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--brown-light); margin-bottom: 14px; }
   .slide.match h2 { font-family: 'DM Serif Display', serif; font-weight: 400; font-size: 54px; color: var(--text); margin-bottom: 10px; }
   .slide.match .hint { font-size: 19px; color: var(--muted); margin-bottom: 28px; max-width: 800px; }
-  .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; max-width: 900px; }
+  .match-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; width: 100%; max-width: 900px; }
   .match-card {
     background: var(--white); border: none; border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 10px;
     box-shadow: 0 4px 16px rgba(92,64,51,0.08); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: box-shadow 0.15s;
@@ -318,16 +318,18 @@ function renderSlide(s) {
       ${s.title ? `<h2>${s.title}</h2>` : ''}
       ${body}`;
   } else if (s.type === 'grid') {
+    const tileW = s.cols ? Math.floor((1120 - (s.cols - 1) * 14) / s.cols) : null;
+    const widthAttr = tileW ? ` style="flex-basis:${tileW}px"` : '';
     const tile = (i) => (typeof i === 'object')
-      ? `<button class="letter-tile two-line" type="button" data-speak="${escapeAttr(i.speak || i.sub || i.label)}">
+      ? `<button class="letter-tile two-line" type="button"${widthAttr} data-speak="${escapeAttr(i.speak || i.sub || i.label)}">
           <span class="tile-main">${i.label}</span>
           ${i.sub ? `<span class="tile-sub">${i.sub}</span>` : ''}
         </button>`
-      : `<button class="letter-tile" type="button" data-speak="${escapeAttr(i.toLowerCase())}">${i}</button>`;
+      : `<button class="letter-tile" type="button"${widthAttr} data-speak="${escapeAttr(i.toLowerCase())}">${i}</button>`;
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
       ${s.title ? `<h2>${s.title}</h2>` : ''}
-      <div class="letter-grid"${s.cols ? ` style="grid-template-columns:repeat(${s.cols},1fr)"` : ''}>${s.items.map(tile).join('')}</div>`;
+      <div class="letter-grid">${s.items.map(tile).join('')}</div>`;
   } else if (s.type === 'choice') {
     el.innerHTML = `
       ${s.eyebrow ? `<div class="eyebrow">${s.eyebrow}</div>` : ''}
