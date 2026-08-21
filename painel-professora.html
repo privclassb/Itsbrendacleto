@@ -574,6 +574,30 @@
     .btn-sm { background: var(--white); border: 1.5px solid var(--sand); border-radius: 8px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; }
     .btn-sm:hover { border-color: var(--brown-light); }
 
+    /* Relatório financeiro (exportar / imprimir) */
+    .report-modal-box { max-width: 640px; }
+    .fin-report-header { text-align: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1.5px solid var(--sand); }
+    .fin-report-company { font-size: 13px; font-weight: 700; color: var(--brown); letter-spacing: 1px; }
+    .fin-report-cnpj { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .fin-report-period { font-size: 13px; color: var(--text); margin-top: 8px; }
+    .fin-report-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
+    .fin-report-summary-card { background: var(--cream); border-radius: 10px; padding: 12px; text-align: center; }
+    .fin-report-summary-value { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--brown); display: block; }
+    .fin-report-summary-label { font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+    .fin-report-section-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); font-weight: 400; margin: 18px 0 10px; }
+    .fin-report-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .fin-report-table th, .fin-report-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--sand); }
+    .fin-report-table th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.4px; }
+    .fin-report-table td.num { text-align: right; white-space: nowrap; }
+    .fin-report-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 16px; }
+
+    @media print {
+      body.printing-fin-report > *:not(#modalFinanceReport) { display: none !important; }
+      body.printing-fin-report #modalFinanceReport { position: static; background: none; display: block; padding: 0; }
+      body.printing-fin-report #modalFinanceReport .report-modal-box { max-width: 100%; box-shadow: none; padding: 0; }
+      body.printing-fin-report .no-print { display: none !important; }
+    }
+
     /* Detalhes do aluno (somente leitura) */
     .detail-row { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--sand); }
     .detail-row:last-child { border-bottom: none; }
@@ -1057,10 +1081,12 @@
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowPagos" checked onchange="loadFinanceiro()" /> Pagos</label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text);"><input type="checkbox" id="financeShowPendentes" checked onchange="loadFinanceiro()" /> Pendentes</label>
       </div>
-      <div class="form-actions">
-        <button class="btn-draft" onclick="loadFinanceiro()" style="flex:1;">Aplicar filtros</button>
-        <button class="btn-draft" onclick="resetFinanceiroFilters()" style="flex:1;">↺ Redefinir filtros</button>
-        <button class="btn-publish" onclick="openLancamento()" style="flex:1;">+ Novo lançamento</button>
+      <div class="form-actions" style="flex-wrap:wrap;">
+        <button class="btn-draft" onclick="loadFinanceiro()" style="flex:1 1 130px;">Aplicar filtros</button>
+        <button class="btn-draft" onclick="resetFinanceiroFilters()" style="flex:1 1 130px;">↺ Redefinir filtros</button>
+        <button class="btn-draft" onclick="quickFinanceYearToDate()" style="flex:1 1 130px;">📅 Jan até hoje</button>
+        <button class="btn-publish" onclick="openLancamento()" style="flex:1 1 150px;">+ Novo lançamento</button>
+        <button class="btn-publish" onclick="openFinanceReport()" style="flex:1 1 170px;background:#1E5C3A;">📊 Relatório / Exportar</button>
       </div>
     </div>
 
@@ -5098,9 +5124,20 @@
       ((p.paid && showPagos) || (!p.paid && showPendentes))
     );
 
-    if (filtered.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum lançamento encontrado.</div>'; return; }
-
     filtered.sort((a, b) => (a.due_date || '').localeCompare(b.due_date || ''));
+
+    window.__finReportCache = {
+      filtered: filtered,
+      studentName: filterStudent ? ((allStudents.find(s => s.id === filterStudent) || {}).full_name || 'Sem nome') : 'Todos os alunos',
+      filterFrom: filterFrom,
+      filterTo: filterTo,
+      entradasPrevistas: entradasPrevistas,
+      entradasConfirmadas: entradasConfirmadas,
+      saidasPrevistas: saidasPrevistas,
+      saidasConfirmadas: saidasConfirmadas
+    };
+
+    if (filtered.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhum lançamento encontrado.</div>'; return; }
 
     const today = todayLocalISO();
 
@@ -5129,6 +5166,154 @@
           <button class="btn-report-action btn-toggle" onclick="openLancamento('${p.id}')">Editar</button>
         </div>`;
     }).join('');
+  }
+
+  function quickFinanceYearToDate() {
+    const now = new Date();
+    const jan1 = new Date(now.getFullYear(), 0, 1);
+    document.getElementById('financeFilterFrom').value = jan1.toISOString().slice(0, 10);
+    document.getElementById('financeFilterTo').value = todayLocalISO();
+    loadFinanceiro();
+  }
+
+  function formatBRDate(iso) {
+    return iso ? new Date(iso + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+  }
+
+  function financeMonthlyBreakdown(list) {
+    const byMonth = {};
+    list.forEach(p => {
+      if (!p.due_date) return;
+      const key = p.due_date.slice(0, 7); // YYYY-MM
+      if (!byMonth[key]) byMonth[key] = { entradasConf: 0, entradasPrev: 0, saidasConf: 0, saidasPrev: 0 };
+      const amt = Number(p.amount) || 0;
+      if (p.type === 'entrada') {
+        byMonth[key].entradasPrev += amt;
+        if (p.paid) byMonth[key].entradasConf += amt;
+      } else {
+        byMonth[key].saidasPrev += amt;
+        if (p.paid) byMonth[key].saidasConf += amt;
+      }
+    });
+    return Object.keys(byMonth).sort().map(key => ({ key, ...byMonth[key] }));
+  }
+
+  function monthKeyLabel(key) {
+    const [y, m] = key.split('-');
+    const label = new Date(Number(y), Number(m) - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  }
+
+  function openFinanceReport() {
+    const cache = window.__finReportCache;
+    if (!cache) { alert('Aplique os filtros do financeiro antes de gerar o relatório.'); return; }
+
+    const periodLabel = (cache.filterFrom ? formatBRDate(cache.filterFrom) : 'início') + ' até ' + (cache.filterTo ? formatBRDate(cache.filterTo) : 'hoje');
+    document.getElementById('finReportPeriod').textContent = 'Período: ' + periodLabel + ' · ' + cache.studentName;
+
+    document.getElementById('finReportSummary').innerHTML = `
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.entradasConfirmadas.toFixed(2)}</span><div class="fin-report-summary-label">Entradas confirmadas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.entradasPrevistas.toFixed(2)}</span><div class="fin-report-summary-label">Entradas previstas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.saidasConfirmadas.toFixed(2)}</span><div class="fin-report-summary-label">Saídas confirmadas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${(cache.entradasConfirmadas - cache.saidasConfirmadas).toFixed(2)}</span><div class="fin-report-summary-label">Lucro confirmado</div></div>
+    `;
+
+    const monthly = financeMonthlyBreakdown(cache.filtered);
+    const monthlyTable = document.getElementById('finReportMonthlyTable');
+    if (monthly.length === 0) {
+      monthlyTable.innerHTML = '<tr><td class="fin-report-empty">Nenhum lançamento no período.</td></tr>';
+    } else {
+      monthlyTable.innerHTML = `
+        <thead><tr><th>Mês</th><th>Entradas confirmadas</th><th>Entradas previstas</th><th>Saídas confirmadas</th></tr></thead>
+        <tbody>
+          ${monthly.map(m => `
+            <tr>
+              <td>${monthKeyLabel(m.key)}</td>
+              <td class="num">R$ ${m.entradasConf.toFixed(2)}</td>
+              <td class="num">R$ ${m.entradasPrev.toFixed(2)}</td>
+              <td class="num">R$ ${m.saidasConf.toFixed(2)}</td>
+            </tr>`).join('')}
+        </tbody>`;
+    }
+
+    const detailTable = document.getElementById('finReportDetailTable');
+    if (cache.filtered.length === 0) {
+      detailTable.innerHTML = '<tr><td class="fin-report-empty">Nenhum lançamento no período.</td></tr>';
+    } else {
+      detailTable.innerHTML = `
+        <thead><tr><th>Data</th><th>Descrição</th><th>Aluno</th><th>Status</th><th>Valor</th></tr></thead>
+        <tbody>
+          ${cache.filtered.map(p => {
+            const student = allStudents.find(s => s.id === p.student_id);
+            const who = student ? student.full_name : (p.type === 'saida' ? 'Empresa' : '—');
+            const today = todayLocalISO();
+            const overdue = !p.paid && p.due_date && p.due_date < today;
+            const statusLabel = p.paid ? 'Pago' : (overdue ? 'Atrasado' : 'Pendente');
+            const sign = p.type === 'saida' ? '-' : '';
+            return `
+              <tr>
+                <td>${formatBRDate(p.due_date)}</td>
+                <td>${p.description || ''}</td>
+                <td>${who}</td>
+                <td>${statusLabel}</td>
+                <td class="num">${sign}R$ ${Number(p.amount || 0).toFixed(2)}</td>
+              </tr>`;
+          }).join('')}
+        </tbody>`;
+    }
+
+    document.getElementById('modalFinanceReport').classList.add('open');
+  }
+
+  function closeFinanceReport() {
+    document.getElementById('modalFinanceReport').classList.remove('open');
+  }
+
+  function printFinanceReport() {
+    document.body.classList.add('printing-fin-report');
+    window.print();
+    setTimeout(() => document.body.classList.remove('printing-fin-report'), 300);
+  }
+
+  function csvField(value) {
+    const s = String(value == null ? '' : value).replace(/"/g, '""');
+    return '"' + s + '"';
+  }
+
+  function downloadFinanceCSV() {
+    const cache = window.__finReportCache;
+    if (!cache) return;
+    const today = todayLocalISO();
+    const rows = [['Data', 'Descrição', 'Aluno', 'Tipo', 'Status', 'Forma de pagamento', 'Data de pagamento', 'Valor']];
+    cache.filtered.forEach(p => {
+      const student = allStudents.find(s => s.id === p.student_id);
+      const who = student ? student.full_name : (p.type === 'saida' ? 'Empresa' : '');
+      const overdue = !p.paid && p.due_date && p.due_date < today;
+      const statusLabel = p.paid ? 'Pago' : (overdue ? 'Atrasado' : 'Pendente');
+      const amountStr = Number(p.amount || 0).toFixed(2).replace('.', ',');
+      rows.push([
+        formatBRDate(p.due_date),
+        p.description || '',
+        who,
+        p.type === 'saida' ? 'Saída' : 'Entrada',
+        statusLabel,
+        p.payment_method || '',
+        p.paid_at ? formatBRDate(p.paid_at) : '',
+        amountStr
+      ]);
+    });
+    const csv = '﻿' + rows.map(r => r.map(csvField).join(';')).join('\r\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const fromLabel = (cache.filterFrom || 'inicio').replace(/-/g, '');
+    const toLabel = (cache.filterTo || today).replace(/-/g, '');
+    a.href = url;
+    a.download = `financeiro_${fromLabel}_${toLabel}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   async function toggleLancamentoPaid(id, newPaid) {
@@ -6100,6 +6285,36 @@
       <button class="btn-modal-cancel" onclick="closeLancamento()">Cancelar</button>
       <button class="btn-modal-save" id="btnDeleteLancamento" style="background:#C0392B;display:none;" onclick="deleteLancamento()">Excluir</button>
       <button class="btn-modal-save" onclick="saveLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Relatório financeiro (exportar / imprimir) -->
+<div class="modal-overlay" id="modalFinanceReport">
+  <div class="modal-box report-modal-box">
+    <div class="fin-report-header">
+      <div class="fin-report-company">PRIV CLASS B</div>
+      <div class="fin-report-cnpj">CNPJ 43.151.392/0001-00</div>
+      <div class="modal-title" style="margin-top:10px;">Relatório financeiro</div>
+      <div class="fin-report-period" id="finReportPeriod"></div>
+    </div>
+
+    <div class="fin-report-summary" id="finReportSummary"></div>
+
+    <div class="fin-report-section-title">Faturamento por mês</div>
+    <div style="overflow-x:auto;">
+      <table class="fin-report-table" id="finReportMonthlyTable"></table>
+    </div>
+
+    <div class="fin-report-section-title">Lançamentos detalhados</div>
+    <div style="overflow-x:auto;">
+      <table class="fin-report-table" id="finReportDetailTable"></table>
+    </div>
+
+    <div class="modal-actions no-print">
+      <button class="btn-modal-cancel" onclick="closeFinanceReport()">Fechar</button>
+      <button class="btn-modal-save" style="background:#5C4033;" onclick="downloadFinanceCSV()">⬇️ Baixar CSV</button>
+      <button class="btn-modal-save" onclick="printFinanceReport()">🖨️ Imprimir / Salvar PDF</button>
     </div>
   </div>
 </div>
