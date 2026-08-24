@@ -3373,6 +3373,19 @@
     document.getElementById('viewReportTitle').textContent = r.title || 'Relatório';
     document.getElementById('viewReportMeta').textContent =
       studentNameById(r.student_id) + period + (teacher ? ' · ' + teacher : '') + ' · ' + status;
+
+    const timestampEl = document.getElementById('viewReportTimestamp');
+    if (currentUserIsBrenda && r.created_at) {
+      const dt = new Date(r.created_at);
+      const dateStr = dt.toLocaleDateString('pt-BR');
+      const timeStr = dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      timestampEl.textContent = 'Lançado em ' + dateStr + ' às ' + timeStr;
+      timestampEl.style.display = 'block';
+    } else {
+      timestampEl.textContent = '';
+      timestampEl.style.display = 'none';
+    }
+
     document.getElementById('viewReportContent').textContent = r.content || '';
     document.getElementById('modalViewReport').classList.add('open');
   }
@@ -6317,6 +6330,7 @@
   <div class="modal-box">
     <div class="modal-title" id="viewReportTitle"></div>
     <div class="modal-sub" id="viewReportMeta"></div>
+    <div class="modal-hint" id="viewReportTimestamp" style="display:none;margin-bottom:14px;"></div>
     <div class="view-report-content" id="viewReportContent"></div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeViewReport()">Fechar</button>
