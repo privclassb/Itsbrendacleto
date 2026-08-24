@@ -574,6 +574,9 @@
     .btn-sm { background: var(--white); border: 1.5px solid var(--sand); border-radius: 8px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer; }
     .btn-sm:hover { border-color: var(--brown-light); }
 
+    /* Ver relatório (leitura) */
+    .view-report-content { background: var(--cream); border-radius: 10px; padding: 16px; font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; word-wrap: break-word; margin-bottom: 6px; max-height: 50vh; overflow-y: auto; }
+
     /* Relatório financeiro (exportar / imprimir) */
     .report-modal-box { max-width: 640px; }
     .fin-report-header { text-align: center; margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1.5px solid var(--sand); }
@@ -2582,6 +2585,7 @@
   // Track params of the last loadReports() call so filter controls can re-trigger it
   let currentReportsTeacherId = null;
   let currentReportsSeeAll = false;
+  let viewReportsCache = [];
 
   async function editStudent(studentId) {
     const student = allStudents.find(s => s.id === studentId);
@@ -3338,6 +3342,8 @@
     const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
     const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
 
+    viewReportsCache = reports;
+
     if (reports.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal encontrado com esse filtro.</div>';
       return;
@@ -3346,16 +3352,33 @@
     listEl.innerHTML = reports.map(r => {
       const period = r.period ? ' · ' + r.period : '';
       return `
-        <div class="report-row">
+        <div class="report-row" style="cursor:pointer;" onclick="openViewReport('${r.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${studentNameById(r.student_id)}</div>
             <div class="report-row-title">${r.title}${period}</div>
           </div>
           <span class="report-status ${r.is_published ? 'published' : 'draft'}">${r.is_published ? 'Publicado' : 'Rascunho'}</span>
-          <button class="btn-report-action btn-toggle" onclick="toggleReportStatus('${r.id}', ${!r.is_published})">${r.is_published ? 'Tornar rascunho' : 'Publicar'}</button>
-          <button class="btn-report-action btn-delete" onclick="deleteReport('${r.id}')">Excluir</button>
+          <button class="btn-report-action btn-toggle" onclick="event.stopPropagation(); toggleReportStatus('${r.id}', ${!r.is_published})">${r.is_published ? 'Tornar rascunho' : 'Publicar'}</button>
+          <button class="btn-report-action btn-delete" onclick="event.stopPropagation(); deleteReport('${r.id}')">Excluir</button>
         </div>`;
     }).join('');
+  }
+
+  function openViewReport(id) {
+    const r = viewReportsCache.find(x => x.id === id);
+    if (!r) return;
+    const period = r.period ? ' · ' + r.period : '';
+    const teacher = r.created_by ? teacherNameById(r.created_by) : '';
+    const status = r.is_published ? 'Publicado' : 'Rascunho';
+    document.getElementById('viewReportTitle').textContent = r.title || 'Relatório';
+    document.getElementById('viewReportMeta').textContent =
+      studentNameById(r.student_id) + period + (teacher ? ' · ' + teacher : '') + ' · ' + status;
+    document.getElementById('viewReportContent').textContent = r.content || '';
+    document.getElementById('modalViewReport').classList.add('open');
+  }
+
+  function closeViewReport() {
+    document.getElementById('modalViewReport').classList.remove('open');
   }
 
   async function saveReport(publish) {
@@ -6285,6 +6308,18 @@
       <button class="btn-modal-cancel" onclick="closeLancamento()">Cancelar</button>
       <button class="btn-modal-save" id="btnDeleteLancamento" style="background:#C0392B;display:none;" onclick="deleteLancamento()">Excluir</button>
       <button class="btn-modal-save" onclick="saveLancamento()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Ver relatório -->
+<div class="modal-overlay" id="modalViewReport">
+  <div class="modal-box">
+    <div class="modal-title" id="viewReportTitle"></div>
+    <div class="modal-sub" id="viewReportMeta"></div>
+    <div class="view-report-content" id="viewReportContent"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeViewReport()">Fechar</button>
     </div>
   </div>
 </div>
