@@ -28,6 +28,21 @@
     .avatar-edit { position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; background: var(--rose); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; color: white; }
     #avatarInput { display: none; }
 
+    /* Modal: Ajustar foto (crop) */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: var(--radius); padding: 28px; width: 100%; max-width: 340px; text-align: center; }
+    .modal-title { font-size: 20px; font-weight: 900; color: var(--text); margin-bottom: 6px; }
+    .modal-hint { font-size: 13px; color: #7A6560; margin-bottom: 18px; line-height: 1.4; }
+    .crop-viewport { width: 260px; height: 260px; margin: 0 auto 18px; border-radius: 50%; overflow: hidden; position: relative; background: var(--cream); border: 3px solid #EEE; cursor: grab; touch-action: none; }
+    .crop-viewport:active { cursor: grabbing; }
+    .crop-viewport img { position: absolute; top: 50%; left: 50%; max-width: none; max-height: none; user-select: none; -webkit-user-drag: none; pointer-events: none; }
+    .crop-zoom-row { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .crop-zoom-row input[type="range"] { flex: 1; accent-color: var(--rose); }
+    .modal-actions { display: flex; gap: 10px; }
+    .btn-modal-cancel { flex: 1; padding: 12px; background: var(--cream); border: 2px solid #EEE; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 700; color: #999; cursor: pointer; }
+    .btn-modal-save { flex: 2; padding: 12px; background: var(--rose); border: none; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 14px; font-weight: 800; color: white; cursor: pointer; }
+
     .hero-greeting { font-size: 13px; font-weight: 800; color: rgba(61,43,31,0.65); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
     .hero-name { font-size: 28px; font-weight: 900; color: var(--text); margin-bottom: 12px; }
     .hero-chips { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
@@ -382,23 +397,128 @@
     document.getElementById('avatarPlaceholder').style.display = 'none';
   }
 
-  document.getElementById('avatarInput').addEventListener('change', async function(e) {
+  // ---- Ajustar foto de perfil (crop: arrastar + zoom) ----
+  const CROP_VIEWPORT_SIZE = 260;
+  const CROP_OUTPUT_SIZE = 400;
+  let cropState = { naturalW: 0, naturalH: 0, scale: 1, baseScale: 1, offsetX: 0, offsetY: 0, dragging: false, startX: 0, startY: 0, startOffsetX: 0, startOffsetY: 0, ready: false };
+
+  document.getElementById('avatarInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (!file) return;
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) return;
-    const userId = session.user.id;
-    try {
-      const ext = file.name.split('.').pop().toLowerCase().replace(/[^a-z]/g, '') || 'jpg';
-      const path = userId + '_' + Date.now() + '.' + ext;
-      const { error: upErr } = await sb.storage.from('Avatars').upload(path, file, { upsert: true });
-      if (upErr) { alert('Erro upload: ' + upErr.message); return; }
-      const { data: urlData } = sb.storage.from('Avatars').getPublicUrl(path);
-      const { error: updErr } = await sb.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', userId);
-      if (updErr) { alert('Erro ao salvar: ' + updErr.message); return; }
-      showAvatar(urlData.publicUrl);
-    } catch(err) { alert('Erro: ' + err.message); }
+    const reader = new FileReader();
+    reader.onload = (ev) => openAvatarCrop(ev.target.result);
+    reader.readAsDataURL(file);
+    e.target.value = '';
   });
+
+  function openAvatarCrop(dataUrl) {
+    cropState.ready = false;
+    const img = document.getElementById('cropImg');
+    img.onload = () => {
+      cropState.naturalW = img.naturalWidth;
+      cropState.naturalH = img.naturalHeight;
+      cropState.baseScale = Math.max(CROP_VIEWPORT_SIZE / cropState.naturalW, CROP_VIEWPORT_SIZE / cropState.naturalH);
+      cropState.scale = cropState.baseScale;
+      cropState.offsetX = 0;
+      cropState.offsetY = 0;
+      cropState.ready = true;
+      document.getElementById('cropZoomSlider').value = 100;
+      applyCropTransform();
+    };
+    img.onerror = () => {
+      alert('Não consegui abrir essa imagem. Tente outro arquivo.');
+      closeAvatarCrop();
+    };
+    img.src = dataUrl;
+    document.getElementById('modalAvatarCrop').classList.add('open');
+  }
+
+  function closeAvatarCrop() {
+    document.getElementById('modalAvatarCrop').classList.remove('open');
+    cropState.ready = false;
+    document.getElementById('cropImg').src = '';
+  }
+
+  function clampCropOffsets() {
+    const dispW = cropState.naturalW * cropState.scale;
+    const dispH = cropState.naturalH * cropState.scale;
+    const maxX = Math.max(0, (dispW - CROP_VIEWPORT_SIZE) / 2);
+    const maxY = Math.max(0, (dispH - CROP_VIEWPORT_SIZE) / 2);
+    cropState.offsetX = Math.min(maxX, Math.max(-maxX, cropState.offsetX));
+    cropState.offsetY = Math.min(maxY, Math.max(-maxY, cropState.offsetY));
+  }
+
+  function applyCropTransform() {
+    const img = document.getElementById('cropImg');
+    const dispW = cropState.naturalW * cropState.scale;
+    const dispH = cropState.naturalH * cropState.scale;
+    img.style.width = dispW + 'px';
+    img.style.height = dispH + 'px';
+    img.style.transform = 'translate(calc(-50% + ' + cropState.offsetX + 'px), calc(-50% + ' + cropState.offsetY + 'px))';
+  }
+
+  function updateCropTransform() {
+    if (!cropState.ready) return;
+    const pct = Number(document.getElementById('cropZoomSlider').value) / 100;
+    cropState.scale = cropState.baseScale * pct;
+    clampCropOffsets();
+    applyCropTransform();
+  }
+
+  // Delegated on document (not the element directly) because the crop modal's markup
+  // is placed after this script block in the HTML, so #cropViewport doesn't exist yet
+  // when this script runs.
+  document.addEventListener('pointerdown', (e) => {
+    const vp = document.getElementById('cropViewport');
+    if (!cropState.ready || !vp || !vp.contains(e.target)) return;
+    cropState.dragging = true;
+    cropState.startX = e.clientX;
+    cropState.startY = e.clientY;
+    cropState.startOffsetX = cropState.offsetX;
+    cropState.startOffsetY = cropState.offsetY;
+    vp.setPointerCapture(e.pointerId);
+  });
+  document.addEventListener('pointermove', (e) => {
+    if (!cropState.dragging) return;
+    cropState.offsetX = cropState.startOffsetX + (e.clientX - cropState.startX);
+    cropState.offsetY = cropState.startOffsetY + (e.clientY - cropState.startY);
+    clampCropOffsets();
+    applyCropTransform();
+  });
+  document.addEventListener('pointerup', () => { cropState.dragging = false; });
+  document.addEventListener('pointercancel', () => { cropState.dragging = false; });
+
+  async function saveAvatarCrop() {
+    if (!cropState.ready) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = CROP_OUTPUT_SIZE;
+    canvas.height = CROP_OUTPUT_SIZE;
+    const ctx = canvas.getContext('2d');
+    const img = document.getElementById('cropImg');
+    const ratio = CROP_OUTPUT_SIZE / CROP_VIEWPORT_SIZE;
+    const dispW = cropState.naturalW * cropState.scale * ratio;
+    const dispH = cropState.naturalH * cropState.scale * ratio;
+    const dx = CROP_OUTPUT_SIZE / 2 - dispW / 2 + cropState.offsetX * ratio;
+    const dy = CROP_OUTPUT_SIZE / 2 - dispH / 2 + cropState.offsetY * ratio;
+    ctx.drawImage(img, dx, dy, dispW, dispH);
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) { alert('Erro ao processar a imagem.'); return; }
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const userId = session.user.id;
+      try {
+        const path = userId + '_' + Date.now() + '.jpg';
+        const { error: upErr } = await sb.storage.from('Avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' });
+        if (upErr) { alert('Erro upload: ' + upErr.message); return; }
+        const { data: urlData } = sb.storage.from('Avatars').getPublicUrl(path);
+        const { error: updErr } = await sb.from('profiles').update({ avatar_url: urlData.publicUrl }).eq('id', userId);
+        if (updErr) { alert('Erro ao salvar: ' + updErr.message); return; }
+        showAvatar(urlData.publicUrl);
+        closeAvatarCrop();
+      } catch (err) { alert('Erro: ' + err.message); }
+    }, 'image/jpeg', 0.9);
+  }
 
   async function updateStreak(userId) {
     const today = todayLocalISO();
@@ -426,5 +546,24 @@
     window.location.href = 'index.html';
   })();
 </script>
+
+<!-- Modal: Ajustar foto de perfil -->
+<div class="modal-overlay" id="modalAvatarCrop">
+  <div class="modal-box">
+    <div class="modal-title">Ajustar foto</div>
+    <div class="modal-hint">Arraste a foto pra posicionar e use o zoom pra escolher o enquadramento.</div>
+    <div class="crop-viewport" id="cropViewport">
+      <img id="cropImg" src="" alt="" />
+    </div>
+    <div class="crop-zoom-row">
+      <span style="font-size:16px;">🔍</span>
+      <input type="range" id="cropZoomSlider" min="100" max="300" value="100" oninput="updateCropTransform()" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeAvatarCrop()">Cancelar</button>
+      <button class="btn-modal-save" onclick="saveAvatarCrop()">Salvar foto</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
