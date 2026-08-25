@@ -281,22 +281,31 @@
     const [{ data: activities }, { data: activeDays }, { data: classes }] = await Promise.all([
       sb.from('lesson_progress').select('user_id, lesson_id, completed_at').in('user_id', ids).gte('completed_at', monthStart).lte('completed_at', monthEnd + 'T23:59:59'),
       sb.from('daily_activity_log').select('user_id, activity_date').in('user_id', ids).gte('activity_date', monthStart).lte('activity_date', monthEnd),
-      sb.from('class_logs').select('student_id, turma_id, class_date, status').in('status', ['realizada', 'cancelada_falta']).gte('class_date', monthStart).lte('class_date', monthEnd)
+      // Busca todos os status (não só realizada/cancelada_falta) pra saber se o aluno
+      // tem aula cadastrada no período mesmo quando a prof ainda não marcou o resultado.
+      sb.from('class_logs').select('student_id, turma_id, class_date, status').gte('class_date', monthStart).lte('class_date', monthEnd)
     ]);
 
     const scoreMap = {};
-    students.forEach(s => { scoreMap[s.id] = { activities: 0, activeDays: 0, classesAttended: 0, classesScheduled: 0 }; });
+    students.forEach(s => { scoreMap[s.id] = { activities: 0, activeDays: 0, classesAttended: 0, classesScheduled: 0, hasAnyClass: false }; });
 
     (activities || []).forEach(a => {
       if (/^adulto-l\d+-a\d+$/.test(a.lesson_id) && scoreMap[a.user_id]) scoreMap[a.user_id].activities++;
     });
     (activeDays || []).forEach(d => { if (scoreMap[d.user_id]) scoreMap[d.user_id].activeDays++; });
     (classes || []).forEach(c => {
+      // Só realizada/cancelada_falta contam pra taxa de presença (a prof já marcou o
+      // resultado); pendente/cancelada/feriado/etc. não entram na taxa, mas ainda
+      // marcam que o aluno tem aula cadastrada no período (evita "sem aulas" errado).
+      const countsForRate = c.status === 'realizada' || c.status === 'cancelada_falta';
       const attended = c.status === 'realizada';
       const applyTo = (id) => {
         if (!scoreMap[id]) return;
-        scoreMap[id].classesScheduled++;
-        if (attended) scoreMap[id].classesAttended++;
+        scoreMap[id].hasAnyClass = true;
+        if (countsForRate) {
+          scoreMap[id].classesScheduled++;
+          if (attended) scoreMap[id].classesAttended++;
+        }
       };
       if (c.student_id) {
         applyTo(c.student_id);
@@ -335,7 +344,9 @@
         const avatar = r.avatar_url
           ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
           : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
-        const attendanceLabel = r.attendanceRate !== null ? Math.round(r.attendanceRate * 100) + '% de presença' : 'sem aulas no período';
+        const attendanceLabel = r.attendanceRate !== null
+          ? Math.round(r.attendanceRate * 100) + '% de presença'
+          : (r.hasAnyClass ? 'aulas ainda não registradas' : 'sem aulas no período');
         return `
           <div class="rank-item ${isMe ? 'rank-you' : ''}">
             <div class="rank-position">${medals[i] || (i + 1)}</div>
