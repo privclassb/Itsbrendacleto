@@ -525,6 +525,7 @@
     .report-status.birthday { background: #FDEDEB; color: #B0503E; }
     .report-status.contract-alert { background: #FFF8E5; color: #A9740C; }
     .report-status.payment-alert { background: #FFF0EE; color: #C0392B; }
+    .report-status.pending-class-alert { background: #EAF2FB; color: #2E6DA4; }
     .report-status.status-realizada { background: #EFF7F3; color: #1E5C3A; }
     .report-status.status-pendente { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
     .report-status.status-cancelada { background: #F3EDF7; color: #6B4C93; }
@@ -1427,7 +1428,22 @@
     }
     const overdueEntries = Object.entries(overdueByStudent);
 
-    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0) {
+    // Aulas aguardando registro: aulas com status "pendente" cuja data já passou, dos
+    // alunos/turmas de cada professora. Aula não registrada não conta presença no
+    // ranking dos alunos, então é importante manter isso em dia.
+    const studentIdsForPending = students.map(s => s.id);
+    const turmaIdsForPending = [...new Set(students.filter(s => s.turma_id).map(s => s.turma_id))];
+    const [{ data: pendingByStudent }, { data: pendingByTurma }] = await Promise.all([
+      studentIdsForPending.length
+        ? sb.from('class_logs').select('id').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('student_id', studentIdsForPending)
+        : Promise.resolve({ data: [] }),
+      turmaIdsForPending.length
+        ? sb.from('class_logs').select('id').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('turma_id', turmaIdsForPending)
+        : Promise.resolve({ data: [] })
+    ]);
+    const pendingClassesCount = (pendingByStudent || []).length + (pendingByTurma || []).length;
+
+    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClassesCount === 0) {
       card.style.display = 'none';
       return;
     }
@@ -1467,7 +1483,16 @@
       </div>`;
     }).join('');
 
-    listEl.innerHTML = overdueRows + birthdayRows + contractRows;
+    const pendingClassesRow = pendingClassesCount === 0 ? '' : `
+      <div class="report-row" style="cursor:pointer;" onclick="showTab('turmas')">
+        <div class="report-row-info">
+          <div class="report-row-student">Aulas aguardando registro</div>
+          <div class="report-row-title">${pendingClassesCount} aula${pendingClassesCount === 1 ? '' : 's'} já passada${pendingClassesCount === 1 ? '' : 's'} sem status — registre pra contar no ranking dos alunos</div>
+        </div>
+        <span class="report-status pending-class-alert">Pendente</span>
+      </div>`;
+
+    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassesRow;
   }
 
   // ---- Minhas tarefas ----
