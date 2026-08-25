@@ -1404,11 +1404,13 @@
       return (d.getMonth() + 1) === todayMonth && d.getDate() === todayDay;
     });
 
-    const contractsEnding = currentUserIsBrenda ? students.filter(s => {
+    // Contratos chegando ao fim: todas as professoras veem, mas `students` já vem
+    // filtrado só com os alunos de cada uma (exceto Brenda, que vê todos).
+    const contractsEnding = students.filter(s => {
       if (!s.contract_end) return false;
       const d = new Date(s.contract_end + 'T00:00:00');
       return (d.getMonth() + 1) === todayMonth && d.getFullYear() === todayYear;
-    }) : [];
+    });
 
     let overdueByStudent = {};
     if (currentUserIsBrenda) {
