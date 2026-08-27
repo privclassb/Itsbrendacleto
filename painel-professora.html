@@ -530,7 +530,9 @@
     .report-status.monthly-report-alert { background: #E8F5F0; color: #1E7A5C; }
     .report-status.lead-alert { background: #FDF0FA; color: #9C2E86; }
     .lead-status-novo { background: #EAF2FB; color: #2E6DA4; }
-    .lead-status-contatado { background: #FFF8E5; color: #A9740C; }
+    .lead-status-aguardando_resposta { background: #FFF8E5; color: #A9740C; }
+    .lead-status-respondeu { background: #E8F2F5; color: #2E7D8C; }
+    .lead-status-parou_de_responder { background: #FBEFEA; color: #B5502E; }
     .lead-status-convertido { background: #E8F5F0; color: #1E7A5C; }
     .lead-status-descartado { background: #F1F1F1; color: #8A8A8A; }
 
@@ -626,6 +628,13 @@
       body.printing-fin-report #modalFinanceReport { position: static; background: none; display: block; padding: 0; }
       body.printing-fin-report #modalFinanceReport .report-modal-box { max-width: 100%; box-shadow: none; padding: 0; }
       body.printing-fin-report .no-print { display: none !important; }
+    }
+
+    @media print {
+      body.printing-leads-report > *:not(#modalLeadsReport) { display: none !important; }
+      body.printing-leads-report #modalLeadsReport { position: static; background: none; display: block; padding: 0; }
+      body.printing-leads-report #modalLeadsReport .report-modal-box { max-width: 100%; box-shadow: none; padding: 0; }
+      body.printing-leads-report .no-print { display: none !important; }
     }
 
     /* Detalhes do aluno (somente leitura) */
@@ -1177,12 +1186,17 @@
   <div class="reports-section panel-section" id="leadsSection">
     <div class="section-title">Leads — "Quero ser aluno"</div>
     <div class="modal-hint" style="margin-bottom:16px;">Respostas do formulário de captação. Preenchimentos novos entram aqui automaticamente.</div>
-    <button class="btn-add" onclick="openAddLead()">+ Adicionar lead</button>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+      <button class="btn-add" style="margin-bottom:0;" onclick="openAddLead()">+ Adicionar lead</button>
+      <button class="btn-add" style="margin-bottom:0; background:var(--cream); color:var(--brown); border:1.5px solid var(--sand);" onclick="openLeadsReport()">📊 Relatório mensal</button>
+    </div>
     <input type="text" class="folder-search" id="leadSearch" placeholder="Buscar por nome ou telefone..." oninput="renderLeads()" />
     <div class="filter-tabs">
       <button class="lead-tab active" data-status="todos">Todos</button>
       <button class="lead-tab" data-status="novo">Novos</button>
-      <button class="lead-tab" data-status="contatado">Contatados</button>
+      <button class="lead-tab" data-status="aguardando_resposta">Aguardando resposta</button>
+      <button class="lead-tab" data-status="respondeu">Respondeu</button>
+      <button class="lead-tab" data-status="parou_de_responder">Parou de responder</button>
       <button class="lead-tab" data-status="convertido">Convertidos</button>
       <button class="lead-tab" data-status="descartado">Descartados</button>
     </div>
@@ -1298,6 +1312,7 @@
   let leadsCache = [];
   let currentLeadFilter = 'todos';
   let currentLeadId = null;
+  let leadContactsCache = [];
 
   const TAB_SECTIONS = {
     inicio: 'inicioSection',
@@ -2482,7 +2497,7 @@
       listEl.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Nenhum lead encontrado.</p></div>`;
       return;
     }
-    const statusLabels = { novo: 'Novo', contatado: 'Contatado', convertido: 'Convertido', descartado: 'Descartado' };
+    const statusLabels = { novo: 'Novo', aguardando_resposta: 'Aguardando resposta', respondeu: 'Respondeu', parou_de_responder: 'Parou de responder', convertido: 'Convertido', descartado: 'Descartado' };
     listEl.innerHTML = filtered.map(l => {
       const dateLabel = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('pt-BR') : '—';
       const status = l.status || 'novo';
@@ -2516,7 +2531,10 @@
     phoneLink.href = waDigits ? ('https://wa.me/' + waDigits) : '#';
     document.getElementById('leadDetailStatus').value = lead.status || 'novo';
     document.getElementById('leadDetailNotes').value = lead.notes || '';
+    document.getElementById('leadContactDate').value = todayLocalISO();
+    document.getElementById('leadContactNote').value = '';
     document.getElementById('modalLeadDetail').classList.add('open');
+    loadLeadContacts(id);
 
     if (!lead.viewed) {
       lead.viewed = true;
@@ -2604,6 +2622,123 @@
     if (data && data[0]) leadsCache.unshift(data[0]);
     closeAddLead();
     renderLeads();
+  }
+
+  // Histórico de contatos de um lead - registros datados separados da
+  // anotação geral, pra Brenda conseguir ver exatamente quando e o que foi
+  // conversado com cada lead ao longo do tempo.
+  async function loadLeadContacts(leadId) {
+    const { data, error } = await sb.from('lead_contacts').select('*').eq('lead_id', leadId)
+      .order('contact_date', { ascending: false }).order('created_at', { ascending: false });
+    if (error) { console.warn('Erro ao carregar contatos do lead:', error); leadContactsCache = []; }
+    else { leadContactsCache = data || []; }
+    renderLeadContacts();
+  }
+
+  function renderLeadContacts() {
+    const el = document.getElementById('leadContactsList');
+    if (!el) return;
+    if (leadContactsCache.length === 0) {
+      el.innerHTML = '<div class="modal-hint">Nenhum contato registrado ainda.</div>';
+      return;
+    }
+    el.innerHTML = leadContactsCache.map(c => {
+      const dateLabel = c.contact_date ? new Date(c.contact_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid var(--sand); font-size:13px;">
+        <div><strong>${dateLabel}</strong> — ${c.note}</div>
+        <button style="background:none; border:none; color:#C0392B; cursor:pointer; font-size:12px; flex:0 0 auto;" onclick="deleteLeadContact('${c.id}')">excluir</button>
+      </div>`;
+    }).join('');
+  }
+
+  async function addLeadContact() {
+    if (!currentLeadId) return;
+    const dateEl = document.getElementById('leadContactDate');
+    const noteEl = document.getElementById('leadContactNote');
+    const note = noteEl.value.trim();
+    if (!note) return;
+    const contact_date = dateEl.value || todayLocalISO();
+    const { data, error } = await sb.from('lead_contacts').insert({ lead_id: currentLeadId, contact_date, note }).select();
+    if (error) { alert('Erro ao salvar contato: ' + error.message); return; }
+    if (data && data[0]) leadContactsCache.unshift(data[0]);
+    noteEl.value = '';
+    renderLeadContacts();
+  }
+
+  async function deleteLeadContact(id) {
+    await sb.from('lead_contacts').delete().eq('id', id);
+    leadContactsCache = leadContactsCache.filter(c => c.id !== id);
+    renderLeadContacts();
+  }
+
+  // Relatório mensal de leads: quantos entraram, quantos responderam (em
+  // algum momento) e quantos converteram, mês a mês - pra Brenda acompanhar
+  // o panorama geral do funil de captação.
+  function leadsMonthlyBreakdown() {
+    const respondedStatuses = { respondeu: true, parou_de_responder: true, convertido: true };
+    const byMonth = {};
+    leadsCache.forEach(l => {
+      if (!l.submitted_at) return;
+      const d = new Date(l.submitted_at);
+      const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      if (!byMonth[key]) byMonth[key] = { entraram: 0, responderam: 0, convertidos: 0 };
+      byMonth[key].entraram++;
+      if (respondedStatuses[l.status]) byMonth[key].responderam++;
+      if (l.status === 'convertido') byMonth[key].convertidos++;
+    });
+    return byMonth;
+  }
+
+  function renderLeadsReportTable() {
+    const byMonth = leadsMonthlyBreakdown();
+    const keys = Object.keys(byMonth).sort().reverse();
+    const table = document.getElementById('leadsReportTable');
+    if (keys.length === 0) {
+      table.innerHTML = '<tr><td>Nenhum lead registrado ainda.</td></tr>';
+      return;
+    }
+    let html = '<tr><th>Mês</th><th>Entraram</th><th>Responderam</th><th>Convertidos</th><th>Taxa de conversão</th></tr>';
+    keys.forEach(key => {
+      const m = byMonth[key];
+      const rate = m.entraram > 0 ? ((m.convertidos / m.entraram) * 100).toFixed(1).replace('.', ',') + '%' : '—';
+      html += `<tr><td>${monthKeyLabel(key)}</td><td>${m.entraram}</td><td>${m.responderam}</td><td>${m.convertidos}</td><td>${rate}</td></tr>`;
+    });
+    table.innerHTML = html;
+  }
+
+  function openLeadsReport() {
+    renderLeadsReportTable();
+    document.getElementById('modalLeadsReport').classList.add('open');
+  }
+
+  function closeLeadsReport() {
+    document.getElementById('modalLeadsReport').classList.remove('open');
+  }
+
+  function printLeadsReport() {
+    document.body.classList.add('printing-leads-report');
+    window.print();
+    setTimeout(() => document.body.classList.remove('printing-leads-report'), 300);
+  }
+
+  function downloadLeadsReportCSV() {
+    const byMonth = leadsMonthlyBreakdown();
+    const keys = Object.keys(byMonth).sort().reverse();
+    const rows = [['Mês', 'Entraram', 'Responderam', 'Convertidos', 'Taxa de conversão']];
+    keys.forEach(key => {
+      const m = byMonth[key];
+      const rate = m.entraram > 0 ? ((m.convertidos / m.entraram) * 100).toFixed(1).replace('.', ',') + '%' : '—';
+      rows.push([monthKeyLabel(key), m.entraram, m.responderam, m.convertidos, rate]);
+    });
+    const csv = rows.map(r => r.map(csvField).join(',')).join('\n');
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'relatorio-leads-' + todayLocalISO() + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   // Modal
@@ -7175,17 +7310,48 @@
     <label class="form-label">Status</label>
     <select class="form-select" id="leadDetailStatus" onchange="updateLeadStatus()">
       <option value="novo">Novo</option>
-      <option value="contatado">Contatado</option>
+      <option value="aguardando_resposta">Aguardando resposta</option>
+      <option value="respondeu">Respondeu</option>
+      <option value="parou_de_responder">Parou de responder</option>
       <option value="convertido">Convertido</option>
       <option value="descartado">Descartado</option>
     </select>
 
-    <label class="form-label" style="margin-top:12px;">Anotações</label>
-    <textarea class="form-input" id="leadDetailNotes" rows="3" onblur="saveLeadNotes()"></textarea>
+    <label class="form-label" style="margin-top:12px;">Anotação geral</label>
+    <textarea class="form-input" id="leadDetailNotes" rows="2" onblur="saveLeadNotes()"></textarea>
+
+    <label class="form-label" style="margin-top:12px;">Histórico de contatos</label>
+    <div style="display:flex; gap:8px; margin-bottom:8px;">
+      <input type="date" class="form-input" id="leadContactDate" style="flex:0 0 150px;" />
+      <input type="text" class="form-input" id="leadContactNote" placeholder="Ex: Mandei mensagem no WhatsApp, sem resposta ainda" style="flex:1;" onkeydown="if(event.key==='Enter'){addLeadContact();}" />
+      <button class="btn-modal-save" style="flex:0 0 auto; padding:10px 16px; margin:0;" onclick="addLeadContact()">+</button>
+    </div>
+    <div id="leadContactsList" style="max-height:180px; overflow-y:auto; margin-bottom:8px;"></div>
 
     <div class="modal-actions">
       <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteLead()">Excluir lead</button>
       <button class="btn-modal-cancel" onclick="closeLeadDetail()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Relatório mensal de leads -->
+<div class="modal-overlay" id="modalLeadsReport">
+  <div class="modal-box report-modal-box">
+    <div class="fin-report-header">
+      <div class="fin-report-company">PRIV CLASS B</div>
+      <div class="modal-title" style="margin-top:10px;">Relatório de leads — mês a mês</div>
+    </div>
+
+    <div class="fin-report-section-title">Panorama por mês</div>
+    <div style="overflow-x:auto;">
+      <table class="fin-report-table" id="leadsReportTable"></table>
+    </div>
+
+    <div class="modal-actions no-print">
+      <button class="btn-modal-cancel" onclick="closeLeadsReport()">Fechar</button>
+      <button class="btn-modal-save" style="background:#5C4033;" onclick="downloadLeadsReportCSV()">⬇️ Baixar CSV</button>
+      <button class="btn-modal-save" onclick="printLeadsReport()">🖨️ Imprimir / Salvar PDF</button>
     </div>
   </div>
 </div>
