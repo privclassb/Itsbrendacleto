@@ -1130,6 +1130,11 @@
       <div id="equipeAulasHojeList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">Aulas aguardando registro — por professora</div>
+      <div id="equipePendingList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
     <div class="report-list">
       <div class="report-list-title">Relatórios recentes — por professora</div>
       <div id="equipeReportsList"><div class="empty-reports">Carregando...</div></div>
@@ -4727,12 +4732,14 @@
 
   async function loadEquipeOverview(myId) {
     const today = todayLocalISO();
-    const [{ data: logs }, { data: reports }] = await Promise.all([
+    const [{ data: logs }, { data: reports }, { data: pendingLogs }] = await Promise.all([
       sb.from('class_logs').select('*').eq('class_date', today),
-      sb.from('reports').select('*').order('created_at', { ascending: false }).limit(50)
+      sb.from('reports').select('*').order('created_at', { ascending: false }).limit(50),
+      sb.from('class_logs').select('*').eq('status', 'pendente').lt('class_date', today)
     ]);
 
     renderEquipeAulasHoje(logs || [], myId);
+    renderEquipePending(pendingLogs || [], myId);
     renderEquipeReports(reports || [], myId);
 
     const teacherSelect = document.getElementById('equipeTeacherSelect');
@@ -4841,6 +4848,48 @@
                 <div class="report-row-title">${time}</div>
               </div>
               <span class="report-status ${badgeClass}">${statusLabel}</span>
+            </div>`;
+        }).join('');
+      return `
+        <div style="margin-bottom:18px;">
+          <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
+          ${rows}
+        </div>`;
+    }).join('');
+  }
+
+  function renderEquipePending(logs, myId) {
+    const listEl = document.getElementById('equipePendingList');
+
+    const grouped = {};
+    logs.forEach(l => {
+      const tId = teacherOfLog(l);
+      if (!tId || tId === myId) return;
+      if (!grouped[tId]) grouped[tId] = [];
+      grouped[tId].push(l);
+    });
+
+    const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
+    if (relevantTeachers.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma aula pendente de registro de outra professora.</div>';
+      return;
+    }
+
+    listEl.innerHTML = relevantTeachers.map(t => {
+      const rows = grouped[t.id]
+        .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''))
+        .map(l => {
+          const turma = allTurmas.find(x => x.id === l.turma_id);
+          const student = allStudents.find(x => x.id === l.student_id);
+          const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+          const dateLabel = l.class_date ? new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+          return `
+            <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
+              <div class="report-row-info">
+                <div class="report-row-student">${who}</div>
+                <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
+              </div>
+              <span class="report-status pending-class-alert">Pendente</span>
             </div>`;
         }).join('');
       return `
