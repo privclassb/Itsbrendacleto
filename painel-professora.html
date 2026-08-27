@@ -4993,132 +4993,158 @@
     }).join('');
   }
 
+  // Alunos/turmas sem professora atribuída (teacher_id vazio no perfil) ficam de fora
+  // do agrupamento por professora — sem isso, essas aulas simplesmente sumiam das
+  // seções "por professora" sem nenhum aviso. Renderiza um bloco extra sinalizando
+  // que precisa checar/corrigir a professora responsável desse aluno/turma.
+  function renderOrphanedLogsBlock(orphaned, rowBuilder) {
+    if (orphaned.length === 0) return '';
+    return `
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:700;color:#C0392B;margin-bottom:4px;">⚠️ Sem professora vinculada</div>
+        <div class="modal-hint" style="margin-bottom:8px;">Esses alunos/turmas não têm professora responsável definida no cadastro — confira em "Editar aluno".</div>
+        ${orphaned.map(rowBuilder).join('')}
+      </div>`;
+  }
+
   function renderEquipeAulasHoje(logs, myId) {
     const listEl = document.getElementById('equipeAulasHojeList');
 
     const grouped = {};
+    const orphaned = [];
     logs.forEach(l => {
       const tId = teacherOfLog(l);
-      if (!tId || tId === myId) return;
+      if (tId === myId) return;
+      if (!tId) { orphaned.push(l); return; }
       if (!grouped[tId]) grouped[tId] = [];
       grouped[tId].push(l);
     });
 
     const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
-    if (relevantTeachers.length === 0) {
+    if (relevantTeachers.length === 0 && orphaned.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula de outra professora hoje.</div>';
       return;
     }
 
-    listEl.innerHTML = relevantTeachers.map(t => {
-      const rows = grouped[t.id]
-        .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || ''))
-        .map(l => {
-          const turma = allTurmas.find(x => x.id === l.turma_id);
-          const student = allStudents.find(x => x.id === l.student_id);
-          const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
-          const time = formatTimeRange(l) || 'sem horário';
-          const badgeClass = 'status-' + l.status;
-          const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
-          return `
-            <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
-              <div class="report-row-info">
-                <div class="report-row-student">${who}</div>
-                <div class="report-row-title">${time}</div>
-              </div>
-              <span class="report-status ${badgeClass}">${statusLabel}</span>
-            </div>`;
-        }).join('');
+    const rowBuilder = l => {
+      const turma = allTurmas.find(x => x.id === l.turma_id);
+      const student = allStudents.find(x => x.id === l.student_id);
+      const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+      const time = formatTimeRange(l) || 'sem horário';
+      const badgeClass = 'status-' + l.status;
+      const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
+      return `
+        <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${who}</div>
+            <div class="report-row-title">${time}</div>
+          </div>
+          <span class="report-status ${badgeClass}">${statusLabel}</span>
+        </div>`;
+    };
+
+    const teacherGroupsHtml = relevantTeachers.map(t => {
+      const rows = grouped[t.id].sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')).map(rowBuilder).join('');
       return `
         <div style="margin-bottom:18px;">
           <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
           ${rows}
         </div>`;
     }).join('');
+
+    listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')), rowBuilder);
   }
 
   function renderEquipePending(logs, myId) {
     const listEl = document.getElementById('equipePendingList');
 
     const grouped = {};
+    const orphaned = [];
     logs.forEach(l => {
       const tId = teacherOfLog(l);
-      if (!tId || tId === myId) return;
+      if (tId === myId) return;
+      if (!tId) { orphaned.push(l); return; }
       if (!grouped[tId]) grouped[tId] = [];
       grouped[tId].push(l);
     });
 
     const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
-    if (relevantTeachers.length === 0) {
+    if (relevantTeachers.length === 0 && orphaned.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula pendente de registro de outra professora.</div>';
       return;
     }
 
-    listEl.innerHTML = relevantTeachers.map(t => {
-      const rows = grouped[t.id]
-        .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''))
-        .map(l => {
-          const turma = allTurmas.find(x => x.id === l.turma_id);
-          const student = allStudents.find(x => x.id === l.student_id);
-          const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
-          const dateLabel = l.class_date ? new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
-          return `
-            <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
-              <div class="report-row-info">
-                <div class="report-row-student">${who}</div>
-                <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
-              </div>
-              <span class="report-status pending-class-alert">Pendente</span>
-            </div>`;
-        }).join('');
+    const rowBuilder = l => {
+      const turma = allTurmas.find(x => x.id === l.turma_id);
+      const student = allStudents.find(x => x.id === l.student_id);
+      const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+      const dateLabel = l.class_date ? new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `
+        <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${who}</div>
+            <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
+          </div>
+          <span class="report-status pending-class-alert">Pendente</span>
+        </div>`;
+    };
+
+    const teacherGroupsHtml = relevantTeachers.map(t => {
+      const rows = grouped[t.id].sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')).map(rowBuilder).join('');
       return `
         <div style="margin-bottom:18px;">
           <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
           ${rows}
         </div>`;
     }).join('');
+
+    listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')), rowBuilder);
   }
 
   function renderEquipeMissingReports(logs, myId) {
     const listEl = document.getElementById('equipeMissingReportList');
 
     const grouped = {};
+    const orphaned = [];
     logs.forEach(l => {
       const tId = teacherOfLog(l);
-      if (!tId || tId === myId) return;
+      if (tId === myId) return;
+      if (!tId) { orphaned.push(l); return; }
       if (!grouped[tId]) grouped[tId] = [];
       grouped[tId].push(l);
     });
 
     const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
-    if (relevantTeachers.length === 0) {
+    if (relevantTeachers.length === 0 && orphaned.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula sem relatório de outra professora nos últimos 60 dias.</div>';
       return;
     }
 
-    listEl.innerHTML = relevantTeachers.map(t => {
-      const rows = grouped[t.id]
-        .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''))
-        .map(l => {
-          const turma = allTurmas.find(x => x.id === l.turma_id);
-          const student = allStudents.find(x => x.id === l.student_id);
-          const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
-          const dateLabel = l.class_date ? new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
-          return `
-            <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
-              <div class="report-row-info">
-                <div class="report-row-student">${who}</div>
-                <div class="report-row-title">Aula de ${dateLabel} sem relatório</div>
-              </div>
-              <span class="report-status missing-report-alert">Sem relatório</span>
-            </div>`;
-        }).join('');
+    const rowBuilder = l => {
+      const turma = allTurmas.find(x => x.id === l.turma_id);
+      const student = allStudents.find(x => x.id === l.student_id);
+      const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
+      const dateLabel = l.class_date ? new Date(l.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `
+        <div class="report-row" style="cursor:pointer;" onclick="openClassLogEdit('${l.id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${who}</div>
+            <div class="report-row-title">Aula de ${dateLabel} sem relatório</div>
+          </div>
+          <span class="report-status missing-report-alert">Sem relatório</span>
+        </div>`;
+    };
+
+    const teacherGroupsHtml = relevantTeachers.map(t => {
+      const rows = grouped[t.id].sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')).map(rowBuilder).join('');
       return `
         <div style="margin-bottom:18px;">
           <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
           ${rows}
         </div>`;
     }).join('');
+
+    listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')), rowBuilder);
   }
 
   function renderEquipeReports(reports, myId) {
