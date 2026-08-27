@@ -1394,8 +1394,9 @@
     const card = document.getElementById('notificacoesCard');
     const listEl = document.getElementById('notificacoesList');
 
-    // A aba início mostra só os alunos da própria professora logada (mesmo pra
-    // Brenda) — o panorama da escola inteira fica na aba "Acompanhar equipe".
+    // Só o aviso de "aulas aguardando registro" fica restrito aos alunos da própria
+    // professora logada (mesmo pra Brenda); as demais notificações abaixo continuam
+    // com o escopo de sempre (todos os alunos, pra quem vê tudo).
     const { data: { session } } = await sb.auth.getSession();
     const myId = session && session.user && session.user.id;
     const myStudents = myId ? students.filter(s => s.teacher_id === myId) : students;
@@ -1405,21 +1406,18 @@
     const todayDay = today.getDate();
     const todayYear = today.getFullYear();
 
-    const birthdays = myStudents.filter(s => {
+    const birthdays = students.filter(s => {
       if (!s.birth_date) return false;
       const d = new Date(s.birth_date + 'T00:00:00');
       return (d.getMonth() + 1) === todayMonth && d.getDate() === todayDay;
     });
 
-    const contractsEnding = myStudents.filter(s => {
+    const contractsEnding = students.filter(s => {
       if (!s.contract_end) return false;
       const d = new Date(s.contract_end + 'T00:00:00');
       return (d.getMonth() + 1) === todayMonth && d.getFullYear() === todayYear;
     });
 
-    // Inadimplência é um panorama financeiro (só Brenda vê, na aba início dela
-    // mesma) — mantém escopo de todos os alunos, já que não tem equivalente
-    // por professora.
     let overdueByStudent = {};
     if (currentUserIsBrenda) {
       const studentIds = students.map(s => s.id);
