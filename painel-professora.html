@@ -1394,25 +1394,32 @@
     const card = document.getElementById('notificacoesCard');
     const listEl = document.getElementById('notificacoesList');
 
+    // A aba início mostra só os alunos da própria professora logada (mesmo pra
+    // Brenda) — o panorama da escola inteira fica na aba "Acompanhar equipe".
+    const { data: { session } } = await sb.auth.getSession();
+    const myId = session && session.user && session.user.id;
+    const myStudents = myId ? students.filter(s => s.teacher_id === myId) : students;
+
     const today = new Date();
     const todayMonth = today.getMonth() + 1;
     const todayDay = today.getDate();
     const todayYear = today.getFullYear();
 
-    const birthdays = students.filter(s => {
+    const birthdays = myStudents.filter(s => {
       if (!s.birth_date) return false;
       const d = new Date(s.birth_date + 'T00:00:00');
       return (d.getMonth() + 1) === todayMonth && d.getDate() === todayDay;
     });
 
-    // Contratos chegando ao fim: todas as professoras veem, mas `students` já vem
-    // filtrado só com os alunos de cada uma (exceto Brenda, que vê todos).
-    const contractsEnding = students.filter(s => {
+    const contractsEnding = myStudents.filter(s => {
       if (!s.contract_end) return false;
       const d = new Date(s.contract_end + 'T00:00:00');
       return (d.getMonth() + 1) === todayMonth && d.getFullYear() === todayYear;
     });
 
+    // Inadimplência é um panorama financeiro (só Brenda vê, na aba início dela
+    // mesma) — mantém escopo de todos os alunos, já que não tem equivalente
+    // por professora.
     let overdueByStudent = {};
     if (currentUserIsBrenda) {
       const studentIds = students.map(s => s.id);
@@ -1429,21 +1436,30 @@
     const overdueEntries = Object.entries(overdueByStudent);
 
     // Aulas aguardando registro: aulas com status "pendente" cuja data já passou, dos
-    // alunos/turmas de cada professora. Aula não registrada não conta presença no
-    // ranking dos alunos, então é importante manter isso em dia.
-    const studentIdsForPending = students.map(s => s.id);
-    const turmaIdsForPending = [...new Set(students.filter(s => s.turma_id).map(s => s.turma_id))];
+    // alunos/turmas da própria professora. Aula não registrada não conta presença no
+    // ranking dos alunos, então é importante manter isso em dia. Traz a lista exata
+    // (não só a contagem) pra já saber qual aluno/turma precisa de registro.
+    const studentIdsForPending = myStudents.map(s => s.id);
+    const turmaIdsForPending = [...new Set(myStudents.filter(s => s.turma_id).map(s => s.turma_id))];
     const [{ data: pendingByStudent }, { data: pendingByTurma }] = await Promise.all([
       studentIdsForPending.length
-        ? sb.from('class_logs').select('id').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('student_id', studentIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('student_id', studentIdsForPending)
         : Promise.resolve({ data: [] }),
       turmaIdsForPending.length
-        ? sb.from('class_logs').select('id').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('turma_id', turmaIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'pendente').lt('class_date', todayLocalISO()).in('turma_id', turmaIdsForPending)
         : Promise.resolve({ data: [] })
     ]);
-    const pendingClassesCount = (pendingByStudent || []).length + (pendingByTurma || []).length;
+    const pendingClasses = [...(pendingByStudent || []), ...(pendingByTurma || [])]
+      .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''));
 
-    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClassesCount === 0) {
+    let turmaNameById = {};
+    const turmaIdsNeeded = [...new Set(pendingClasses.filter(c => c.turma_id).map(c => c.turma_id))];
+    if (turmaIdsNeeded.length) {
+      const { data: turmasData } = await sb.from('turmas').select('id, name').in('id', turmaIdsNeeded);
+      (turmasData || []).forEach(t => { turmaNameById[t.id] = t.name; });
+    }
+
+    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClasses.length === 0) {
       card.style.display = 'none';
       return;
     }
@@ -1483,16 +1499,31 @@
       </div>`;
     }).join('');
 
-    const pendingClassesRow = pendingClassesCount === 0 ? '' : `
-      <div class="report-row" style="cursor:pointer;" onclick="showTab('turmas')">
+    const pendingClassRows = pendingClasses.map(c => {
+      const dateLabel = c.class_date ? new Date(c.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      if (c.student_id) {
+        const s = myStudents.find(st => st.id === c.student_id);
+        return `
+        <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${c.student_id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${s ? (s.full_name || 'Aluno') : 'Aluno'}</div>
+            <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
+          </div>
+          <span class="report-status pending-class-alert">Pendente</span>
+        </div>`;
+      }
+      const turmaName = turmaNameById[c.turma_id] || 'Turma';
+      return `
+      <div class="report-row" style="cursor:pointer;" onclick="openTurmaProfile('${c.turma_id}')">
         <div class="report-row-info">
-          <div class="report-row-student">Aulas aguardando registro</div>
-          <div class="report-row-title">${pendingClassesCount} aula${pendingClassesCount === 1 ? '' : 's'} já passada${pendingClassesCount === 1 ? '' : 's'} sem status — registre pra contar no ranking dos alunos</div>
+          <div class="report-row-student">${turmaName}</div>
+          <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
         </div>
         <span class="report-status pending-class-alert">Pendente</span>
       </div>`;
+    }).join('');
 
-    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassesRow;
+    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassRows;
   }
 
   // ---- Minhas tarefas ----
