@@ -635,6 +635,7 @@
       body.printing-leads-report #modalLeadsReport { position: static; background: none; display: block; padding: 0; }
       body.printing-leads-report #modalLeadsReport .report-modal-box { max-width: 100%; box-shadow: none; padding: 0; }
       body.printing-leads-report .no-print { display: none !important; }
+      body.printing-leads-report #leadsReportMonthLabel { display: block !important; }
     }
 
     /* Detalhes do aluno (somente leitura) */
@@ -2497,7 +2498,6 @@
       listEl.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Nenhum lead encontrado.</p></div>`;
       return;
     }
-    const statusLabels = { novo: 'Novo', aguardando_resposta: 'Aguardando resposta', respondeu: 'Respondeu', parou_de_responder: 'Parou de responder', convertido: 'Convertido', descartado: 'Descartado' };
     listEl.innerHTML = filtered.map(l => {
       const dateLabel = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('pt-BR') : '—';
       const status = l.status || 'novo';
@@ -2508,7 +2508,7 @@
           <div class="report-row-student">${unreadDot}${l.nome || 'Sem nome'}</div>
           <div class="report-row-title">${dateLabel} · ${l.modelo || '—'} · ${l.telefone || 'sem telefone'}</div>
         </div>
-        <span class="report-status lead-status-${status}">${statusLabels[status] || status}</span>
+        <span class="report-status lead-status-${status}">${LEAD_STATUS_LABELS[status] || status}</span>
       </div>`;
     }).join('');
   }
@@ -2690,26 +2690,77 @@
     return byMonth;
   }
 
-  function renderLeadsReportTable() {
-    const byMonth = leadsMonthlyBreakdown();
-    const keys = Object.keys(byMonth).sort().reverse();
-    const table = document.getElementById('leadsReportTable');
-    if (keys.length === 0) {
-      table.innerHTML = '<tr><td>Nenhum lead registrado ainda.</td></tr>';
-      return;
-    }
-    let html = '<tr><th>Mês</th><th>Entraram</th><th>Responderam</th><th>Convertidos</th><th>Taxa de conversão</th></tr>';
-    keys.forEach(key => {
-      const m = byMonth[key];
-      const rate = m.entraram > 0 ? ((m.convertidos / m.entraram) * 100).toFixed(1).replace('.', ',') + '%' : '—';
-      html += `<tr><td>${monthKeyLabel(key)}</td><td>${m.entraram}</td><td>${m.responderam}</td><td>${m.convertidos}</td><td>${rate}</td></tr>`;
+  const LEAD_STATUS_LABELS = { novo: 'Novo', aguardando_resposta: 'Aguardando resposta', respondeu: 'Respondeu', parou_de_responder: 'Parou de responder', convertido: 'Convertido', descartado: 'Descartado' };
+  const LEAD_STATUS_ORDER = ['novo', 'aguardando_resposta', 'respondeu', 'parou_de_responder', 'convertido', 'descartado'];
+
+  function leadsForMonth(key) {
+    return leadsCache.filter(l => {
+      if (!l.submitted_at) return false;
+      const d = new Date(l.submitted_at);
+      const k = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+      return k === key;
     });
-    table.innerHTML = html;
   }
 
   function openLeadsReport() {
-    renderLeadsReportTable();
+    const byMonth = leadsMonthlyBreakdown();
+    const keys = Object.keys(byMonth).sort().reverse();
+    const sel = document.getElementById('leadsReportMonth');
+    if (keys.length === 0) {
+      sel.innerHTML = '<option value="">Nenhum lead registrado ainda</option>';
+    } else {
+      sel.innerHTML = keys.map(k => `<option value="${k}">${monthKeyLabel(k)}</option>`).join('');
+      sel.value = keys[0];
+    }
+    renderLeadsReportMonth();
     document.getElementById('modalLeadsReport').classList.add('open');
+  }
+
+  function renderLeadsReportMonth() {
+    const key = document.getElementById('leadsReportMonth').value;
+    const summaryEl = document.getElementById('leadsReportSummary');
+    const statusTableEl = document.getElementById('leadsReportStatusTable');
+    const detailTableEl = document.getElementById('leadsReportDetailTable');
+    const monthLabelEl = document.getElementById('leadsReportMonthLabel');
+
+    if (!key) {
+      summaryEl.innerHTML = '';
+      statusTableEl.innerHTML = '<tr><td>Nenhum lead registrado ainda.</td></tr>';
+      detailTableEl.innerHTML = '';
+      monthLabelEl.textContent = '';
+      return;
+    }
+
+    monthLabelEl.textContent = monthKeyLabel(key);
+    const monthLeads = leadsForMonth(key);
+    const respondedStatuses = { respondeu: true, parou_de_responder: true, convertido: true };
+    const entraram = monthLeads.length;
+    const responderam = monthLeads.filter(l => respondedStatuses[l.status]).length;
+    const convertidos = monthLeads.filter(l => l.status === 'convertido').length;
+    const rate = entraram > 0 ? ((convertidos / entraram) * 100).toFixed(1).replace('.', ',') + '%' : '—';
+
+    summaryEl.innerHTML = `
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${entraram}</span><div class="fin-report-summary-label">Entraram</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${responderam}</span><div class="fin-report-summary-label">Responderam</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${convertidos}</span><div class="fin-report-summary-label">Convertidos</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${rate}</span><div class="fin-report-summary-label">Taxa de conversão</div></div>
+    `;
+
+    const statusCounts = {};
+    monthLeads.forEach(l => { const s = l.status || 'novo'; statusCounts[s] = (statusCounts[s] || 0) + 1; });
+    let statusHtml = '<tr><th>Status</th><th>Quantidade</th></tr>';
+    LEAD_STATUS_ORDER.forEach(s => {
+      if (statusCounts[s]) statusHtml += `<tr><td>${LEAD_STATUS_LABELS[s]}</td><td>${statusCounts[s]}</td></tr>`;
+    });
+    statusTableEl.innerHTML = statusHtml || '<tr><td>Nenhum lead nesse mês.</td></tr>';
+
+    const sortedLeads = monthLeads.slice().sort((a, b) => (a.submitted_at || '').localeCompare(b.submitted_at || ''));
+    let detailHtml = '<tr><th>Data</th><th>Nome</th><th>Status</th><th>Telefone</th></tr>';
+    sortedLeads.forEach(l => {
+      const dateLabel = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('pt-BR') : '—';
+      detailHtml += `<tr><td>${dateLabel}</td><td>${l.nome || 'Sem nome'}</td><td>${LEAD_STATUS_LABELS[l.status] || 'Novo'}</td><td>${l.telefone || '—'}</td></tr>`;
+    });
+    detailTableEl.innerHTML = detailHtml;
   }
 
   function closeLeadsReport() {
@@ -2723,20 +2774,25 @@
   }
 
   function downloadLeadsReportCSV() {
-    const byMonth = leadsMonthlyBreakdown();
-    const keys = Object.keys(byMonth).sort().reverse();
-    const rows = [['Mês', 'Entraram', 'Responderam', 'Convertidos', 'Taxa de conversão']];
-    keys.forEach(key => {
-      const m = byMonth[key];
-      const rate = m.entraram > 0 ? ((m.convertidos / m.entraram) * 100).toFixed(1).replace('.', ',') + '%' : '—';
-      rows.push([monthKeyLabel(key), m.entraram, m.responderam, m.convertidos, rate]);
+    const key = document.getElementById('leadsReportMonth').value;
+    if (!key) return;
+    const monthLeads = leadsForMonth(key).slice().sort((a, b) => (a.submitted_at || '').localeCompare(b.submitted_at || ''));
+    const rows = [['Data', 'Nome', 'Status', 'Telefone', 'Objetivo']];
+    monthLeads.forEach(l => {
+      rows.push([
+        l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('pt-BR') : '',
+        l.nome || '',
+        LEAD_STATUS_LABELS[l.status] || 'Novo',
+        l.telefone || '',
+        l.objetivo || ''
+      ]);
     });
     const csv = rows.map(r => r.map(csvField).join(',')).join('\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'relatorio-leads-' + todayLocalISO() + '.csv';
+    a.download = 'leads-' + key + '.csv';
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -7340,12 +7396,23 @@
   <div class="modal-box report-modal-box">
     <div class="fin-report-header">
       <div class="fin-report-company">PRIV CLASS B</div>
-      <div class="modal-title" style="margin-top:10px;">Relatório de leads — mês a mês</div>
+      <div class="modal-title" style="margin-top:10px;">Relatório de leads</div>
     </div>
 
-    <div class="fin-report-section-title">Panorama por mês</div>
+    <label class="form-label no-print">Escolha o mês</label>
+    <select class="form-select no-print" id="leadsReportMonth" onchange="renderLeadsReportMonth()" style="margin-bottom:16px;"></select>
+    <div class="fin-report-period" id="leadsReportMonthLabel" style="display:none;"></div>
+
+    <div class="fin-report-summary" id="leadsReportSummary"></div>
+
+    <div class="fin-report-section-title">Por status</div>
     <div style="overflow-x:auto;">
-      <table class="fin-report-table" id="leadsReportTable"></table>
+      <table class="fin-report-table" id="leadsReportStatusTable"></table>
+    </div>
+
+    <div class="fin-report-section-title">Leads do mês</div>
+    <div style="overflow-x:auto;">
+      <table class="fin-report-table" id="leadsReportDetailTable"></table>
     </div>
 
     <div class="modal-actions no-print">
