@@ -528,6 +528,15 @@
     .report-status.pending-class-alert { background: #EAF2FB; color: #2E6DA4; }
     .report-status.missing-report-alert { background: #F3EDF7; color: #6B4C93; }
     .report-status.monthly-report-alert { background: #E8F5F0; color: #1E7A5C; }
+    .report-status.lead-alert { background: #FDF0FA; color: #9C2E86; }
+    .lead-status-novo { background: #EAF2FB; color: #2E6DA4; }
+    .lead-status-contatado { background: #FFF8E5; color: #A9740C; }
+    .lead-status-convertido { background: #E8F5F0; color: #1E7A5C; }
+    .lead-status-descartado { background: #F1F1F1; color: #8A8A8A; }
+
+    .lead-tab { padding: 7px 16px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .lead-tab.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
+    .lead-tab:hover:not(.active) { border-color: var(--brown-light); color: var(--text); }
 
     /* Aviso grande ao entrar (aulas/relatórios pendentes) */
     .login-notice-box { max-width: 420px; text-align: center; }
@@ -801,6 +810,7 @@
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">Turmas</button>
     <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">Minha Agenda</button>
     <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">Financeiro</button>
+    <button class="nav-btn" id="navLeads" data-tab="leads" onclick="showTab('leads')" style="display:none;">Leads</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">Materiais</button>
     <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;">Acompanhar equipe</button>
@@ -1163,6 +1173,23 @@
     </div>
   </div>
 
+  <!-- Leads - "Quero ser aluno" (só Brenda) -->
+  <div class="reports-section panel-section" id="leadsSection">
+    <div class="section-title">Leads — "Quero ser aluno"</div>
+    <div class="modal-hint" style="margin-bottom:16px;">Respostas do formulário de captação. Preenchimentos novos entram aqui automaticamente.</div>
+    <input type="text" class="folder-search" id="leadSearch" placeholder="Buscar por nome ou telefone..." oninput="renderLeads()" />
+    <div class="filter-tabs">
+      <button class="lead-tab active" data-status="todos">Todos</button>
+      <button class="lead-tab" data-status="novo">Novos</button>
+      <button class="lead-tab" data-status="contatado">Contatados</button>
+      <button class="lead-tab" data-status="convertido">Convertidos</button>
+      <button class="lead-tab" data-status="descartado">Descartados</button>
+    </div>
+    <div class="report-list">
+      <div id="leadsList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
   <!-- Ver como aluno -->
   <div class="reports-section panel-section" id="vercomoSection">
     <div class="report-list">
@@ -1267,6 +1294,9 @@
   let allStudents = [];
   let currentFilter = 'todos';
   let isBrenda = false;
+  let leadsCache = [];
+  let currentLeadFilter = 'todos';
+  let currentLeadId = null;
 
   const TAB_SECTIONS = {
     inicio: 'inicioSection',
@@ -1277,6 +1307,7 @@
     agenda: 'agendaSection',
     financeiro: 'financeiroSection',
     equipe: 'equipeSection',
+    leads: 'leadsSection',
     vercomo: 'vercomoSection'
   };
 
@@ -1329,6 +1360,8 @@
       document.getElementById('navMateriais').style.display = 'inline-flex';
       document.getElementById('navFinanceiro').style.display = 'inline-flex';
       document.getElementById('navEquipe').style.display = 'inline-flex';
+      document.getElementById('navLeads').style.display = 'inline-flex';
+      await loadLeads();
       document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
       await loadStudentsForSelect();
@@ -1460,6 +1493,14 @@
     }
     const overdueEntries = Object.entries(overdueByStudent);
 
+    // Novos leads do formulário "Quero ser aluno" ainda não vistos - só Brenda
+    // acompanha essa aba, então esse aviso não aparece pras outras professoras.
+    let newLeadsCount = 0;
+    if (currentUserIsBrenda) {
+      const { count } = await sb.from('leads').select('id', { count: 'exact', head: true }).eq('viewed', false);
+      newLeadsCount = count || 0;
+    }
+
     // Aulas aguardando registro: aulas com status "pendente" cuja data já passou, dos
     // alunos/turmas da própria professora. Aula não registrada não conta presença no
     // ranking dos alunos, então é importante manter isso em dia. Traz a lista exata
@@ -1527,9 +1568,9 @@
       (turmasData || []).forEach(t => { turmaNameById[t.id] = t.name; });
     }
 
-    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClasses.length === 0 && missingReportClasses.length === 0 && missingMonthlyReportStudents.length === 0) {
+    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClasses.length === 0 && missingReportClasses.length === 0 && missingMonthlyReportStudents.length === 0 && newLeadsCount === 0) {
       card.style.display = 'none';
-      maybeShowLoginNotice({ pendingCount: 0, missingReportCount: 0, missingMonthlyCount: 0 });
+      maybeShowLoginNotice({ pendingCount: 0, missingReportCount: 0, missingMonthlyCount: 0, newLeadsCount: 0 });
       return;
     }
     card.style.display = 'block';
@@ -1625,12 +1666,22 @@
         <span class="report-status monthly-report-alert">Mensal pendente</span>
       </div>`).join('');
 
-    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassRows + missingReportRows + missingMonthlyRows;
+    const leadsRow = newLeadsCount > 0 ? `
+      <div class="report-row" style="cursor:pointer;" onclick="showTab('leads')">
+        <div class="report-row-info">
+          <div class="report-row-student">Novos leads do formulário</div>
+          <div class="report-row-title">${newLeadsCount} lead${newLeadsCount === 1 ? '' : 's'} aguardando triagem</div>
+        </div>
+        <span class="report-status lead-alert">Novo</span>
+      </div>` : '';
+
+    listEl.innerHTML = leadsRow + overdueRows + birthdayRows + contractRows + pendingClassRows + missingReportRows + missingMonthlyRows;
 
     maybeShowLoginNotice({
       pendingCount: pendingClasses.length,
       missingReportCount: missingReportClasses.length,
-      missingMonthlyCount: missingMonthlyReportStudents.length
+      missingMonthlyCount: missingMonthlyReportStudents.length,
+      newLeadsCount: newLeadsCount
     });
   }
 
@@ -1649,7 +1700,7 @@
   function maybeShowLoginNotice(counts) {
     if (sessionStorage.getItem('__login_notice_shown')) return;
 
-    const total = counts.pendingCount + counts.missingReportCount + counts.missingMonthlyCount;
+    const total = counts.pendingCount + counts.missingReportCount + counts.missingMonthlyCount + (counts.newLeadsCount || 0);
     if (total === 0) { sessionStorage.setItem('__login_notice_shown', '1'); return; }
 
     // O modal fica no HTML depois deste <script>, então se a página ainda não
@@ -1672,6 +1723,9 @@
     }
     if (counts.missingMonthlyCount > 0) {
       lines.push(`<div class="login-notice-line">🗓️ <strong>${counts.missingMonthlyCount}</strong> relatório${counts.missingMonthlyCount === 1 ? '' : 's'} mensal${counts.missingMonthlyCount === 1 ? '' : 'is'} pendente${counts.missingMonthlyCount === 1 ? '' : 's'}</div>`);
+    }
+    if (counts.newLeadsCount > 0) {
+      lines.push(`<div class="login-notice-line">📩 <strong>${counts.newLeadsCount}</strong> novo${counts.newLeadsCount === 1 ? '' : 's'} lead${counts.newLeadsCount === 1 ? '' : 's'} no formulário</div>`);
     }
     document.getElementById('loginNoticeBody').innerHTML = lines.join('');
     modalEl.classList.add('open');
@@ -2390,6 +2444,107 @@
       renderStudents(allStudents);
     });
   });
+
+  // Leads ("Quero ser aluno") - só Brenda
+  document.querySelectorAll('.lead-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.lead-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentLeadFilter = tab.dataset.status;
+      renderLeads();
+    });
+  });
+
+  async function loadLeads() {
+    const { data, error } = await sb.from('leads').select('*').order('submitted_at', { ascending: false });
+    if (error) { console.warn('Erro ao carregar leads:', error); return; }
+    leadsCache = data || [];
+    renderLeads();
+  }
+
+  function renderLeads() {
+    const searchEl = document.getElementById('leadSearch');
+    const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    let filtered = leadsCache;
+    if (currentLeadFilter !== 'todos') {
+      filtered = filtered.filter(l => (l.status || 'novo') === currentLeadFilter);
+    }
+    if (search) {
+      filtered = filtered.filter(l =>
+        (l.nome || '').toLowerCase().includes(search) ||
+        (l.telefone || '').toLowerCase().includes(search)
+      );
+    }
+    const listEl = document.getElementById('leadsList');
+    if (!listEl) return;
+    if (filtered.length === 0) {
+      listEl.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><p>Nenhum lead encontrado.</p></div>`;
+      return;
+    }
+    const statusLabels = { novo: 'Novo', contatado: 'Contatado', convertido: 'Convertido', descartado: 'Descartado' };
+    listEl.innerHTML = filtered.map(l => {
+      const dateLabel = l.submitted_at ? new Date(l.submitted_at).toLocaleDateString('pt-BR') : '—';
+      const status = l.status || 'novo';
+      const unreadDot = !l.viewed ? '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#C0392B;margin-right:6px;"></span>' : '';
+      return `
+      <div class="report-row" style="cursor:pointer;" onclick="openLeadDetail('${l.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${unreadDot}${l.nome || 'Sem nome'}</div>
+          <div class="report-row-title">${dateLabel} · ${l.modelo || '—'} · ${l.telefone || 'sem telefone'}</div>
+        </div>
+        <span class="report-status lead-status-${status}">${statusLabels[status] || status}</span>
+      </div>`;
+    }).join('');
+  }
+
+  async function openLeadDetail(id) {
+    const lead = leadsCache.find(l => l.id === id);
+    if (!lead) return;
+    currentLeadId = id;
+    document.getElementById('leadDetailName').textContent = lead.nome || 'Sem nome';
+    const dateLabel = lead.submitted_at ? new Date(lead.submitted_at).toLocaleString('pt-BR') : '—';
+    document.getElementById('leadDetailMeta').textContent = 'Preenchido em ' + dateLabel;
+    document.getElementById('leadDetailObjetivo').textContent = lead.objetivo || '—';
+    document.getElementById('leadDetailExperiencia').textContent = lead.experiencia || '—';
+    document.getElementById('leadDetailModelo').textContent = lead.modelo || '—';
+    document.getElementById('leadDetailHorario').textContent = lead.horario_preferido || '—';
+    const phoneDigits = (lead.telefone || '').replace(/\D/g, '');
+    const waDigits = phoneDigits ? (phoneDigits.startsWith('55') ? phoneDigits : '55' + phoneDigits) : '';
+    const phoneLink = document.getElementById('leadDetailTelefoneLink');
+    phoneLink.textContent = lead.telefone || '—';
+    phoneLink.href = waDigits ? ('https://wa.me/' + waDigits) : '#';
+    document.getElementById('leadDetailStatus').value = lead.status || 'novo';
+    document.getElementById('leadDetailNotes').value = lead.notes || '';
+    document.getElementById('modalLeadDetail').classList.add('open');
+
+    if (!lead.viewed) {
+      lead.viewed = true;
+      await sb.from('leads').update({ viewed: true }).eq('id', id);
+      renderLeads();
+    }
+  }
+
+  function closeLeadDetail() {
+    document.getElementById('modalLeadDetail').classList.remove('open');
+    currentLeadId = null;
+  }
+
+  async function updateLeadStatus() {
+    if (!currentLeadId) return;
+    const status = document.getElementById('leadDetailStatus').value;
+    const lead = leadsCache.find(l => l.id === currentLeadId);
+    if (lead) lead.status = status;
+    await sb.from('leads').update({ status }).eq('id', currentLeadId);
+    renderLeads();
+  }
+
+  async function saveLeadNotes() {
+    if (!currentLeadId) return;
+    const notes = document.getElementById('leadDetailNotes').value;
+    const lead = leadsCache.find(l => l.id === currentLeadId);
+    if (lead) lead.notes = notes;
+    await sb.from('leads').update({ notes }).eq('id', currentLeadId);
+  }
 
   // Modal
   document.getElementById('addStudentBtn').addEventListener('click', () => {
@@ -6939,6 +7094,37 @@
     <div class="view-report-content" id="viewReportContent"></div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeViewReport()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Detalhe do lead -->
+<div class="modal-overlay" id="modalLeadDetail">
+  <div class="modal-box">
+    <div class="modal-title" id="leadDetailName"></div>
+    <div class="modal-hint" id="leadDetailMeta" style="margin-bottom:14px;"></div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px; font-size:14px; color:var(--text);">
+      <div><strong>Objetivo:</strong> <span id="leadDetailObjetivo"></span></div>
+      <div><strong>Experiência com o idioma:</strong> <span id="leadDetailExperiencia"></span></div>
+      <div><strong>Modelo desejado:</strong> <span id="leadDetailModelo"></span></div>
+      <div><strong>Disponibilidade:</strong> <span id="leadDetailHorario"></span></div>
+      <div><strong>Telefone:</strong> <a id="leadDetailTelefoneLink" href="#" target="_blank" style="color:var(--brown);"></a></div>
+    </div>
+
+    <label class="form-label">Status</label>
+    <select class="form-select" id="leadDetailStatus" onchange="updateLeadStatus()">
+      <option value="novo">Novo</option>
+      <option value="contatado">Contatado</option>
+      <option value="convertido">Convertido</option>
+      <option value="descartado">Descartado</option>
+    </select>
+
+    <label class="form-label" style="margin-top:12px;">Anotações</label>
+    <textarea class="form-input" id="leadDetailNotes" rows="3" onblur="saveLeadNotes()"></textarea>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeLeadDetail()">Fechar</button>
     </div>
   </div>
 </div>
