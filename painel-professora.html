@@ -1507,7 +1507,7 @@
       if (c.student_id) {
         const s = myStudents.find(st => st.id === c.student_id);
         return `
-        <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${c.student_id}')">
+        <div class="report-row" style="cursor:pointer;" onclick="openPendingStudentReport('${c.student_id}', '${c.id}')">
           <div class="report-row-info">
             <div class="report-row-student">${s ? (s.full_name || 'Aluno') : 'Aluno'}</div>
             <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
@@ -1517,7 +1517,7 @@
       }
       const turmaName = turmaNameById[c.turma_id] || 'Turma';
       return `
-      <div class="report-row" style="cursor:pointer;" onclick="openTurmaProfile('${c.turma_id}')">
+      <div class="report-row" style="cursor:pointer;" onclick="openPendingTurmaReport('${c.turma_id}', '${c.id}')">
         <div class="report-row-info">
           <div class="report-row-student">${turmaName}</div>
           <div class="report-row-title">Aula de ${dateLabel} sem registro</div>
@@ -1527,6 +1527,19 @@
     }).join('');
 
     listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassRows;
+  }
+
+  // Clicar num aviso de "aula sem registro" (início ou equipe) já abre o perfil e,
+  // em seguida, o card de lançar o relatório daquela aula específica — em vez de só
+  // deixar a professora no perfil pra ela achar a aula manualmente.
+  async function openPendingStudentReport(studentId, classLogId) {
+    await openStudentProfile(studentId);
+    openClassReport(classLogId, studentId);
+  }
+
+  async function openPendingTurmaReport(turmaId, classLogId) {
+    await openTurmaProfile(turmaId);
+    openTurmaClassReport(classLogId);
   }
 
   // ---- Minhas tarefas ----
