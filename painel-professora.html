@@ -1138,7 +1138,7 @@
 
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title">Aulas sem relatório — por professora</div>
-      <div class="modal-hint" style="margin-bottom:8px;">Aulas já marcadas como realizadas (ou canceladas por falta) nos últimos 60 dias, mas sem nenhum relatório lançado ainda.</div>
+      <div class="modal-hint" style="margin-bottom:8px;">Aulas já marcadas como realizadas nos últimos 60 dias, mas sem nenhum relatório lançado ainda.</div>
       <div id="equipeMissingReportList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
@@ -1462,19 +1462,21 @@
     const pendingClasses = [...(pendingByStudent || []), ...(pendingByTurma || [])]
       .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''));
 
-    // Aulas com status já definido (realizada/cancelada por falta), mas sem nenhum
-    // relatório lançado — a professora mudou o status sem registrar o que foi
-    // trabalhado. Olha só os últimos 60 dias pra não trazer um histórico gigante
-    // de aulas antigas de antes desse controle existir.
+    // Aulas marcadas como "realizada", mas sem nenhum relatório lançado — a
+    // professora mudou o status sem registrar o que foi trabalhado. Os outros
+    // status (cancelada, cancelada por falta, para reagendar, feriado, recesso etc.)
+    // não geram esse aviso, já que só aula que de fato aconteceu precisa de relatório.
+    // Olha só os últimos 60 dias pra não trazer um histórico gigante de aulas antigas
+    // de antes desse controle existir.
     const missingReportSince = new Date();
     missingReportSince.setDate(missingReportSince.getDate() - 60);
     const missingReportSinceStr = missingReportSince.toISOString().slice(0, 10);
     const [{ data: doneByStudent }, { data: doneByTurma }] = await Promise.all([
       studentIdsForPending.length
-        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').in('status', ['realizada', 'cancelada_falta']).gte('class_date', missingReportSinceStr).in('student_id', studentIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('student_id', studentIdsForPending)
         : Promise.resolve({ data: [] }),
       turmaIdsForPending.length
-        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').in('status', ['realizada', 'cancelada_falta']).gte('class_date', missingReportSinceStr).in('turma_id', turmaIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('turma_id', turmaIdsForPending)
         : Promise.resolve({ data: [] })
     ]);
     const doneClasses = [...(doneByStudent || []), ...(doneByTurma || [])];
@@ -4809,7 +4811,7 @@
       // perfil do aluno/turma, igual à lista "Relatórios enviados" da aba Relatórios.
       sb.from('reports').select('*').is('class_log_id', null).order('created_at', { ascending: false }).limit(50),
       sb.from('class_logs').select('*').eq('status', 'pendente').lt('class_date', today),
-      sb.from('class_logs').select('*').in('status', ['realizada', 'cancelada_falta']).gte('class_date', missingReportSinceStr)
+      sb.from('class_logs').select('*').eq('status', 'realizada').gte('class_date', missingReportSinceStr)
     ]);
     const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
     const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
