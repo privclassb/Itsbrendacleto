@@ -5201,7 +5201,20 @@
     document.getElementById('classLogEditStartTime').value = l.start_time ? l.start_time.slice(0, 5) : '';
     document.getElementById('classLogEditEndTime').value = l.end_time ? l.end_time.slice(0, 5) : '';
     document.getElementById('classLogEditStatus').value = l.status || 'realizada';
-    document.getElementById('classLogEditContent').value = l.content || '';
+
+    // Se o campo de anotações da aula estiver vazio mas já existir relatório
+    // lançado (pelo card de relatório, individual ou de turma), mostra o
+    // conteúdo dele aqui também — pra não parecer que não tem nada registrado.
+    let displayContent = l.content || '';
+    if (!displayContent) {
+      const reportStudentIds = l.student_id ? [l.student_id] : allStudents.filter(s => s.turma_id === l.turma_id).map(s => s.id);
+      if (reportStudentIds.length) {
+        const { data: existingReportsForLog } = await sb.from('reports').select('content').eq('class_log_id', id).in('student_id', reportStudentIds);
+        const firstWithContent = (existingReportsForLog || []).find(r => r.content && r.content.trim());
+        if (firstWithContent) displayContent = firstWithContent.content;
+      }
+    }
+    document.getElementById('classLogEditContent').value = displayContent;
     document.getElementById('classLogEditNeedsMakeup').checked = !!l.needs_makeup;
     document.getElementById('classLogEditMakeupHistory').innerHTML = await buildMakeupHistoryHtml(l);
     document.getElementById('classLogEditRescheduleHistory').innerHTML = await buildRescheduleHistoryHtml(id);
@@ -5223,6 +5236,34 @@
     document.getElementById('modalClassLogEdit').classList.remove('open');
   }
 
+  // Escreve o conteúdo de uma aula também na tabela de relatórios — pra que não
+  // importe se a professora registrou pelo campo de anotações da aula (Editar
+  // aula) ou pelo card de relatório, o conteúdo apareça igual nos dois lugares.
+  // Só escreve quando tem conteúdo de verdade (nunca apaga um relatório existente
+  // só porque o campo de anotações ficou vazio).
+  async function syncClassContentToReports(classLogId, studentId, turmaId, content, dateStr, session) {
+    if (!content) return;
+    const dateLabel = dateStr ? new Date(dateStr + 'T00:00:00').toLocaleDateString('pt-BR') : '';
+    const defaultTitle = dateLabel ? 'Aula de ' + dateLabel : 'Aula';
+
+    const targetStudentIds = studentId ? [studentId] : allStudents.filter(s => s.turma_id === turmaId).map(s => s.id);
+    if (targetStudentIds.length === 0) return;
+
+    const { data: existing } = await sb.from('reports').select('id, student_id').eq('class_log_id', classLogId).in('student_id', targetStudentIds);
+    const existingByStudent = {};
+    (existing || []).forEach(r => { existingByStudent[r.student_id] = r.id; });
+
+    for (const sId of targetStudentIds) {
+      const existingId = existingByStudent[sId];
+      if (existingId) {
+        await withAuthRetry(() => sb.from('reports').update({ content }).eq('id', existingId));
+      } else {
+        const payload = { student_id: sId, class_log_id: classLogId, title: defaultTitle, period: '', content, is_published: false, created_by: session.user.id };
+        await withAuthRetry(() => sb.from('reports').insert(payload));
+      }
+    }
+  }
+
   async function saveClassLogEdit() {
     const id = document.getElementById('classLogEditId').value;
     const updates = {
@@ -5241,7 +5282,7 @@
       return;
     }
 
-    const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', id).maybeSingle();
+    const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time, student_id, turma_id').eq('id', id).maybeSingle();
     const oldLog = oldLogRaw ? { ...oldLogRaw } : null;
 
     const { data: updData, error } = await withAuthRetry(() => sb.from('class_logs').update(updates).eq('id', id).select());
@@ -5263,8 +5304,12 @@
       await saveAttendanceForClassLog(id, attendanceList);
     }
 
-    closeClassLogEdit();
     const { data: { session } } = await sb.auth.getSession();
+    if (oldLog) {
+      await syncClassContentToReports(id, oldLog.student_id, oldLog.turma_id, updates.content, updates.class_date, session);
+    }
+
+    closeClassLogEdit();
     await Promise.all([
       loadAulasHoje(session.user.id, currentUserIsBrenda),
       loadClassLogs(session.user.id, currentUserIsBrenda),
@@ -5366,8 +5411,11 @@
     const { data: oldLogRaw } = await sb.from('class_logs').select('class_date, start_time, end_time').eq('id', classLogId).maybeSingle();
     const oldLog = oldLogRaw ? { ...oldLogRaw } : null;
 
+    // Mantém o campo de anotações da aula (usado em "Editar aula") sincronizado com
+    // o relatório — assim, não importa por qual tela a professora escreveu o
+    // conteúdo, ele aparece igual nas duas.
     const { data: logUpdData, error: logUpdErr } = await withAuthRetry(() => sb.from('class_logs').update({
-      class_date: date, start_time: startTime, end_time: endTime, status, needs_makeup: needsMakeup
+      class_date: date, start_time: startTime, end_time: endTime, status, content, needs_makeup: needsMakeup
     }).eq('id', classLogId).select());
 
     if (logUpdErr || !logUpdData || logUpdData.length === 0) {
