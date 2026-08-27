@@ -1177,6 +1177,7 @@
   <div class="reports-section panel-section" id="leadsSection">
     <div class="section-title">Leads — "Quero ser aluno"</div>
     <div class="modal-hint" style="margin-bottom:16px;">Respostas do formulário de captação. Preenchimentos novos entram aqui automaticamente.</div>
+    <button class="btn-add" onclick="openAddLead()">+ Adicionar lead</button>
     <input type="text" class="folder-search" id="leadSearch" placeholder="Buscar por nome ou telefone..." oninput="renderLeads()" />
     <div class="filter-tabs">
       <button class="lead-tab active" data-status="todos">Todos</button>
@@ -2544,6 +2545,65 @@
     const lead = leadsCache.find(l => l.id === currentLeadId);
     if (lead) lead.notes = notes;
     await sb.from('leads').update({ notes }).eq('id', currentLeadId);
+  }
+
+  async function deleteLead() {
+    if (!currentLeadId) return;
+    if (!confirm('Excluir esse lead? Essa ação não pode ser desfeita.')) return;
+    const { error } = await sb.from('leads').delete().eq('id', currentLeadId);
+    if (error) { alert('Erro ao excluir: ' + error.message); return; }
+    leadsCache = leadsCache.filter(l => l.id !== currentLeadId);
+    closeLeadDetail();
+    renderLeads();
+  }
+
+  function openAddLead() {
+    document.getElementById('addLeadNome').value = '';
+    document.getElementById('addLeadTelefone').value = '';
+    document.getElementById('addLeadObjetivo').value = '';
+    document.getElementById('addLeadModelo').value = 'Individual';
+    document.getElementById('addLeadHorario').value = '';
+    document.getElementById('addLeadExperiencia').value = '';
+    document.getElementById('addLeadNotes').value = '';
+    const msgEl = document.getElementById('addLeadMsg');
+    msgEl.textContent = '';
+    msgEl.className = 'msg';
+    document.getElementById('modalAddLead').classList.add('open');
+  }
+
+  function closeAddLead() {
+    document.getElementById('modalAddLead').classList.remove('open');
+  }
+
+  async function createLead() {
+    const msgEl = document.getElementById('addLeadMsg');
+    const nome = document.getElementById('addLeadNome').value.trim();
+    if (!nome) {
+      msgEl.textContent = 'Preenche pelo menos o nome.';
+      msgEl.className = 'msg err';
+      return;
+    }
+    const payload = {
+      nome: nome,
+      telefone: document.getElementById('addLeadTelefone').value.trim(),
+      objetivo: document.getElementById('addLeadObjetivo').value.trim(),
+      modelo: document.getElementById('addLeadModelo').value,
+      horario_preferido: document.getElementById('addLeadHorario').value.trim(),
+      experiencia: document.getElementById('addLeadExperiencia').value.trim(),
+      notes: document.getElementById('addLeadNotes').value.trim(),
+      status: 'novo',
+      viewed: true,
+      source: 'manual'
+    };
+    const { data, error } = await sb.from('leads').insert(payload).select();
+    if (error) {
+      msgEl.textContent = 'Erro ao cadastrar: ' + error.message;
+      msgEl.className = 'msg err';
+      return;
+    }
+    if (data && data[0]) leadsCache.unshift(data[0]);
+    closeAddLead();
+    renderLeads();
   }
 
   // Modal
@@ -7124,7 +7184,48 @@
     <textarea class="form-input" id="leadDetailNotes" rows="3" onblur="saveLeadNotes()"></textarea>
 
     <div class="modal-actions">
+      <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteLead()">Excluir lead</button>
       <button class="btn-modal-cancel" onclick="closeLeadDetail()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Adicionar lead manualmente -->
+<div class="modal-overlay" id="modalAddLead">
+  <div class="modal-box">
+    <div class="modal-title">Adicionar lead</div>
+    <div class="modal-sub">Cadastre um lead que não veio pelo formulário.</div>
+
+    <label class="form-label">Nome</label>
+    <input type="text" class="form-input" id="addLeadNome" placeholder="Nome do lead" />
+
+    <label class="form-label">Telefone</label>
+    <input type="text" class="form-input" id="addLeadTelefone" placeholder="Ex: 21999998888" />
+
+    <label class="form-label">Objetivo</label>
+    <input type="text" class="form-input" id="addLeadObjetivo" placeholder="Ex: Ser fluente" />
+
+    <label class="form-label">Modelo desejado</label>
+    <select class="form-select" id="addLeadModelo">
+      <option value="Individual">Individual</option>
+      <option value="Turma">Turma</option>
+      <option value="Em dupla">Em dupla</option>
+    </select>
+
+    <label class="form-label">Disponibilidade</label>
+    <input type="text" class="form-input" id="addLeadHorario" placeholder="Ex: Terças e quintas à tarde" />
+
+    <label class="form-label">Experiência com o idioma</label>
+    <textarea class="form-input" id="addLeadExperiencia" rows="2" placeholder="Opcional"></textarea>
+
+    <label class="form-label">Anotações</label>
+    <textarea class="form-input" id="addLeadNotes" rows="2" placeholder="Opcional"></textarea>
+
+    <div id="addLeadMsg" class="msg"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeAddLead()">Cancelar</button>
+      <button class="btn-modal-save" onclick="createLead()">Cadastrar</button>
     </div>
   </div>
 </div>
