@@ -1482,10 +1482,10 @@
     const missingReportSinceStr = missingReportSince.toISOString().slice(0, 10);
     const [{ data: doneByStudent }, { data: doneByTurma }] = await Promise.all([
       studentIdsForPending.length
-        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('student_id', studentIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date, content').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('student_id', studentIdsForPending)
         : Promise.resolve({ data: [] }),
       turmaIdsForPending.length
-        ? sb.from('class_logs').select('id, student_id, turma_id, class_date').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('turma_id', turmaIdsForPending)
+        ? sb.from('class_logs').select('id, student_id, turma_id, class_date, content').eq('status', 'realizada').gte('class_date', missingReportSinceStr).in('turma_id', turmaIdsForPending)
         : Promise.resolve({ data: [] })
     ]);
     const doneClasses = [...(doneByStudent || []), ...(doneByTurma || [])];
@@ -1494,7 +1494,10 @@
       ? await sb.from('reports').select('class_log_id').in('class_log_id', doneClassLogIds)
       : { data: [] };
     const reportedLogIds = new Set((existingReportsForDone || []).map(r => r.class_log_id));
-    const missingReportClasses = doneClasses.filter(c => !reportedLogIds.has(c.id))
+    // Conta como "tem relatório" tanto uma entrada na tabela reports quanto uma
+    // anotação escrita direto no campo de conteúdo da aula (várias professoras
+    // registram o que foi trabalhado ali mesmo, na hora de marcar a aula como realizada).
+    const missingReportClasses = doneClasses.filter(c => !reportedLogIds.has(c.id) && !(c.content && c.content.trim()))
       .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''));
 
     // Relatórios mensais pendentes: alunos da própria professora que já estavam
@@ -4909,7 +4912,9 @@
       ? await sb.from('reports').select('class_log_id').in('class_log_id', doneLogIds)
       : { data: [] };
     const reportedLogIds = new Set((reportsForDone || []).map(r => r.class_log_id));
-    const missingReportLogs = (doneLogs || []).filter(l => !reportedLogIds.has(l.id));
+    // Conta como "tem relatório" tanto uma entrada na tabela reports quanto uma
+    // anotação escrita direto no campo de conteúdo da aula.
+    const missingReportLogs = (doneLogs || []).filter(l => !reportedLogIds.has(l.id) && !(l.content && l.content.trim()));
 
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
