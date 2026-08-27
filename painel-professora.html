@@ -527,6 +527,15 @@
     .report-status.payment-alert { background: #FFF0EE; color: #C0392B; }
     .report-status.pending-class-alert { background: #EAF2FB; color: #2E6DA4; }
     .report-status.missing-report-alert { background: #F3EDF7; color: #6B4C93; }
+    .report-status.monthly-report-alert { background: #E8F5F0; color: #1E7A5C; }
+
+    /* Aviso grande ao entrar (aulas/relatórios pendentes) */
+    .login-notice-box { max-width: 420px; text-align: center; }
+    .login-notice-icon { font-size: 44px; margin-bottom: 10px; }
+    .login-notice-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 8px; }
+    .login-notice-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+    .login-notice-line { background: var(--cream); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 14.5px; color: var(--text); text-align: left; }
+    .login-notice-line strong { color: var(--brown); font-family: 'DM Serif Display', serif; font-size: 17px; }
     .report-status.status-realizada { background: #EFF7F3; color: #1E5C3A; }
     .report-status.status-pendente { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
     .report-status.status-cancelada { background: #F3EDF7; color: #6B4C93; }
@@ -1488,6 +1497,20 @@
     const missingReportClasses = doneClasses.filter(c => !reportedLogIds.has(c.id))
       .sort((a, b) => (a.class_date || '').localeCompare(b.class_date || ''));
 
+    // Relatórios mensais pendentes: alunos da própria professora que já estavam
+    // matriculados no mês passado, mas não têm nenhum relatório mensal (sem
+    // class_log_id) desde o início do mês passado — ou seja, o relatório do mês
+    // anterior ainda não foi feito. Fica valendo o mês inteiro atual até ser corrigido.
+    const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+    const prevMonthStartStr = new Date(Date.UTC(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1)).toISOString();
+    const prevMonthLabel = prevMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const myActiveStudents = myStudents.filter(s => s.active !== false && (!s.contract_start || s.contract_start < prevMonthStartStr.slice(0, 10)));
+    const { data: recentMonthlyReports } = myActiveStudents.length
+      ? await sb.from('reports').select('student_id').is('class_log_id', null).in('student_id', myActiveStudents.map(s => s.id)).gte('created_at', prevMonthStartStr)
+      : { data: [] };
+    const reportedStudentIds = new Set((recentMonthlyReports || []).map(r => r.student_id));
+    const missingMonthlyReportStudents = myActiveStudents.filter(s => !reportedStudentIds.has(s.id));
+
     let turmaNameById = {};
     const turmaIdsNeeded = [...new Set([...pendingClasses, ...missingReportClasses].filter(c => c.turma_id).map(c => c.turma_id))];
     if (turmaIdsNeeded.length) {
@@ -1495,8 +1518,9 @@
       (turmasData || []).forEach(t => { turmaNameById[t.id] = t.name; });
     }
 
-    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClasses.length === 0 && missingReportClasses.length === 0) {
+    if (birthdays.length === 0 && contractsEnding.length === 0 && overdueEntries.length === 0 && pendingClasses.length === 0 && missingReportClasses.length === 0 && missingMonthlyReportStudents.length === 0) {
       card.style.display = 'none';
+      maybeShowLoginNotice({ pendingCount: 0, missingReportCount: 0, missingMonthlyCount: 0 });
       return;
     }
     card.style.display = 'block';
@@ -1583,7 +1607,71 @@
       </div>`;
     }).join('');
 
-    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassRows + missingReportRows;
+    const missingMonthlyRows = missingMonthlyReportStudents.map(s => `
+      <div class="report-row" style="cursor:pointer;" onclick="openMonthlyReportForStudent('${s.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+          <div class="report-row-title">Relatório mensal de ${prevMonthLabel} pendente</div>
+        </div>
+        <span class="report-status monthly-report-alert">Mensal pendente</span>
+      </div>`).join('');
+
+    listEl.innerHTML = overdueRows + birthdayRows + contractRows + pendingClassRows + missingReportRows + missingMonthlyRows;
+
+    maybeShowLoginNotice({
+      pendingCount: pendingClasses.length,
+      missingReportCount: missingReportClasses.length,
+      missingMonthlyCount: missingMonthlyReportStudents.length
+    });
+  }
+
+  // Vai pra aba Relatórios com o aluno já selecionado no formulário "Novo
+  // relatório", pronto pra escrever o relatório mensal que está faltando.
+  function openMonthlyReportForStudent(studentId) {
+    showTab('relatorios');
+    const sel = document.getElementById('reportStudent');
+    if (sel) sel.value = studentId;
+    const titleInput = document.getElementById('reportTitle');
+    if (titleInput) titleInput.focus();
+  }
+
+  // Aviso grande ao entrar na plataforma, uma vez por sessão, resumindo aulas e
+  // relatórios pendentes — pra não passar batido pra professora.
+  function maybeShowLoginNotice(counts) {
+    if (sessionStorage.getItem('__login_notice_shown')) return;
+
+    const total = counts.pendingCount + counts.missingReportCount + counts.missingMonthlyCount;
+    if (total === 0) { sessionStorage.setItem('__login_notice_shown', '1'); return; }
+
+    // O modal fica no HTML depois deste <script>, então se a página ainda não
+    // terminou de carregar (ex.: essa função rodou muito rápido, antes do parser
+    // chegar lá embaixo), espera o DOM terminar antes de tentar abrir.
+    const modalEl = document.getElementById('modalLoginNotice');
+    if (!modalEl) {
+      document.addEventListener('DOMContentLoaded', () => maybeShowLoginNotice(counts), { once: true });
+      return;
+    }
+
+    sessionStorage.setItem('__login_notice_shown', '1');
+
+    const lines = [];
+    if (counts.pendingCount > 0) {
+      lines.push(`<div class="login-notice-line">📋 <strong>${counts.pendingCount}</strong> aula${counts.pendingCount === 1 ? '' : 's'} aguardando registro</div>`);
+    }
+    if (counts.missingReportCount > 0) {
+      lines.push(`<div class="login-notice-line">📝 <strong>${counts.missingReportCount}</strong> aula${counts.missingReportCount === 1 ? '' : 's'} realizada${counts.missingReportCount === 1 ? '' : 's'} sem relatório</div>`);
+    }
+    if (counts.missingMonthlyCount > 0) {
+      lines.push(`<div class="login-notice-line">🗓️ <strong>${counts.missingMonthlyCount}</strong> relatório${counts.missingMonthlyCount === 1 ? '' : 's'} mensal${counts.missingMonthlyCount === 1 ? '' : 'is'} pendente${counts.missingMonthlyCount === 1 ? '' : 's'}</div>`);
+    }
+    document.getElementById('loginNoticeBody').innerHTML = lines.join('');
+    modalEl.classList.add('open');
+  }
+
+  function closeLoginNotice() {
+    document.getElementById('modalLoginNotice').classList.remove('open');
+    const card = document.getElementById('notificacoesCard');
+    if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   // Clicar num aviso de "aula sem registro" (início ou equipe) já abre o perfil e,
@@ -6686,6 +6774,19 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeAvatarCrop()">Cancelar</button>
       <button class="btn-modal-save" onclick="saveAvatarCrop()">Salvar foto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Aviso ao entrar (aulas/relatórios pendentes) -->
+<div class="modal-overlay" id="modalLoginNotice">
+  <div class="modal-box login-notice-box">
+    <div class="login-notice-icon">🔔</div>
+    <div class="login-notice-title">Antes de começar...</div>
+    <div class="login-notice-sub">Você tem algumas pendências pra colocar em dia:</div>
+    <div id="loginNoticeBody"></div>
+    <div class="modal-actions">
+      <button class="btn-modal-save" style="flex:1;" onclick="closeLoginNotice()">Entendi, ver notificações</button>
     </div>
   </div>
 </div>
