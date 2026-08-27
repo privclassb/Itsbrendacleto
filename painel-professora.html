@@ -4732,11 +4732,15 @@
 
   async function loadEquipeOverview(myId) {
     const today = todayLocalISO();
-    const [{ data: logs }, { data: reports }, { data: pendingLogs }] = await Promise.all([
+    const [{ data: logs }, { data: rawReports }, { data: pendingLogs }] = await Promise.all([
       sb.from('class_logs').select('*').eq('class_date', today),
-      sb.from('reports').select('*').order('created_at', { ascending: false }).limit(50),
+      // Só relatórios mensais (sem class_log_id) — os relatórios por aula ficam no
+      // perfil do aluno/turma, igual à lista "Relatórios enviados" da aba Relatórios.
+      sb.from('reports').select('*').is('class_log_id', null).order('created_at', { ascending: false }).limit(50),
       sb.from('class_logs').select('*').eq('status', 'pendente').lt('class_date', today)
     ]);
+    const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
+    const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
 
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
