@@ -1151,6 +1151,12 @@
       <div id="equipeMissingReportList"><div class="empty-reports">Carregando...</div></div>
     </div>
 
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">Relatórios mensais pendentes — por professora</div>
+      <div class="modal-hint" style="margin-bottom:8px;" id="equipeMissingMonthlyHint"></div>
+      <div id="equipeMissingMonthlyList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
     <div class="report-list">
       <div class="report-list-title">Relatórios recentes — por professora</div>
       <div id="equipeReportsList"><div class="empty-reports">Carregando...</div></div>
@@ -4916,9 +4922,23 @@
     // anotação escrita direto no campo de conteúdo da aula.
     const missingReportLogs = (doneLogs || []).filter(l => !reportedLogIds.has(l.id) && !(l.content && l.content.trim()));
 
+    // Relatórios mensais pendentes de toda a equipe: mesma regra usada na aba início
+    // (mês anterior inteiro), só que aqui olhando os alunos de todas as professoras.
+    const prevMonthDate = new Date(); prevMonthDate.setDate(1); prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
+    const prevMonthStartStr = new Date(Date.UTC(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1)).toISOString();
+    const prevMonthLabelEquipe = prevMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    document.getElementById('equipeMissingMonthlyHint').textContent = 'Alunos sem relatório mensal desde o início de ' + prevMonthLabelEquipe + '.';
+    const allActiveStudents = allStudents.filter(s => s.active !== false && (!s.contract_start || s.contract_start < prevMonthStartStr.slice(0, 10)));
+    const { data: allMonthlyReports } = allActiveStudents.length
+      ? await sb.from('reports').select('student_id').is('class_log_id', null).in('student_id', allActiveStudents.map(s => s.id)).gte('created_at', prevMonthStartStr)
+      : { data: [] };
+    const reportedStudentIdsEquipe = new Set((allMonthlyReports || []).map(r => r.student_id));
+    const missingMonthlyStudents = allActiveStudents.filter(s => !reportedStudentIdsEquipe.has(s.id));
+
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
     renderEquipeMissingReports(missingReportLogs, myId);
+    renderEquipeMissingMonthly(missingMonthlyStudents, myId, prevMonthLabelEquipe);
     renderEquipeReports(reports || [], myId);
 
     const teacherSelect = document.getElementById('equipeTeacherSelect');
@@ -5145,6 +5165,46 @@
     }).join('');
 
     listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')), rowBuilder);
+  }
+
+  function renderEquipeMissingMonthly(students, myId, prevMonthLabel) {
+    const listEl = document.getElementById('equipeMissingMonthlyList');
+
+    const grouped = {};
+    const orphaned = [];
+    students.forEach(s => {
+      const tId = s.teacher_id;
+      if (tId === myId) return;
+      if (!tId) { orphaned.push(s); return; }
+      if (!grouped[tId]) grouped[tId] = [];
+      grouped[tId].push(s);
+    });
+
+    const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
+    if (relevantTeachers.length === 0 && orphaned.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal pendente de outra professora.</div>';
+      return;
+    }
+
+    const rowBuilder = s => `
+      <div class="report-row" style="cursor:pointer;" onclick="openMonthlyReportForStudent('${s.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+          <div class="report-row-title">Relatório mensal de ${prevMonthLabel} pendente</div>
+        </div>
+        <span class="report-status monthly-report-alert">Mensal pendente</span>
+      </div>`;
+
+    const teacherGroupsHtml = relevantTeachers.map(t => {
+      const rows = grouped[t.id].sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '')).map(rowBuilder).join('');
+      return `
+        <div style="margin-bottom:18px;">
+          <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
+          ${rows}
+        </div>`;
+    }).join('');
+
+    listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '')), rowBuilder);
   }
 
   function renderEquipeReports(reports, myId) {
