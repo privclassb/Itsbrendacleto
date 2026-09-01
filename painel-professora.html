@@ -1128,6 +1128,7 @@
         <button class="btn-draft" onclick="quickFinanceYearToDate()" style="flex:1 1 130px;">📅 Jan até hoje</button>
         <button class="btn-publish" onclick="openLancamento()" style="flex:1 1 150px;">+ Novo lançamento</button>
         <button class="btn-publish" onclick="openFinanceReport()" style="flex:1 1 170px;background:#1E5C3A;">📊 Relatório / Exportar</button>
+        <button class="btn-draft" onclick="openPaymentSettings()" style="flex:1 1 170px;">⚙️ Configurações de cobrança</button>
       </div>
     </div>
 
@@ -1379,6 +1380,7 @@
       document.getElementById('navEquipe').style.display = 'inline-flex';
       document.getElementById('navLeads').style.display = 'inline-flex';
       await loadLeads();
+      await loadPaymentSettings();
       document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
       await loadStudentsForSelect();
@@ -6077,6 +6079,51 @@
     }).join('');
   }
 
+  // Configurações padrão de multa/juros usadas na emissão dos boletos
+  // (integração com Mercado Pago) - fica guardado numa linha única na tabela
+  // payment_settings, editável só por Brenda.
+  let paymentSettingsCache = { multa_percent: 2, juros_percent_month: 1 };
+
+  async function loadPaymentSettings() {
+    const { data, error } = await sb.from('payment_settings').select('*').eq('id', 1).maybeSingle();
+    if (error) { console.warn('Erro ao carregar configurações de cobrança:', error); return; }
+    if (data) paymentSettingsCache = data;
+  }
+
+  function openPaymentSettings() {
+    document.getElementById('paymentSettingsMulta').value = paymentSettingsCache.multa_percent;
+    document.getElementById('paymentSettingsJuros').value = paymentSettingsCache.juros_percent_month;
+    const msgEl = document.getElementById('paymentSettingsMsg');
+    msgEl.textContent = '';
+    msgEl.className = 'msg';
+    document.getElementById('modalPaymentSettings').classList.add('open');
+  }
+
+  function closePaymentSettings() {
+    document.getElementById('modalPaymentSettings').classList.remove('open');
+  }
+
+  async function savePaymentSettings() {
+    const msgEl = document.getElementById('paymentSettingsMsg');
+    const multa = parseFloat(document.getElementById('paymentSettingsMulta').value);
+    const juros = parseFloat(document.getElementById('paymentSettingsJuros').value);
+    if (isNaN(multa) || isNaN(juros) || multa < 0 || juros < 0) {
+      msgEl.textContent = 'Preenche os dois campos com números válidos.';
+      msgEl.className = 'msg err';
+      return;
+    }
+    const { error } = await sb.from('payment_settings').update({ multa_percent: multa, juros_percent_month: juros, updated_at: new Date().toISOString() }).eq('id', 1);
+    if (error) {
+      msgEl.textContent = 'Erro ao salvar: ' + error.message;
+      msgEl.className = 'msg err';
+      return;
+    }
+    paymentSettingsCache = { multa_percent: multa, juros_percent_month: juros };
+    msgEl.textContent = 'Salvo!';
+    msgEl.className = 'msg ok';
+    setTimeout(closePaymentSettings, 800);
+  }
+
   function quickFinanceYearToDate() {
     const now = new Date();
     const jan1 = new Date(now.getFullYear(), 0, 1);
@@ -7419,6 +7466,27 @@
       <button class="btn-modal-cancel" onclick="closeLeadsReport()">Fechar</button>
       <button class="btn-modal-save" style="background:#5C4033;" onclick="downloadLeadsReportCSV()">⬇️ Baixar CSV</button>
       <button class="btn-modal-save" onclick="printLeadsReport()">🖨️ Imprimir / Salvar PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Configurações de cobrança (multa/juros padrão dos boletos) -->
+<div class="modal-overlay" id="modalPaymentSettings">
+  <div class="modal-box">
+    <div class="modal-title">Configurações de cobrança</div>
+    <div class="modal-sub">Multa e juros aplicados por atraso nos boletos gerados pra os alunos. Vale pra todos, a partir da próxima cobrança gerada.</div>
+
+    <label class="form-label">Multa por atraso (%)</label>
+    <input type="number" class="form-input" id="paymentSettingsMulta" min="0" max="20" step="0.1" placeholder="Ex: 2" />
+
+    <label class="form-label" style="margin-top:12px;">Juros ao mês (%)</label>
+    <input type="number" class="form-input" id="paymentSettingsJuros" min="0" max="20" step="0.1" placeholder="Ex: 1" />
+
+    <div id="paymentSettingsMsg" class="msg"></div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closePaymentSettings()">Cancelar</button>
+      <button class="btn-modal-save" onclick="savePaymentSettings()">Salvar</button>
     </div>
   </div>
 </div>
