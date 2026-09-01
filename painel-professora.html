@@ -6082,7 +6082,7 @@
   // Configurações padrão de multa/juros usadas na emissão dos boletos
   // (integração com Mercado Pago) - fica guardado numa linha única na tabela
   // payment_settings, editável só por Brenda.
-  let paymentSettingsCache = { multa_percent: 2, juros_percent_month: 1 };
+  let paymentSettingsCache = { multa_valor: 15, juros_percent_month: 1 };
 
   async function loadPaymentSettings() {
     const { data, error } = await sb.from('payment_settings').select('*').eq('id', 1).maybeSingle();
@@ -6091,7 +6091,7 @@
   }
 
   function openPaymentSettings() {
-    document.getElementById('paymentSettingsMulta').value = paymentSettingsCache.multa_percent;
+    document.getElementById('paymentSettingsMulta').value = paymentSettingsCache.multa_valor;
     document.getElementById('paymentSettingsJuros').value = paymentSettingsCache.juros_percent_month;
     const msgEl = document.getElementById('paymentSettingsMsg');
     msgEl.textContent = '';
@@ -6112,13 +6112,13 @@
       msgEl.className = 'msg err';
       return;
     }
-    const { error } = await sb.from('payment_settings').update({ multa_percent: multa, juros_percent_month: juros, updated_at: new Date().toISOString() }).eq('id', 1);
+    const { error } = await sb.from('payment_settings').update({ multa_valor: multa, juros_percent_month: juros, updated_at: new Date().toISOString() }).eq('id', 1);
     if (error) {
       msgEl.textContent = 'Erro ao salvar: ' + error.message;
       msgEl.className = 'msg err';
       return;
     }
-    paymentSettingsCache = { multa_percent: multa, juros_percent_month: juros };
+    paymentSettingsCache = { multa_valor: multa, juros_percent_month: juros };
     msgEl.textContent = 'Salvo!';
     msgEl.className = 'msg ok';
     setTimeout(closePaymentSettings, 800);
@@ -7476,8 +7476,8 @@
     <div class="modal-title">Configurações de cobrança</div>
     <div class="modal-sub">Multa e juros aplicados por atraso nos boletos gerados pra os alunos. Vale pra todos, a partir da próxima cobrança gerada.</div>
 
-    <label class="form-label">Multa por atraso (%)</label>
-    <input type="number" class="form-input" id="paymentSettingsMulta" min="0" max="20" step="0.1" placeholder="Ex: 2" />
+    <label class="form-label">Multa por atraso (R$)</label>
+    <input type="number" class="form-input" id="paymentSettingsMulta" min="0" step="0.01" placeholder="Ex: 15,00" />
 
     <label class="form-label" style="margin-top:12px;">Juros ao mês (%)</label>
     <input type="number" class="form-input" id="paymentSettingsJuros" min="0" max="20" step="0.1" placeholder="Ex: 1" />
