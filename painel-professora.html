@@ -540,6 +540,14 @@
     .lead-tab.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
     .lead-tab:hover:not(.active) { border-color: var(--brown-light); color: var(--text); }
 
+    .contrato-tab { padding: 7px 16px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--muted); cursor: pointer; transition: all 0.2s; }
+    .contrato-tab.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
+    .contrato-tab:hover:not(.active) { border-color: var(--brown-light); color: var(--text); }
+    .report-status.contrato-ativo { background: #EFF7F3; color: #1E5C3A; }
+    .report-status.contrato-vencido { background: #FFF0EE; color: #C0392B; }
+    .report-status.contrato-a-vencer { background: #FFF8E5; color: #A9740C; }
+    .report-status.contrato-sem { background: #F1F1F1; color: #8A8A8A; }
+
     /* Aviso grande ao entrar (aulas/relatórios pendentes) */
     .login-notice-box { max-width: 420px; text-align: center; }
     .login-notice-icon { font-size: 44px; margin-bottom: 10px; }
@@ -820,6 +828,7 @@
     <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">Turmas</button>
     <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">Minha Agenda</button>
     <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">Financeiro</button>
+    <button class="nav-btn" id="navContratos" data-tab="contratos" onclick="showTab('contratos')" style="display:none;">Contratos</button>
     <button class="nav-btn" id="navLeads" data-tab="leads" onclick="showTab('leads')" style="display:none;">Leads</button>
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">Materiais</button>
@@ -1138,6 +1147,28 @@
     </div>
   </div>
 
+  <!-- Contratos (só Brenda) -->
+  <div class="reports-section panel-section" id="contratosSection">
+    <div class="section-title">Contratos</div>
+    <div class="modal-hint" style="margin-bottom:16px;">Vencimento de contrato de todos os alunos ativos, e o histórico de contratos já renovados.</div>
+    <input type="text" class="folder-search" id="contratoSearch" placeholder="Buscar por nome do aluno..." oninput="renderContratos()" />
+    <div class="filter-tabs">
+      <button class="contrato-tab active" data-status="todos">Todos</button>
+      <button class="contrato-tab" data-status="vencido">Vencidos</button>
+      <button class="contrato-tab" data-status="a_vencer">A vencer (30 dias)</button>
+      <button class="contrato-tab" data-status="ativo">Ativos</button>
+      <button class="contrato-tab" data-status="sem_contrato">Sem contrato</button>
+    </div>
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title">Contratos atuais</div>
+      <div id="contratosList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+    <div class="report-list">
+      <div class="report-list-title">Histórico de contratos renovados</div>
+      <div id="contratosHistoryList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+  </div>
+
   <!-- Acompanhar equipe (só Brenda) -->
   <div class="reports-section panel-section" id="equipeSection">
     <div class="report-list" style="margin-bottom:24px;">
@@ -1324,6 +1355,7 @@
     turmas: 'turmasSection',
     agenda: 'agendaSection',
     financeiro: 'financeiroSection',
+    contratos: 'contratosSection',
     equipe: 'equipeSection',
     leads: 'leadsSection',
     vercomo: 'vercomoSection'
@@ -1381,6 +1413,8 @@
       document.getElementById('navLeads').style.display = 'inline-flex';
       await loadLeads();
       await loadPaymentSettings();
+      document.getElementById('navContratos').style.display = 'inline-flex';
+      await loadContratos();
       document.getElementById('novaTurmaForm').style.display = 'block';
       await loadLinks();
       await loadStudentsForSelect();
@@ -2463,6 +2497,99 @@
       renderStudents(allStudents);
     });
   });
+
+  // Contratos - só Brenda
+  document.querySelectorAll('.contrato-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.contrato-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentContratoFilter = tab.dataset.status;
+      renderContratos();
+    });
+  });
+
+  let currentContratoFilter = 'todos';
+  let contractHistoryAllCache = [];
+
+  const CONTRATO_STATUS_LABELS = { vencido: 'Vencido', a_vencer: 'A vencer', ativo: 'Ativo', sem_contrato: 'Sem contrato' };
+  const CONTRATO_STATUS_CLASS = { vencido: 'contrato-vencido', a_vencer: 'contrato-a-vencer', ativo: 'contrato-ativo', sem_contrato: 'contrato-sem' };
+
+  function contratoStatus(s) {
+    if (!s.contract_end) return 'sem_contrato';
+    const today = todayLocalISO();
+    if (s.contract_end < today) return 'vencido';
+    const diffDays = Math.round((new Date(s.contract_end + 'T00:00:00') - new Date(today + 'T00:00:00')) / 86400000);
+    if (diffDays <= 30) return 'a_vencer';
+    return 'ativo';
+  }
+
+  async function loadContratos() {
+    const studentIds = allStudents.map(s => s.id);
+    const { data, error } = studentIds.length
+      ? await sb.from('contract_history').select('*').in('student_id', studentIds).order('contract_end', { ascending: false })
+      : { data: [] };
+    if (error) { console.warn('Erro ao carregar histórico de contratos:', error); contractHistoryAllCache = []; }
+    else { contractHistoryAllCache = data || []; }
+    renderContratos();
+  }
+
+  function renderContratos() {
+    const searchEl = document.getElementById('contratoSearch');
+    const search = searchEl ? searchEl.value.toLowerCase().trim() : '';
+
+    let filtered = allStudents.filter(s => s.active !== false).map(s => ({ student: s, status: contratoStatus(s) }));
+    if (currentContratoFilter !== 'todos') {
+      filtered = filtered.filter(f => f.status === currentContratoFilter);
+    }
+    if (search) {
+      filtered = filtered.filter(f => (f.student.full_name || '').toLowerCase().includes(search));
+    }
+    filtered.sort((a, b) => (a.student.contract_end || '9999-99-99').localeCompare(b.student.contract_end || '9999-99-99'));
+
+    const listEl = document.getElementById('contratosList');
+    if (filtered.length === 0) {
+      listEl.innerHTML = '<div class="empty"><div class="empty-icon">📭</div><p>Nenhum contrato encontrado.</p></div>';
+    } else {
+      listEl.innerHTML = filtered.map(f => {
+        const s = f.student;
+        const startLabel = s.contract_start ? new Date(s.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+        const endLabel = s.contract_end ? new Date(s.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+        return `
+        <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${s.id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+            <div class="report-row-title">${startLabel} – ${endLabel}</div>
+          </div>
+          <span class="report-status ${CONTRATO_STATUS_CLASS[f.status]}">${CONTRATO_STATUS_LABELS[f.status]}</span>
+        </div>`;
+      }).join('');
+    }
+
+    const historyEl = document.getElementById('contratosHistoryList');
+    let historyFiltered = contractHistoryAllCache;
+    if (search) {
+      historyFiltered = historyFiltered.filter(c => {
+        const s = allStudents.find(st => st.id === c.student_id);
+        return s && (s.full_name || '').toLowerCase().includes(search);
+      });
+    }
+    if (historyFiltered.length === 0) {
+      historyEl.innerHTML = '<div class="empty-reports">Nenhum contrato renovado ainda.</div>';
+    } else {
+      historyEl.innerHTML = historyFiltered.map(c => {
+        const s = allStudents.find(st => st.id === c.student_id);
+        const startLabel = c.contract_start ? new Date(c.contract_start + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+        const endLabel = c.contract_end ? new Date(c.contract_end + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+        return `
+        <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${c.student_id}')">
+          <div class="report-row-info">
+            <div class="report-row-student">${s ? (s.full_name || 'Aluno') : 'Aluno'}</div>
+            <div class="report-row-title">${startLabel} – ${endLabel}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+  }
 
   // Leads ("Quero ser aluno") - só Brenda
   document.querySelectorAll('.lead-tab').forEach(tab => {
