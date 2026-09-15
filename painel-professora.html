@@ -620,6 +620,22 @@
     .fin-report-company { font-size: 13px; font-weight: 700; color: var(--brown); letter-spacing: 1px; }
     .fin-report-cnpj { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .fin-report-period { font-size: 13px; color: var(--text); margin-top: 8px; }
+    /* Gráfico de crescimento (Financeiro) */
+    .growth-stat-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; }
+    .growth-stat { flex: 1 1 160px; }
+    .growth-stat-value { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); display: block; }
+    .growth-stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .growth-chart-svg { width: 100%; height: auto; overflow: visible; }
+    .growth-bar { fill: var(--brown); }
+    .growth-bar:hover { fill: var(--brown-light); }
+    .growth-goal-line { stroke: #A9740C; stroke-width: 2; stroke-dasharray: 5 4; }
+    .growth-goal-label { fill: #A9740C; font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+    .growth-gridline { stroke: var(--sand); stroke-width: 1; }
+    .growth-axis-label { fill: var(--muted); font-size: 10.5px; font-family: 'DM Sans', sans-serif; }
+    .growth-value-label { fill: var(--text); font-size: 11px; font-weight: 600; font-family: 'DM Sans', sans-serif; }
+    .growth-tooltip { position: absolute; background: var(--text); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 6px 10px; border-radius: 6px; pointer-events: none; opacity: 0; transition: opacity 0.1s; white-space: nowrap; transform: translate(-50%, -100%); z-index: 5; }
+    .growth-chart-container { position: relative; }
+
     .fin-report-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
     .fin-report-summary-card { background: var(--cream); border-radius: 10px; padding: 12px; text-align: center; }
     .fin-report-summary-value { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--brown); display: block; }
@@ -1114,6 +1130,21 @@
         <span class="overview-value" id="finLucro" style="font-size:22px;">—</span>
         <div class="overview-label">Lucro confirmado</div>
       </div>
+    </div>
+
+    <div class="report-list growth-card" style="margin-bottom:24px;">
+      <div class="report-list-title">📈 Crescimento — meta de dezembro</div>
+      <div class="growth-stat-row">
+        <div class="growth-stat">
+          <span class="growth-stat-value" id="growthCurrentValue">—</span>
+          <div class="growth-stat-label" id="growthCurrentLabel">Faturamento do mês</div>
+        </div>
+        <div class="growth-stat">
+          <span class="growth-stat-value" id="growthGapValue">—</span>
+          <div class="growth-stat-label">Falta pra meta de R$ 15.000</div>
+        </div>
+      </div>
+      <div id="growthChartWrap"><div class="empty-reports">Carregando...</div></div>
     </div>
 
     <div class="report-form">
@@ -6113,6 +6144,10 @@
 
     if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar financeiro.</div>'; return; }
 
+    // Gráfico de crescimento usa todos os lançamentos, sem os filtros da
+    // lista abaixo - é uma visão fixa do histórico completo até a meta.
+    renderGrowthChart(payments || []);
+
     const filterStudent = filterSelect.value;
     const filterFrom = document.getElementById('financeFilterFrom').value;
     const filterTo = document.getElementById('financeFilterTo').value;
@@ -6262,6 +6297,147 @@
       }
     });
     return Object.keys(byMonth).sort().map(key => ({ key, ...byMonth[key] }));
+  }
+
+  // ---- Gráfico de crescimento (meta de faturamento mensal até dezembro) ----
+
+  const GROWTH_GOAL = 15000;
+
+  function niceStep(rough) {
+    if (rough <= 0) return 1000;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(rough)));
+    const residual = rough / magnitude;
+    let step;
+    if (residual <= 1) step = 1;
+    else if (residual <= 2) step = 2;
+    else if (residual <= 5) step = 5;
+    else step = 10;
+    return step * magnitude;
+  }
+
+  function formatCompactBRL(v) {
+    if (Math.abs(v) >= 1000) return 'R$ ' + (v / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k';
+    return 'R$ ' + v.toFixed(0);
+  }
+
+  function formatBRLFull(v) {
+    return 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  function shortMonthLabel(key) {
+    const [y, m] = key.split('-');
+    return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
+  }
+
+  function renderGrowthChart(payments) {
+    const entradas = payments.filter(p => p.type === 'entrada');
+    const monthly = financeMonthlyBreakdown(entradas);
+
+    // Mostra do início do histórico (ou dos últimos 6 meses, o que for mais
+    // cedo) até dezembro do ano corrente, pra sempre deixar visível o
+    // caminho até a meta - mesmo pros meses futuros que ainda não têm dado.
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+    const sixAgoKey = sixMonthsAgo.getFullYear() + '-' + String(sixMonthsAgo.getMonth() + 1).padStart(2, '0');
+    let firstKey = monthly.length ? monthly[0].key : sixAgoKey;
+    if (firstKey > sixAgoKey) firstKey = sixAgoKey;
+
+    const months = [];
+    const cursor = new Date(Number(firstKey.slice(0, 4)), Number(firstKey.slice(5, 7)) - 1, 1);
+    const endCursor = new Date(currentYear, 11, 1);
+    while (cursor <= endCursor) {
+      const key = cursor.getFullYear() + '-' + String(cursor.getMonth() + 1).padStart(2, '0');
+      const found = monthly.find(m => m.key === key);
+      months.push({ key, value: found ? found.entradasConf : 0 });
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
+
+    const currentMonthKey = currentYear + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const currentMonthData = months.find(m => m.key === currentMonthKey);
+    const currentValue = currentMonthData ? currentMonthData.value : 0;
+    const gap = Math.max(0, GROWTH_GOAL - currentValue);
+
+    document.getElementById('growthCurrentValue').textContent = formatBRLFull(currentValue);
+    document.getElementById('growthCurrentLabel').textContent = 'Faturamento de ' + monthKeyLabel(currentMonthKey);
+    document.getElementById('growthGapValue').textContent = gap === 0 ? 'Meta batida! 🎉' : formatBRLFull(gap);
+
+    renderGrowthChartSVG(months, currentMonthKey);
+  }
+
+  function renderGrowthChartSVG(months, currentMonthKey) {
+    const wrap = document.getElementById('growthChartWrap');
+    if (!months.length) { wrap.innerHTML = '<div class="empty-reports">Nenhum dado de faturamento ainda.</div>'; return; }
+
+    const width = 720, height = 260;
+    const marginLeft = 60, marginRight = 20, marginTop = 20, marginBottom = 34;
+    const chartW = width - marginLeft - marginRight;
+    const chartH = height - marginTop - marginBottom;
+
+    const maxVal = Math.max(GROWTH_GOAL, ...months.map(m => m.value)) * 1.15;
+    const yTicks = 4;
+    const yStep = niceStep(maxVal / yTicks);
+    const yMax = Math.ceil(maxVal / yStep) * yStep;
+
+    const barSlot = chartW / months.length;
+    const barWidth = Math.min(24, barSlot * 0.6);
+
+    const yScale = v => marginTop + chartH - (v / yMax) * chartH;
+    const goalY = yScale(GROWTH_GOAL);
+
+    let gridlines = '';
+    for (let i = 0; i <= yTicks; i++) {
+      const v = (yMax / yTicks) * i;
+      const y = yScale(v);
+      gridlines += `<line class="growth-gridline" x1="${marginLeft}" x2="${width - marginRight}" y1="${y.toFixed(1)}" y2="${y.toFixed(1)}" />`;
+      gridlines += `<text class="growth-axis-label" x="${marginLeft - 8}" y="${(y + 4).toFixed(1)}" text-anchor="end">${formatCompactBRL(v)}</text>`;
+    }
+
+    let bars = '';
+    months.forEach((m, i) => {
+      const x = marginLeft + i * barSlot + (barSlot - barWidth) / 2;
+      const barH = Math.max(0, (m.value / yMax) * chartH);
+      const y = marginTop + chartH - barH;
+      bars += `<rect class="growth-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${barH.toFixed(1)}" rx="4" ry="4" data-month="${m.key}" data-value="${m.value}" />`;
+      if (m.key === currentMonthKey && m.value > 0) {
+        bars += `<text class="growth-value-label" x="${(x + barWidth / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle">${formatCompactBRL(m.value)}</text>`;
+      }
+    });
+
+    let xLabels = '';
+    months.forEach((m, i) => {
+      const x = marginLeft + i * barSlot + barSlot / 2;
+      xLabels += `<text class="growth-axis-label" x="${x.toFixed(1)}" y="${(height - marginBottom + 16).toFixed(1)}" text-anchor="middle">${shortMonthLabel(m.key)}</text>`;
+    });
+
+    wrap.innerHTML = `<div class="growth-chart-container">
+      <svg class="growth-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMinYMin meet">
+        ${gridlines}
+        <line class="growth-goal-line" x1="${marginLeft}" x2="${width - marginRight}" y1="${goalY.toFixed(1)}" y2="${goalY.toFixed(1)}" />
+        <text class="growth-goal-label" x="${width - marginRight}" y="${(goalY - 6).toFixed(1)}" text-anchor="end">Meta: R$ 15.000</text>
+        ${bars}
+        ${xLabels}
+      </svg>
+      <div class="growth-tooltip" id="growthTooltip"></div>
+    </div>`;
+
+    const tooltip = document.getElementById('growthTooltip');
+    const positionTooltip = (e) => {
+      const rect = wrap.getBoundingClientRect();
+      tooltip.style.left = (e.clientX - rect.left) + 'px';
+      tooltip.style.top = (e.clientY - rect.top - 10) + 'px';
+    };
+    wrap.querySelectorAll('.growth-bar').forEach(bar => {
+      bar.addEventListener('pointerenter', (e) => {
+        const monthKey = bar.dataset.month;
+        const value = Number(bar.dataset.value);
+        tooltip.textContent = monthKeyLabel(monthKey) + ': ' + formatBRLFull(value);
+        tooltip.style.opacity = '1';
+        positionTooltip(e);
+      });
+      bar.addEventListener('pointermove', positionTooltip);
+      bar.addEventListener('pointerleave', () => { tooltip.style.opacity = '0'; });
+    });
   }
 
   function monthKeyLabel(key) {
