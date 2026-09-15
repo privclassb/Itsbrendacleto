@@ -527,7 +527,7 @@
     .report-status.payment-alert { background: #FFF0EE; color: #C0392B; }
     .report-status.pending-class-alert { background: #EAF2FB; color: #2E6DA4; }
     .report-status.missing-report-alert { background: #F3EDF7; color: #6B4C93; }
-    .report-status.monthly-report-alert { background: #E8F5F0; color: #1E7A5C; }
+    .report-status.monthly-report-alert { background: #FFF0EE; color: #C0392B; }
     .report-status.lead-alert { background: #FDF0FA; color: #9C2E86; }
     .lead-status-novo { background: #EAF2FB; color: #2E6DA4; }
     .lead-status-aguardando_resposta { background: #FFF8E5; color: #A9740C; }
@@ -1210,11 +1210,6 @@
       </div>
       <div class="modal-hint" style="margin-bottom:8px;" id="equipeMissingMonthlyHint"></div>
       <div id="equipeMissingMonthlyList"><div class="empty-reports">Carregando...</div></div>
-    </div>
-
-    <div class="report-list">
-      <div class="report-list-title">Relatórios recentes — por professora</div>
-      <div id="equipeReportsList"><div class="empty-reports">Carregando...</div></div>
     </div>
   </div>
 
@@ -5441,16 +5436,11 @@
     const missingReportSince = new Date();
     missingReportSince.setDate(missingReportSince.getDate() - 60);
     const missingReportSinceStr = missingReportSince.toISOString().slice(0, 10);
-    const [{ data: logs }, { data: rawReports }, { data: pendingLogs }, { data: doneLogs }] = await Promise.all([
+    const [{ data: logs }, { data: pendingLogs }, { data: doneLogs }] = await Promise.all([
       sb.from('class_logs').select('*').eq('class_date', today),
-      // Só relatórios mensais (sem class_log_id) — os relatórios por aula ficam no
-      // perfil do aluno/turma, igual à lista "Relatórios enviados" da aba Relatórios.
-      sb.from('reports').select('*').is('class_log_id', null).order('created_at', { ascending: false }).limit(50),
       sb.from('class_logs').select('*').eq('status', 'pendente').lt('class_date', today),
       sb.from('class_logs').select('*').eq('status', 'realizada').gte('class_date', missingReportSinceStr)
     ]);
-    const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
-    const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
 
     const doneLogIds = (doneLogs || []).map(l => l.id);
     const { data: reportsForDone } = doneLogIds.length
@@ -5472,7 +5462,6 @@
     renderEquipePending(pendingLogs || [], myId);
     renderEquipeMissingReports(missingReportLogs, myId);
     await renderEquipeMissingMonthlyForSelectedMonth();
-    renderEquipeReports(reports || [], myId);
 
     const teacherSelect = document.getElementById('equipeTeacherSelect');
     const otherTeachers = allTeachers.filter(t => t.id !== myId);
@@ -5773,45 +5762,6 @@
     }).join('');
 
     listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '')), rowBuilder);
-  }
-
-  function renderEquipeReports(reports, myId) {
-    const listEl = document.getElementById('equipeReportsList');
-
-    const grouped = {};
-    reports.forEach(r => {
-      if (!r.created_by || r.created_by === myId) return;
-      if (!grouped[r.created_by]) grouped[r.created_by] = [];
-      grouped[r.created_by].push(r);
-    });
-
-    const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
-    if (relevantTeachers.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório recente de outra professora.</div>';
-      return;
-    }
-
-    listEl.innerHTML = relevantTeachers.map(t => {
-      const rows = grouped[t.id].slice(0, 5).map(r => {
-        const date = new Date(r.created_at).toLocaleDateString('pt-BR');
-        const period = r.period ? ' · ' + r.period : '';
-        const badgeClass = r.is_published ? 'published' : 'draft';
-        const badgeLabel = r.is_published ? 'Publicado' : 'Rascunho';
-        return `
-          <div class="report-row">
-            <div class="report-row-info">
-              <div class="report-row-student">${studentNameById(r.student_id)} · ${r.title}${period}</div>
-              <div class="report-row-title">${date}</div>
-            </div>
-            <span class="report-status ${badgeClass}">${badgeLabel}</span>
-          </div>`;
-      }).join('');
-      return `
-        <div style="margin-bottom:18px;">
-          <div style="font-size:13px;font-weight:700;color:var(--brown);margin-bottom:4px;">${t.full_name}</div>
-          ${rows}
-        </div>`;
-    }).join('');
   }
 
   async function openClassLogEdit(id) {
