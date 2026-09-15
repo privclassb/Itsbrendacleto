@@ -1665,7 +1665,7 @@
       <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${studentId}')">
         <div class="report-row-info">
           <div class="report-row-student">${s ? (s.full_name || 'Aluno') : 'Aluno'}</div>
-          <div class="report-row-title">${label} · R$ ${info.total.toFixed(2)}</div>
+          <div class="report-row-title">${label} · ${formatBRLFull(info.total)}</div>
         </div>
         <span class="report-status payment-alert">Inadimplente</span>
       </div>`;
@@ -2053,7 +2053,7 @@
 
     // Financeiro (só Brenda)
     if (currentUserIsBrenda) {
-    const fee = (student.monthly_fee != null) ? ('R$ ' + Number(student.monthly_fee).toFixed(2)) : '—';
+    const fee = (student.monthly_fee != null) ? formatBRLFull(Number(student.monthly_fee)) : '—';
     document.getElementById('profileFinanceInfo').innerHTML = `
       <div class="detail-row"><span class="detail-label">Parcela mensal</span><span class="detail-value">${fee}</span></div>
       <div class="detail-row"><span class="detail-label">Status</span><span class="detail-value">${PAYMENT_STATUS_LABEL[student.payment_status || 'em_dia']}</span></div>`;
@@ -2068,7 +2068,7 @@
         const date = p.paid_at ? new Date(p.paid_at + 'T00:00:00').toLocaleDateString('pt-BR') : ('previsto ' + new Date(p.due_date + 'T00:00:00').toLocaleDateString('pt-BR'));
         const overdue = !p.paid && p.due_date && p.due_date < todayStr;
         const statusLabel = p.paid ? ' · Pago' : (overdue ? ' · Atrasado' : ' · Pendente');
-        return `<div class="detail-row" style="cursor:pointer;" onclick="openLancamento('${p.id}')"><span class="detail-label">${date}${statusLabel}</span><span class="detail-value">R$ ${Number(p.amount).toFixed(2)}</span></div>`;
+        return `<div class="detail-row" style="cursor:pointer;" onclick="openLancamento('${p.id}')"><span class="detail-label">${date}${statusLabel}</span><span class="detail-value">${formatBRLFull(Number(p.amount))}</span></div>`;
       }).join('') + newLancamentoBtn;
     }
     }
@@ -6169,11 +6169,11 @@
     const saidasPrevistas = baseForSummary.filter(p => p.type === 'saida').reduce((sum, p) => sum + Number(p.amount), 0);
     const saidasConfirmadas = baseForSummary.filter(p => p.type === 'saida' && p.paid).reduce((sum, p) => sum + Number(p.amount), 0);
 
-    document.getElementById('finEntradasPrevistas').textContent = 'R$ ' + entradasPrevistas.toFixed(2);
-    document.getElementById('finEntradasConfirmadas').textContent = 'R$ ' + entradasConfirmadas.toFixed(2);
-    document.getElementById('finSaidasPrevistas').textContent = 'R$ ' + saidasPrevistas.toFixed(2);
-    document.getElementById('finSaidasConfirmadas').textContent = 'R$ ' + saidasConfirmadas.toFixed(2);
-    document.getElementById('finLucro').textContent = 'R$ ' + (entradasConfirmadas - saidasConfirmadas).toFixed(2);
+    document.getElementById('finEntradasPrevistas').textContent = formatBRLFull(entradasPrevistas);
+    document.getElementById('finEntradasConfirmadas').textContent = formatBRLFull(entradasConfirmadas);
+    document.getElementById('finSaidasPrevistas').textContent = formatBRLFull(saidasPrevistas);
+    document.getElementById('finSaidasConfirmadas').textContent = formatBRLFull(saidasConfirmadas);
+    document.getElementById('finLucro').textContent = formatBRLFull(entradasConfirmadas - saidasConfirmadas);
 
     let filtered = baseForSummary.filter(p =>
       ((p.type === 'entrada' && showEntradas) || (p.type === 'saida' && showSaidas)) &&
@@ -6218,7 +6218,7 @@
             <div class="report-row-student">${p.description}${who ? ' — ' + who : ''}</div>
             <div class="report-row-title">Agendado: ${dueDate}${p.paid ? ' · Pago: ' + paidDate : ' · ' + statusLabel}${p.payment_method ? ' · ' + p.payment_method : ''}</div>
           </div>
-          <span class="report-row-student" style="color:${color};">${sign}R$ ${Number(p.amount).toFixed(2)}</span>
+          <span class="report-row-student" style="color:${color};">${sign}${formatBRLFull(Number(p.amount))}</span>
           <button class="btn-report-action btn-toggle" onclick="openLancamento('${p.id}')">Editar</button>
         </div>`;
     }).join('');
@@ -6454,10 +6454,10 @@
     document.getElementById('finReportPeriod').textContent = 'Período: ' + periodLabel + ' · ' + cache.studentName;
 
     document.getElementById('finReportSummary').innerHTML = `
-      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.entradasConfirmadas.toFixed(2)}</span><div class="fin-report-summary-label">Entradas confirmadas</div></div>
-      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.entradasPrevistas.toFixed(2)}</span><div class="fin-report-summary-label">Entradas previstas</div></div>
-      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${cache.saidasConfirmadas.toFixed(2)}</span><div class="fin-report-summary-label">Saídas confirmadas</div></div>
-      <div class="fin-report-summary-card"><span class="fin-report-summary-value">R$ ${(cache.entradasConfirmadas - cache.saidasConfirmadas).toFixed(2)}</span><div class="fin-report-summary-label">Lucro confirmado</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${formatBRLFull(cache.entradasConfirmadas)}</span><div class="fin-report-summary-label">Entradas confirmadas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${formatBRLFull(cache.entradasPrevistas)}</span><div class="fin-report-summary-label">Entradas previstas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${formatBRLFull(cache.saidasConfirmadas)}</span><div class="fin-report-summary-label">Saídas confirmadas</div></div>
+      <div class="fin-report-summary-card"><span class="fin-report-summary-value">${formatBRLFull(cache.entradasConfirmadas - cache.saidasConfirmadas)}</span><div class="fin-report-summary-label">Lucro confirmado</div></div>
     `;
 
     const monthly = financeMonthlyBreakdown(cache.filtered);
@@ -6471,9 +6471,9 @@
           ${monthly.map(m => `
             <tr>
               <td>${monthKeyLabel(m.key)}</td>
-              <td class="num">R$ ${m.entradasConf.toFixed(2)}</td>
-              <td class="num">R$ ${m.entradasPrev.toFixed(2)}</td>
-              <td class="num">R$ ${m.saidasConf.toFixed(2)}</td>
+              <td class="num">${formatBRLFull(m.entradasConf)}</td>
+              <td class="num">${formatBRLFull(m.entradasPrev)}</td>
+              <td class="num">${formatBRLFull(m.saidasConf)}</td>
             </tr>`).join('')}
         </tbody>`;
     }
@@ -6498,7 +6498,7 @@
                 <td>${p.description || ''}</td>
                 <td>${who}</td>
                 <td>${statusLabel}</td>
-                <td class="num">${sign}R$ ${Number(p.amount || 0).toFixed(2)}</td>
+                <td class="num">${sign}${formatBRLFull(Number(p.amount || 0))}</td>
               </tr>`;
           }).join('')}
         </tbody>`;
@@ -6777,7 +6777,7 @@
       return `
         <div class="report-row">
           <div class="report-row-info">
-            <div class="report-row-student">R$ ${Number(p.amount).toFixed(2)}</div>
+            <div class="report-row-student">${formatBRLFull(Number(p.amount))}</div>
             <div class="report-row-title">${date}</div>
           </div>
           <button class="btn-report-action btn-delete" onclick="deletePayment('${p.id}', '${studentId}')">Excluir</button>
