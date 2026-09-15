@@ -1204,7 +1204,10 @@
     </div>
 
     <div class="report-list" style="margin-bottom:24px;">
-      <div class="report-list-title">Relatórios mensais pendentes — por professora</div>
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>Relatórios mensais — por professora</span>
+        <input type="month" class="form-input" id="equipeMonthlyReportMonth" style="width:auto;" onchange="renderEquipeMissingMonthlyForSelectedMonth()" />
+      </div>
       <div class="modal-hint" style="margin-bottom:8px;" id="equipeMissingMonthlyHint"></div>
       <div id="equipeMissingMonthlyList"><div class="empty-reports">Carregando...</div></div>
     </div>
@@ -1342,6 +1345,7 @@
   let allStudents = [];
   let currentFilter = 'todos';
   let isBrenda = false;
+  let equipeMyId = null;
   let leadsCache = [];
   let currentLeadFilter = 'todos';
   let currentLeadId = null;
@@ -5457,23 +5461,17 @@
     // anotação escrita direto no campo de conteúdo da aula.
     const missingReportLogs = (doneLogs || []).filter(l => !reportedLogIds.has(l.id) && !(l.content && l.content.trim()));
 
-    // Relatórios mensais pendentes de toda a equipe: mesma regra usada na aba início
-    // (mês anterior inteiro), só que aqui olhando os alunos de todas as professoras.
-    const prevMonthDate = new Date(); prevMonthDate.setDate(1); prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
-    const prevMonthStartStr = new Date(Date.UTC(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1)).toISOString();
-    const prevMonthLabelEquipe = prevMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
-    document.getElementById('equipeMissingMonthlyHint').textContent = 'Alunos sem relatório mensal desde o início de ' + prevMonthLabelEquipe + '.';
-    const allActiveStudents = allStudents.filter(s => s.active !== false && (!s.contract_start || s.contract_start < prevMonthStartStr.slice(0, 10)));
-    const { data: allMonthlyReports } = allActiveStudents.length
-      ? await sb.from('reports').select('student_id').is('class_log_id', null).in('student_id', allActiveStudents.map(s => s.id)).gte('created_at', prevMonthStartStr)
-      : { data: [] };
-    const reportedStudentIdsEquipe = new Set((allMonthlyReports || []).map(r => r.student_id));
-    const missingMonthlyStudents = allActiveStudents.filter(s => !reportedStudentIdsEquipe.has(s.id));
+    // Relatórios mensais por professora: navegável por mês (padrão = mês
+    // vigente), pra Brenda conseguir conferir a entrega em qualquer mês, não
+    // só um aviso fixo do mês anterior.
+    equipeMyId = myId;
+    const monthInput = document.getElementById('equipeMonthlyReportMonth');
+    if (!monthInput.value) monthInput.value = todayLocalISO().slice(0, 7);
 
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
     renderEquipeMissingReports(missingReportLogs, myId);
-    renderEquipeMissingMonthly(missingMonthlyStudents, myId, prevMonthLabelEquipe);
+    await renderEquipeMissingMonthlyForSelectedMonth();
     renderEquipeReports(reports || [], myId);
 
     const teacherSelect = document.getElementById('equipeTeacherSelect');
@@ -5702,7 +5700,39 @@
     listEl.innerHTML = teacherGroupsHtml + renderOrphanedLogsBlock(orphaned.sort((a, b) => (a.class_date || '').localeCompare(b.class_date || '')), rowBuilder);
   }
 
-  function renderEquipeMissingMonthly(students, myId, prevMonthLabel) {
+  function equipeMonthRange(monthStr) {
+    const [y, m] = monthStr.split('-').map(Number);
+    const startDateStr = new Date(Date.UTC(y, m - 1, 1)).toISOString().slice(0, 10);
+    const endDateStr = new Date(Date.UTC(y, m, 1)).toISOString().slice(0, 10);
+    return { startDateStr, endDateStr };
+  }
+
+  // Recalcula a lista de relatórios mensais (entregues/pendentes) pra o mês
+  // escolhido no seletor - chamado ao trocar o mês e também no carregamento
+  // inicial da aba (com o mês vigente já selecionado).
+  async function renderEquipeMissingMonthlyForSelectedMonth() {
+    const monthInput = document.getElementById('equipeMonthlyReportMonth');
+    const monthStr = monthInput.value;
+    if (!monthStr) return;
+
+    const { startDateStr, endDateStr } = equipeMonthRange(monthStr);
+    const startISO = startDateStr + 'T00:00:00.000Z';
+    const endISO = endDateStr + 'T00:00:00.000Z';
+    const monthLabel = new Date(startDateStr + 'T00:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    document.getElementById('equipeMissingMonthlyHint').textContent = 'Situação da entrega dos relatórios mensais de ' + monthLabel + '.';
+
+    // Só entram alunos que já estavam matriculados antes do fim do mês
+    // escolhido (não cobra relatório de quem ainda nem tinha começado).
+    const eligibleStudents = allStudents.filter(s => s.active !== false && (!s.contract_start || s.contract_start < endDateStr));
+    const { data: monthlyReports } = eligibleStudents.length
+      ? await sb.from('reports').select('student_id').is('class_log_id', null).in('student_id', eligibleStudents.map(s => s.id)).gte('created_at', startISO).lt('created_at', endISO)
+      : { data: [] };
+    const reportedIds = new Set((monthlyReports || []).map(r => r.student_id));
+
+    renderEquipeMissingMonthly(eligibleStudents, reportedIds, equipeMyId, monthLabel);
+  }
+
+  function renderEquipeMissingMonthly(students, reportedIds, myId, monthLabel) {
     const listEl = document.getElementById('equipeMissingMonthlyList');
 
     const grouped = {};
@@ -5717,18 +5747,21 @@
 
     const relevantTeachers = allTeachers.filter(t => grouped[t.id]);
     if (relevantTeachers.length === 0 && orphaned.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal pendente de outra professora.</div>';
+      listEl.innerHTML = '<div class="empty-reports">Nenhum aluno de outra professora nesse mês.</div>';
       return;
     }
 
-    const rowBuilder = s => `
+    const rowBuilder = s => {
+      const delivered = reportedIds.has(s.id);
+      return `
       <div class="report-row" style="cursor:pointer;" onclick="openMonthlyReportForStudent('${s.id}')">
         <div class="report-row-info">
           <div class="report-row-student">${s.full_name || 'Aluno'}</div>
-          <div class="report-row-title">Relatório mensal de ${prevMonthLabel} pendente</div>
+          <div class="report-row-title">Relatório mensal de ${monthLabel}${delivered ? ' entregue' : ' pendente'}</div>
         </div>
-        <span class="report-status monthly-report-alert">Mensal pendente</span>
+        <span class="report-status ${delivered ? 'published' : 'monthly-report-alert'}">${delivered ? 'Entregue' : 'Pendente'}</span>
       </div>`;
+    };
 
     const teacherGroupsHtml = relevantTeachers.map(t => {
       const rows = grouped[t.id].sort((a, b) => (a.full_name || '').localeCompare(b.full_name || '')).map(rowBuilder).join('');
