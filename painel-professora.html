@@ -6712,6 +6712,9 @@
       allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
     document.getElementById('renegOldPayments').innerHTML = '<div class="modal-hint">Escolha um aluno.</div>';
     document.getElementById('renegOldTotal').textContent = '';
+    document.getElementById('renegApplyInterest').checked = false;
+    document.getElementById('renegInterestPercent').value = '';
+    document.getElementById('renegInterestPercent').style.display = 'none';
     document.getElementById('renegInstallments').value = '1';
     document.getElementById('renegValue').value = '';
     document.getElementById('renegFirstDueDate').value = todayLocalISO();
@@ -6722,6 +6725,16 @@
 
   function closeRenegotiate() {
     document.getElementById('modalRenegotiate').classList.remove('open');
+  }
+
+  function toggleRenegInterestInput() {
+    const checked = document.getElementById('renegApplyInterest').checked;
+    const input = document.getElementById('renegInterestPercent');
+    input.style.display = checked ? 'inline-block' : 'none';
+    if (checked && !input.value) {
+      input.value = paymentSettingsCache.juros_percent_month || '';
+    }
+    updateRenegNewTotal();
   }
 
   async function loadRenegotiateStudentDebts() {
@@ -6751,20 +6764,43 @@
     updateRenegOldTotal();
   }
 
-  function updateRenegOldTotal() {
+  function renegOldSelectedTotal() {
     const checked = Array.from(document.querySelectorAll('.reneg-old-checkbox:checked'));
-    const total = checked.reduce((sum, c) => sum + Number(c.dataset.amount), 0);
-    document.getElementById('renegOldTotal').textContent = checked.length
-      ? checked.length + ' parcela(s) selecionada(s) — total: ' + formatBRLFull(total)
-      : 'Nenhuma parcela selecionada.';
+    return checked.reduce((sum, c) => sum + Number(c.dataset.amount), 0);
   }
 
+  function updateRenegOldTotal() {
+    const checked = document.querySelectorAll('.reneg-old-checkbox:checked').length;
+    const total = renegOldSelectedTotal();
+    document.getElementById('renegOldTotal').textContent = checked
+      ? checked + ' parcela(s) selecionada(s) — total: ' + formatBRLFull(total)
+      : 'Nenhuma parcela selecionada.';
+    updateRenegNewTotal();
+  }
+
+  // Recalcula automaticamente o valor de cada nova parcela (total em aberto,
+  // com juros se marcado, dividido pelo número de parcelas) - Brenda ainda
+  // pode digitar por cima pra ajustar manualmente se quiser.
   function updateRenegNewTotal() {
     const n = parseInt(document.getElementById('renegInstallments').value, 10) || 0;
-    const v = parseFloat(document.getElementById('renegValue').value) || 0;
-    document.getElementById('renegNewTotal').textContent = (n && v)
-      ? 'Novo total: ' + n + 'x ' + formatBRLFull(v) + ' = ' + formatBRLFull(n * v)
-      : '';
+    const oldTotal = renegOldSelectedTotal();
+    const applyInterest = document.getElementById('renegApplyInterest').checked;
+    const interestPercent = applyInterest ? (parseFloat(document.getElementById('renegInterestPercent').value) || 0) : 0;
+    const totalWithInterest = oldTotal + (oldTotal * interestPercent / 100);
+
+    const valueInput = document.getElementById('renegValue');
+    if (n > 0 && totalWithInterest > 0) {
+      valueInput.value = (Math.round((totalWithInterest / n) * 100) / 100).toFixed(2);
+    }
+
+    const v = parseFloat(valueInput.value) || 0;
+    const newTotalEl = document.getElementById('renegNewTotal');
+    if (n && v) {
+      const interestNote = applyInterest && interestPercent > 0 ? ` (com ${interestPercent}% de juros sobre ${formatBRLFull(oldTotal)})` : '';
+      newTotalEl.textContent = 'Novo total: ' + n + 'x ' + formatBRLFull(v) + ' = ' + formatBRLFull(n * v) + interestNote;
+    } else {
+      newTotalEl.textContent = '';
+    }
   }
 
   async function saveRenegotiate() {
@@ -7704,14 +7740,20 @@
       <div class="modal-hint" id="renegOldTotal" style="margin-top:6px;"></div>
     </div>
 
+    <div class="modal-row" style="display:flex;align-items:center;gap:8px;">
+      <input type="checkbox" id="renegApplyInterest" onchange="toggleRenegInterestInput()" style="width:auto;" />
+      <label class="modal-label" style="margin:0;" for="renegApplyInterest">Acrescentar juros</label>
+      <input type="number" step="0.01" min="0" class="modal-input" id="renegInterestPercent" placeholder="% sobre o total" style="width:120px;display:none;" oninput="updateRenegNewTotal()" />
+    </div>
+
     <div class="modal-row" style="display:flex;gap:10px;">
       <div style="flex:1;">
         <label class="modal-label">Número de novas parcelas</label>
         <input type="number" min="1" step="1" class="modal-input" id="renegInstallments" value="1" oninput="updateRenegNewTotal()" />
       </div>
       <div style="flex:1;">
-        <label class="modal-label">Valor de cada parcela (R$)</label>
-        <input type="number" step="0.01" min="0" class="modal-input" id="renegValue" oninput="updateRenegNewTotal()" />
+        <label class="modal-label">Valor de cada parcela (R$) — calculado automático, pode ajustar</label>
+        <input type="number" step="0.01" min="0" class="modal-input" id="renegValue" />
       </div>
     </div>
 
