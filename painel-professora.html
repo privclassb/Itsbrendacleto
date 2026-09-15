@@ -155,7 +155,7 @@
       overflow-wrap: break-word;
     }
 
-    .finance-summary-grid { grid-template-columns: repeat(5, 1fr); }
+    .finance-summary-grid { grid-template-columns: repeat(6, 1fr); }
     @media (max-width: 700px) { .finance-summary-grid { grid-template-columns: repeat(2, 1fr); } }
 
     .overview-label {
@@ -1117,6 +1117,10 @@
       <div class="overview-card">
         <span class="overview-value" id="finEntradasConfirmadas" style="font-size:22px;">—</span>
         <div class="overview-label">Entradas confirmadas</div>
+      </div>
+      <div class="overview-card">
+        <span class="overview-value" id="finAReceber" style="font-size:22px;">—</span>
+        <div class="overview-label">Valor a receber</div>
       </div>
       <div class="overview-card">
         <span class="overview-value" id="finSaidasPrevistas" style="font-size:22px;">—</span>
@@ -6171,6 +6175,7 @@
 
     document.getElementById('finEntradasPrevistas').textContent = formatBRLFull(entradasPrevistas);
     document.getElementById('finEntradasConfirmadas').textContent = formatBRLFull(entradasConfirmadas);
+    document.getElementById('finAReceber').textContent = formatBRLFull(entradasPrevistas - entradasConfirmadas);
     document.getElementById('finSaidasPrevistas').textContent = formatBRLFull(saidasPrevistas);
     document.getElementById('finSaidasConfirmadas').textContent = formatBRLFull(saidasConfirmadas);
     document.getElementById('finLucro').textContent = formatBRLFull(entradasConfirmadas - saidasConfirmadas);
