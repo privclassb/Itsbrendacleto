@@ -2697,6 +2697,7 @@
     document.getElementById('leadDetailNotes').value = lead.notes || '';
     document.getElementById('leadContactDate').value = todayLocalISO();
     document.getElementById('leadContactNote').value = '';
+    editingLeadContactId = null;
     document.getElementById('modalLeadDetail').classList.add('open');
     loadLeadContacts(id);
 
@@ -2799,6 +2800,8 @@
     renderLeadContacts();
   }
 
+  let editingLeadContactId = null;
+
   function renderLeadContacts() {
     const el = document.getElementById('leadContactsList');
     if (!el) return;
@@ -2807,13 +2810,56 @@
       return;
     }
     el.innerHTML = leadContactsCache.map(c => {
+      if (c.id === editingLeadContactId) {
+        return `
+        <div style="padding:8px 0; border-bottom:1px solid var(--sand);">
+          <input type="date" class="form-input" id="editContactDate-${c.id}" value="${c.contact_date || ''}" style="margin-bottom:6px;" />
+          <textarea class="form-input" id="editContactNote-${c.id}" rows="3" style="margin-bottom:6px;">${c.note || ''}</textarea>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-modal-save" style="padding:6px 14px; margin:0;" onclick="saveEditLeadContact('${c.id}')">Salvar</button>
+            <button class="btn-modal-cancel" style="padding:6px 14px; margin:0;" onclick="cancelEditLeadContact()">Cancelar</button>
+          </div>
+        </div>`;
+      }
       const dateLabel = c.contact_date ? new Date(c.contact_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
       return `
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; padding:6px 0; border-bottom:1px solid var(--sand); font-size:13px;">
-        <div><strong>${dateLabel}</strong> — ${c.note}</div>
-        <button style="background:none; border:none; color:#C0392B; cursor:pointer; font-size:12px; flex:0 0 auto;" onclick="deleteLeadContact('${c.id}')">excluir</button>
+      <div style="padding:8px 0; border-bottom:1px solid var(--sand); font-size:13px;">
+        <div style="margin-bottom:4px;"><strong>${dateLabel}</strong></div>
+        <div style="white-space:pre-wrap; margin-bottom:6px;">${c.note}</div>
+        <div style="display:flex; gap:14px;">
+          <button style="background:none; border:none; color:var(--brown); cursor:pointer; font-size:12px; padding:0;" onclick="startEditLeadContact('${c.id}')">editar</button>
+          <button style="background:none; border:none; color:#C0392B; cursor:pointer; font-size:12px; padding:0;" onclick="deleteLeadContact('${c.id}')">excluir</button>
+        </div>
       </div>`;
     }).join('');
+  }
+
+  function startEditLeadContact(id) {
+    editingLeadContactId = id;
+    renderLeadContacts();
+  }
+
+  function cancelEditLeadContact() {
+    editingLeadContactId = null;
+    renderLeadContacts();
+  }
+
+  async function saveEditLeadContact(id) {
+    const dateEl = document.getElementById('editContactDate-' + id);
+    const noteEl = document.getElementById('editContactNote-' + id);
+    const contact_date = dateEl.value || todayLocalISO();
+    const note = noteEl.value.trim();
+    if (!note) return;
+    const { error } = await sb.from('lead_contacts').update({ contact_date, note }).eq('id', id);
+    if (error) { alert('Erro ao salvar contato: ' + error.message); return; }
+    const c = leadContactsCache.find(x => x.id === id);
+    if (c) { c.contact_date = contact_date; c.note = note; }
+    leadContactsCache.sort((a, b) => {
+      if (a.contact_date !== b.contact_date) return (b.contact_date || '').localeCompare(a.contact_date || '');
+      return (b.created_at || '').localeCompare(a.created_at || '');
+    });
+    editingLeadContactId = null;
+    renderLeadContacts();
   }
 
   async function addLeadContact() {
@@ -7923,12 +7969,12 @@
     <textarea class="form-input" id="leadDetailNotes" rows="2" onblur="saveLeadNotes()"></textarea>
 
     <label class="form-label" style="margin-top:12px;">Histórico de contatos</label>
-    <div style="display:flex; gap:8px; margin-bottom:8px;">
-      <input type="date" class="form-input" id="leadContactDate" style="flex:0 0 150px;" />
-      <input type="text" class="form-input" id="leadContactNote" placeholder="Ex: Mandei mensagem no WhatsApp, sem resposta ainda" style="flex:1;" onkeydown="if(event.key==='Enter'){addLeadContact();}" />
-      <button class="btn-modal-save" style="flex:0 0 auto; padding:10px 16px; margin:0;" onclick="addLeadContact()">+</button>
+    <div style="margin-bottom:10px;">
+      <input type="date" class="form-input" id="leadContactDate" style="margin-bottom:6px;" />
+      <textarea class="form-input" id="leadContactNote" rows="3" placeholder="Ex: Mandei mensagem no WhatsApp, sem resposta ainda" style="margin-bottom:6px;"></textarea>
+      <button class="btn-modal-save" style="padding:8px 16px; margin:0;" onclick="addLeadContact()">+ Adicionar contato</button>
     </div>
-    <div id="leadContactsList" style="max-height:180px; overflow-y:auto; margin-bottom:8px;"></div>
+    <div id="leadContactsList" style="max-height:260px; overflow-y:auto; margin-bottom:8px;"></div>
 
     <div class="modal-actions">
       <button class="btn-modal-save" style="background:#C0392B;" onclick="deleteLead()">Excluir lead</button>
