@@ -1,12 +1,16 @@
 // Robô de notificações push (OneSignal) do itsbrendacleto.
 // Roda periodicamente via GitHub Actions (.github/workflows/notifications.yml).
 //
-// 5 lembretes:
+// 9 lembretes:
 //   1. Aula em 1h (aluno)
 //   2. Prática — 3 dias sem atividade (aluno)
 //   3. Relatório de aula pendente (professora)
 //   4. Relatório mensal pendente, a partir do dia 10 (professora)
 //   5. Novo relatório mensal publicado (aluno)
+//   6. Curtida em post da Comunidade
+//   7. Comentário em post da Comunidade
+//   8. Nova enquete publicada na Comunidade
+//   9. Aniversário de alguém da Comunidade (avisa todo mundo)
 
 const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
 const ONESIGNAL_APP_ID = '58dbb455-e1d0-4871-9919-bdf37b56aafe';
@@ -230,7 +234,127 @@ async function newMonthlyReportNotifications() {
   return reports.length;
 }
 
-// ─── Envio de teste avulso (não mexe em nenhum dos 5 lembretes reais) ───
+// ─── 6. Curtida em post da Comunidade ────────────────────────────────────
+async function likeNotifications() {
+  const likes = await sb(`community_likes?select=post_id,user_id&notified_at=is.null`);
+  if (!likes.length) return 0;
+
+  const postIds = [...new Set(likes.map((l) => l.post_id))];
+  const posts = await sb(`community_posts?select=id,author_id&id=in.(${postIds.join(',')})`);
+  const postAuthor = {};
+  posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
+
+  const likerIds = [...new Set(likes.map((l) => l.user_id))];
+  const likers = await sb(`profiles?select=id,full_name&id=in.(${likerIds.join(',')})`);
+  const likerName = {};
+  likers.forEach((u) => { likerName[u.id] = u.full_name; });
+
+  const byAuthor = {};
+  for (const l of likes) {
+    const authorId = postAuthor[l.post_id];
+    if (authorId && authorId !== l.user_id) (byAuthor[authorId] = byAuthor[authorId] || []).push(l);
+  }
+
+  for (const [authorId, authorLikes] of Object.entries(byAuthor)) {
+    const msg = authorLikes.length === 1
+      ? `${likerName[authorLikes[0].user_id] || 'Alguém'} curtiu seu post na Comunidade!`
+      : `${authorLikes.length} pessoas curtiram seu post na Comunidade!`;
+    await sendPush([authorId], 'Nova curtida ❤️', msg);
+  }
+
+  if (!DRY_RUN) {
+    const nowIso = new Date().toISOString();
+    for (const l of likes) {
+      await sb(`community_likes?post_id=eq.${l.post_id}&user_id=eq.${l.user_id}`, { method: 'PATCH', body: JSON.stringify({ notified_at: nowIso }) });
+    }
+  }
+  return likes.length;
+}
+
+// ─── 7. Comentário em post da Comunidade ─────────────────────────────────
+async function commentNotifications() {
+  const comments = await sb(`community_comments?select=id,post_id,author_id&notified_at=is.null`);
+  if (!comments.length) return 0;
+
+  const postIds = [...new Set(comments.map((c) => c.post_id))];
+  const posts = await sb(`community_posts?select=id,author_id&id=in.(${postIds.join(',')})`);
+  const postAuthor = {};
+  posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
+
+  const commenterIds = [...new Set(comments.map((c) => c.author_id))];
+  const commenters = await sb(`profiles?select=id,full_name&id=in.(${commenterIds.join(',')})`);
+  const commenterName = {};
+  commenters.forEach((u) => { commenterName[u.id] = u.full_name; });
+
+  const byAuthor = {};
+  for (const c of comments) {
+    const authorId = postAuthor[c.post_id];
+    if (authorId && authorId !== c.author_id) (byAuthor[authorId] = byAuthor[authorId] || []).push(c);
+  }
+
+  for (const [authorId, authorComments] of Object.entries(byAuthor)) {
+    const msg = authorComments.length === 1
+      ? `${commenterName[authorComments[0].author_id] || 'Alguém'} comentou no seu post na Comunidade!`
+      : `Seu post na Comunidade recebeu ${authorComments.length} comentários novos!`;
+    await sendPush([authorId], 'Novo comentário 💬', msg);
+  }
+
+  if (!DRY_RUN) {
+    const ids = comments.map((c) => c.id).join(',');
+    await sb(`community_comments?id=in.(${ids})`, { method: 'PATCH', body: JSON.stringify({ notified_at: new Date().toISOString() }) });
+  }
+  return comments.length;
+}
+
+// ─── 8. Nova enquete publicada na Comunidade ─────────────────────────────
+async function pollNotifications() {
+  const polls = await sb(`community_posts?select=id,author_id,poll_question&poll_question=not.is.null&poll_notified_at=is.null`);
+  if (!polls.length) return 0;
+
+  const people = await sb(`profiles?select=id&role=in.(adulto,professora)`);
+  const allIds = people.map((p) => p.id);
+
+  for (const poll of polls) {
+    const targetIds = allIds.filter((id) => id !== poll.author_id);
+    if (targetIds.length) {
+      await sendPush(targetIds, 'Nova enquete na Comunidade! 📊', `${poll.poll_question} — vote e participe!`);
+    }
+  }
+
+  if (!DRY_RUN) {
+    const ids = polls.map((p) => p.id).join(',');
+    await sb(`community_posts?id=in.(${ids})`, { method: 'PATCH', body: JSON.stringify({ poll_notified_at: new Date().toISOString() }) });
+  }
+  return polls.length;
+}
+
+// ─── 9. Aniversário de alguém da Comunidade (avisa todo mundo) ──────────
+async function communityBirthdayNotifications(now) {
+  const people = await sb(`profiles?select=id,full_name,birth_date,community_birthday_notified_date&role=in.(adulto,professora)`);
+  const birthdayPeople = people.filter((p) => {
+    if (!p.birth_date) return false;
+    const d = new Date(p.birth_date + 'T00:00:00');
+    return (d.getMonth() + 1) === now.month && d.getDate() === now.day;
+  });
+  if (!birthdayPeople.length) return 0;
+
+  const allIds = people.map((p) => p.id);
+  let sent = 0;
+  for (const person of birthdayPeople) {
+    if (person.community_birthday_notified_date === now.date) continue; // já avisado hoje
+    const targetIds = allIds.filter((id) => id !== person.id);
+    if (targetIds.length) {
+      await sendPush(targetIds, 'Aniversário na Comunidade! 🎂', `Hoje é aniversário de ${person.full_name}! Fale inglês — vai lá parabenizar em inglês 🎉`);
+    }
+    if (!DRY_RUN) {
+      await sb(`profiles?id=eq.${person.id}`, { method: 'PATCH', body: JSON.stringify({ community_birthday_notified_date: now.date }) });
+    }
+    sent++;
+  }
+  return sent;
+}
+
+// ─── Envio de teste avulso (não mexe em nenhum dos 9 lembretes reais) ───
 async function checkSubscription(externalId) {
   try {
     const res = await fetch(`https://api.onesignal.com/apps/${ONESIGNAL_APP_ID}/users/by/external_id/${externalId}`, {
@@ -272,6 +396,10 @@ async function main() {
   results.classReportReminders = await classReportReminders(now);
   results.monthlyReportReminders = await monthlyReportReminders(now);
   results.newMonthlyReportNotifications = await newMonthlyReportNotifications();
+  results.likeNotifications = await likeNotifications();
+  results.commentNotifications = await commentNotifications();
+  results.pollNotifications = await pollNotifications();
+  results.communityBirthdayNotifications = await communityBirthdayNotifications(now);
 
   console.log('Resumo:', JSON.stringify(results));
 }
