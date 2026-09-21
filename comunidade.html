@@ -85,6 +85,42 @@
 
     .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
     .empty-msg-sm { text-align: center; padding: 10px; color: var(--muted); font-size: 12px; }
+
+    /* Birthdays */
+    .birthday-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+    .birthday-item:last-child { border-bottom: none; }
+    .birthday-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
+    .birthday-btn { background: var(--rose); color: var(--white); border: none; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .birthday-btn:hover { opacity: 0.85; }
+
+    /* Topic suggestion */
+    .topic-suggestion { display: flex; align-items: center; gap: 10px; justify-content: space-between; background: var(--cream); border: 1.5px dashed var(--gold); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: var(--text); }
+    .topic-suggestion-text { flex: 1; }
+    .topic-use-btn { background: var(--gold); color: var(--white); border: none; border-radius: 8px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0; }
+    .topic-use-btn:hover { opacity: 0.85; }
+
+    /* Poll builder (composer) */
+    .poll-builder { margin-top: 10px; padding: 12px; background: var(--cream); border-radius: 10px; }
+    .poll-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 8px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--white); outline: none; margin-bottom: 8px; }
+    .poll-input:focus { border-color: var(--mint); }
+    .poll-option-row { display: flex; gap: 8px; align-items: center; }
+    .poll-option-row .poll-input { margin-bottom: 8px; }
+    .poll-remove-btn { background: none; border: none; color: var(--muted); font-size: 15px; cursor: pointer; padding: 0 4px 8px; }
+    .poll-remove-btn:hover { color: #C0392B; }
+    .poll-add-option-btn { background: none; border: 1.5px dashed var(--sand); border-radius: 8px; padding: 6px 12px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--muted); cursor: pointer; }
+    .poll-add-option-btn:hover { border-color: var(--brown-light); color: var(--text); }
+    #pollToggleBtn.active { background: var(--gold); border-color: var(--gold); color: var(--white); }
+
+    /* Poll display (feed) */
+    .poll-box { margin-bottom: 10px; }
+    .poll-question { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+    .poll-option { position: relative; border: 1.5px solid var(--sand); border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; cursor: pointer; overflow: hidden; }
+    .poll-option:hover { border-color: var(--brown-light); }
+    .poll-option.poll-option-mine { border-color: var(--mint); }
+    .poll-option-bar { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(168,197,181,0.35); transition: width 0.3s; z-index: 0; }
+    .poll-option-label { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--text); }
+    .poll-option-pct { color: var(--muted); font-weight: 600; flex-shrink: 0; }
+    .poll-total { font-size: 11px; color: var(--muted); margin-top: 2px; }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -138,17 +174,32 @@
     <div id="myRankNote"></div>
   </div>
 
+  <div class="section-title" id="birthdaySectionTitle" style="display:none;">🎂 Aniversariantes de hoje</div>
+  <div class="card" id="birthdayCard" style="display:none;">
+    <div id="birthdayList"></div>
+  </div>
+
   <div class="section-title">Mural</div>
   <div class="card">
     <div class="composer-row">
       <div id="composerAvatar" class="composer-avatar-fallback">?</div>
       <div class="composer-body">
+        <div class="topic-suggestion">
+          <span class="topic-suggestion-text">💡 <b>Tema de hoje:</b> <span id="topicText"></span></span>
+          <button type="button" class="topic-use-btn" onclick="useTopic()">Usar</button>
+        </div>
         <textarea id="postContent" placeholder="Compartilhe seus estudos, uma dica ou uma conquista..."></textarea>
+        <div class="poll-builder" id="pollBuilder" style="display:none;">
+          <input type="text" class="poll-input" id="pollQuestion" placeholder="Pergunta da enquete..." />
+          <div id="pollOptionsList"></div>
+          <button type="button" class="poll-add-option-btn" onclick="addPollOption()">+ Adicionar opção</button>
+        </div>
         <img id="postImagePreview" />
         <div class="composer-actions">
           <div>
             <input type="file" id="postImageInput" accept="image/*" />
-            <label for="postImageInput" class="post-photo-btn">Foto</label>
+            <label for="postImageInput" class="post-photo-btn" id="photoLabel">Foto</label>
+            <button type="button" class="post-photo-btn" id="pollToggleBtn" onclick="togglePollBuilder()">📊 Enquete</button>
           </div>
           <button class="btn-publish" id="publishPostBtn" onclick="createPost()">Publicar</button>
         </div>
@@ -261,7 +312,141 @@
       composerAvatar.textContent = initials(CURRENT_USER_NAME);
     }
 
+    loadTopicSuggestion();
+    await loadBirthdaysToday();
     await loadRanking();
+    await loadPosts();
+  }
+
+  // ---- Tema sugerido do dia ----
+  const TOPIC_PROMPTS = [
+    "What's your favorite English word and why?",
+    "Describe your weekend in 3 English sentences.",
+    "Share one thing you learned in English this week.",
+    "What's a movie or show you'd recommend? Tell us about it in English!",
+    "What's your favorite food? Describe it in English.",
+    "Share a study tip that works for you.",
+    "What's a goal you have for your English this month?",
+    "Tell us about your favorite place to visit.",
+    "What's something that made you smile today?",
+    "Describe your morning routine in English.",
+    "What's a song you love? Share the lyrics or why you like it.",
+    "If you could travel anywhere, where would you go? Why?",
+    "What's your favorite hobby? Tell us about it.",
+    "Share a fun fact about yourself in English.",
+    "What English word do you find hard to pronounce?",
+  ];
+  let currentTopic = '';
+
+  function loadTopicSuggestion() {
+    const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    currentTopic = TOPIC_PROMPTS[dayOfYear % TOPIC_PROMPTS.length];
+    document.getElementById('topicText').textContent = currentTopic;
+  }
+
+  function useTopic() {
+    const textarea = document.getElementById('postContent');
+    textarea.value = '📝 ' + currentTopic + '\n\n';
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+  }
+
+  // ---- Aniversariantes do dia ----
+  async function loadBirthdaysToday() {
+    const today = new Date();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+
+    const { data: people } = await sb.from('profiles').select('id, full_name, avatar_url, birth_date, role').in('role', ['adulto', 'professora']);
+    const todays = (people || []).filter(p => {
+      if (!p.birth_date) return false;
+      const d = new Date(p.birth_date + 'T00:00:00');
+      return (d.getMonth() + 1) === month && d.getDate() === day;
+    });
+
+    if (!todays.length) return;
+
+    document.getElementById('birthdaySectionTitle').style.display = 'block';
+    document.getElementById('birthdayCard').style.display = 'block';
+    document.getElementById('birthdayList').innerHTML = todays.map(p => {
+      const avatar = p.avatar_url
+        ? `<img class="rank-avatar-img" src="${p.avatar_url}" />`
+        : `<div class="rank-avatar-fallback">${initials(p.full_name)}</div>`;
+      return `
+        <div class="birthday-item">
+          ${avatar}
+          <div class="birthday-name">${escapeHtml(p.full_name || 'Aluno')}</div>
+          <button class="birthday-btn">🎉 Parabenizar</button>
+        </div>`;
+    }).join('');
+
+    document.querySelectorAll('#birthdayList .birthday-btn').forEach((btn, i) => {
+      btn.addEventListener('click', () => greetBirthday(todays[i].full_name || 'Aluno'));
+    });
+  }
+
+  function greetBirthday(name) {
+    const textarea = document.getElementById('postContent');
+    textarea.value = `Happy birthday, ${name}! 🎉🎂 Hope you have an amazing day!`;
+    textarea.focus();
+    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ---- Construtor de enquete ----
+  let pollMode = false;
+  let pollOptionEls = [];
+
+  function togglePollBuilder() {
+    pollMode = !pollMode;
+    document.getElementById('pollBuilder').style.display = pollMode ? 'block' : 'none';
+    document.getElementById('pollToggleBtn').classList.toggle('active', pollMode);
+    document.getElementById('photoLabel').style.display = pollMode ? 'none' : 'inline-block';
+    if (pollMode && pollOptionEls.length === 0) {
+      addPollOption();
+      addPollOption();
+    }
+  }
+
+  function addPollOption() {
+    if (pollOptionEls.length >= 4) return;
+    const list = document.getElementById('pollOptionsList');
+    const row = document.createElement('div');
+    row.className = 'poll-option-row';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'poll-input poll-option-input';
+    input.placeholder = 'Opção ' + (pollOptionEls.length + 1);
+    row.appendChild(input);
+    if (pollOptionEls.length >= 2) {
+      const rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'poll-remove-btn';
+      rm.textContent = '✕';
+      rm.onclick = function () {
+        row.remove();
+        pollOptionEls = pollOptionEls.filter(el => el !== input);
+      };
+      row.appendChild(rm);
+    }
+    list.appendChild(row);
+    pollOptionEls.push(input);
+  }
+
+  function resetPollBuilder() {
+    pollMode = false;
+    pollOptionEls = [];
+    document.getElementById('pollOptionsList').innerHTML = '';
+    document.getElementById('pollBuilder').style.display = 'none';
+    document.getElementById('pollToggleBtn').classList.remove('active');
+    document.getElementById('photoLabel').style.display = 'inline-block';
+    document.getElementById('pollQuestion').value = '';
+  }
+
+  async function castVote(postId, optionIndex) {
+    await sb.from('community_poll_votes').upsert(
+      { post_id: postId, user_id: CURRENT_USER_ID, option_index: optionIndex },
+      { onConflict: 'post_id,user_id' }
+    );
     await loadPosts();
   }
 
@@ -382,15 +567,25 @@
 
     const postIds = posts.map(p => p.id);
     const authorIds = [...new Set(posts.map(p => p.author_id))];
+    const pollPostIds = posts.filter(p => p.poll_question).map(p => p.id);
 
-    const [{ data: authors }, { data: likes }, { data: comments }] = await Promise.all([
+    const [{ data: authors }, { data: likes }, { data: comments }, { data: pollVotes }] = await Promise.all([
       sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds),
       sb.from('community_likes').select('post_id, user_id').in('post_id', postIds),
-      sb.from('community_comments').select('id, post_id').in('post_id', postIds)
+      sb.from('community_comments').select('id, post_id').in('post_id', postIds),
+      pollPostIds.length ? sb.from('community_poll_votes').select('post_id, user_id, option_index').in('post_id', pollPostIds) : Promise.resolve({ data: [] })
     ]);
 
     const authorMap = {};
     (authors || []).forEach(a => { authorMap[a.id] = a; });
+
+    const pollTallyByPost = {};
+    const myVoteByPost = {};
+    (pollVotes || []).forEach(v => {
+      if (!pollTallyByPost[v.post_id]) pollTallyByPost[v.post_id] = {};
+      pollTallyByPost[v.post_id][v.option_index] = (pollTallyByPost[v.post_id][v.option_index] || 0) + 1;
+      if (v.user_id === CURRENT_USER_ID) myVoteByPost[v.post_id] = v.option_index;
+    });
 
     const likesByPost = {};
     likedPostIds = new Set();
@@ -414,6 +609,29 @@
       const likeCount = likesByPost[p.id] || 0;
       const commentCount = commentCountByPost[p.id] || 0;
 
+      let pollHtml = '';
+      if (p.poll_question) {
+        const tally = pollTallyByPost[p.id] || {};
+        const totalVotes = Object.values(tally).reduce((a, b) => a + b, 0);
+        const myVote = myVoteByPost[p.id];
+        const hasVoted = myVote !== undefined;
+        pollHtml = `
+          <div class="poll-box">
+            <div class="poll-question">📊 ${escapeHtml(p.poll_question)}</div>
+            ${(p.poll_options || []).map((opt, i) => {
+              const count = tally[i] || 0;
+              const pct = totalVotes ? Math.round(count / totalVotes * 100) : 0;
+              const isMine = myVote === i;
+              return `
+                <div class="poll-option ${isMine ? 'poll-option-mine' : ''}" onclick="castVote('${p.id}', ${i})">
+                  <div class="poll-option-bar" style="width:${hasVoted ? pct : 0}%;"></div>
+                  <div class="poll-option-label"><span>${escapeHtml(opt)}</span>${hasVoted ? `<span class="poll-option-pct">${pct}% (${count})</span>` : ''}</div>
+                </div>`;
+            }).join('')}
+            <div class="poll-total">${totalVotes} voto${totalVotes === 1 ? '' : 's'}</div>
+          </div>`;
+      }
+
       return `
         <div class="post-card">
           <div class="post-header">
@@ -425,6 +643,7 @@
             ${canDelete ? `<button class="post-delete-btn" onclick="deletePost('${p.id}')" title="Excluir post">🗑</button>` : ''}
           </div>
           ${p.content ? `<div class="post-content">${escapeHtml(p.content)}</div>` : ''}
+          ${pollHtml}
           ${p.image_url ? `<img class="post-image" src="${p.image_url}" />` : ''}
           <div class="post-actions">
             <button class="post-action-btn ${isLiked ? 'liked' : ''}" id="likeBtn-${p.id}" onclick="toggleLike('${p.id}')">
@@ -563,9 +782,20 @@
     const textarea = document.getElementById('postContent');
     const fileInput = document.getElementById('postImageInput');
     const content = textarea.value.trim();
-    const file = fileInput.files[0];
+    const file = pollMode ? null : fileInput.files[0];
 
-    if (!content && !file) { alert('Escreva algo ou anexe uma foto para publicar.'); return; }
+    let pollQuestion = null, pollOptions = null;
+    if (pollMode) {
+      pollQuestion = document.getElementById('pollQuestion').value.trim();
+      pollOptions = pollOptionEls.map(el => el.value.trim()).filter(Boolean);
+      if (!pollQuestion || pollOptions.length < 2) {
+        alert('Escreva a pergunta e pelo menos 2 opções pra criar a enquete.');
+        return;
+      }
+    } else if (!content && !file) {
+      alert('Escreva algo ou anexe uma foto para publicar.');
+      return;
+    }
 
     const btn = document.getElementById('publishPostBtn');
     btn.disabled = true;
@@ -582,16 +812,19 @@
         imageUrl = urlData.publicUrl;
       }
 
-      const { error } = await sb.from('community_posts').insert({
-        author_id: CURRENT_USER_ID,
-        content,
-        image_url: imageUrl
-      });
+      const payload = { author_id: CURRENT_USER_ID, content, image_url: imageUrl };
+      if (pollMode) {
+        payload.poll_question = pollQuestion;
+        payload.poll_options = pollOptions;
+      }
+
+      const { error } = await sb.from('community_posts').insert(payload);
       if (error) throw error;
 
       textarea.value = '';
       fileInput.value = '';
       document.getElementById('postImagePreview').style.display = 'none';
+      resetPollBuilder();
       await loadPosts();
     } catch (err) {
       alert('Erro ao publicar: ' + (err.message || err));
