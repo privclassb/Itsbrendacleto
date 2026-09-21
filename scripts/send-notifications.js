@@ -1,11 +1,12 @@
 // Robô de notificações push (OneSignal) do itsbrendacleto.
 // Roda periodicamente via GitHub Actions (.github/workflows/notifications.yml).
 //
-// 4 lembretes:
+// 5 lembretes:
 //   1. Aula em 1h (aluno)
 //   2. Prática — 3 dias sem atividade (aluno)
 //   3. Relatório de aula pendente (professora)
 //   4. Relatório mensal pendente, a partir do dia 10 (professora)
+//   5. Novo relatório mensal publicado (aluno)
 
 const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
 const ONESIGNAL_APP_ID = '58dbb455-e1d0-4871-9919-bdf37b56aafe';
@@ -212,7 +213,24 @@ async function monthlyReportReminders(now) {
   return sent;
 }
 
-// ─── Envio de teste avulso (não mexe em nenhum dos 4 lembretes reais) ───
+// ─── 5. Novo relatório mensal publicado (aluno) ─────────────────────────
+async function newMonthlyReportNotifications() {
+  const reports = await sb(
+    `reports?select=id,student_id,title,period&class_log_id=is.null&is_published=eq.true&student_notified_at=is.null`
+  );
+  if (!reports.length) return 0;
+  const nowIso = new Date().toISOString();
+  for (const r of reports) {
+    const label = r.period || r.title || 'seu relatório mensal';
+    await sendPush([r.student_id], 'Novo relatório disponível! 📄', `${label} já está disponível. Dá uma olhada!`);
+    if (!DRY_RUN) {
+      await sb(`reports?id=eq.${r.id}`, { method: 'PATCH', body: JSON.stringify({ student_notified_at: nowIso }) });
+    }
+  }
+  return reports.length;
+}
+
+// ─── Envio de teste avulso (não mexe em nenhum dos 5 lembretes reais) ───
 async function checkSubscription(externalId) {
   try {
     const res = await fetch(`https://api.onesignal.com/apps/${ONESIGNAL_APP_ID}/users/by/external_id/${externalId}`, {
@@ -253,6 +271,7 @@ async function main() {
   results.practiceNudges = await practiceNudges(now);
   results.classReportReminders = await classReportReminders(now);
   results.monthlyReportReminders = await monthlyReportReminders(now);
+  results.newMonthlyReportNotifications = await newMonthlyReportNotifications();
 
   console.log('Resumo:', JSON.stringify(results));
 }
