@@ -232,7 +232,9 @@ async function sendTestPush(email) {
     return;
   }
   await checkSubscription(rows[0].id);
-  await sendPush([rows[0].id], 'Teste de notificação 🔔', 'Se você recebeu essa mensagem, as notificações do itsbrendacleto estão funcionando!');
+  const heading = process.env.TEST_HEADING || 'Teste de notificação 🔔';
+  const content = process.env.TEST_CONTENT || 'Se você recebeu essa mensagem, as notificações do itsbrendacleto estão funcionando!';
+  await sendPush([rows[0].id], heading, content);
   console.log(`Teste enviado pra ${rows[0].full_name || email}`);
 }
 
