@@ -387,7 +387,7 @@
 
   function greetBirthday(name) {
     const textarea = document.getElementById('postContent');
-    textarea.value = `Happy birthday, ${name}! 🎉🎂 Hope you have an amazing day!`;
+    textarea.placeholder = `Write a birthday message for ${name} in English! 🎉`;
     textarea.focus();
     textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
