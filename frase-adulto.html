@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Frase do Dia | itsbrendacleto</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
@@ -77,7 +78,7 @@
 <body>
 
 <header>
-  <a href="home-adulto.html" class="btn-back">← Voltar</a>
+  <a href="home-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
   <div class="header-title">Frase do dia</div>
 </header>
 
@@ -87,7 +88,10 @@
     <div class="quote-label">Frase do dia</div>
     <div class="quote-text" id="quoteText">"The limits of my language mean the limits of my world."</div>
     <div class="quote-author" id="quoteAuthor">— Ludwig Wittgenstein</div>
-    <button class="btn-audio" id="btnAudio">Ouvir pronúncia</button>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+      <button class="btn-audio" id="btnAudio">Ouvir pronúncia</button>
+      <button class="btn-audio" id="btnShare">📸 Compartilhar</button>
+    </div>
   </div>
 
   <div class="translation-card">
@@ -465,6 +469,117 @@
   });
 
   showQuote(idx);
+
+  // ---- Volta pro painel certo dependendo de quem está logado ----
+  (async () => {
+    try {
+      const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+      const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async (_n, _t, fn) => fn() } });
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) return;
+      const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+      if (profile && profile.role === 'professora') {
+        document.getElementById('backBtn').href = 'painel-professora.html';
+      }
+    } catch (e) { /* mantém o link padrão se der erro */ }
+  })();
+
+  // ---- Compartilhar no Instagram ----
+  function getWrappedLines(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    let line = '';
+    const lines = [];
+    for (const word of words) {
+      const test = line ? line + ' ' + word : word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        lines.push(line);
+        line = word;
+      } else {
+        line = test;
+      }
+    }
+    if (line) lines.push(line);
+    return lines;
+  }
+
+  async function shareToInstagram() {
+    const btn = document.getElementById('btnShare');
+    const original = btn.textContent;
+    btn.textContent = 'Gerando...';
+    btn.disabled = true;
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+      const q = quotes[idx];
+      const W = 1080, H = 1080;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = '#5C4033';
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.font = 'italic 460px "DM Serif Display", Georgia, serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('"', 30, 400);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = '600 28px "DM Sans", sans-serif';
+      ctx.fillText('F R A S E   D O   D I A', W / 2, 150);
+
+      ctx.font = 'italic 52px "DM Serif Display", Georgia, serif';
+      const quoteLines = getWrappedLines(ctx, q.en, 880);
+      const quoteLineHeight = 68;
+      const quoteBlockHeight = (quoteLines.length - 1) * quoteLineHeight;
+      const quoteStartY = 500 - quoteBlockHeight / 2;
+      ctx.fillStyle = '#FFFFFF';
+      quoteLines.forEach((l, i) => ctx.fillText(l, W / 2, quoteStartY + i * quoteLineHeight));
+
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '500 30px "DM Sans", sans-serif';
+      ctx.fillText(q.author, W / 2, quoteStartY + quoteBlockHeight + 60);
+
+      ctx.font = 'italic 32px "DM Sans", sans-serif';
+      const transLines = getWrappedLines(ctx, q.pt, 880);
+      ctx.fillStyle = 'rgba(255,255,255,0.85)';
+      const transStartY = H - 260;
+      transLines.forEach((l, i) => ctx.fillText(l, W / 2, transStartY + i * 42));
+
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '600 26px "DM Sans", sans-serif';
+      ctx.fillText('itsbrendacleto', W / 2, H - 55);
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) { alert('Não foi possível gerar a imagem.'); return; }
+        const file = new File([blob], 'frase-do-dia.png', { type: 'image/png' });
+        let shared = false;
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'Frase do dia', text: 'Frase do dia — itsbrendacleto' });
+            shared = true;
+          } catch (e) { /* usuário cancelou o compartilhamento */ shared = true; }
+        }
+        if (!shared) {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'frase-do-dia.png';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          URL.revokeObjectURL(url);
+        }
+      }, 'image/png');
+    } finally {
+      btn.textContent = original;
+      btn.disabled = false;
+    }
+  }
+
+  document.getElementById('btnShare').addEventListener('click', shareToInstagram);
 </script>
 </body>
 </html>
