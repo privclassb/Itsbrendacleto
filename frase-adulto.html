@@ -523,18 +523,28 @@
       ctx.fillStyle = 'rgba(255,255,255,0.06)';
       ctx.font = 'italic 520px "DM Serif Display", Georgia, serif';
       ctx.textAlign = 'left';
-      ctx.fillText('"', 40, 640);
+      ctx.fillText('"', 40, 700);
 
       ctx.textAlign = 'center';
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.font = '600 30px "DM Sans", sans-serif';
-      ctx.fillText('F R A S E   D O   D I A', W / 2, 280);
+
+      // Marca no topo — deixa claro de onde vem essa frase
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = '400 62px "DM Serif Display", Georgia, serif';
+      ctx.fillText('itsbrendacleto', W / 2, 170);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.65)';
+      ctx.font = '500 27px "DM Sans", sans-serif';
+      ctx.fillText('Inglês para a vida real', W / 2, 225);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '600 26px "DM Sans", sans-serif';
+      ctx.fillText('F R A S E   D O   D I A', W / 2, 345);
 
       ctx.font = 'italic 58px "DM Serif Display", Georgia, serif';
       const quoteLines = getWrappedLines(ctx, q.en, 900);
       const quoteLineHeight = 76;
       const quoteBlockHeight = (quoteLines.length - 1) * quoteLineHeight;
-      const quoteStartY = 820 - quoteBlockHeight / 2;
+      const quoteStartY = 870 - quoteBlockHeight / 2;
       ctx.fillStyle = '#FFFFFF';
       quoteLines.forEach((l, i) => ctx.fillText(l, W / 2, quoteStartY + i * quoteLineHeight));
 
@@ -545,12 +555,17 @@
       ctx.font = 'italic 36px "DM Sans", sans-serif';
       const transLines = getWrappedLines(ctx, q.pt, 900);
       ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      const transStartY = H - 420;
+      const transStartY = H - 440;
       transLines.forEach((l, i) => ctx.fillText(l, W / 2, transStartY + i * 46));
 
-      ctx.fillStyle = 'rgba(255,255,255,0.5)';
-      ctx.font = '600 28px "DM Sans", sans-serif';
-      ctx.fillText('itsbrendacleto', W / 2, H - 100);
+      // Rodapé — chamada pra quem tá vendo o story entender do que se trata
+      ctx.fillStyle = 'rgba(255,255,255,0.9)';
+      ctx.font = '600 34px "DM Sans", sans-serif';
+      ctx.fillText('📚 Pratique inglês todo dia', W / 2, H - 150);
+
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = '500 28px "DM Sans", sans-serif';
+      ctx.fillText('com a itsbrendacleto', W / 2, H - 95);
 
       canvas.toBlob(async (blob) => {
         if (!blob) { alert('Não foi possível gerar a imagem.'); return; }
