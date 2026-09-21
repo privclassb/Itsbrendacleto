@@ -1048,15 +1048,16 @@
     </div>
 
     <div class="report-list">
-      <div class="report-list-title">Relatórios enviados</div>
-      <div class="report-filters">
-        <input type="month" class="form-select" id="reportFilterMonth" onchange="loadReports(currentReportsTeacherId, currentReportsSeeAll)" />
-        <select class="form-select" id="reportFilterTeacher" onchange="loadReports(currentReportsTeacherId, currentReportsSeeAll)" style="display:none;">
-          <option value="">Todas as professoras</option>
-        </select>
-        <button class="btn-report-action" onclick="clearReportFilters()">Limpar filtros</button>
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>Relatórios mensais</span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn-sm" onclick="shiftReportsMonth(-1)">← Mês anterior</button>
+          <span id="reportsMonthLabel" style="font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;"></span>
+          <button class="btn-sm" onclick="shiftReportsMonth(1)">Mês seguinte →</button>
+        </div>
       </div>
-      <div id="reportsList"><div class="empty-reports">Carregando...</div></div>
+      <div class="modal-hint" style="margin-bottom:8px;">Clique num aluno pra lançar ou revisar o relatório mensal dele.</div>
+      <div id="reportsChecklist"><div class="empty-reports">Carregando...</div></div>
     </div>
 
   </div>
@@ -3437,6 +3438,9 @@
   let currentReportsTeacherId = null;
   let currentReportsSeeAll = false;
   let viewReportsCache = [];
+  let reportsChecklistMonth = null;
+  let reportsChecklistCache = {};
+  let currentEditingReportId = null;
 
   async function editStudent(studentId) {
     const student = allStudents.find(s => s.id === studentId);
@@ -4148,71 +4152,90 @@
       allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
   }
 
+  // Checklist de relatórios mensais: sempre mostra só os alunos da própria
+  // professora logada, mês a mês (navegável com as setas). A visão agrupada
+  // por todas as professoras continua exclusiva da aba "Acompanhar equipe".
   async function loadReports(teacherId, seeAll) {
     currentReportsTeacherId = teacherId;
     currentReportsSeeAll = seeAll;
+    if (!reportsChecklistMonth) reportsChecklistMonth = todayLocalISO().slice(0, 7);
+    await renderReportsChecklist();
+  }
 
-    const teacherSel = document.getElementById('reportFilterTeacher');
-    if (seeAll) {
-      teacherSel.style.display = '';
-      if (!teacherSel.dataset.populated) {
-        teacherSel.innerHTML = '<option value="">Todas as professoras</option>' +
-          allTeachers.map(t => `<option value="${t.id}">${t.full_name || 'Sem nome'}</option>`).join('');
-        teacherSel.dataset.populated = '1';
-      }
-    } else {
-      teacherSel.style.display = 'none';
-      teacherSel.value = '';
+  function shiftReportsMonth(delta) {
+    const [y, m] = reportsChecklistMonth.split('-').map(Number);
+    const d = new Date(y, m - 1 + delta, 1);
+    reportsChecklistMonth = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    renderReportsChecklist();
+  }
+
+  async function renderReportsChecklist() {
+    const listEl = document.getElementById('reportsChecklist');
+    const labelEl = document.getElementById('reportsMonthLabel');
+    if (!listEl || !currentReportsTeacherId) return;
+    labelEl.textContent = monthKeyLabel(reportsChecklistMonth);
+
+    const { startDateStr, endDateStr } = equipeMonthRange(reportsChecklistMonth);
+    const startISO = startDateStr + 'T00:00:00.000Z';
+    const endISO = endDateStr + 'T00:00:00.000Z';
+
+    const myStudents = allStudents.filter(s => s.teacher_id === currentReportsTeacherId && s.active !== false
+      && (!s.contract_start || s.contract_start < endDateStr));
+
+    if (myStudents.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum aluno pra esse mês.</div>';
+      reportsChecklistCache = {};
+      return;
     }
 
-    const listEl = document.getElementById('reportsList');
-    // Só relatórios mensais (sem class_log_id) — os relatórios por aula ficam no perfil do aluno/turma
-    let query = sb.from('reports').select('*').is('class_log_id', null).order('created_at', { ascending: false });
-    if (!seeAll) {
-      query = query.eq('created_by', teacherId);
-    } else if (teacherSel.value) {
-      query = query.eq('created_by', teacherSel.value);
-    }
-
-    const monthVal = document.getElementById('reportFilterMonth').value; // "YYYY-MM"
-    if (monthVal) {
-      const [y, m] = monthVal.split('-').map(Number);
-      const monthStart = new Date(Date.UTC(y, m - 1, 1)).toISOString();
-      const monthEnd = new Date(Date.UTC(y, m, 1)).toISOString();
-      query = query.gte('created_at', monthStart).lt('created_at', monthEnd);
-    }
-
-    const { data: rawReports, error } = await query;
+    const { data: monthlyReports, error } = await sb.from('reports').select('*').is('class_log_id', null)
+      .in('student_id', myStudents.map(s => s.id)).gte('created_at', startISO).lt('created_at', endISO);
 
     if (error) {
       listEl.innerHTML = '<div class="empty-reports">Erro ao carregar relatórios.</div>';
       return;
     }
-    // Alguns relatórios por aula antigos (de antes do vínculo por class_log_id existir) não têm
-    // class_log_id preenchido — filtra também pelo padrão de título "Aula de DD/MM/AAAA" pra pegar esses casos.
-    const AULA_TITLE_RE = /^Aula de \d{2}\/\d{2}\/\d{4}$/;
-    const reports = (rawReports || []).filter(r => !AULA_TITLE_RE.test((r.title || '').trim()));
 
-    viewReportsCache = reports;
+    const reportByStudent = {};
+    (monthlyReports || []).forEach(r => { reportByStudent[r.student_id] = r; });
+    reportsChecklistCache = reportByStudent;
 
-    if (reports.length === 0) {
-      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório mensal encontrado com esse filtro.</div>';
-      return;
-    }
-
-    listEl.innerHTML = reports.map(r => {
-      const period = r.period ? ' · ' + r.period : '';
+    const sorted = myStudents.slice().sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
+    listEl.innerHTML = sorted.map(s => {
+      const r = reportByStudent[s.id];
+      const delivered = !!r;
+      const statusText = delivered ? (r.is_published ? 'Publicado' : 'Rascunho salvo') : 'Ainda não lançado';
       return `
-        <div class="report-row" style="cursor:pointer;" onclick="openViewReport('${r.id}')">
+        <div class="report-row" style="cursor:pointer;" onclick="openReportChecklistItem('${s.id}')">
           <div class="report-row-info">
-            <div class="report-row-student">${studentNameById(r.student_id)}</div>
-            <div class="report-row-title">${r.title}${period}</div>
+            <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+            <div class="report-row-title">${statusText}</div>
           </div>
-          <span class="report-status ${r.is_published ? 'published' : 'draft'}">${r.is_published ? 'Publicado' : 'Rascunho'}</span>
-          <button class="btn-report-action btn-toggle" onclick="event.stopPropagation(); toggleReportStatus('${r.id}', ${!r.is_published})">${r.is_published ? 'Tornar rascunho' : 'Publicar'}</button>
-          <button class="btn-report-action btn-delete" onclick="event.stopPropagation(); deleteReport('${r.id}')">Excluir</button>
+          <span class="report-status ${delivered ? 'published' : 'monthly-report-alert'}">${delivered ? '✓ Entregue' : 'Pendente'}</span>
         </div>`;
     }).join('');
+  }
+
+  // Clicar num aluno do checklist abre o formulário "Novo relatório" já com
+  // esse aluno selecionado - se já existe relatório desse mês, carrega o
+  // conteúdo existente pra edição em vez de criar um duplicado.
+  function openReportChecklistItem(studentId) {
+    const existing = reportsChecklistCache[studentId];
+    document.getElementById('reportStudent').value = studentId;
+    if (existing) {
+      currentEditingReportId = existing.id;
+      document.getElementById('reportTitle').value = existing.title || '';
+      document.getElementById('reportPeriod').value = existing.period || '';
+      document.getElementById('reportContent').value = existing.content || '';
+    } else {
+      currentEditingReportId = null;
+      document.getElementById('reportTitle').value = 'Relatório de ' + monthKeyLabel(reportsChecklistMonth);
+      document.getElementById('reportPeriod').value = monthKeyLabel(reportsChecklistMonth);
+      document.getElementById('reportContent').value = '';
+    }
+    const titleInput = document.getElementById('reportTitle');
+    titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    titleInput.focus();
   }
 
   function openViewReport(id) {
@@ -4258,14 +4281,25 @@
 
     const { data: { session } } = await sb.auth.getSession();
 
-    const { error } = await sb.from('reports').insert({
-      student_id: studentId,
-      title,
-      period: period || null,
-      content,
-      is_published: publish,
-      created_by: session.user.id
-    });
+    let error;
+    if (currentEditingReportId) {
+      ({ error } = await sb.from('reports').update({
+        student_id: studentId,
+        title,
+        period: period || null,
+        content,
+        is_published: publish
+      }).eq('id', currentEditingReportId));
+    } else {
+      ({ error } = await sb.from('reports').insert({
+        student_id: studentId,
+        title,
+        period: period || null,
+        content,
+        is_published: publish,
+        created_by: session.user.id
+      }));
+    }
 
     if (error) {
       alert('Erro ao salvar relatório: ' + error.message);
@@ -4276,6 +4310,7 @@
     document.getElementById('reportTitle').value = '';
     document.getElementById('reportPeriod').value = '';
     document.getElementById('reportContent').value = '';
+    currentEditingReportId = null;
 
     await loadReports(session.user.id, currentUserIsBrenda);
   }
@@ -4293,12 +4328,6 @@
     if (error) { alert('Erro ao excluir relatório.'); return; }
     const { data: { session } } = await sb.auth.getSession();
     await loadReports(session.user.id, currentUserIsBrenda);
-  }
-
-  function clearReportFilters() {
-    document.getElementById('reportFilterMonth').value = '';
-    document.getElementById('reportFilterTeacher').value = '';
-    loadReports(currentReportsTeacherId, currentReportsSeeAll);
   }
 
   // ---- Turmas ----
