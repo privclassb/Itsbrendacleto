@@ -1016,37 +1016,6 @@
   <!-- Relatórios - todas as professoras -->
   <div class="reports-section panel-section" id="reportsSection">
 
-    <div class="report-form">
-      <div class="report-form-title">Novo relatório</div>
-
-      <div class="form-row">
-        <label class="form-label">Aluno</label>
-        <select class="form-select" id="reportStudent">
-          <option value="">Selecione o aluno...</option>
-        </select>
-      </div>
-
-      <div class="form-row">
-        <label class="form-label">Título</label>
-        <input type="text" class="form-input" id="reportTitle" placeholder="Ex: Relatório de Maio" />
-      </div>
-
-      <div class="form-row">
-        <label class="form-label">Período</label>
-        <input type="text" class="form-input" id="reportPeriod" placeholder="Ex: Maio 2025" />
-      </div>
-
-      <div class="form-row">
-        <label class="form-label">Conteúdo</label>
-        <textarea class="form-textarea" id="reportContent" placeholder="Escreva o relatório do aluno aqui..."></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button class="btn-draft" onclick="saveReport(false)">Salvar rascunho</button>
-        <button class="btn-publish" onclick="saveReport(true)">Publicar para o aluno</button>
-      </div>
-    </div>
-
     <div class="report-list">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <span>Relatórios mensais</span>
@@ -4145,12 +4114,9 @@
 
   // ---- Relatórios (todas as professoras) ----
 
-  function loadStudentsForReports() {
-    const sel = document.getElementById('reportStudent');
-    if (!sel) return;
-    sel.innerHTML = '<option value="">Selecione o aluno...</option>' +
-      allStudents.map(s => `<option value="${s.id}">${s.full_name || 'Sem nome'}</option>`).join('');
-  }
+  // O aluno do relatório agora vem sempre do clique no checklist mensal
+  // (função mantida como no-op só pra não quebrar quem ainda a chama).
+  function loadStudentsForReports() {}
 
   // Checklist de relatórios mensais: sempre mostra só os alunos da própria
   // professora logada, mês a mês (navegável com as setas). A visão agrupada
@@ -4221,7 +4187,9 @@
   // conteúdo existente pra edição em vez de criar um duplicado.
   function openReportChecklistItem(studentId) {
     const existing = reportsChecklistCache[studentId];
+    const student = allStudents.find(s => s.id === studentId);
     document.getElementById('reportStudent').value = studentId;
+    document.getElementById('reportFormTitle').textContent = (student ? student.full_name : 'Aluno') + ' — ' + monthKeyLabel(reportsChecklistMonth);
     if (existing) {
       currentEditingReportId = existing.id;
       document.getElementById('reportTitle').value = existing.title || '';
@@ -4233,9 +4201,12 @@
       document.getElementById('reportPeriod').value = monthKeyLabel(reportsChecklistMonth);
       document.getElementById('reportContent').value = '';
     }
-    const titleInput = document.getElementById('reportTitle');
-    titleInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    titleInput.focus();
+    document.getElementById('modalReportForm').classList.add('open');
+  }
+
+  function closeReportForm() {
+    document.getElementById('modalReportForm').classList.remove('open');
+    currentEditingReportId = null;
   }
 
   function openViewReport(id) {
@@ -4311,6 +4282,7 @@
     document.getElementById('reportPeriod').value = '';
     document.getElementById('reportContent').value = '';
     currentEditingReportId = null;
+    document.getElementById('modalReportForm').classList.remove('open');
 
     await loadReports(session.user.id, currentUserIsBrenda);
   }
@@ -7966,6 +7938,35 @@
     <div class="view-report-content" id="viewReportContent"></div>
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeViewReport()">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Relatório mensal -->
+<div class="modal-overlay" id="modalReportForm">
+  <div class="modal-box">
+    <div class="modal-title" id="reportFormTitle">Relatório</div>
+    <input type="hidden" id="reportStudent" />
+
+    <div class="form-row">
+      <label class="form-label">Título</label>
+      <input type="text" class="form-input" id="reportTitle" placeholder="Ex: Relatório de Maio" />
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Período</label>
+      <input type="text" class="form-input" id="reportPeriod" placeholder="Ex: Maio 2025" />
+    </div>
+
+    <div class="form-row">
+      <label class="form-label">Conteúdo</label>
+      <textarea class="form-textarea" id="reportContent" placeholder="Escreva o relatório do aluno aqui..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeReportForm()">Cancelar</button>
+      <button class="btn-draft" onclick="saveReport(false)">Salvar rascunho</button>
+      <button class="btn-publish" onclick="saveReport(true)">Publicar para o aluno</button>
     </div>
   </div>
 </div>
