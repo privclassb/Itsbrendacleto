@@ -245,9 +245,9 @@ async function likeNotifications() {
   posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
 
   const likerIds = [...new Set(likes.map((l) => l.user_id))];
-  const likers = await sb(`profiles?select=id,full_name&id=in.(${likerIds.join(',')})`);
+  const likers = await sb(`profiles?select=id,full_name,community_display_name&id=in.(${likerIds.join(',')})`);
   const likerName = {};
-  likers.forEach((u) => { likerName[u.id] = u.full_name; });
+  likers.forEach((u) => { likerName[u.id] = u.community_display_name || u.full_name; });
 
   const byAuthor = {};
   for (const l of likes) {
@@ -282,9 +282,9 @@ async function commentNotifications() {
   posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
 
   const commenterIds = [...new Set(comments.map((c) => c.author_id))];
-  const commenters = await sb(`profiles?select=id,full_name&id=in.(${commenterIds.join(',')})`);
+  const commenters = await sb(`profiles?select=id,full_name,community_display_name&id=in.(${commenterIds.join(',')})`);
   const commenterName = {};
-  commenters.forEach((u) => { commenterName[u.id] = u.full_name; });
+  commenters.forEach((u) => { commenterName[u.id] = u.community_display_name || u.full_name; });
 
   const byAuthor = {};
   for (const c of comments) {
@@ -339,9 +339,9 @@ async function pollVoteNotifications() {
   posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
 
   const voterIds = [...new Set(votes.map((v) => v.user_id))];
-  const voters = await sb(`profiles?select=id,full_name&id=in.(${voterIds.join(',')})`);
+  const voters = await sb(`profiles?select=id,full_name,community_display_name&id=in.(${voterIds.join(',')})`);
   const voterName = {};
-  voters.forEach((u) => { voterName[u.id] = u.full_name; });
+  voters.forEach((u) => { voterName[u.id] = u.community_display_name || u.full_name; });
 
   const byAuthor = {};
   for (const v of votes) {
@@ -365,7 +365,7 @@ async function pollVoteNotifications() {
 
 // ─── 9. Aniversário de alguém da Comunidade (avisa todo mundo) ──────────
 async function communityBirthdayNotifications(now) {
-  const people = await sb(`profiles?select=id,full_name,birth_date,community_birthday_notified_date&role=in.(adulto,professora)`);
+  const people = await sb(`profiles?select=id,full_name,community_display_name,birth_date,community_birthday_notified_date&role=in.(adulto,professora)`);
   const birthdayPeople = people.filter((p) => {
     if (!p.birth_date) return false;
     const d = new Date(p.birth_date + 'T00:00:00');
@@ -379,7 +379,8 @@ async function communityBirthdayNotifications(now) {
     if (person.community_birthday_notified_date === now.date) continue; // já avisado hoje
     const targetIds = allIds.filter((id) => id !== person.id);
     if (targetIds.length) {
-      await sendPush(targetIds, 'Aniversário na Comunidade! 🎂', `Hoje é aniversário de ${person.full_name}! Fale inglês — vai lá parabenizar em inglês 🎉`);
+      const personName = person.community_display_name || person.full_name;
+      await sendPush(targetIds, 'Aniversário na Comunidade! 🎂', `Hoje é aniversário de ${personName}! Fale inglês — vai lá parabenizar em inglês 🎉`);
     }
     if (!DRY_RUN) {
       await sb(`profiles?id=eq.${person.id}`, { method: 'PATCH', body: JSON.stringify({ community_birthday_notified_date: now.date }) });

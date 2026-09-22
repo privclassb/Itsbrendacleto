@@ -186,6 +186,10 @@
 
   <div class="section-title">Mural</div>
   <div class="card">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Seu nome na Comunidade: <b id="myDisplayNameLabel">...</b>
+      <a href="#" onclick="editDisplayName();return false;" style="color:var(--brown);font-weight:600;text-decoration:none;">editar</a>
+    </div>
     <div class="composer-row">
       <div id="composerAvatar" class="composer-avatar-fallback">?</div>
       <div class="composer-body">
@@ -282,6 +286,7 @@
 
   let CURRENT_USER_ID = null;
   let CURRENT_USER_NAME = '';
+  let CURRENT_USER_FULL_NAME = '';
   let IS_BRENDA = false;
   let likedPostIds = new Set();
   let likersByPostCache = {};
@@ -296,6 +301,10 @@
     return (name || '?').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
   }
 
+  function displayName(p) {
+    return (p && (p.community_display_name || p.full_name)) || 'Aluno';
+  }
+
   async function init(session) {
     const user = session.user;
     const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
@@ -306,8 +315,10 @@
     }
 
     CURRENT_USER_ID = user.id;
-    CURRENT_USER_NAME = profile.full_name || user.email.split('@')[0];
-    IS_BRENDA = CURRENT_USER_NAME.toLowerCase().includes('brenda');
+    const fullName = profile.full_name || user.email.split('@')[0];
+    CURRENT_USER_FULL_NAME = fullName;
+    CURRENT_USER_NAME = profile.community_display_name || fullName;
+    IS_BRENDA = fullName.toLowerCase().includes('brenda');
 
     document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'home-adulto.html';
 
@@ -317,6 +328,8 @@
     } else {
       composerAvatar.textContent = initials(CURRENT_USER_NAME);
     }
+
+    document.getElementById('myDisplayNameLabel').textContent = CURRENT_USER_NAME;
 
     loadTopicSuggestion();
     await loadBirthdaysToday();
@@ -350,6 +363,24 @@
     document.getElementById('topicText').textContent = currentTopic;
   }
 
+  async function editDisplayName() {
+    const current = CURRENT_USER_NAME;
+    const input = prompt(
+      `Como seu nome vai aparecer pra outros alunos na Comunidade?\n(Seu nome completo "${CURRENT_USER_FULL_NAME}" continua no cadastro — isso é só o que aparece aqui. Deixe em branco pra usar o nome completo.)`,
+      current === CURRENT_USER_FULL_NAME ? '' : current
+    );
+    if (input === null) return; // cancelou
+
+    const newName = input.trim() || null;
+    const { error } = await sb.from('profiles').update({ community_display_name: newName }).eq('id', CURRENT_USER_ID);
+    if (error) { alert('Erro ao salvar: ' + error.message); return; }
+
+    CURRENT_USER_NAME = newName || CURRENT_USER_FULL_NAME;
+    document.getElementById('myDisplayNameLabel').textContent = CURRENT_USER_NAME;
+    await loadPosts();
+    await loadRanking();
+  }
+
   function useTopic() {
     const textarea = document.getElementById('postContent');
     textarea.value = '📝 ' + currentTopic + '\n\n';
@@ -363,7 +394,7 @@
     const month = today.getMonth() + 1;
     const day = today.getDate();
 
-    const { data: people } = await sb.from('profiles').select('id, full_name, avatar_url, birth_date, role').in('role', ['adulto', 'professora']);
+    const { data: people } = await sb.from('profiles').select('id, full_name, community_display_name, avatar_url, birth_date, role').in('role', ['adulto', 'professora']);
     const todays = (people || []).filter(p => {
       if (!p.birth_date) return false;
       const d = new Date(p.birth_date + 'T00:00:00');
@@ -377,17 +408,17 @@
     document.getElementById('birthdayList').innerHTML = todays.map(p => {
       const avatar = p.avatar_url
         ? `<img class="rank-avatar-img" src="${p.avatar_url}" />`
-        : `<div class="rank-avatar-fallback">${initials(p.full_name)}</div>`;
+        : `<div class="rank-avatar-fallback">${initials(displayName(p))}</div>`;
       return `
         <div class="birthday-item">
           ${avatar}
-          <div class="birthday-name">${escapeHtml(p.full_name || 'Aluno')}</div>
+          <div class="birthday-name">${escapeHtml(displayName(p))}</div>
           <button class="birthday-btn">🎉 Parabenizar</button>
         </div>`;
     }).join('');
 
     document.querySelectorAll('#birthdayList .birthday-btn').forEach((btn, i) => {
-      btn.addEventListener('click', () => greetBirthday(todays[i].full_name || 'Aluno'));
+      btn.addEventListener('click', () => greetBirthday(displayName(todays[i])));
     });
   }
 
@@ -462,7 +493,7 @@
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
     document.getElementById('rankingMonthLabel').textContent = 'Pontuação de ' + now.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }) + ' · atividades, dias ativos e presença em aula';
 
-    const { data: students } = await sb.from('profiles').select('id, full_name, avatar_url, turma_id').eq('role', 'adulto');
+    const { data: students } = await sb.from('profiles').select('id, full_name, community_display_name, avatar_url, turma_id').eq('role', 'adulto');
     if (!students || students.length === 0) {
       document.getElementById('rankingList').innerHTML = '<div class="empty-msg">Ninguém no ranking ainda.</div>';
       return;
@@ -534,7 +565,7 @@
         const isMe = r.id === CURRENT_USER_ID;
         const avatar = r.avatar_url
           ? `<img class="rank-avatar-img" src="${r.avatar_url}" />`
-          : `<div class="rank-avatar-fallback">${initials(r.full_name)}</div>`;
+          : `<div class="rank-avatar-fallback">${initials(displayName(r))}</div>`;
         const attendanceLabel = r.attendanceRate !== null
           ? Math.round(r.attendanceRate * 100) + '% de presença'
           : (r.hasAnyClass ? 'aulas ainda não registradas' : 'sem aulas no período');
@@ -543,7 +574,7 @@
             <div class="rank-position">${medals[i] || (i + 1)}</div>
             <div class="rank-avatar">${avatar}</div>
             <div class="rank-info">
-              <div class="rank-name">${escapeHtml(r.full_name || 'Aluno')}${isMe ? ' (você)' : ''}</div>
+              <div class="rank-name">${escapeHtml(displayName(r))}${isMe ? ' (você)' : ''}</div>
               <div class="rank-breakdown">${r.activities} atividades · ${r.activeDays} dias ativos · ${attendanceLabel}</div>
             </div>
             <div class="rank-points">${r.points}<span>pts</span></div>
@@ -576,7 +607,7 @@
     const pollPostIds = posts.filter(p => p.poll_question).map(p => p.id);
 
     const [{ data: peoplePass1 }, { data: likes }, { data: comments }, { data: pollVotes }] = await Promise.all([
-      sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds),
+      sb.from('profiles').select('id, full_name, community_display_name, avatar_url').in('id', authorIds),
       sb.from('community_likes').select('post_id, user_id').in('post_id', postIds),
       sb.from('community_comments').select('id, post_id').in('post_id', postIds),
       pollPostIds.length ? sb.from('community_poll_votes').select('post_id, user_id, option_index').in('post_id', pollPostIds) : Promise.resolve({ data: [] })
@@ -590,10 +621,10 @@
     const voterIds = [...new Set((pollVotes || []).map(v => v.user_id))];
     const missingIds = [...new Set([...likerIds, ...voterIds])].filter(id => !authorMap[id]);
     const nameMap = {};
-    (peoplePass1 || []).forEach(a => { nameMap[a.id] = a.full_name || 'Aluno'; });
+    (peoplePass1 || []).forEach(a => { nameMap[a.id] = displayName(a); });
     if (missingIds.length) {
-      const { data: morePeople } = await sb.from('profiles').select('id, full_name').in('id', missingIds);
-      (morePeople || []).forEach(a => { nameMap[a.id] = a.full_name || 'Aluno'; });
+      const { data: morePeople } = await sb.from('profiles').select('id, full_name, community_display_name').in('id', missingIds);
+      (morePeople || []).forEach(a => { nameMap[a.id] = displayName(a); });
     }
 
     const pollTallyByPost = {};
@@ -621,7 +652,7 @@
 
     listEl.innerHTML = posts.map(p => {
       const author = authorMap[p.author_id];
-      const authorName = author?.full_name || 'Aluno';
+      const authorName = displayName(author);
       const avatar = author?.avatar_url
         ? `<img class="rank-avatar-img" src="${author.avatar_url}" />`
         : `<div class="rank-avatar-fallback">${initials(authorName)}</div>`;
@@ -729,7 +760,7 @@
     const { data: comments } = await sb.from('community_comments').select('*').eq('post_id', postId).order('created_at', { ascending: true });
     const authorIds = [...new Set((comments || []).map(c => c.author_id))];
     const { data: authors } = authorIds.length
-      ? await sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds)
+      ? await sb.from('profiles').select('id, full_name, community_display_name, avatar_url').in('id', authorIds)
       : { data: [] };
     const authorMap = {};
     (authors || []).forEach(a => { authorMap[a.id] = a; });
@@ -737,7 +768,7 @@
     const listHtml = (comments || []).map(c => {
       const canDelete = c.author_id === CURRENT_USER_ID || IS_BRENDA;
       const author = authorMap[c.author_id];
-      const authorName = author?.full_name || 'Aluno';
+      const authorName = displayName(author);
       const avatar = author?.avatar_url
         ? `<img class="comment-avatar-img" src="${author.avatar_url}" />`
         : `<div class="comment-avatar-fallback">${initials(authorName)}</div>`;
