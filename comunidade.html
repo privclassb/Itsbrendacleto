@@ -73,6 +73,8 @@
     .post-action-btn.liked { color: var(--rose); }
 
     .comments-box { display: none; margin-top: 12px; border-top: 1px solid var(--sand); padding-top: 12px; }
+    .likers-box { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .post-action-btn span[id^="likeCount-"] { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
     .comment-item { display: flex; align-items: baseline; gap: 6px; padding: 6px 0; font-size: 13px; }
     .comment-author { font-weight: 600; color: var(--text); flex-shrink: 0; }
     .comment-text { color: var(--text); flex: 1; word-break: break-word; }
@@ -120,6 +122,7 @@
     .poll-option-bar { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(168,197,181,0.35); transition: width 0.3s; z-index: 0; }
     .poll-option-label { position: relative; z-index: 1; display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--text); }
     .poll-option-pct { color: var(--muted); font-weight: 600; flex-shrink: 0; }
+    .poll-option-voters { position: relative; z-index: 1; font-size: 11px; color: var(--muted); margin-top: 3px; }
     .poll-total { font-size: 11px; color: var(--muted); margin-top: 2px; }
   </style>
   <link rel="manifest" href="manifest.json" />
@@ -279,6 +282,7 @@
   let CURRENT_USER_NAME = '';
   let IS_BRENDA = false;
   let likedPostIds = new Set();
+  let likersByPostCache = {};
 
   function escapeHtml(str) {
     const div = document.createElement('div');
@@ -569,7 +573,7 @@
     const authorIds = [...new Set(posts.map(p => p.author_id))];
     const pollPostIds = posts.filter(p => p.poll_question).map(p => p.id);
 
-    const [{ data: authors }, { data: likes }, { data: comments }, { data: pollVotes }] = await Promise.all([
+    const [{ data: peoplePass1 }, { data: likes }, { data: comments }, { data: pollVotes }] = await Promise.all([
       sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds),
       sb.from('community_likes').select('post_id, user_id').in('post_id', postIds),
       sb.from('community_comments').select('id, post_id').in('post_id', postIds),
@@ -577,20 +581,36 @@
     ]);
 
     const authorMap = {};
-    (authors || []).forEach(a => { authorMap[a.id] = a; });
+    (peoplePass1 || []).forEach(a => { authorMap[a.id] = a; });
+
+    // Busca nomes de quem curtiu/votou (pode ter gente que não é autor de nenhum post)
+    const likerIds = [...new Set((likes || []).map(l => l.user_id))];
+    const voterIds = [...new Set((pollVotes || []).map(v => v.user_id))];
+    const missingIds = [...new Set([...likerIds, ...voterIds])].filter(id => !authorMap[id]);
+    const nameMap = {};
+    (peoplePass1 || []).forEach(a => { nameMap[a.id] = a.full_name || 'Aluno'; });
+    if (missingIds.length) {
+      const { data: morePeople } = await sb.from('profiles').select('id, full_name').in('id', missingIds);
+      (morePeople || []).forEach(a => { nameMap[a.id] = a.full_name || 'Aluno'; });
+    }
 
     const pollTallyByPost = {};
+    const pollVotersByPost = {};
     const myVoteByPost = {};
     (pollVotes || []).forEach(v => {
       if (!pollTallyByPost[v.post_id]) pollTallyByPost[v.post_id] = {};
       pollTallyByPost[v.post_id][v.option_index] = (pollTallyByPost[v.post_id][v.option_index] || 0) + 1;
+      if (!pollVotersByPost[v.post_id]) pollVotersByPost[v.post_id] = {};
+      (pollVotersByPost[v.post_id][v.option_index] = pollVotersByPost[v.post_id][v.option_index] || []).push(nameMap[v.user_id] || 'Aluno');
       if (v.user_id === CURRENT_USER_ID) myVoteByPost[v.post_id] = v.option_index;
     });
 
     const likesByPost = {};
+    likersByPostCache = {};
     likedPostIds = new Set();
     (likes || []).forEach(l => {
       likesByPost[l.post_id] = (likesByPost[l.post_id] || 0) + 1;
+      (likersByPostCache[l.post_id] = likersByPostCache[l.post_id] || []).push(nameMap[l.user_id] || 'Aluno');
       if (l.user_id === CURRENT_USER_ID) likedPostIds.add(l.post_id);
     });
 
@@ -612,9 +632,9 @@
       let pollHtml = '';
       if (p.poll_question) {
         const tally = pollTallyByPost[p.id] || {};
+        const votersMap = pollVotersByPost[p.id] || {};
         const totalVotes = Object.values(tally).reduce((a, b) => a + b, 0);
         const myVote = myVoteByPost[p.id];
-        const hasVoted = myVote !== undefined;
         pollHtml = `
           <div class="poll-box">
             <div class="poll-question">📊 ${escapeHtml(p.poll_question)}</div>
@@ -622,10 +642,12 @@
               const count = tally[i] || 0;
               const pct = totalVotes ? Math.round(count / totalVotes * 100) : 0;
               const isMine = myVote === i;
+              const voterNames = votersMap[i] || [];
               return `
                 <div class="poll-option ${isMine ? 'poll-option-mine' : ''}" onclick="castVote('${p.id}', ${i})">
-                  <div class="poll-option-bar" style="width:${hasVoted ? pct : 0}%;"></div>
-                  <div class="poll-option-label"><span>${escapeHtml(opt)}</span>${hasVoted ? `<span class="poll-option-pct">${pct}% (${count})</span>` : ''}</div>
+                  <div class="poll-option-bar" style="width:${pct}%;"></div>
+                  <div class="poll-option-label"><span>${escapeHtml(opt)}</span><span class="poll-option-pct">${pct}% (${count})</span></div>
+                  ${voterNames.length ? `<div class="poll-option-voters">${voterNames.map(escapeHtml).join(', ')}</div>` : ''}
                 </div>`;
             }).join('')}
             <div class="poll-total">${totalVotes} voto${totalVotes === 1 ? '' : 's'}</div>
@@ -647,12 +669,13 @@
           ${p.image_url ? `<img class="post-image" src="${p.image_url}" />` : ''}
           <div class="post-actions">
             <button class="post-action-btn ${isLiked ? 'liked' : ''}" id="likeBtn-${p.id}" onclick="toggleLike('${p.id}')">
-              ${isLiked ? '❤️' : '🤍'} <span id="likeCount-${p.id}">${likeCount}</span>
+              ${isLiked ? '❤️' : '🤍'} <span id="likeCount-${p.id}" onclick="event.stopPropagation(); toggleLikers('${p.id}')">${likeCount}</span>
             </button>
             <button class="post-action-btn" onclick="toggleComments('${p.id}')">
               <span id="commentCount-${p.id}">${commentCount}</span> comentários
             </button>
           </div>
+          <div class="likers-box" id="likers-${p.id}" style="display:none;"></div>
           <div class="comments-box" id="comments-${p.id}"></div>
         </div>`;
     }).join('');
@@ -666,9 +689,11 @@
     if (isLiked) {
       await sb.from('community_likes').delete().eq('post_id', postId).eq('user_id', CURRENT_USER_ID);
       likedPostIds.delete(postId);
+      likersByPostCache[postId] = (likersByPostCache[postId] || []).filter(n => n !== CURRENT_USER_NAME);
     } else {
       await sb.from('community_likes').insert({ post_id: postId, user_id: CURRENT_USER_ID });
       likedPostIds.add(postId);
+      (likersByPostCache[postId] = likersByPostCache[postId] || []).push(CURRENT_USER_NAME);
     }
 
     const nowLiked = likedPostIds.has(postId);
@@ -676,7 +701,16 @@
     const current = parseInt(countEl.textContent, 10) || 0;
     const next = nowLiked ? current + 1 : Math.max(0, current - 1);
     countEl.textContent = next;
-    btn.innerHTML = (nowLiked ? '❤️' : '🤍') + ` <span id="likeCount-${postId}">${next}</span>`;
+    btn.innerHTML = (nowLiked ? '❤️' : '🤍') + ` <span id="likeCount-${postId}" onclick="event.stopPropagation(); toggleLikers('${postId}')">${next}</span>`;
+  }
+
+  function toggleLikers(postId) {
+    const box = document.getElementById('likers-' + postId);
+    if (!box) return;
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    const names = likersByPostCache[postId] || [];
+    box.textContent = names.length ? 'Curtido por: ' + names.join(', ') : 'Ninguém curtiu ainda.';
+    box.style.display = 'block';
   }
 
   async function toggleComments(postId) {
