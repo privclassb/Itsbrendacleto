@@ -21,6 +21,14 @@ name: Notificações push
         description: 'Texto customizado do teste (opcional, só usado junto com test_email)'
         type: string
         default: ''
+      broadcast_heading:
+        description: 'Preenchendo isso (junto com broadcast_content), manda essa notificação pra TODO MUNDO (alunos + professoras), sem mexer nos lembretes reais'
+        type: string
+        default: ''
+      broadcast_content:
+        description: 'Texto da notificação avulsa pra todo mundo (só usado junto com broadcast_heading)'
+        type: string
+        default: ''
 
 jobs:
   send-notifications:
@@ -38,4 +46,6 @@ jobs:
           TEST_EMAIL: ${{ github.event.inputs.test_email || '' }}
           TEST_HEADING: ${{ github.event.inputs.test_heading || '' }}
           TEST_CONTENT: ${{ github.event.inputs.test_content || '' }}
+          BROADCAST_HEADING: ${{ github.event.inputs.broadcast_heading || '' }}
+          BROADCAST_CONTENT: ${{ github.event.inputs.broadcast_content || '' }}
         run: node scripts/send-notifications.js

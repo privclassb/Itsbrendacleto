@@ -380,10 +380,25 @@ async function sendTestPush(email) {
   console.log(`Teste enviado pra ${rows[0].full_name || email}`);
 }
 
+// ─── Notificação avulsa pra todo mundo (aluno + professora) ─────────────
+async function broadcastNotification(heading, content) {
+  const people = await sb(`profiles?select=id&role=in.(adulto,professora)`);
+  const ids = people.map((p) => p.id);
+  await sendPush(ids, heading, content);
+  console.log(`Notificação avulsa enviada pra ${ids.length} pessoa(s).`);
+}
+
 async function main() {
   const testEmail = process.env.TEST_EMAIL;
   if (testEmail) {
     await sendTestPush(testEmail);
+    return;
+  }
+
+  const broadcastHeading = process.env.BROADCAST_HEADING;
+  const broadcastContent = process.env.BROADCAST_CONTENT;
+  if (broadcastHeading && broadcastContent) {
+    await broadcastNotification(broadcastHeading, broadcastContent);
     return;
   }
 
