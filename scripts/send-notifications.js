@@ -328,6 +328,41 @@ async function pollNotifications() {
   return polls.length;
 }
 
+// ─── 8b. Voto em enquete (avisa quem criou a enquete) ────────────────────
+async function pollVoteNotifications() {
+  const votes = await sb(`community_poll_votes?select=id,post_id,user_id&notified_at=is.null`);
+  if (!votes.length) return 0;
+
+  const postIds = [...new Set(votes.map((v) => v.post_id))];
+  const posts = await sb(`community_posts?select=id,author_id&id=in.(${postIds.join(',')})`);
+  const postAuthor = {};
+  posts.forEach((p) => { postAuthor[p.id] = p.author_id; });
+
+  const voterIds = [...new Set(votes.map((v) => v.user_id))];
+  const voters = await sb(`profiles?select=id,full_name&id=in.(${voterIds.join(',')})`);
+  const voterName = {};
+  voters.forEach((u) => { voterName[u.id] = u.full_name; });
+
+  const byAuthor = {};
+  for (const v of votes) {
+    const authorId = postAuthor[v.post_id];
+    if (authorId && authorId !== v.user_id) (byAuthor[authorId] = byAuthor[authorId] || []).push(v);
+  }
+
+  for (const [authorId, authorVotes] of Object.entries(byAuthor)) {
+    const msg = authorVotes.length === 1
+      ? `${voterName[authorVotes[0].user_id] || 'Alguém'} votou na sua enquete!`
+      : `${authorVotes.length} pessoas votaram na sua enquete!`;
+    await sendPush([authorId], 'Novo voto na sua enquete 📊', msg);
+  }
+
+  if (!DRY_RUN) {
+    const ids = votes.map((v) => v.id).join(',');
+    await sb(`community_poll_votes?id=in.(${ids})`, { method: 'PATCH', body: JSON.stringify({ notified_at: new Date().toISOString() }) });
+  }
+  return votes.length;
+}
+
 // ─── 9. Aniversário de alguém da Comunidade (avisa todo mundo) ──────────
 async function communityBirthdayNotifications(now) {
   const people = await sb(`profiles?select=id,full_name,birth_date,community_birthday_notified_date&role=in.(adulto,professora)`);
@@ -432,6 +467,7 @@ async function main() {
   results.likeNotifications = await likeNotifications();
   results.commentNotifications = await commentNotifications();
   results.pollNotifications = await pollNotifications();
+  results.pollVoteNotifications = await pollVoteNotifications();
   results.communityBirthdayNotifications = await communityBirthdayNotifications(now);
 
   console.log('Resumo:', JSON.stringify(results));
