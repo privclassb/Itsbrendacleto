@@ -76,6 +76,8 @@
     .likers-box { font-size: 12px; color: var(--muted); margin-top: 8px; }
     .post-action-btn span[id^="likeCount-"] { cursor: pointer; text-decoration: underline dotted; text-underline-offset: 2px; }
     .comment-item { display: flex; align-items: baseline; gap: 6px; padding: 6px 0; font-size: 13px; }
+    .comment-avatar-img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; flex-shrink: 0; align-self: center; }
+    .comment-avatar-fallback { width: 22px; height: 22px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; align-self: center; }
     .comment-author { font-weight: 600; color: var(--text); flex-shrink: 0; }
     .comment-text { color: var(--text); flex: 1; word-break: break-word; }
     .comment-delete { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; flex-shrink: 0; }
@@ -727,16 +729,22 @@
     const { data: comments } = await sb.from('community_comments').select('*').eq('post_id', postId).order('created_at', { ascending: true });
     const authorIds = [...new Set((comments || []).map(c => c.author_id))];
     const { data: authors } = authorIds.length
-      ? await sb.from('profiles').select('id, full_name').in('id', authorIds)
+      ? await sb.from('profiles').select('id, full_name, avatar_url').in('id', authorIds)
       : { data: [] };
     const authorMap = {};
     (authors || []).forEach(a => { authorMap[a.id] = a; });
 
     const listHtml = (comments || []).map(c => {
       const canDelete = c.author_id === CURRENT_USER_ID || IS_BRENDA;
+      const author = authorMap[c.author_id];
+      const authorName = author?.full_name || 'Aluno';
+      const avatar = author?.avatar_url
+        ? `<img class="comment-avatar-img" src="${author.avatar_url}" />`
+        : `<div class="comment-avatar-fallback">${initials(authorName)}</div>`;
       return `
         <div class="comment-item">
-          <span class="comment-author">${escapeHtml(authorMap[c.author_id]?.full_name || 'Aluno')}:</span>
+          ${avatar}
+          <span class="comment-author">${escapeHtml(authorName)}:</span>
           <span class="comment-text">${escapeHtml(c.content)}</span>
           ${canDelete ? `<button class="comment-delete" onclick="deleteComment('${c.id}','${postId}')">🗑</button>` : ''}
         </div>`;
