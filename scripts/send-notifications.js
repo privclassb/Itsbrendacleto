@@ -397,7 +397,8 @@ async function printSubscriptionStats() {
   const people = await sb(`profiles?select=id&role=in.(adulto,professora)`);
   console.log(`Pessoas cadastradas (alunos + professoras): ${people.length}`);
   console.log(`Inscrições no OneSignal (todas, algumas podem estar quebradas): ${body.players ?? '?'}`);
-  console.log(`Inscrições ativas de verdade (recebem notificação): ${body.messagable_players ?? '?'}`);
+  console.log(`Inscrições ativas de verdade (recebem notificação): ${body.messageable_players ?? '?'}`);
+  console.log('Resposta completa do OneSignal (debug):', JSON.stringify(body));
 }
 
 async function main() {
