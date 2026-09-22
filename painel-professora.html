@@ -906,6 +906,10 @@
         <input type="text" id="teacherFolderUrl" placeholder="Link do Drive..." style="grid-column:1/-1;" />
         <button class="btn-add-folder" onclick="addTeacherFolder()">+ Adicionar pasta</button>
       </div>
+      <div id="teacherBirthdaysBlock" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--sand);">
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">Aniversário das professoras (pra aparecer no mural da Comunidade)</div>
+        <div id="teacherBirthdaysList"></div>
+      </div>
     </div>
 
   </div>
@@ -1429,7 +1433,9 @@
       await loadStudentsForSelect();
       document.getElementById('addTeacherBtn').style.display = 'inline-flex';
       document.getElementById('addTeacherFolderForm').style.display = 'grid';
+      document.getElementById('teacherBirthdaysBlock').style.display = 'block';
       await loadTeachers();
+      await loadTeacherBirthdays();
     }
     await loadTeacherFolders(user.id, isBrenda);
     // Relatórios — todas as professoras
@@ -3971,6 +3977,31 @@
   function teacherNameById(id) {
     const t = allTeachers.find(x => x.id === id);
     return t ? (t.full_name || 'Sem nome') : 'Professora';
+  }
+
+  async function loadTeacherBirthdays() {
+    const listEl = document.getElementById('teacherBirthdaysList');
+    if (!listEl) return;
+    const { data: teachers } = await sb.from('profiles').select('id, full_name, birth_date').eq('role', 'professora').order('full_name');
+    if (!teachers || !teachers.length) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhuma professora cadastrada.</div>';
+      return;
+    }
+    listEl.innerHTML = teachers.map(t => `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="flex:1;font-size:13px;color:var(--text);">${t.full_name || 'Sem nome'}</span>
+        <input type="date" class="modal-input" id="teacherBirthDate-${t.id}" value="${t.birth_date || ''}" style="max-width:160px;" />
+        <button class="btn-sm" onclick="saveTeacherBirthday('${t.id}')">Salvar</button>
+      </div>`).join('');
+  }
+
+  async function saveTeacherBirthday(teacherId) {
+    const input = document.getElementById('teacherBirthDate-' + teacherId);
+    const birthDate = input.value || null;
+    const { error } = await sb.from('profiles').update({ birth_date: birthDate }).eq('id', teacherId);
+    if (error) { alert('Erro ao salvar: ' + error.message); return; }
+    input.style.borderColor = 'var(--mint)';
+    setTimeout(() => { input.style.borderColor = ''; }, 1200);
   }
 
   async function loadTeacherFolders(userId, seeAll) {
