@@ -388,6 +388,18 @@ async function broadcastNotification(heading, content) {
   console.log(`Notificação avulsa enviada pra ${ids.length} pessoa(s).`);
 }
 
+// ─── Quantas pessoas têm notificação ativada ─────────────────────────────
+async function printSubscriptionStats() {
+  const res = await fetch(`https://onesignal.com/api/v1/apps/${ONESIGNAL_APP_ID}`, {
+    headers: { Authorization: `Basic ${ONESIGNAL_REST_API_KEY}` }
+  });
+  const body = await res.json();
+  const people = await sb(`profiles?select=id&role=in.(adulto,professora)`);
+  console.log(`Pessoas cadastradas (alunos + professoras): ${people.length}`);
+  console.log(`Inscrições no OneSignal (todas, algumas podem estar quebradas): ${body.players ?? '?'}`);
+  console.log(`Inscrições ativas de verdade (recebem notificação): ${body.messagable_players ?? '?'}`);
+}
+
 async function main() {
   const testEmail = process.env.TEST_EMAIL;
   if (testEmail) {
@@ -399,6 +411,11 @@ async function main() {
   const broadcastContent = process.env.BROADCAST_CONTENT;
   if (broadcastHeading && broadcastContent) {
     await broadcastNotification(broadcastHeading, broadcastContent);
+    return;
+  }
+
+  if (process.env.SHOW_STATS === 'true') {
+    await printSubscriptionStats();
     return;
   }
 

@@ -29,6 +29,10 @@ name: Notificações push
         description: 'Texto da notificação avulsa pra todo mundo (só usado junto com broadcast_heading)'
         type: string
         default: ''
+      show_stats:
+        description: 'Marque pra só mostrar quantas pessoas têm notificação ativada de verdade (não manda nada)'
+        type: boolean
+        default: false
 
 jobs:
   send-notifications:
@@ -48,4 +52,5 @@ jobs:
           TEST_CONTENT: ${{ github.event.inputs.test_content || '' }}
           BROADCAST_HEADING: ${{ github.event.inputs.broadcast_heading || '' }}
           BROADCAST_CONTENT: ${{ github.event.inputs.broadcast_content || '' }}
+          SHOW_STATS: ${{ github.event.inputs.show_stats || 'false' }}
         run: node scripts/send-notifications.js
