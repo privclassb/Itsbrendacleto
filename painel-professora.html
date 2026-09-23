@@ -98,6 +98,46 @@
       color: var(--muted);
     }
 
+    /* ── Layout: menu lateral + conteúdo ── */
+    .menu-toggle-btn {
+      display: none;
+      background: none;
+      border: 1.5px solid rgba(255,255,255,0.3);
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 16px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+
+    .app-layout {
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .sidebar {
+      width: 230px;
+      flex-shrink: 0;
+      background: var(--white);
+      border-right: 1px solid var(--sand);
+      min-height: calc(100vh - 61px);
+      position: sticky;
+      top: 61px;
+      padding: 18px 12px;
+      align-self: stretch;
+    }
+
+    .sidebar-top { display: none; }
+    .sidebar-brand { font-weight: 700; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-close-btn { background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer; }
+
+    .sidebar-backdrop { display: none; }
+
+    .content-area {
+      flex: 1;
+      min-width: 0;
+    }
+
     /* ── Main ── */
     main {
       max-width: 900px;
@@ -105,29 +145,62 @@
       padding: 28px 20px;
     }
 
-    /* ── Navegação por abas ── */
+    /* ── Navegação lateral ── */
     .panel-nav {
       display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
+      flex-direction: column;
+      gap: 3px;
     }
     .nav-btn {
-      padding: 9px 18px;
-      border-radius: 99px;
-      border: 1.5px solid var(--sand);
-      background: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
       font-family: 'DM Sans', sans-serif;
-      font-size: 13px;
+      font-size: 13.5px;
       font-weight: 600;
       color: var(--muted);
       cursor: pointer;
       transition: all 0.2s;
+      text-decoration: none;
     }
-    .nav-btn.active { background: var(--brown); border-color: var(--brown); color: var(--white); }
-    .nav-btn:hover:not(.active) { border-color: var(--brown-light); color: var(--text); }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-btn.active { background: var(--brown); color: var(--white); }
+    .nav-btn:hover:not(.active) { background: var(--sand); color: var(--text); }
+    .sidebar-divider { height: 1px; background: var(--sand); margin: 10px 4px; }
     .panel-section { display: none; }
     .panel-section.active { display: block; }
+
+    @media (max-width: 900px) {
+      .menu-toggle-btn { display: inline-flex; align-items: center; }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        min-height: 100vh;
+        width: 260px;
+        box-shadow: var(--shadow);
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        overflow-y: auto;
+      }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-top { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--sand); }
+      .sidebar-backdrop.open {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(44,31,26,0.4);
+        z-index: 99;
+      }
+    }
 
     /* ── Overview cards ── */
     .overview-grid {
@@ -810,54 +883,68 @@
 
 <header>
   <div class="header-left">
+    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleSidebar()" aria-label="Abrir menu">☰</button>
     <div class="header-brand">itsbrendacleto</div>
     <div class="header-tag">Professora</div>
   </div>
   <button class="btn-logout" id="logoutBtn">Sair</button>
 </header>
 
-<div class="welcome-strip">
-  <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
-    <div class="teacher-avatar-wrap">
-      <div class="teacher-avatar-placeholder" id="teacherAvatarPlaceholder">👩‍🏫</div>
-      <img class="teacher-avatar-img" id="teacherAvatarImg" style="display:none;" />
-      <label for="teacherAvatarInput" class="teacher-photo-btn" title="Trocar foto">✏️</label>
-      <input type="file" id="teacherAvatarInput" accept="image/*" />
-    </div>
-    <div>
-      <h1>Olá, <span id="teacherName">Professora</span></h1>
-      <p>Aqui está o resumo dos seus alunos hoje.</p>
-    </div>
-  </div>
-  <div id="pushPermBanner" style="display:none;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:12px 16px;margin-top:4px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-    <span>Ative as notificações pra receber lembretes de aula e relatório direto no celular.</span>
-    <span style="display:flex;gap:8px;">
-      <button type="button" onclick="ativarNotificacoesPush()" style="background:#fff;color:var(--brown,#5C4033);border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">Ativar</button>
-      <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;cursor:pointer;">Agora não</button>
-    </span>
-  </div>
-</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-<main>
+<div class="app-layout">
 
-  <!-- Navegação por abas -->
-  <div class="panel-nav">
-    <button class="nav-btn active" data-tab="inicio" onclick="showTab('inicio')">Página inicial</button>
-    <button class="nav-btn" data-tab="alunos" onclick="showTab('alunos')">Alunos</button>
-    <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')">Turmas</button>
-    <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')">Minha Agenda</button>
-    <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;">Financeiro</button>
-    <button class="nav-btn" id="navContratos" data-tab="contratos" onclick="showTab('contratos')" style="display:none;">Contratos</button>
-    <button class="nav-btn" id="navLeads" data-tab="leads" onclick="showTab('leads')" style="display:none;">Leads</button>
-    <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
-    <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">Materiais</button>
-    <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;">Acompanhar equipe</button>
-    <button class="nav-btn" id="navAtividade" data-tab="atividade" onclick="showTab('atividade')" style="display:none;">Atividade dos alunos</button>
-    <button class="nav-btn" data-tab="vercomo" onclick="showTab('vercomo')">Ver como aluno</button>
-    <a class="nav-btn" href="comunidade.html" style="text-decoration:none;display:inline-flex;align-items:center;">Comunidade</a>
-    <a class="nav-btn" href="material-de-aula.html" style="text-decoration:none;display:inline-flex;align-items:center;">Material de aula</a>
-    <a class="nav-btn" href="frase-adulto.html" style="text-decoration:none;display:inline-flex;align-items:center;">Frase do dia</a>
-  </div>
+  <!-- Navegação lateral -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <span class="sidebar-brand">Menu</span>
+      <button class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Fechar menu">✕</button>
+    </div>
+    <div class="panel-nav">
+      <button class="nav-btn active" data-tab="inicio" onclick="showTab('inicio')"><span class="nav-icon">🏠</span>Página inicial</button>
+      <button class="nav-btn" data-tab="alunos" onclick="showTab('alunos')"><span class="nav-icon">👥</span>Alunos</button>
+      <button class="nav-btn" data-tab="turmas" onclick="showTab('turmas')"><span class="nav-icon">🏫</span>Turmas</button>
+      <button class="nav-btn" data-tab="agenda" onclick="showTab('agenda')"><span class="nav-icon">📅</span>Minha Agenda</button>
+      <button class="nav-btn" id="navFinanceiro" data-tab="financeiro" onclick="showTab('financeiro')" style="display:none;"><span class="nav-icon">💰</span>Financeiro</button>
+      <button class="nav-btn" id="navContratos" data-tab="contratos" onclick="showTab('contratos')" style="display:none;"><span class="nav-icon">📄</span>Contratos</button>
+      <button class="nav-btn" id="navLeads" data-tab="leads" onclick="showTab('leads')" style="display:none;"><span class="nav-icon">📩</span>Leads</button>
+      <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')"><span class="nav-icon">📝</span>Relatórios</button>
+      <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;"><span class="nav-icon">📚</span>Materiais</button>
+      <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;"><span class="nav-icon">👀</span>Acompanhar equipe</button>
+      <button class="nav-btn" id="navAtividade" data-tab="atividade" onclick="showTab('atividade')" style="display:none;"><span class="nav-icon">📊</span>Atividade dos alunos</button>
+      <button class="nav-btn" data-tab="vercomo" onclick="showTab('vercomo')"><span class="nav-icon">🎭</span>Ver como aluno</button>
+      <div class="sidebar-divider"></div>
+      <a class="nav-btn" href="comunidade.html"><span class="nav-icon">💬</span>Comunidade</a>
+      <a class="nav-btn" href="material-de-aula.html"><span class="nav-icon">🎓</span>Material de aula</a>
+      <a class="nav-btn" href="frase-adulto.html"><span class="nav-icon">💭</span>Frase do dia</a>
+    </div>
+  </aside>
+
+  <div class="content-area">
+
+    <div class="welcome-strip">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div class="teacher-avatar-wrap">
+          <div class="teacher-avatar-placeholder" id="teacherAvatarPlaceholder">👩‍🏫</div>
+          <img class="teacher-avatar-img" id="teacherAvatarImg" style="display:none;" />
+          <label for="teacherAvatarInput" class="teacher-photo-btn" title="Trocar foto">✏️</label>
+          <input type="file" id="teacherAvatarInput" accept="image/*" />
+        </div>
+        <div>
+          <h1>Olá, <span id="teacherName">Professora</span></h1>
+          <p>Aqui está o resumo dos seus alunos hoje.</p>
+        </div>
+      </div>
+      <div id="pushPermBanner" style="display:none;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:12px 16px;margin-top:4px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <span>Ative as notificações pra receber lembretes de aula e relatório direto no celular.</span>
+        <span style="display:flex;gap:8px;">
+          <button type="button" onclick="ativarNotificacoesPush()" style="background:#fff;color:var(--brown,#5C4033);border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">Ativar</button>
+          <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;cursor:pointer;">Agora não</button>
+        </span>
+      </div>
+    </div>
+
+    <main>
 
   <!-- Aba: Página inicial -->
   <div class="panel-section active" id="inicioSection">
@@ -1282,7 +1369,11 @@
     </div>
   </div>
 
-</main>
+    </main>
+
+  </div>
+
+</div>
 
 <!-- Modal: Add student -->
 <div class="modal-overlay" id="modalOverlay">
@@ -1400,6 +1491,19 @@
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.tab === tab);
     });
+    closeSidebar();
+  }
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarBackdrop').classList.add('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('open');
+  }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
   }
 
   async function init() {
