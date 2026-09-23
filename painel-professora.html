@@ -852,6 +852,7 @@
     <button class="nav-btn" data-tab="relatorios" onclick="showTab('relatorios')">Relatórios</button>
     <button class="nav-btn" id="navMateriais" data-tab="materiais" onclick="showTab('materiais')" style="display:none;">Materiais</button>
     <button class="nav-btn" id="navEquipe" data-tab="equipe" onclick="showTab('equipe')" style="display:none;">Acompanhar equipe</button>
+    <button class="nav-btn" id="navAtividade" data-tab="atividade" onclick="showTab('atividade')" style="display:none;">Atividade dos alunos</button>
     <button class="nav-btn" data-tab="vercomo" onclick="showTab('vercomo')">Ver como aluno</button>
     <a class="nav-btn" href="comunidade.html" style="text-decoration:none;display:inline-flex;align-items:center;">Comunidade</a>
     <a class="nav-btn" href="material-de-aula.html" style="text-decoration:none;display:inline-flex;align-items:center;">Material de aula</a>
@@ -1183,8 +1184,8 @@
     </div>
   </div>
 
-  <!-- Acompanhar equipe (só Brenda) -->
-  <div class="reports-section panel-section" id="equipeSection">
+  <!-- Atividade dos alunos: acessos e atividades concluídas (só Brenda) -->
+  <div class="reports-section panel-section" id="atividadeSection">
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <span>Acessos e atividades dos alunos</span>
@@ -1197,7 +1198,10 @@
       <div class="modal-hint" style="margin-bottom:8px;">Último acesso à plataforma e atividades concluídas, de todos os alunos.</div>
       <div id="equipeActivityList"><div class="empty-reports">Carregando...</div></div>
     </div>
+  </div>
 
+  <!-- Acompanhar equipe (só Brenda) -->
+  <div class="reports-section panel-section" id="equipeSection">
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <span>Calendário semanal — Equipe</span>
@@ -1383,6 +1387,7 @@
     financeiro: 'financeiroSection',
     contratos: 'contratosSection',
     equipe: 'equipeSection',
+    atividade: 'atividadeSection',
     leads: 'leadsSection',
     vercomo: 'vercomoSection'
   };
@@ -1436,6 +1441,7 @@
       document.getElementById('navMateriais').style.display = 'inline-flex';
       document.getElementById('navFinanceiro').style.display = 'inline-flex';
       document.getElementById('navEquipe').style.display = 'inline-flex';
+      document.getElementById('navAtividade').style.display = 'inline-flex';
       document.getElementById('navLeads').style.display = 'inline-flex';
       await loadLeads();
       await loadPaymentSettings();
@@ -1472,6 +1478,7 @@
       document.getElementById('financeFilterTo').value = lastDay.toISOString().slice(0, 10);
       await loadFinanceiro();
       await loadEquipeOverview(user.id);
+      renderEquipeActivity();
     }
   }
 
@@ -5643,7 +5650,6 @@
     const monthInput = document.getElementById('equipeMonthlyReportMonth');
     if (!monthInput.value) monthInput.value = todayLocalISO().slice(0, 7);
 
-    renderEquipeActivity();
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
     renderEquipeMissingReports(missingReportLogs, myId);
