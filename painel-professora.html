@@ -4200,7 +4200,7 @@
     const startISO = startDateStr + 'T00:00:00.000Z';
     const endISO = endDateStr + 'T00:00:00.000Z';
 
-    const myStudents = allStudents.filter(s => s.teacher_id === currentReportsTeacherId && s.active !== false
+    const myStudents = allStudents.filter(s => (currentReportsSeeAll || s.teacher_id === currentReportsTeacherId) && s.active !== false
       && (!s.contract_start || s.contract_start < endDateStr));
 
     if (myStudents.length === 0) {
@@ -4221,15 +4221,21 @@
     (monthlyReports || []).forEach(r => { reportByStudent[r.student_id] = r; });
     reportsChecklistCache = reportByStudent;
 
+    const teacherName = {};
+    if (currentReportsSeeAll) allTeachers.forEach(t => { teacherName[t.id] = t.full_name || 'Sem nome'; });
+
     const sorted = myStudents.slice().sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
     listEl.innerHTML = sorted.map(s => {
       const r = reportByStudent[s.id];
       const delivered = !!r;
       const statusText = delivered ? (r.is_published ? 'Publicado' : 'Rascunho salvo') : 'Ainda não lançado';
+      const nameLabel = currentReportsSeeAll
+        ? `${s.full_name || 'Aluno'} <span style="font-weight:400;color:var(--muted);font-size:12px;">— ${teacherName[s.teacher_id] || '—'}</span>`
+        : (s.full_name || 'Aluno');
       return `
         <div class="report-row" style="cursor:pointer;" onclick="openReportChecklistItem('${s.id}')">
           <div class="report-row-info">
-            <div class="report-row-student">${s.full_name || 'Aluno'}</div>
+            <div class="report-row-student">${nameLabel}</div>
             <div class="report-row-title">${statusText}</div>
           </div>
           <span class="report-status ${delivered ? 'published' : 'monthly-report-alert'}">${delivered ? '✓ Entregue' : 'Pendente'}</span>
