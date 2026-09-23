@@ -1,0 +1,28 @@
+name: Admin - Corrigir início de contrato
+
+"on":
+  workflow_dispatch:
+    inputs:
+      student_query:
+        description: 'Nome do aluno (ou e-mail cadastrado)'
+        type: string
+        required: true
+      new_contract_start:
+        description: 'Data correta de início do contrato (YYYY-MM-DD)'
+        type: string
+        required: true
+
+jobs:
+  fix-contract-start:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Corrigir início de contrato
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STUDENT_QUERY: ${{ github.event.inputs.student_query }}
+          NEW_CONTRACT_START: ${{ github.event.inputs.new_contract_start }}
+        run: node scripts/admin-fix-contract-start.js
