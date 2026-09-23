@@ -14,6 +14,9 @@
 
 const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
 const ONESIGNAL_APP_ID = '58dbb455-e1d0-4871-9919-bdf37b56aafe';
+const SITE_URL = 'https://privclassb.github.io/Itsbrendacleto/';
+const PROFESSORA_URL = SITE_URL + 'painel-professora.html';
+const COMUNIDADE_URL = SITE_URL + 'comunidade.html';
 
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const ONESIGNAL_REST_API_KEY = process.env.ONESIGNAL_REST_API_KEY;
@@ -76,14 +79,15 @@ async function sb(path, opts = {}) {
   return res.json();
 }
 
-async function sendPush(externalIds, heading, content) {
+async function sendPush(externalIds, heading, content, url) {
   if (!externalIds.length) return;
   const payload = {
     app_id: ONESIGNAL_APP_ID,
     target_channel: 'push',
     include_aliases: { external_id: externalIds },
     headings: { en: heading },
-    contents: { en: content }
+    contents: { en: content },
+    url: url || SITE_URL
   };
   if (DRY_RUN) {
     console.log('[DRY_RUN] enviaria push pra', externalIds, '->', heading, '|', content);
@@ -181,7 +185,7 @@ async function classReportReminders(now) {
     const msg = teacherLogs.length === 1
       ? `A aula de ${dates} ainda está sem relatório.`
       : `${teacherLogs.length} aulas ainda estão sem relatório: ${dates}.`;
-    await sendPush([teacherId], 'Relatório de aula pendente 📝', msg);
+    await sendPush([teacherId], 'Relatório de aula pendente 📝', msg, PROFESSORA_URL);
     if (!DRY_RUN) {
       const doneIds = teacherLogs.map((l) => l.id).join(',');
       await sb(`class_logs?id=in.(${doneIds})`, { method: 'PATCH', body: JSON.stringify({ report_reminder_sent_at: nowIso }) });
@@ -208,7 +212,7 @@ async function monthlyReportReminders(now) {
     const msg = diasRestantes > 0
       ? `Faltam ${diasRestantes} dia(s) pra entregar o relatório mensal (até dia 15).`
       : 'O prazo do relatório mensal (dia 15) já passou — não esqueça de preencher!';
-    await sendPush([t.id], 'Relatório mensal pendente 🗓️', msg);
+    await sendPush([t.id], 'Relatório mensal pendente 🗓️', msg, PROFESSORA_URL);
     if (!DRY_RUN) {
       await sb(`profiles?id=eq.${t.id}`, { method: 'PATCH', body: JSON.stringify({ last_monthly_report_reminder_at: nowIso }) });
     }
@@ -259,7 +263,7 @@ async function likeNotifications() {
     const msg = authorLikes.length === 1
       ? `${likerName[authorLikes[0].user_id] || 'Alguém'} curtiu seu post na Comunidade!`
       : `${authorLikes.length} pessoas curtiram seu post na Comunidade!`;
-    await sendPush([authorId], 'Nova curtida ❤️', msg);
+    await sendPush([authorId], 'Nova curtida ❤️', msg, COMUNIDADE_URL);
   }
 
   if (!DRY_RUN) {
@@ -296,7 +300,7 @@ async function commentNotifications() {
     const msg = authorComments.length === 1
       ? `${commenterName[authorComments[0].author_id] || 'Alguém'} comentou no seu post na Comunidade!`
       : `Seu post na Comunidade recebeu ${authorComments.length} comentários novos!`;
-    await sendPush([authorId], 'Novo comentário 💬', msg);
+    await sendPush([authorId], 'Novo comentário 💬', msg, COMUNIDADE_URL);
   }
 
   if (!DRY_RUN) {
@@ -317,7 +321,7 @@ async function pollNotifications() {
   for (const poll of polls) {
     const targetIds = allIds.filter((id) => id !== poll.author_id);
     if (targetIds.length) {
-      await sendPush(targetIds, 'Nova enquete na Comunidade! 📊', `${poll.poll_question} — vote e participe!`);
+      await sendPush(targetIds, 'Nova enquete na Comunidade! 📊', `${poll.poll_question} — vote e participe!`, COMUNIDADE_URL);
     }
   }
 
@@ -353,7 +357,7 @@ async function pollVoteNotifications() {
     const msg = authorVotes.length === 1
       ? `${voterName[authorVotes[0].user_id] || 'Alguém'} votou na sua enquete!`
       : `${authorVotes.length} pessoas votaram na sua enquete!`;
-    await sendPush([authorId], 'Novo voto na sua enquete 📊', msg);
+    await sendPush([authorId], 'Novo voto na sua enquete 📊', msg, COMUNIDADE_URL);
   }
 
   if (!DRY_RUN) {
@@ -380,7 +384,7 @@ async function communityBirthdayNotifications(now) {
     const targetIds = allIds.filter((id) => id !== person.id);
     if (targetIds.length) {
       const personName = person.community_display_name || person.full_name;
-      await sendPush(targetIds, 'Aniversário na Comunidade! 🎂', `Hoje é aniversário de ${personName}! Fale inglês — vai lá parabenizar em inglês 🎉`);
+      await sendPush(targetIds, 'Aniversário na Comunidade! 🎂', `Hoje é aniversário de ${personName}! Fale inglês — vai lá parabenizar em inglês 🎉`, COMUNIDADE_URL);
     }
     if (!DRY_RUN) {
       await sb(`profiles?id=eq.${person.id}`, { method: 'PATCH', body: JSON.stringify({ community_birthday_notified_date: now.date }) });
