@@ -1,0 +1,23 @@
+name: Admin - Inspecionar cadastro de aluno
+
+"on":
+  workflow_dispatch:
+    inputs:
+      student_query:
+        description: 'Nome do aluno (ou e-mail cadastrado)'
+        type: string
+        required: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Inspecionar
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          STUDENT_QUERY: ${{ github.event.inputs.student_query }}
+        run: node scripts/admin-inspect-student.js
