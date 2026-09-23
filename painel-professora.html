@@ -1187,6 +1187,19 @@
   <div class="reports-section panel-section" id="equipeSection">
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+        <span>Acessos e atividades dos alunos</span>
+        <select class="form-select" id="equipeActivitySort" onchange="renderEquipeActivity()" style="max-width:200px;">
+          <option value="last_active">Menos ativos primeiro</option>
+          <option value="most_active">Mais ativos primeiro</option>
+          <option value="name">Ordem alfabética</option>
+        </select>
+      </div>
+      <div class="modal-hint" style="margin-bottom:8px;">Último acesso à plataforma e atividades concluídas, de todos os alunos.</div>
+      <div id="equipeActivityList"><div class="empty-reports">Carregando...</div></div>
+    </div>
+
+    <div class="report-list" style="margin-bottom:24px;">
+      <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
         <span>Calendário semanal — Equipe</span>
         <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
           <select class="form-select" id="equipeTeacherSelect" onchange="equipeWeekOffset=0;loadEquipeWeek();" style="max-width:180px;">
@@ -5549,6 +5562,60 @@
 
   // ---- Acompanhar equipe (só Brenda) ----
 
+  function formatLastActive(iso) {
+    if (!iso) return { label: 'Nunca acessou', days: Infinity };
+    const diffMs = Date.now() - new Date(iso).getTime();
+    const days = Math.floor(diffMs / 86400000);
+    const dateLabel = new Date(iso).toLocaleDateString('pt-BR');
+    if (days <= 0) return { label: `Hoje (${dateLabel})`, days: 0 };
+    if (days === 1) return { label: `Ontem (${dateLabel})`, days: 1 };
+    return { label: `${dateLabel} (há ${days} dias)`, days };
+  }
+
+  function renderEquipeActivity() {
+    const listEl = document.getElementById('equipeActivityList');
+    if (!listEl) return;
+    const sortMode = document.getElementById('equipeActivitySort').value;
+    const teacherName = {};
+    allTeachers.forEach(t => { teacherName[t.id] = t.full_name || 'Sem nome'; });
+
+    const rows = allStudents.filter(s => s.active !== false).map(s => {
+      const progress = progressByStudent[s.id] || { activities: [] };
+      const activityCount = progress.activities.length;
+      const lastActivityAt = progress.activities.reduce((max, a) => (!max || a.completed_at > max) ? a.completed_at : max, null);
+      const lastActive = formatLastActive(s.last_active_at);
+      return {
+        student: s,
+        teacherLabel: teacherName[s.teacher_id] || '—',
+        activityCount,
+        lastActivityLabel: lastActivityAt ? new Date(lastActivityAt).toLocaleDateString('pt-BR') : 'Nenhuma ainda',
+        lastActive
+      };
+    });
+
+    if (sortMode === 'most_active') {
+      rows.sort((a, b) => b.activityCount - a.activityCount || a.lastActive.days - b.lastActive.days);
+    } else if (sortMode === 'name') {
+      rows.sort((a, b) => (a.student.full_name || '').localeCompare(b.student.full_name || ''));
+    } else {
+      rows.sort((a, b) => b.lastActive.days - a.lastActive.days);
+    }
+
+    if (rows.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum aluno cadastrado ainda.</div>';
+      return;
+    }
+
+    listEl.innerHTML = rows.map(r => `
+      <div class="report-row" style="cursor:pointer;" onclick="openStudentProfile('${r.student.id}')">
+        <div class="report-row-info">
+          <div class="report-row-student">${r.student.full_name || 'Aluno'} <span style="font-weight:400;color:var(--muted);font-size:12px;">— ${r.teacherLabel}</span></div>
+          <div class="report-row-title">Último acesso: ${r.lastActive.label} · ${r.activityCount} atividade(s) concluída(s) · última em ${r.lastActivityLabel}</div>
+        </div>
+        <span class="report-status ${r.lastActive.days <= 3 ? 'published' : 'monthly-report-alert'}">${r.lastActive.days <= 3 ? 'Ativo' : 'Sumido'}</span>
+      </div>`).join('');
+  }
+
   async function loadEquipeOverview(myId) {
     const today = todayLocalISO();
     const missingReportSince = new Date();
@@ -5576,6 +5643,7 @@
     const monthInput = document.getElementById('equipeMonthlyReportMonth');
     if (!monthInput.value) monthInput.value = todayLocalISO().slice(0, 7);
 
+    renderEquipeActivity();
     renderEquipeAulasHoje(logs || [], myId);
     renderEquipePending(pendingLogs || [], myId);
     renderEquipeMissingReports(missingReportLogs, myId);

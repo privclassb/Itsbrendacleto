@@ -355,6 +355,8 @@
     if (profile?.role === 'professora') { window.location.href = 'painel-professora.html'; return; }
     if (profile?.role === 'kids') { window.location.href = 'home-kids.html'; return; }
 
+    sb.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('id', user.id).then(() => {});
+
     const name = profile?.full_name || user.email.split('@')[0];
     const level = profile?.level || 1;
     document.getElementById('heroName').textContent = name + '.';

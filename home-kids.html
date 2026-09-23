@@ -328,6 +328,8 @@
     if (profile?.role === 'professora') { window.location.href = 'painel-professora.html'; return; }
     if (profile?.role === 'adulto') { window.location.href = 'home-adulto.html'; return; }
 
+    sb.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('id', user.id).then(() => {});
+
     const name = profile?.full_name || user.email.split('@')[0];
     const mission = profile?.level || 1;
     document.getElementById('heroName').textContent = name + '! 👋';
