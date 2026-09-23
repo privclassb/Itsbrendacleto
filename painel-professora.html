@@ -1775,12 +1775,35 @@
 
   // Vai pra aba Relatórios com o aluno já selecionado no formulário "Novo
   // relatório", pronto pra escrever o relatório mensal que está faltando.
-  function openMonthlyReportForStudent(studentId) {
-    showTab('relatorios');
-    const sel = document.getElementById('reportStudent');
-    if (sel) sel.value = studentId;
-    const titleInput = document.getElementById('reportTitle');
-    if (titleInput) titleInput.focus();
+  // Abre o relatório mensal de um aluno de OUTRA professora, direto da aba
+  // "Acompanhar equipe" — sem trocar de aba (o modal flutua por cima),
+  // pra não misturar com o checklist pessoal da Brenda em "Relatórios".
+  async function openMonthlyReportForStudent(studentId) {
+    const student = allStudents.find(s => s.id === studentId);
+    const monthStr = document.getElementById('equipeMonthlyReportMonth').value;
+    const monthLabel = monthKeyLabel(monthStr);
+    const { startDateStr, endDateStr } = equipeMonthRange(monthStr);
+    const startISO = startDateStr + 'T00:00:00.000Z';
+    const endISO = endDateStr + 'T00:00:00.000Z';
+
+    const { data: existingReports } = await sb.from('reports').select('*').eq('student_id', studentId)
+      .is('class_log_id', null).gte('created_at', startISO).lt('created_at', endISO);
+    const existing = (existingReports && existingReports[0]) || null;
+
+    document.getElementById('reportStudent').value = studentId;
+    document.getElementById('reportFormTitle').textContent = (student ? student.full_name : 'Aluno') + ' — ' + monthLabel;
+    if (existing) {
+      currentEditingReportId = existing.id;
+      document.getElementById('reportTitle').value = existing.title || '';
+      document.getElementById('reportPeriod').value = existing.period || '';
+      document.getElementById('reportContent').value = existing.content || '';
+    } else {
+      currentEditingReportId = null;
+      document.getElementById('reportTitle').value = 'Relatório de ' + monthLabel;
+      document.getElementById('reportPeriod').value = monthLabel;
+      document.getElementById('reportContent').value = '';
+    }
+    document.getElementById('modalReportForm').classList.add('open');
   }
 
   // Aviso grande ao entrar na plataforma, uma vez por sessão, resumindo aulas e
@@ -4200,7 +4223,7 @@
     const startISO = startDateStr + 'T00:00:00.000Z';
     const endISO = endDateStr + 'T00:00:00.000Z';
 
-    const myStudents = allStudents.filter(s => (currentReportsSeeAll || s.teacher_id === currentReportsTeacherId) && s.active !== false
+    const myStudents = allStudents.filter(s => s.teacher_id === currentReportsTeacherId && s.active !== false
       && (!s.contract_start || s.contract_start < endDateStr));
 
     if (myStudents.length === 0) {
@@ -4221,21 +4244,15 @@
     (monthlyReports || []).forEach(r => { reportByStudent[r.student_id] = r; });
     reportsChecklistCache = reportByStudent;
 
-    const teacherName = {};
-    if (currentReportsSeeAll) allTeachers.forEach(t => { teacherName[t.id] = t.full_name || 'Sem nome'; });
-
     const sorted = myStudents.slice().sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
     listEl.innerHTML = sorted.map(s => {
       const r = reportByStudent[s.id];
       const delivered = !!r;
       const statusText = delivered ? (r.is_published ? 'Publicado' : 'Rascunho salvo') : 'Ainda não lançado';
-      const nameLabel = currentReportsSeeAll
-        ? `${s.full_name || 'Aluno'} <span style="font-weight:400;color:var(--muted);font-size:12px;">— ${teacherName[s.teacher_id] || '—'}</span>`
-        : (s.full_name || 'Aluno');
       return `
         <div class="report-row" style="cursor:pointer;" onclick="openReportChecklistItem('${s.id}')">
           <div class="report-row-info">
-            <div class="report-row-student">${nameLabel}</div>
+            <div class="report-row-student">${s.full_name || 'Aluno'}</div>
             <div class="report-row-title">${statusText}</div>
           </div>
           <span class="report-status ${delivered ? 'published' : 'monthly-report-alert'}">${delivered ? '✓ Entregue' : 'Pendente'}</span>
@@ -4346,6 +4363,7 @@
     document.getElementById('modalReportForm').classList.remove('open');
 
     await loadReports(session.user.id, currentUserIsBrenda);
+    if (currentUserIsBrenda) await renderEquipeMissingMonthlyForSelectedMonth();
   }
 
   async function toggleReportStatus(id, newStatus) {
