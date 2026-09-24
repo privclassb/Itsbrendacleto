@@ -1026,11 +1026,15 @@
       + Adicionar aluno
     </button>
 
+    <!-- Busca -->
+    <input type="text" class="folder-search" id="studentSearch" placeholder="Buscar aluno pelo nome..." oninput="onStudentSearchInput()" style="margin-bottom:12px;" />
+
     <!-- Filter tabs -->
     <div class="filter-tabs">
       <button class="tab active" data-filter="todos">Todos</button>
       <button class="tab" data-filter="kids">Kids</button>
       <button class="tab" data-filter="adulto">Adultos</button>
+      <button class="tab" data-filter="inativos">Inativos</button>
     </div>
 
     <!-- Student list -->
@@ -1460,6 +1464,7 @@
   };
 
   let allStudents = [];
+  let studentSearchQuery = '';
   let currentFilter = 'todos';
   let isBrenda = false;
   let equipeMyId = null;
@@ -2594,9 +2599,10 @@
   }
 
   function updateOverview(students) {
-    document.getElementById('totalAlunos').textContent  = students.length;
-    document.getElementById('totalKids').textContent    = students.filter(s => s.role === 'kids').length;
-    document.getElementById('totalAdultos').textContent = students.filter(s => s.role === 'adulto').length;
+    const active = students.filter(s => s.active !== false);
+    document.getElementById('totalAlunos').textContent  = active.length;
+    document.getElementById('totalKids').textContent    = active.filter(s => s.role === 'kids').length;
+    document.getElementById('totalAdultos').textContent = active.filter(s => s.role === 'adulto').length;
   }
 
   function countCompletedAulas(student, activities) {
@@ -2609,12 +2615,23 @@
     return activities.filter(a => /^adulto-l\d+-(a\d+|workout)$/.test(a.lesson_id)).length;
   }
 
+  function onStudentSearchInput() {
+    studentSearchQuery = document.getElementById('studentSearch').value.toLowerCase().trim();
+    renderStudents(allStudents);
+  }
+
   function renderStudents(students) {
     const list = document.getElementById('studentList');
 
-    const filtered = currentFilter === 'todos'
-      ? students
-      : students.filter(s => s.role === currentFilter);
+    let filtered = currentFilter === 'inativos'
+      ? students.filter(s => s.active === false)
+      : students.filter(s => s.active !== false);
+    if (currentFilter !== 'todos' && currentFilter !== 'inativos') {
+      filtered = filtered.filter(s => s.role === currentFilter);
+    }
+    if (studentSearchQuery) {
+      filtered = filtered.filter(s => (s.full_name || '').toLowerCase().includes(studentSearchQuery));
+    }
 
     if (filtered.length === 0) {
       list.innerHTML = `
