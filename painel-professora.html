@@ -2529,8 +2529,28 @@
     const { error } = await sb.from('profiles').update({ active: newActive }).eq('id', student.id);
     if (error) { alert('Erro: ' + error.message); return; }
 
+    // Ao inativar, pergunta separadamente se as parcelas pendentes no
+    // Financeiro (acordo/renegociação, mensalidade etc.) devem continuar
+    // (aluno ainda deve e vai pagar) ou ser canceladas (aluno cancelou de
+    // vez e não vai mais pagar). Parcelas já pagas nunca são mexidas.
+    if (!newActive) {
+      const { data: pending } = await sb.from('payments').select('id, amount').eq('student_id', student.id).eq('paid', false);
+      if (pending && pending.length > 0) {
+        const total = pending.reduce((sum, p) => sum + Number(p.amount), 0);
+        const cancelar = confirm(
+          `Esse aluno tem ${pending.length} parcela(s) pendente(s) no Financeiro, totalizando ${formatBRLFull(total)}.\n\n` +
+          `Clique OK pra CANCELAR essas parcelas também (ele não vai mais pagar).\n` +
+          `Clique Cancelar pra MANTER as parcelas como estão (ele ainda vai pagar o que deve).`
+        );
+        if (cancelar) {
+          await sb.from('payments').delete().eq('student_id', student.id).eq('paid', false);
+        }
+      }
+    }
+
     const { data: { session } } = await sb.auth.getSession();
     await loadStudents(session.user.id, currentUserIsBrenda);
+    if (currentUserIsBrenda) await loadFinanceiro();
     openStudentProfile(student.id);
   }
 
