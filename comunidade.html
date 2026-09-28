@@ -84,16 +84,18 @@
     .comment-image { display: block; max-width: 180px; max-height: 180px; border-radius: 8px; margin-top: 6px; cursor: pointer; object-fit: cover; }
     .comment-delete { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; flex-shrink: 0; }
     .comment-delete:hover { color: #C0392B; }
-    .comment-input-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
-    .comment-input { flex: 1; border: 1.5px solid var(--sand); border-radius: 8px; padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; background: var(--cream); }
+    .comment-composer { margin-top: 8px; }
+    .comment-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 7px 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; background: var(--cream); }
     .comment-input:focus { border-color: var(--mint); background: var(--white); }
-    .comment-photo-btn { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 8px; padding: 7px 10px; font-size: 14px; line-height: 1; cursor: pointer; flex-shrink: 0; }
+    .comment-image-preview-wrap { display: none; margin-top: 8px; }
+    .comment-image-preview { display: block; max-width: 100%; max-height: 160px; border-radius: 10px; object-fit: cover; }
+    .comment-image-remove-btn { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; padding: 0; margin-top: 4px; }
+    .comment-image-remove-btn:hover { color: #C0392B; }
+    .comment-composer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+    .comment-photo-btn { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 8px; padding: 6px 12px; font-size: 12px; font-weight: 500; color: var(--text); cursor: pointer; }
     .comment-photo-btn:hover { border-color: var(--brown-light); }
     .comment-photo-btn.has-image { border-color: var(--mint); background: rgba(168,197,181,0.25); }
     .comment-send-btn { background: var(--brown); color: var(--white); border: none; border-radius: 8px; padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .comment-image-preview-row { display: none; align-items: center; gap: 8px; margin-top: 6px; }
-    .comment-image-preview-row img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; }
-    .comment-image-preview-remove { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; }
 
     .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
     .empty-msg-sm { text-align: center; padding: 10px; color: var(--muted); font-size: 12px; }
@@ -795,15 +797,19 @@
 
     box.innerHTML = `
       <div class="comments-list">${listHtml || '<div class="empty-msg-sm">Nenhum comentário ainda.</div>'}</div>
-      <div class="comment-input-row">
+      <div class="comment-composer">
         <input type="text" class="comment-input" id="commentInput-${postId}" placeholder="Escreva um comentário..." />
-        <input type="file" id="commentImageInput-${postId}" accept="image/*" style="display:none;" />
-        <label for="commentImageInput-${postId}" class="comment-photo-btn" id="commentPhotoBtn-${postId}" title="Anexar foto">📷</label>
-        <button class="comment-send-btn" onclick="addComment('${postId}')">Enviar</button>
-      </div>
-      <div class="comment-image-preview-row" id="commentImagePreviewRow-${postId}">
-        <img id="commentImagePreviewImg-${postId}" />
-        <button type="button" class="comment-image-preview-remove" onclick="removeCommentImage('${postId}')">✕ remover foto</button>
+        <div class="comment-image-preview-wrap" id="commentImagePreviewWrap-${postId}">
+          <img class="comment-image-preview" id="commentImagePreviewImg-${postId}" />
+          <button type="button" class="comment-image-remove-btn" onclick="removeCommentImage('${postId}')">✕ remover foto</button>
+        </div>
+        <div class="comment-composer-actions">
+          <div>
+            <input type="file" id="commentImageInput-${postId}" accept="image/*" style="display:none;" />
+            <label for="commentImageInput-${postId}" class="comment-photo-btn" id="commentPhotoBtn-${postId}">Foto</label>
+          </div>
+          <button class="comment-send-btn" onclick="addComment('${postId}')">Enviar</button>
+        </div>
       </div>`;
 
     const input = document.getElementById('commentInput-' + postId);
@@ -813,11 +819,13 @@
       const file = e.target.files[0];
       if (!file) { removeCommentImage(postId); return; }
       pendingCommentImages[postId] = file;
-      document.getElementById('commentPhotoBtn-' + postId).classList.add('has-image');
+      const btn = document.getElementById('commentPhotoBtn-' + postId);
+      btn.classList.add('has-image');
+      btn.textContent = 'Trocar foto';
       const reader = new FileReader();
       reader.onload = function (ev) {
         document.getElementById('commentImagePreviewImg-' + postId).src = ev.target.result;
-        document.getElementById('commentImagePreviewRow-' + postId).style.display = 'flex';
+        document.getElementById('commentImagePreviewWrap-' + postId).style.display = 'block';
       };
       reader.readAsDataURL(file);
     });
@@ -828,9 +836,9 @@
     const fileInput = document.getElementById('commentImageInput-' + postId);
     if (fileInput) fileInput.value = '';
     const btn = document.getElementById('commentPhotoBtn-' + postId);
-    if (btn) btn.classList.remove('has-image');
-    const row = document.getElementById('commentImagePreviewRow-' + postId);
-    if (row) row.style.display = 'none';
+    if (btn) { btn.classList.remove('has-image'); btn.textContent = 'Foto'; }
+    const wrap = document.getElementById('commentImagePreviewWrap-' + postId);
+    if (wrap) wrap.style.display = 'none';
   }
 
   async function addComment(postId) {
