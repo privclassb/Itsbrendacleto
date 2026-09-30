@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 · My Daily Routine! · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+    --brown1:#7A4A2B;
+    --brown2:#5A331B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito Sans', sans-serif;
+    color:var(--dark);
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 40px);
+    background-color:#fff;
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Nunito', sans-serif; margin:0; }
+
+  .btn-voltar{display:none;align-items:center;gap:6px;background:rgba(0,0,0,0.3);border:none;border-radius:0;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-decoration:none;width:100%;position:relative;z-index:9999;pointer-events:all !important;}
+  .btn-voltar:active{background:rgba(0,0,0,0.5);}
+  .planner-mode .pills{display:none;}
+  .planner-mode .btn-voltar{display:block;}
+
+  header{
+    background:linear-gradient(135deg, var(--brown1), var(--brown2));
+    color:#fff; text-align:center; padding:22px 16px 18px; border-radius:0 0 24px 24px;
+  }
+  header .tag{
+    font-size:12px; font-weight:800; background:rgba(255,255,255,.18);
+    display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  header h1{ font-size:24px; font-weight:900; }
+  header .sub{ font-size:14px; opacity:.9; margin-top:4px; }
+
+  nav.pills{ display:flex; gap:8px; overflow-x:auto; padding:14px 12px 4px; -webkit-overflow-scrolling:touch; }
+  nav.pills::-webkit-scrollbar{ display:none; }
+  nav.pills button{
+    flex:0 0 auto; border:none; background:#f1f1f1; color:var(--dark);
+    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px;
+    padding:9px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;
+  }
+  nav.pills button.active{ background:var(--blue); color:#fff; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 16px 60px; }
+  section{ display:none; animation:fade .25s ease; }
+  section.show{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-title{ font-size:20px; font-weight:900; margin:14px 0 4px; }
+  .section-hint{ font-size:14px; color:#666; margin-bottom:14px; }
+  .how-box{
+    background:#eef7fb; border-left:4px solid var(--blue); border-radius:10px;
+    padding:12px 14px; font-size:14px; line-height:1.6; margin-bottom:14px; color:var(--dark);
+  }
+
+  .btn{ border:none; border-radius:14px; padding:12px 18px; font-weight:800; font-size:14px; cursor:pointer; background:var(--blue); color:#fff; }
+  .btn.secondary{ background:#eee; color:var(--dark); }
+  .btn.big{ font-size:17px; padding:16px 30px; display:block; margin:16px auto; }
+
+  /* ---- Story Mode ---- */
+  .story-wrap{ text-align:center; }
+  .story-card{
+    background:var(--pink); border-radius:22px; padding:30px 20px; margin-bottom:14px;
+    cursor:pointer; transition:transform .12s;
+  }
+  .story-card:active{ transform:scale(.97); }
+  .story-emoji{ font-size:72px; display:block; margin-bottom:10px; }
+  .story-en{ font-size:22px; font-weight:900; }
+  .story-pt{ font-size:14px; opacity:.75; margin-top:4px; }
+  .story-tap-hint{ font-size:12px; opacity:.6; margin-top:10px; }
+  .story-nav{ display:flex; justify-content:center; gap:14px; align-items:center; margin-bottom:12px; }
+  .story-arrow{ border:none; background:#eee; width:46px; height:46px; border-radius:50%; font-size:20px; cursor:pointer; }
+  .story-dots{ display:flex; justify-content:center; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+  .story-dot{ width:9px; height:9px; border-radius:50%; background:#ddd; }
+  .story-dot.seen{ background:var(--blue); }
+  .story-dot.active{ background:var(--coral); }
+
+  /* ---- Speed Match ---- */
+  .speed-hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-weight:800; font-size:14px; color:#888; }
+  .speed-timer-track{ height:10px; background:#eee; border-radius:6px; overflow:hidden; margin-bottom:16px; }
+  .speed-timer-bar{ height:100%; background:var(--coral); width:100%; transition:width .1s linear; }
+  .speed-card{ background:var(--yellow); border-radius:20px; padding:26px; text-align:center; margin-bottom:16px; }
+  .speed-subject{ font-size:14px; font-weight:800; opacity:.7; letter-spacing:.5px; margin-bottom:6px; }
+  .speed-verb{ font-size:24px; font-weight:900; }
+  .speed-options{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .speed-opt{ border:none; border-radius:16px; padding:16px 22px; font-weight:900; font-size:17px; cursor:pointer; background:#f6f6f6; min-width:130px; }
+  .speed-opt.correct{ background:var(--mint); }
+  .speed-opt.incorrect{ background:var(--coral); }
+  .speed-final{ text-align:center; padding:20px 0; }
+  .speed-final .score{ font-size:40px; font-weight:900; color:var(--blue); }
+
+  /* ---- Catch the Time ---- */
+  .catch-hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .catch-target{ font-weight:900; font-size:15px; background:var(--lavender); border-radius:14px; padding:8px 14px; }
+  .catch-score{ font-weight:800; font-size:14px; color:#888; }
+  .catch-area{
+    position:relative; height:380px; border-radius:22px; overflow:hidden; margin-bottom:14px;
+    background:linear-gradient(180deg, #cdeffb, #eaf9ff);
+  }
+  .bubble{
+    position:absolute; bottom:-70px; width:78px; height:78px; border-radius:50%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    font-size:10px; font-weight:800; text-align:center; padding:4px; cursor:pointer;
+    background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.12);
+    animation-name:rise; animation-timing-function:linear; animation-fill-mode:forwards;
+  }
+  .bubble .b-emoji{ font-size:26px; }
+  .bubble.pop{ animation:none !important; transform:scale(1.4); opacity:0; transition:.25s; }
+  @keyframes rise{ to{ bottom:440px; } }
+  .catch-cover{
+    position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:rgba(255,255,255,.9); text-align:center; padding:20px;
+  }
+  .catch-cover.hide{ display:none; }
+
+  /* ---- Sentence Detective ---- */
+  .det-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin-bottom:10px; }
+  .det-card{ background:var(--lavender); border-radius:18px; padding:18px; margin-bottom:14px; }
+  .det-instruction{ text-align:center; font-weight:800; font-size:14px; margin-bottom:14px; }
+  .det-opt{
+    display:block; width:100%; text-align:left; background:#fff; border:none;
+    border-radius:12px; padding:13px 14px; margin-bottom:9px; font-size:15px; font-weight:700; cursor:pointer;
+  }
+  .det-opt.wrong-found{ background:var(--coral); }
+  .det-opt.missed{ background:#eee; opacity:.6; }
+  .det-fix{ text-align:center; background:var(--mint); border-radius:12px; padding:10px; font-weight:800; font-size:14px; margin-top:4px; display:none; }
+  .det-fix.show{ display:block; }
+  .det-done{ text-align:center; padding:20px 0; }
+  .det-done .score{ font-size:36px; font-weight:900; color:var(--blue); }
+
+  /* Missao */
+  .mission-item{
+    display:flex; align-items:center; gap:12px; background:#f6f6f6; border-radius:14px;
+    padding:14px; margin-bottom:10px; cursor:pointer;
+  }
+  .mission-item.done{ background:#dff5e6; }
+  .mission-check{
+    width:26px; height:26px; border-radius:50%; border:2px solid #bbb;
+    display:flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto;
+  }
+  .mission-item.done .mission-check{ background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
+  .mission-label{ font-weight:700; font-size:15px; }
+
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .badge-card{ background:#fff; border-radius:24px; padding:30px 24px; text-align:center; max-width:340px; position:relative; overflow:hidden; }
+  .badge-trophy{ font-size:70px; animation:bounce 1s infinite; }
+  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  .badge-card h2{ font-size:22px; margin:10px 0 4px; }
+  .badge-card p{ font-size:14px; color:#666; margin-bottom:16px; }
+  .confetti{ position:absolute; top:-10px; font-size:18px; animation:fall 2.2s linear forwards; }
+  @keyframes fall{ to{ transform:translateY(420px) rotate(360deg); opacity:0; } }
+  .share-btn{ background:var(--pink); color:#fff; border:none; border-radius:14px; padding:12px 20px; font-weight:800; cursor:pointer; }
+  .close-btn{ background:none; border:none; color:#999; margin-top:10px; font-weight:700; cursor:pointer; }
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<a class="btn-voltar" id="btnVoltar" href="planner-kids-10.html">← Voltar para a lista</a>
+
+<header>
+  <div class="tag">⭐ KIDS EDITION · LESSON 10</div>
+  <h1>⏰ My Daily Routine!</h1>
+  <div class="sub">Homework practice · itsbrendacleto</div>
+</header>
+
+<nav class="pills" id="pills"></nav>
+
+<main>
+
+  <section id="story">
+    <div class="section-title">📖 Story Mode</div>
+    <div class="section-hint">Tap the card to hear it! Use the arrows to move through the whole day.</div>
+    <div class="story-wrap">
+      <div class="story-card" id="storyCard">
+        <span class="story-emoji" id="storyEmoji"></span>
+        <span class="story-en" id="storyEn"></span>
+        <div class="story-pt" id="storyPt"></div>
+        <div class="story-tap-hint">👆 tap to hear</div>
+      </div>
+      <div class="story-nav">
+        <button class="story-arrow" id="storyPrev">◀</button>
+        <span id="storyCount" style="font-weight:800;color:#888;font-size:13px;"></span>
+        <button class="story-arrow" id="storyNext">▶</button>
+      </div>
+      <div class="story-dots" id="storyDots"></div>
+    </div>
+  </section>
+
+  <section id="speed">
+    <div class="section-title">⚡ Speed Match</div>
+    <div class="how-box">Toca na forma certa do verbo antes que o tempo acabe! Preste atenção: <b>He/She</b> pedem <b>-s</b>.</div>
+    <div class="speed-hud"><span id="speedRound"></span><span id="speedScore"></span></div>
+    <div class="speed-timer-track"><div class="speed-timer-bar" id="speedTimerBar"></div></div>
+    <div id="speedBody"></div>
+  </section>
+
+  <section id="catch">
+    <div class="section-title">🫧 Catch the Time!</div>
+    <div class="how-box">Escute e leia o alvo, depois toque na bolha certa antes que ela suba e desapareça!</div>
+    <div class="catch-hud">
+      <div class="catch-target" id="catchTarget">Tap Start to play!</div>
+      <div class="catch-score" id="catchScore"></div>
+    </div>
+    <div class="catch-area" id="catchArea">
+      <div class="catch-cover" id="catchCover">
+        <div style="font-size:50px;margin-bottom:10px;">🫧</div>
+        <button class="btn big" id="catchStart">▶ Start Game</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="detective">
+    <div class="section-title">🕵️ Sentence Detective</div>
+    <div class="how-box">Uma das 3 frases está <b>errada</b>. Toque nela para descobrir!</div>
+    <div class="det-progress" id="detProgress"></div>
+    <div id="detBody"></div>
+  </section>
+
+  <section id="missao">
+    <div class="section-title">🎯 Missão</div>
+    <div class="section-hint">Mark each activity as you finish it!</div>
+    <div id="missionList"></div>
+  </section>
+
+</main>
+
+<div class="overlay" id="badgeOverlay">
+  <div class="badge-card" id="badgeCard">
+    <div class="badge-trophy">🏆</div>
+    <h2>You did it!</h2>
+    <p>You finished Lesson 10 — My Daily Routine! 🎉</p>
+    <button class="share-btn" id="shareBtn">📤 Share</button><br>
+    <button class="close-btn" id="closeBadge">Close</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- SUPABASE (padrão itsbrendacleto) ---------------- */
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
+
+// ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+var __previewAs = sessionStorage.getItem('__preview_as');
+if (__previewAs) {
+  var __origGetSession = sb.auth.getSession.bind(sb.auth);
+  sb.auth.getSession = async function () {
+    var real = await __origGetSession();
+    if (real && real.data && real.data.session) {
+      real.data.session = Object.assign({}, real.data.session, {
+        user: Object.assign({}, real.data.session.user, { id: __previewAs })
+      });
+    }
+    return real;
+  };
+  var __previewNoop = function () {
+    var p = new Proxy(function () {}, {
+      get: function (t, prop) {
+        if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+        return function () { return p; };
+      }
+    });
+    return p;
+  };
+  var __origFrom = sb.from.bind(sb);
+  sb.from = function (table) {
+    var qb = __origFrom(table);
+    ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+      qb[m] = function () { return __previewNoop(); };
+    });
+    return qb;
+  };
+  if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+  var __insertPreviewBanner = function () {
+    if (document.getElementById('previewModeBanner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'previewModeBanner';
+    banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+    var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+    banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+      '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+    document.body.insertBefore(banner, document.body.firstChild);
+  };
+  if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'previewExitBtn') {
+      sessionStorage.removeItem('__preview_as');
+      sessionStorage.removeItem('__preview_name');
+      window.location.href = 'painel-professora.html';
+    }
+  });
+}
+
+var LESSON_ID = 'kids-m1-a10';
+var LESSON_PREFIX = 'kids-l1-a10-';
+var BADGE_NAME = 'aula-kids-10-completa';
+
+async function saveFaseProgress(faseKey) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: LESSON_PREFIX + faseKey, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso:', e); }
+}
+
+async function saveLessonComplete() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('badges').upsert({ user_id: session.user.id, badge_name: BADGE_NAME, earned_at: new Date().toISOString() });
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar conclusão da aula:', e); }
+}
+
+/* ---------------- TTS (standard itsbrendacleto voice picker) ---------------- */
+var __ttsVoice=null;
+function __pickTtsVoice(){if(!window.speechSynthesis)return null;var voices=window.speechSynthesis.getVoices();if(!voices.length)return null;var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;});if(!en.length)return null;var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i;var normal=en.filter(function(v){return !NOVELTY.test(v.name);});var base=normal.length?normal:en;var sysDefault=base.filter(function(v){return v.default;})[0];if(sysDefault)return sysDefault;var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';});var pool=exact.length?exact:base;var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0];return pref||pool[0];}
+if(window.speechSynthesis){__ttsVoice=__pickTtsVoice();window.speechSynthesis.onvoiceschanged=function(){__ttsVoice=__pickTtsVoice();};}
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(__ttsVoice)u.voice=__ttsVoice;u.rate=.85;window.speechSynthesis.speak(u);}
+
+/* ---------------- UTILS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ---------------- DATA ---------------- */
+const routineWords = [
+  {en:'wake up', pt:'Acordar', emoji:'⏰'},
+  {en:'get up', pt:'Levantar', emoji:'🛏️'},
+  {en:'brush my teeth', pt:'Escovar os dentes', emoji:'🪥'},
+  {en:'take a shower', pt:'Tomar banho', emoji:'🚿'},
+  {en:'get dressed', pt:'Se vestir', emoji:'👕'},
+  {en:'go to school', pt:'Ir pra escola', emoji:'🎒'},
+  {en:'have breakfast', pt:'Tomar café', emoji:'🍳'},
+  {en:'have lunch', pt:'Almoçar', emoji:'🍽️'},
+  {en:'do homework', pt:'Fazer lição', emoji:'📝'},
+  {en:'have dinner', pt:'Jantar', emoji:'🍝'},
+  {en:'take a bath', pt:'Tomar banho (noite)', emoji:'🛁'},
+  {en:'go to bed', pt:'Ir dormir', emoji:'🌙'}
+];
+
+const speedVerbs = [
+  {base:'wake up', third:'wakes up'},
+  {base:'get up', third:'gets up'},
+  {base:'take a shower', third:'takes a shower'},
+  {base:'get dressed', third:'gets dressed'},
+  {base:'go to school', third:'goes to school'},
+  {base:'have breakfast', third:'has breakfast'},
+  {base:'have lunch', third:'has lunch'},
+  {base:'do homework', third:'does homework'},
+  {base:'have dinner', third:'has dinner'},
+  {base:'go to bed', third:'goes to bed'}
+];
+const thirdSubjects = ['He','She'];
+const baseSubjects = ['I','You','We','They'];
+const SPEED_ROUNDS = 10;
+const SPEED_TIME = 6000;
+
+const CATCH_WIN = 8;
+
+const detectiveRounds = [
+  {opts:['She wakes up at 7.','She wake up at 7.','They go to school.'], wrong:1, fix:'She wakes up at 7.'},
+  {opts:['He doesn’t goes to school.','He doesn’t go to school.','I have breakfast at 8.'], wrong:0, fix:'He doesn’t go to school.'},
+  {opts:['Do you brush your teeth at night?','Does you brush your teeth at night?','We have dinner at home.'], wrong:1, fix:'Do you brush your teeth at night?'},
+  {opts:['She have lunch at school.','She has lunch at school.','He plays soccer.'], wrong:0, fix:'She has lunch at school.'},
+  {opts:['They doesn’t do homework.','They don’t do homework.','I go to bed at 9.'], wrong:0, fix:'They don’t do homework.'},
+  {opts:['He take a shower at night.','He takes a shower at night.','We get dressed fast.'], wrong:0, fix:'He takes a shower at night.'},
+  {opts:['Does she has breakfast at 7?','Does she have breakfast at 7?','I wake up early.'], wrong:0, fix:'Does she have breakfast at 7?'},
+  {opts:['I goes to school at 8.','I go to school at 8.','She does her homework.'], wrong:0, fix:'I go to school at 8.'}
+];
+
+const missionTasks = [
+  {id:'story', label:'📖 Finish Story Mode'},
+  {id:'speed', label:'⚡ Finish Speed Match'},
+  {id:'catch', label:'🫧 Catch 8 in Catch the Time'},
+  {id:'detective', label:'🕵️ Finish Sentence Detective'}
+];
+
+/* ---------------- NAV ---------------- */
+const sections = ['story','speed','catch','detective','missao'];
+const pillLabels = {story:'📖 Story', speed:'⚡ Speed', catch:'🫧 Catch', detective:'🕵️ Detective', missao:'🎯 Missão'};
+const pillsNav = document.getElementById('pills');
+sections.forEach(name=>{
+  const b = document.createElement('button');
+  b.textContent = pillLabels[name];
+  b.addEventListener('click', ()=>show(name));
+  b.dataset.name = name;
+  pillsNav.appendChild(b);
+});
+function show(name){
+  sections.forEach(s=> document.getElementById(s).classList.toggle('show', s===name));
+  Array.from(pillsNav.children).forEach(b=> b.classList.toggle('active', b.dataset.name===name));
+  if(name !== 'catch' && typeof stopCatchGame === 'function') stopCatchGame();
+}
+
+/* ---------------- STORY MODE ---------------- */
+let storyIndex = 0;
+const storySeen = new Set();
+function renderStory(){
+  const item = routineWords[storyIndex];
+  document.getElementById('storyEmoji').textContent = item.emoji;
+  document.getElementById('storyEn').textContent = item.en;
+  document.getElementById('storyPt').textContent = item.pt;
+  document.getElementById('storyCount').textContent = `${storyIndex+1} / ${routineWords.length}`;
+  storySeen.add(storyIndex);
+  const dots = document.getElementById('storyDots');
+  dots.innerHTML = '';
+  routineWords.forEach((w,i)=>{
+    const d = document.createElement('div');
+    d.className = 'story-dot' + (i===storyIndex ? ' active' : (storySeen.has(i) ? ' seen' : ''));
+    dots.appendChild(d);
+  });
+  if(storySeen.size === routineWords.length) markDone('story');
+}
+document.getElementById('storyCard').addEventListener('click', ()=> speak(routineWords[storyIndex].en));
+document.getElementById('storyPrev').addEventListener('click', ()=>{
+  storyIndex = (storyIndex - 1 + routineWords.length) % routineWords.length;
+  renderStory();
+  speak(routineWords[storyIndex].en);
+});
+document.getElementById('storyNext').addEventListener('click', ()=>{
+  storyIndex = (storyIndex + 1) % routineWords.length;
+  renderStory();
+  speak(routineWords[storyIndex].en);
+});
+renderStory();
+
+/* ---------------- SPEED MATCH ---------------- */
+let speedRoundIndex = 0, speedScore = 0, speedTimerInterval = null;
+function buildSpeedRound(){
+  const verb = randomItem(speedVerbs);
+  const isThird = Math.random() < 0.5;
+  const subject = isThird ? randomItem(thirdSubjects) : randomItem(baseSubjects);
+  const correct = isThird ? verb.third : verb.base;
+  const wrong = isThird ? verb.base : verb.third;
+  return {subject, verb, correct, wrong};
+}
+function renderSpeed(){
+  document.getElementById('speedRound').textContent = `Round ${Math.min(speedRoundIndex+1, SPEED_ROUNDS)}/${SPEED_ROUNDS}`;
+  document.getElementById('speedScore').textContent = `⭐ ${speedScore}`;
+  const body = document.getElementById('speedBody');
+  clearInterval(speedTimerInterval);
+  if(speedRoundIndex >= SPEED_ROUNDS){
+    body.innerHTML = `<div class="speed-final"><div class="score">${speedScore}/${SPEED_ROUNDS}</div><p>Awesome speed! 🎉</p><button class="btn" id="speedRestart">🔄 Play Again</button></div>`;
+    document.getElementById('speedTimerBar').style.width = '0%';
+    document.getElementById('speedRestart').addEventListener('click', ()=>{
+      speedRoundIndex = 0; speedScore = 0; renderSpeed();
+    });
+    markDone('speed');
+    return;
+  }
+  const r = buildSpeedRound();
+  body.innerHTML = `<div class="speed-card"><div class="speed-subject">${r.subject}</div><div class="speed-verb">${r.verb.base}</div></div><div class="speed-options" id="speedOptions"></div>`;
+  const optsBox = document.getElementById('speedOptions');
+  let correctBtn = null;
+  shuffle([{t:r.correct, ok:true},{t:r.wrong, ok:false}]).forEach(o=>{
+    const b = document.createElement('button');
+    b.className = 'speed-opt';
+    b.textContent = o.t;
+    if(o.ok) correctBtn = b;
+    b.addEventListener('click', ()=> answerSpeed(o.ok, b, optsBox, false, correctBtn));
+    optsBox.appendChild(b);
+  });
+  let timeLeft = SPEED_TIME;
+  const bar = document.getElementById('speedTimerBar');
+  bar.style.width = '100%';
+  speedTimerInterval = setInterval(()=>{
+    timeLeft -= 100;
+    bar.style.width = Math.max(0,(timeLeft/SPEED_TIME)*100) + '%';
+    if(timeLeft <= 0){
+      clearInterval(speedTimerInterval);
+      answerSpeed(false, null, optsBox, true, correctBtn);
+    }
+  }, 100);
+}
+function answerSpeed(isCorrect, btn, optsBox, timedOut, correctBtn){
+  clearInterval(speedTimerInterval);
+  Array.from(optsBox.children).forEach(el=> el.disabled = true);
+  if(btn) btn.classList.add(isCorrect ? 'correct' : 'incorrect');
+  if(!isCorrect && correctBtn) correctBtn.classList.add('correct');
+  if(isCorrect) speedScore++;
+  setTimeout(()=>{ speedRoundIndex++; renderSpeed(); }, 900);
+}
+renderSpeed();
+
+/* ---------------- CATCH THE TIME ---------------- */
+let catchScore = 0, catchTarget = null, catchSpawnInterval = null, catchRunning = false;
+function startCatchGame(){
+  catchScore = 0;
+  catchRunning = true;
+  document.getElementById('catchCover').classList.add('hide');
+  document.getElementById('catchArea').querySelectorAll('.bubble').forEach(b=>b.remove());
+  pickNewTarget();
+  updateCatchHud();
+  clearInterval(catchSpawnInterval);
+  catchSpawnInterval = setInterval(spawnBubble, 900);
+}
+function stopCatchGame(){
+  catchRunning = false;
+  clearInterval(catchSpawnInterval);
+}
+function pickNewTarget(){
+  catchTarget = randomItem(routineWords);
+  document.getElementById('catchTarget').textContent = `Catch: ${catchTarget.en} ${catchTarget.emoji}`;
+  speak(catchTarget.en);
+}
+function updateCatchHud(){
+  document.getElementById('catchScore').textContent = `✅ ${catchScore}/${CATCH_WIN}`;
+}
+function spawnBubble(){
+  if(!catchRunning) return;
+  const area = document.getElementById('catchArea');
+  // 45% chance to spawn the current target, otherwise a decoy
+  const isTarget = Math.random() < 0.45;
+  const item = isTarget ? catchTarget : randomItem(routineWords.filter(w=>w.en !== catchTarget.en));
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.dataset.word = item.en;
+  bubble.innerHTML = `<span class="b-emoji">${item.emoji}</span>${item.en}`;
+  bubble.style.left = (8 + Math.random()*74) + '%';
+  const duration = 4 + Math.random()*2;
+  bubble.style.animationDuration = duration + 's';
+  bubble.addEventListener('animationend', ()=>{ if(bubble.parentNode) bubble.remove(); });
+  bubble.addEventListener('click', ()=>{
+    if(!catchRunning) return;
+    if(bubble.dataset.word === catchTarget.en){
+      catchScore++;
+      updateCatchHud();
+      bubble.classList.add('pop');
+      setTimeout(()=> bubble.remove(), 260);
+      if(catchScore >= CATCH_WIN){
+        stopCatchGame();
+        markDone('catch');
+        setTimeout(()=>{
+          document.getElementById('catchArea').querySelectorAll('.bubble').forEach(b=>b.remove());
+          document.getElementById('catchTarget').textContent = '🎉 You caught them all!';
+          const cover = document.getElementById('catchCover');
+          cover.classList.remove('hide');
+          cover.innerHTML = `<div style="font-size:50px;margin-bottom:10px;">🎉</div><button class="btn big" id="catchStart">🔄 Play Again</button>`;
+          document.getElementById('catchStart').addEventListener('click', startCatchGame);
+        }, 300);
+      } else {
+        pickNewTarget();
+      }
+    } else {
+      bubble.style.filter = 'grayscale(1)';
+      setTimeout(()=>{ if(bubble.parentNode) bubble.remove(); }, 200);
+    }
+  });
+  area.appendChild(bubble);
+}
+document.getElementById('catchStart').addEventListener('click', startCatchGame);
+
+/* ---------------- SENTENCE DETECTIVE ---------------- */
+let detIndex = 0, detScore = 0;
+function renderDet(){
+  document.getElementById('detProgress').textContent = `Round ${Math.min(detIndex+1, detectiveRounds.length)} of ${detectiveRounds.length}`;
+  const body = document.getElementById('detBody');
+  if(detIndex >= detectiveRounds.length){
+    body.innerHTML = `<div class="det-done"><div class="score">${detScore}/${detectiveRounds.length}</div><p>Nice detective work! 🕵️</p><button class="btn" id="detRestart">🔄 Try Again</button></div>`;
+    document.getElementById('detRestart').addEventListener('click', ()=>{ detIndex = 0; detScore = 0; renderDet(); });
+    markDone('detective');
+    return;
+  }
+  const r = detectiveRounds[detIndex];
+  const order = shuffle(r.opts.map((o,i)=>({o,i})));
+  body.innerHTML = `<div class="det-card"><div class="det-instruction">Qual frase está ERRADA?</div><div id="detOptions"></div><div class="det-fix" id="detFix"></div></div>`;
+  const box = document.getElementById('detOptions');
+  order.forEach(obj=>{
+    const b = document.createElement('button');
+    b.className = 'det-opt';
+    b.textContent = obj.o;
+    b.addEventListener('click', ()=>{
+      Array.from(box.children).forEach(el=>el.disabled=true);
+      const fix = document.getElementById('detFix');
+      if(obj.i === r.wrong){
+        b.classList.add('wrong-found');
+        detScore++;
+      } else {
+        b.classList.add('missed');
+        Array.from(box.children).forEach(el=>{
+          if(el.textContent === r.opts[r.wrong]) el.classList.add('wrong-found');
+        });
+      }
+      fix.textContent = `✅ ${r.fix}`;
+      fix.classList.add('show');
+      setTimeout(()=>{ detIndex++; renderDet(); }, 1400);
+    });
+    box.appendChild(b);
+  });
+}
+renderDet();
+
+/* ---------------- MISSAO ---------------- */
+const missionState = {};
+function renderMission(){
+  const list = document.getElementById('missionList');
+  list.innerHTML = '';
+  missionTasks.forEach(t=>{
+    const done = !!missionState[t.id];
+    const div = document.createElement('div');
+    div.className = 'mission-item' + (done ? ' done' : '');
+    div.innerHTML = `<div class="mission-check">${done ? '✓' : ''}</div><div class="mission-label">${t.label}</div>`;
+    div.addEventListener('click', ()=>{
+      missionState[t.id] = !missionState[t.id];
+      renderMission();
+      checkAllDone();
+    });
+    list.appendChild(div);
+  });
+}
+function markDone(id){
+  if (missionState[id]) return;
+  missionState[id] = true;
+  renderMission();
+  checkAllDone();
+  saveFaseProgress(id);
+}
+function checkAllDone(){
+  if(missionTasks.every(t=>missionState[t.id])){
+    document.getElementById('badgeOverlay').classList.add('show');
+    launchConfetti();
+    saveLessonComplete();
+  }
+}
+renderMission();
+
+/* ---------------- BADGE / CONFETTI ---------------- */
+function launchConfetti(){
+  const card = document.getElementById('badgeCard');
+  const emojis = ['🎉','⏰','🌙','🎈','✨'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100 + '%';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    card.appendChild(c);
+    setTimeout(()=>c.remove(), 2500);
+  }
+}
+document.getElementById('closeBadge').addEventListener('click', ()=>{
+  document.getElementById('badgeOverlay').classList.remove('show');
+});
+document.getElementById('shareBtn').addEventListener('click', async ()=>{
+  const text = "I finished Lesson 10 — My Daily Routine! 🎉⏰ #itsbrendacleto";
+  if(navigator.share){
+    try{ await navigator.share({text}); }catch(e){}
+  } else {
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Copied! Paste it on your Instagram story 📲');
+    }catch(e){
+      alert(text);
+    }
+  }
+});
+
+/* ---------------- INITIAL VIEW / PLANNER MODE ---------------- */
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fase = params.get('fase');
+  var validFases = ['story','speed','catch','detective'];
+  if (fase && validFases.indexOf(fase) !== -1) {
+    document.body.classList.add('planner-mode');
+    show(fase);
+  } else {
+    show('story');
+  }
+})();
+</script>
+</body>
+</html>

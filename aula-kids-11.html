@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11 · Days of the Week! · itsbrendacleto</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+    --brown1:#7A4A2B;
+    --brown2:#5A331B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:'Nunito Sans', sans-serif;
+    color:var(--dark);
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 40px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 40px);
+    background-color:#fff;
+    min-height:100vh;
+  }
+  h1,h2,h3{ font-family:'Nunito', sans-serif; margin:0; }
+
+  .btn-voltar{display:none;align-items:center;gap:6px;background:rgba(0,0,0,0.3);border:none;border-radius:0;padding:10px 20px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;color:#fff;cursor:pointer;text-decoration:none;width:100%;position:relative;z-index:9999;pointer-events:all !important;}
+  .btn-voltar:active{background:rgba(0,0,0,0.5);}
+  .planner-mode .pills{display:none;}
+  .planner-mode .btn-voltar{display:block;}
+
+  header{
+    background:linear-gradient(135deg, var(--brown1), var(--brown2));
+    color:#fff; text-align:center; padding:22px 16px 18px; border-radius:0 0 24px 24px;
+  }
+  header .tag{
+    font-size:12px; font-weight:800; background:rgba(255,255,255,.18);
+    display:inline-block; padding:4px 12px; border-radius:20px; margin-bottom:8px;
+  }
+  header h1{ font-size:24px; font-weight:900; }
+  header .sub{ font-size:14px; opacity:.9; margin-top:4px; }
+
+  nav.pills{ display:flex; gap:8px; overflow-x:auto; padding:14px 12px 4px; -webkit-overflow-scrolling:touch; }
+  nav.pills::-webkit-scrollbar{ display:none; }
+  nav.pills button{
+    flex:0 0 auto; border:none; background:#f1f1f1; color:var(--dark);
+    font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px;
+    padding:9px 14px; border-radius:20px; cursor:pointer; white-space:nowrap;
+  }
+  nav.pills button.active{ background:var(--blue); color:#fff; }
+
+  main{ max-width:720px; margin:0 auto; padding:10px 16px 60px; }
+  section{ display:none; animation:fade .25s ease; }
+  section.show{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .section-title{ font-size:20px; font-weight:900; margin:14px 0 4px; }
+  .section-hint{ font-size:14px; color:#666; margin-bottom:14px; }
+  .how-box{
+    background:#eef7fb; border-left:4px solid var(--blue); border-radius:10px;
+    padding:12px 14px; font-size:14px; line-height:1.6; margin-bottom:14px; color:var(--dark);
+  }
+  .btn{ border:none; border-radius:14px; padding:12px 18px; font-weight:800; font-size:14px; cursor:pointer; background:var(--blue); color:#fff; }
+  .btn.secondary{ background:#eee; color:var(--dark); }
+  .btn.big{ font-size:17px; padding:16px 30px; display:block; margin:16px auto; }
+
+  /* ---- Calendar Flip ---- */
+  .flip-sub{ font-size:13px; font-weight:800; color:#888; margin:16px 0 8px; letter-spacing:.5px; text-transform:uppercase; }
+  .flip-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+  .flip-row.meals{ grid-template-columns:repeat(3,1fr); }
+  .flip-card{ perspective:800px; height:96px; cursor:pointer; }
+  .flip-inner{ position:relative; width:100%; height:100%; transition:transform .5s; transform-style:preserve-3d; }
+  .flip-card.flipped .flip-inner{ transform:rotateY(180deg); }
+  .flip-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:14px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:4px;
+  }
+  .flip-front{ background:var(--card-color, var(--lavender)); color:#fff; font-weight:900; font-size:13px; }
+  .flip-back{ background:#fff; box-shadow:inset 0 0 0 2px var(--card-color, var(--lavender)); transform:rotateY(180deg); }
+  .flip-back .fb-emoji{ font-size:24px; }
+  .flip-back .fb-en{ font-weight:900; font-size:11px; margin-top:2px; }
+  .flip-back .fb-pt{ font-size:9px; opacity:.7; }
+  .flip-progress{ text-align:center; font-size:13px; color:#888; font-weight:700; margin:12px 0 4px; }
+
+  /* ---- Wheel of the Week ---- */
+  .wheel-wrap{ display:flex; flex-direction:column; align-items:center; }
+  .wheel-pointer{ font-size:28px; margin-bottom:-6px; z-index:2; }
+  .wheel{
+    width:230px; height:230px; border-radius:50%; position:relative; margin-bottom:16px;
+    border:6px solid #fff; box-shadow:0 6px 18px rgba(0,0,0,.15);
+    transition:transform 3s cubic-bezier(.17,.67,.32,1.02);
+  }
+  .wheel-label{
+    position:absolute; left:50%; top:6px; transform-origin:0 109px; font-weight:900; font-size:12px; color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+  .wheel-center{ position:absolute; left:50%; top:50%; width:20px; height:20px; background:#fff; border-radius:50%; transform:translate(-50%,-50%); z-index:2; }
+  .wheel-hud{ display:flex; justify-content:space-between; width:100%; max-width:340px; font-weight:800; font-size:14px; color:#888; margin-bottom:6px; }
+  .wheel-challenge{ display:none; background:var(--yellow); border-radius:18px; padding:18px; text-align:center; margin-top:8px; width:100%; }
+  .wheel-challenge.show{ display:block; }
+  .wheel-sentence-stub{ font-size:16px; font-weight:800; margin-bottom:14px; }
+  .wheel-options{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .wheel-opt{ border:none; border-radius:14px; padding:13px 18px; font-weight:900; font-size:15px; cursor:pointer; background:#fff; }
+  .wheel-opt.correct{ background:var(--mint); }
+  .wheel-opt.incorrect{ background:var(--coral); }
+  .wheel-final{ text-align:center; }
+  .wheel-final .score{ font-size:36px; font-weight:900; color:var(--blue); }
+
+  /* ---- True or False Streak ---- */
+  .tf-story{
+    background:#fff; border-radius:16px; padding:16px; margin-bottom:16px; font-size:14px;
+    line-height:1.7; box-shadow:0 2px 8px rgba(0,0,0,.05);
+  }
+  .tf-story b{ color:var(--blue); }
+  .tf-hud{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .tf-streak{ font-weight:900; font-size:16px; color:var(--coral); }
+  .tf-progress{ font-size:13px; color:#888; font-weight:700; }
+  .tf-card{ background:var(--lavender); border-radius:20px; padding:26px; text-align:center; margin-bottom:16px; font-weight:900; font-size:18px; }
+  .tf-buttons{ display:flex; gap:14px; justify-content:center; }
+  .tf-buttons button{ flex:1; max-width:150px; border:none; border-radius:18px; padding:18px; font-weight:900; font-size:18px; cursor:pointer; }
+  .tf-true{ background:var(--mint); }
+  .tf-false{ background:var(--coral); }
+  .tf-buttons button:disabled{ opacity:.55; }
+  .tf-final{ text-align:center; padding:10px 0; }
+  .tf-final .score{ font-size:36px; font-weight:900; color:var(--blue); }
+
+  /* ---- Weekly Puzzle ---- */
+  .wp-bank{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .wp-chip{
+    background:var(--yellow); border:none; border-radius:12px; padding:10px 14px; font-weight:700;
+    font-size:13px; text-align:left; cursor:pointer;
+  }
+  .wp-chip.selected{ background:var(--coral); }
+  .wp-chip.used{ display:none; }
+  .wp-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .wp-slot{
+    background:#fff; border:2px dashed #ccc; border-radius:10px; min-height:78px; padding:4px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; cursor:pointer;
+  }
+  .wp-slot .wp-day{ font-size:10px; font-weight:900; color:#aaa; margin-bottom:2px; }
+  .wp-slot .wp-text{ font-size:8.5px; font-weight:700; line-height:1.2; }
+  .wp-slot.filled{ border-style:solid; border-color:var(--mint); background:#eafbf1; }
+  .wp-feedback{ text-align:center; font-weight:800; font-size:14px; min-height:22px; margin-top:8px; }
+  .wp-feedback.ok{ color:#2e9e5b; }
+  .wp-feedback.no{ color:#d9534f; }
+
+  /* Missao */
+  .mission-item{
+    display:flex; align-items:center; gap:12px; background:#f6f6f6; border-radius:14px;
+    padding:14px; margin-bottom:10px; cursor:pointer;
+  }
+  .mission-item.done{ background:#dff5e6; }
+  .mission-check{
+    width:26px; height:26px; border-radius:50%; border:2px solid #bbb;
+    display:flex; align-items:center; justify-content:center; font-size:14px; flex:0 0 auto;
+  }
+  .mission-item.done .mission-check{ background:#2e9e5b; border-color:#2e9e5b; color:#fff; }
+  .mission-label{ font-weight:700; font-size:15px; }
+
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.55);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .badge-card{ background:#fff; border-radius:24px; padding:30px 24px; text-align:center; max-width:340px; position:relative; overflow:hidden; }
+  .badge-trophy{ font-size:70px; animation:bounce 1s infinite; }
+  @keyframes bounce{ 0%,100%{transform:translateY(0);} 50%{transform:translateY(-10px);} }
+  .badge-card h2{ font-size:22px; margin:10px 0 4px; }
+  .badge-card p{ font-size:14px; color:#666; margin-bottom:16px; }
+  .confetti{ position:absolute; top:-10px; font-size:18px; animation:fall 2.2s linear forwards; }
+  @keyframes fall{ to{ transform:translateY(420px) rotate(360deg); opacity:0; } }
+  .share-btn{ background:var(--pink); color:#fff; border:none; border-radius:14px; padding:12px 20px; font-weight:800; cursor:pointer; }
+  .close-btn{ background:none; border:none; color:#999; margin-top:10px; font-weight:700; cursor:pointer; }
+</style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<a class="btn-voltar" id="btnVoltar" href="planner-kids-11.html">← Voltar para a lista</a>
+
+<header>
+  <div class="tag">⭐ KIDS EDITION · LESSON 11</div>
+  <h1>📅 Days of the Week!</h1>
+  <div class="sub">Homework practice · itsbrendacleto</div>
+</header>
+
+<nav class="pills" id="pills"></nav>
+
+<main>
+
+  <section id="calendar">
+    <div class="section-title">🗓️ Calendar Flip</div>
+    <div class="section-hint">Tap a card to flip it and hear it!</div>
+    <div class="flip-sub">Days of the Week</div>
+    <div class="flip-row" id="flipDaysRow"></div>
+    <div class="flip-sub">Meals — using "have"</div>
+    <div class="flip-row meals" id="flipMealsRow"></div>
+    <div class="flip-progress" id="flipProgress"></div>
+  </section>
+
+  <section id="wheel">
+    <div class="section-title">🎡 Wheel of the Week</div>
+    <div class="how-box">Gire a roda pra sortear um dia, depois toque na forma certa do verbo pra completar a frase!</div>
+    <div class="wheel-hud"><span id="wheelRound"></span><span id="wheelScore"></span></div>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer">🔻</div>
+      <div class="wheel" id="wheelCircle"></div>
+      <button class="btn big" id="wheelSpinBtn">🎡 SPIN!</button>
+      <div class="wheel-challenge" id="wheelChallenge">
+        <div class="wheel-sentence-stub" id="wheelStub"></div>
+        <div class="wheel-options" id="wheelOptions"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="truefalse">
+    <div class="section-title">🔥 True or False Streak</div>
+    <div class="section-hint">Leia a semana do Ben e responda True ou False o mais rápido que conseguir!</div>
+    <div class="tf-story">
+      Hi! I'm Ben. <b>On Mondays</b>, I have soccer practice. <b>On Tuesdays</b>, I have art class.
+      <b>On Wednesdays</b>, I don't have school. <b>On Thursdays</b>, I have dinner with my grandpa.
+      <b>On Fridays</b>, I watch a movie with my friends. <b>On Saturdays</b>, I play video games.
+      <b>On Sundays</b>, I have lunch with my family.
+    </div>
+    <div class="tf-hud"><span class="tf-progress" id="tfProgress"></span><span class="tf-streak" id="tfStreak"></span></div>
+    <div id="tfBody"></div>
+  </section>
+
+  <section id="puzzle">
+    <div class="section-title">🧩 Weekly Puzzle</div>
+    <div class="how-box">Toque numa frase da lista e depois toque no dia certo do calendário pra encaixar!</div>
+    <div class="wp-bank" id="wpBank"></div>
+    <div class="wp-grid" id="wpGrid"></div>
+    <div class="wp-feedback" id="wpFeedback"></div>
+  </section>
+
+  <section id="missao">
+    <div class="section-title">🎯 Missão</div>
+    <div class="section-hint">Mark each activity as you finish it!</div>
+    <div id="missionList"></div>
+  </section>
+
+</main>
+
+<div class="overlay" id="badgeOverlay">
+  <div class="badge-card" id="badgeCard">
+    <div class="badge-trophy">🏆</div>
+    <h2>You did it!</h2>
+    <p>You finished Lesson 11 — Days of the Week! 🎉</p>
+    <button class="share-btn" id="shareBtn">📤 Share</button><br>
+    <button class="close-btn" id="closeBadge">Close</button>
+  </div>
+</div>
+
+<script>
+/* ---------------- SUPABASE (padrão itsbrendacleto) ---------------- */
+var sb = supabase.createClient('https://vbqumpzlxseakvmyvkem.supabase.co', 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj', { auth: { persistSession: true, storage: window.localStorage, autoRefreshToken: true, detectSessionInUrl: false, lock: async function(_name, _acquireTimeout, fn) { return fn(); } } });
+
+// ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+var __previewAs = sessionStorage.getItem('__preview_as');
+if (__previewAs) {
+  var __origGetSession = sb.auth.getSession.bind(sb.auth);
+  sb.auth.getSession = async function () {
+    var real = await __origGetSession();
+    if (real && real.data && real.data.session) {
+      real.data.session = Object.assign({}, real.data.session, {
+        user: Object.assign({}, real.data.session.user, { id: __previewAs })
+      });
+    }
+    return real;
+  };
+  var __previewNoop = function () {
+    var p = new Proxy(function () {}, {
+      get: function (t, prop) {
+        if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+        return function () { return p; };
+      }
+    });
+    return p;
+  };
+  var __origFrom = sb.from.bind(sb);
+  sb.from = function (table) {
+    var qb = __origFrom(table);
+    ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+      qb[m] = function () { return __previewNoop(); };
+    });
+    return qb;
+  };
+  if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+  var __insertPreviewBanner = function () {
+    if (document.getElementById('previewModeBanner')) return;
+    var banner = document.createElement('div');
+    banner.id = 'previewModeBanner';
+    banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+    var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+    banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+      '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+    document.body.insertBefore(banner, document.body.firstChild);
+  };
+  if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+  document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'previewExitBtn') {
+      sessionStorage.removeItem('__preview_as');
+      sessionStorage.removeItem('__preview_name');
+      window.location.href = 'painel-professora.html';
+    }
+  });
+}
+
+var LESSON_ID = 'kids-m1-a11';
+var LESSON_PREFIX = 'kids-l1-a11-';
+var BADGE_NAME = 'aula-kids-11-completa';
+
+async function saveFaseProgress(faseKey) {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: LESSON_PREFIX + faseKey, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar progresso:', e); }
+}
+
+async function saveLessonComplete() {
+  try {
+    var { data } = await sb.auth.getSession();
+    var session = data && data.session;
+    if (!session) return;
+    await sb.from('badges').upsert({ user_id: session.user.id, badge_name: BADGE_NAME, earned_at: new Date().toISOString() });
+    await sb.from('lesson_progress').upsert({ user_id: session.user.id, lesson_id: LESSON_ID, completed_at: new Date().toISOString() });
+  } catch (e) { console.error('Erro ao salvar conclusão da aula:', e); }
+}
+
+/* ---------------- TTS (standard itsbrendacleto voice picker) ---------------- */
+var __ttsVoice=null;
+function __pickTtsVoice(){if(!window.speechSynthesis)return null;var voices=window.speechSynthesis.getVoices();if(!voices.length)return null;var en=voices.filter(function(v){return v.lang&&v.lang.toLowerCase().indexOf('en')===0;});if(!en.length)return null;var NOVELTY=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i;var normal=en.filter(function(v){return !NOVELTY.test(v.name);});var base=normal.length?normal:en;var sysDefault=base.filter(function(v){return v.default;})[0];if(sysDefault)return sysDefault;var exact=base.filter(function(v){return v.lang.toLowerCase()==='en-us';});var pool=exact.length?exact:base;var pref=pool.filter(function(v){return /siri|google|natural|online|enhanced|premium/i.test(v.name)||/enhanced|premium/i.test(v.voiceURI||'');})[0];return pref||pool[0];}
+if(window.speechSynthesis){__ttsVoice=__pickTtsVoice();window.speechSynthesis.onvoiceschanged=function(){__ttsVoice=__pickTtsVoice();};}
+function speak(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(t);u.lang='en-US';if(__ttsVoice)u.voice=__ttsVoice;u.rate=.85;window.speechSynthesis.speak(u);}
+
+/* ---------------- UTILS ---------------- */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+/* ---------------- DATA ---------------- */
+const daysData = [
+  {en:'Sunday', pt:'Domingo', emoji:'☀️'},
+  {en:'Monday', pt:'Segunda', emoji:'📚'},
+  {en:'Tuesday', pt:'Terça', emoji:'🗓️'},
+  {en:'Wednesday', pt:'Quarta', emoji:'🐫'},
+  {en:'Thursday', pt:'Quinta', emoji:'⚡'},
+  {en:'Friday', pt:'Sexta', emoji:'🎉'},
+  {en:'Saturday', pt:'Sábado', emoji:'🎈'}
+];
+const mealsData = [
+  {en:'have breakfast', pt:'Tomar café da manhã', emoji:'🍳'},
+  {en:'have lunch', pt:'Almoçar', emoji:'🥪'},
+  {en:'have dinner', pt:'Jantar', emoji:'🍝'}
+];
+const flipColors = ['pink','mint','lavender','yellow','coral','blue','pink'];
+
+const wheelDays = ['Sundays','Mondays','Tuesdays','Wednesdays','Thursdays','Fridays','Saturdays'];
+const wheelSubjectsThird = ['He','She'];
+const wheelSubjectsBase = ['I','You','We','They'];
+const wheelRoutines = [
+  {base:'have breakfast', third:'has breakfast'},
+  {base:'play soccer', third:'plays soccer'},
+  {base:'do homework', third:'does homework'},
+  {base:'go to school', third:'goes to school'},
+  {base:'watch a movie', third:'watches a movie'},
+  {base:'visit grandma', third:'visits grandma'},
+  {base:'have dinner', third:'has dinner'}
+];
+const WHEEL_ROUNDS = 8;
+
+const tfStatements = [
+  {s:'Ben has soccer practice on Mondays.', a:true},
+  {s:'Ben has art class on Wednesdays.', a:false},
+  {s:'Ben doesn’t have school on Wednesdays.', a:true},
+  {s:'Ben has dinner with his grandpa on Thursdays.', a:true},
+  {s:'Ben watches a movie on Saturdays.', a:false},
+  {s:'Ben plays video games on Saturdays.', a:true},
+  {s:'Ben has lunch with his family on Sundays.', a:true},
+  {s:'Ben has soccer practice on Fridays.', a:false}
+];
+
+const puzzleSentences = [
+  {day:'Sunday', text:'I have breakfast with my dad on Sundays.'},
+  {day:'Monday', text:'She has piano lessons on Mondays.'},
+  {day:'Tuesday', text:'We don’t have school on Tuesdays.'},
+  {day:'Wednesday', text:'He plays soccer on Wednesdays.'},
+  {day:'Thursday', text:'Do you have dinner with your family on Thursdays?'},
+  {day:'Friday', text:'They watch movies on Fridays.'},
+  {day:'Saturday', text:'I visit my grandma on Saturdays.'}
+];
+
+const missionTasks = [
+  {id:'calendar', label:'🗓️ Flip every card in Calendar Flip'},
+  {id:'wheel', label:'🎡 Finish Wheel of the Week'},
+  {id:'truefalse', label:'🔥 Finish True or False Streak'},
+  {id:'puzzle', label:'🧩 Complete the Weekly Puzzle'}
+];
+
+/* ---------------- NAV ---------------- */
+const sections = ['calendar','wheel','truefalse','puzzle','missao'];
+const pillLabels = {calendar:'🗓️ Calendar', wheel:'🎡 Wheel', truefalse:'🔥 True/False', puzzle:'🧩 Puzzle', missao:'🎯 Missão'};
+const pillsNav = document.getElementById('pills');
+sections.forEach(name=>{
+  const b = document.createElement('button');
+  b.textContent = pillLabels[name];
+  b.addEventListener('click', ()=>show(name));
+  b.dataset.name = name;
+  pillsNav.appendChild(b);
+});
+function show(name){
+  sections.forEach(s=> document.getElementById(s).classList.toggle('show', s===name));
+  Array.from(pillsNav.children).forEach(b=> b.classList.toggle('active', b.dataset.name===name));
+}
+
+/* ---------------- CALENDAR FLIP ---------------- */
+const flipSeen = new Set();
+const totalFlipCards = daysData.length + mealsData.length;
+function buildFlipRow(container, data, colorOffset){
+  data.forEach((item,i)=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    const color = flipColors[(i+colorOffset) % flipColors.length];
+    card.innerHTML = `
+      <div class="flip-inner">
+        <div class="flip-face flip-front" style="--card-color:var(--${color})">❓</div>
+        <div class="flip-face flip-back" style="--card-color:var(--${color})">
+          <span class="fb-emoji">${item.emoji}</span>
+          <span class="fb-en">${item.en}</span>
+          <span class="fb-pt">${item.pt}</span>
+        </div>
+      </div>`;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(card.classList.contains('flipped')){
+        speak(item.en);
+        flipSeen.add(item.en);
+        document.getElementById('flipProgress').textContent = `${flipSeen.size} / ${totalFlipCards} flipped`;
+        if(flipSeen.size === totalFlipCards) markDone('calendar');
+      }
+    });
+    container.appendChild(card);
+  });
+}
+buildFlipRow(document.getElementById('flipDaysRow'), daysData, 0);
+buildFlipRow(document.getElementById('flipMealsRow'), mealsData, 3);
+document.getElementById('flipProgress').textContent = `0 / ${totalFlipCards} flipped`;
+
+/* ---------------- WHEEL OF THE WEEK ---------------- */
+let wheelRoundIndex = 0, wheelScore = 0, wheelRotation = 0, wheelSpinning = false;
+const wheelEl = document.getElementById('wheelCircle');
+function buildWheelFace(){
+  const segAngle = 360 / wheelDays.length;
+  const colors = ['#F2A7C3','#A8E6CF','#C9A8E8','#FFD97D','#FFB3A7','#5BC4E8','#F2A7C3'];
+  let gradientParts = [];
+  wheelDays.forEach((d,i)=>{
+    gradientParts.push(`${colors[i % colors.length]} ${i*segAngle}deg ${(i+1)*segAngle}deg`);
+  });
+  wheelEl.style.background = `conic-gradient(${gradientParts.join(',')})`;
+  wheelDays.forEach((d,i)=>{
+    const label = document.createElement('div');
+    label.className = 'wheel-label';
+    const angle = i*segAngle + segAngle/2;
+    label.style.transform = `rotate(${angle}deg)`;
+    const flip = (angle > 90 && angle < 270) ? 180 : 0;
+    label.innerHTML = `<span style="display:inline-block; transform:rotate(${flip}deg);">${d.slice(0,3)}</span>`;
+    wheelEl.appendChild(label);
+  });
+  const center = document.createElement('div');
+  center.className = 'wheel-center';
+  wheelEl.appendChild(center);
+}
+buildWheelFace();
+
+function renderWheelHud(){
+  document.getElementById('wheelRound').textContent = `Round ${Math.min(wheelRoundIndex+1, WHEEL_ROUNDS)}/${WHEEL_ROUNDS}`;
+  document.getElementById('wheelScore').textContent = `⭐ ${wheelScore}`;
+}
+renderWheelHud();
+
+document.getElementById('wheelSpinBtn').addEventListener('click', ()=>{
+  if(wheelSpinning) return;
+  if(wheelRoundIndex >= WHEEL_ROUNDS){
+    // reset for another round of play
+    wheelRoundIndex = 0; wheelScore = 0; renderWheelHud();
+  }
+  wheelSpinning = true;
+  document.getElementById('wheelChallenge').classList.remove('show');
+  const segAngle = 360 / wheelDays.length;
+  const dayIndex = Math.floor(Math.random()*wheelDays.length);
+  const extraSpins = 4 + Math.floor(Math.random()*2);
+  const targetWithinCircle = 360 - (dayIndex*segAngle + segAngle/2);
+  wheelRotation = wheelRotation - (wheelRotation % 360) + extraSpins*360 + targetWithinCircle;
+  wheelEl.style.transform = `rotate(${wheelRotation}deg)`;
+  setTimeout(()=>{
+    wheelSpinning = false;
+    onWheelLanded(wheelDays[dayIndex]);
+  }, 3050);
+});
+
+let wheelCurrentSubject = null, wheelCurrentRoutine = null, wheelCurrentDay = null;
+function onWheelLanded(day){
+  wheelCurrentDay = day;
+  const isThird = Math.random() < 0.5;
+  wheelCurrentSubject = isThird ? randomItem(wheelSubjectsThird) : randomItem(wheelSubjectsBase);
+  wheelCurrentRoutine = randomItem(wheelRoutines);
+  const correct = isThird ? wheelCurrentRoutine.third : wheelCurrentRoutine.base;
+  const wrong = isThird ? wheelCurrentRoutine.base : wheelCurrentRoutine.third;
+  document.getElementById('wheelStub').textContent = `${wheelCurrentSubject}  ___  on ${day}.`;
+  const optsBox = document.getElementById('wheelOptions');
+  optsBox.innerHTML = '';
+  shuffle([{t:correct, ok:true},{t:wrong, ok:false}]).forEach(o=>{
+    const b = document.createElement('button');
+    b.className = 'wheel-opt';
+    b.textContent = o.t;
+    b.addEventListener('click', ()=>{
+      Array.from(optsBox.children).forEach(el=>el.disabled=true);
+      if(o.ok){
+        b.classList.add('correct');
+        wheelScore++;
+      } else {
+        b.classList.add('incorrect');
+        Array.from(optsBox.children).forEach(el=>{ if(el!==b) el.classList.add('correct'); });
+      }
+      wheelRoundIndex++;
+      renderWheelHud();
+      setTimeout(()=>{
+        document.getElementById('wheelChallenge').classList.remove('show');
+        if(wheelRoundIndex >= WHEEL_ROUNDS){
+          markDone('wheel');
+        }
+      }, 1100);
+    });
+    optsBox.appendChild(b);
+  });
+  document.getElementById('wheelChallenge').classList.add('show');
+}
+
+/* ---------------- TRUE OR FALSE STREAK ---------------- */
+let tfIndex = 0, tfStreak = 0, tfScore = 0;
+function renderTf(){
+  document.getElementById('tfProgress').textContent = `Statement ${Math.min(tfIndex+1, tfStatements.length)} of ${tfStatements.length}`;
+  document.getElementById('tfStreak').textContent = tfStreak > 0 ? `🔥`.repeat(Math.min(tfStreak,5)) + ` x${tfStreak}` : '';
+  const body = document.getElementById('tfBody');
+  if(tfIndex >= tfStatements.length){
+    body.innerHTML = `<div class="tf-final"><div class="score">${tfScore}/${tfStatements.length}</div><p>Great listening! 🎉</p><button class="btn" id="tfRestart">🔄 Try Again</button></div>`;
+    document.getElementById('tfRestart').addEventListener('click', ()=>{ tfIndex=0; tfStreak=0; tfScore=0; renderTf(); });
+    markDone('truefalse');
+    return;
+  }
+  const st = tfStatements[tfIndex];
+  body.innerHTML = `<div class="tf-card">${st.s}</div><div class="tf-buttons"><button class="tf-true" id="tfTrue">TRUE ✅</button><button class="tf-false" id="tfFalse">FALSE ❌</button></div>`;
+  function answer(val, btnId){
+    document.getElementById('tfTrue').disabled = true;
+    document.getElementById('tfFalse').disabled = true;
+    const correct = val === st.a;
+    if(correct){
+      tfStreak++;
+      tfScore++;
+    } else {
+      tfStreak = 0;
+    }
+    document.getElementById(btnId).style.outline = correct ? '4px solid #2e9e5b' : '4px solid #d9534f';
+    setTimeout(()=>{ tfIndex++; renderTf(); }, 900);
+  }
+  document.getElementById('tfTrue').addEventListener('click', ()=> answer(true, 'tfTrue'));
+  document.getElementById('tfFalse').addEventListener('click', ()=> answer(false, 'tfFalse'));
+}
+renderTf();
+
+/* ---------------- WEEKLY PUZZLE ---------------- */
+let wpSelectedChip = null;
+const wpPlaced = {};
+function renderWpBank(){
+  const bank = document.getElementById('wpBank');
+  bank.innerHTML = '';
+  shuffle(puzzleSentences).forEach(item=>{
+    const chip = document.createElement('button');
+    chip.className = 'wp-chip';
+    chip.textContent = item.text;
+    chip.dataset.day = item.day;
+    if(wpPlaced[item.day]) chip.classList.add('used');
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('used')) return;
+      Array.from(bank.children).forEach(c=> c.classList.remove('selected'));
+      chip.classList.add('selected');
+      wpSelectedChip = item;
+    });
+    bank.appendChild(chip);
+  });
+}
+function renderWpGrid(){
+  const grid = document.getElementById('wpGrid');
+  grid.innerHTML = '';
+  daysData.forEach(d=>{
+    const slot = document.createElement('div');
+    slot.className = 'wp-slot' + (wpPlaced[d.en] ? ' filled' : '');
+    slot.innerHTML = `<div class="wp-day">${d.en.slice(0,3)}</div><div class="wp-text">${wpPlaced[d.en] ? wpPlaced[d.en].text : ''}</div>`;
+    slot.addEventListener('click', ()=>{
+      const fb = document.getElementById('wpFeedback');
+      if(wpPlaced[d.en]){ return; }
+      if(!wpSelectedChip){
+        fb.textContent = '👆 Toque numa frase primeiro!';
+        fb.className = 'wp-feedback no';
+        return;
+      }
+      if(wpSelectedChip.day === d.en){
+        wpPlaced[d.en] = wpSelectedChip;
+        wpSelectedChip = null;
+        fb.textContent = '✅ Correct!';
+        fb.className = 'wp-feedback ok';
+        renderWpBank();
+        renderWpGrid();
+        if(Object.keys(wpPlaced).length === daysData.length) markDone('puzzle');
+      } else {
+        fb.textContent = '🤔 Não é esse dia — olha a frase de novo!';
+        fb.className = 'wp-feedback no';
+      }
+    });
+    grid.appendChild(slot);
+  });
+}
+renderWpBank();
+renderWpGrid();
+
+/* ---------------- MISSAO ---------------- */
+const missionState = {};
+function renderMission(){
+  const list = document.getElementById('missionList');
+  list.innerHTML = '';
+  missionTasks.forEach(t=>{
+    const done = !!missionState[t.id];
+    const div = document.createElement('div');
+    div.className = 'mission-item' + (done ? ' done' : '');
+    div.innerHTML = `<div class="mission-check">${done ? '✓' : ''}</div><div class="mission-label">${t.label}</div>`;
+    div.addEventListener('click', ()=>{
+      missionState[t.id] = !missionState[t.id];
+      renderMission();
+      checkAllDone();
+    });
+    list.appendChild(div);
+  });
+}
+function markDone(id){
+  if (missionState[id]) return;
+  missionState[id] = true;
+  renderMission();
+  checkAllDone();
+  saveFaseProgress(id);
+}
+function checkAllDone(){
+  if(missionTasks.every(t=>missionState[t.id])){
+    document.getElementById('badgeOverlay').classList.add('show');
+    launchConfetti();
+    saveLessonComplete();
+  }
+}
+renderMission();
+
+/* ---------------- BADGE / CONFETTI ---------------- */
+function launchConfetti(){
+  const card = document.getElementById('badgeCard');
+  const emojis = ['🎉','📅','🍝','🎈','✨'];
+  for(let i=0;i<24;i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100 + '%';
+    c.style.animationDelay = (Math.random()*0.6)+'s';
+    card.appendChild(c);
+    setTimeout(()=>c.remove(), 2500);
+  }
+}
+document.getElementById('closeBadge').addEventListener('click', ()=>{
+  document.getElementById('badgeOverlay').classList.remove('show');
+});
+document.getElementById('shareBtn').addEventListener('click', async ()=>{
+  const text = "I finished Lesson 11 — Days of the Week! 🎉📅 #itsbrendacleto";
+  if(navigator.share){
+    try{ await navigator.share({text}); }catch(e){}
+  } else {
+    try{
+      await navigator.clipboard.writeText(text);
+      alert('Copied! Paste it on your Instagram story 📲');
+    }catch(e){
+      alert(text);
+    }
+  }
+});
+
+/* ---------------- INITIAL VIEW / PLANNER MODE ---------------- */
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fase = params.get('fase');
+  var validFases = ['calendar','wheel','truefalse','puzzle'];
+  if (fase && validFases.indexOf(fase) !== -1) {
+    document.body.classList.add('planner-mode');
+    show(fase);
+  } else {
+    show('calendar');
+  }
+})();
+</script>
+</body>
+</html>
