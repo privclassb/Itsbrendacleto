@@ -110,11 +110,13 @@
     .empty-msg-sm { text-align: center; padding: 10px; color: var(--muted); font-size: 12px; }
 
     /* Birthdays */
-    .birthday-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
-    .birthday-item:last-child { border-bottom: none; }
+    .birthday-entry { padding: 10px 0; border-bottom: 1px solid var(--sand); }
+    .birthday-entry:last-child { border-bottom: none; }
+    .birthday-item { display: flex; align-items: center; gap: 12px; }
     .birthday-name { flex: 1; font-size: 14px; font-weight: 600; color: var(--text); }
     .birthday-btn { background: var(--rose); color: var(--white); border: none; border-radius: 8px; padding: 7px 14px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
     .birthday-btn:hover { opacity: 0.85; }
+    .birthday-mural-box { display: none; margin-top: 12px; border-top: 1px solid var(--sand); padding-top: 12px; }
 
     /* Topic suggestion */
     .topic-suggestion { display: flex; align-items: center; gap: 10px; justify-content: space-between; background: var(--cream); border: 1.5px dashed var(--gold); border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; color: var(--text); }
@@ -432,23 +434,90 @@
         ? `<img class="rank-avatar-img" src="${p.avatar_url}" />`
         : `<div class="rank-avatar-fallback">${initials(displayName(p))}</div>`;
       return `
-        <div class="birthday-item">
+        <div class="birthday-entry">
+          <div class="birthday-item">
+            ${avatar}
+            <div class="birthday-name">${escapeHtml(displayName(p))}</div>
+            <button class="birthday-btn" onclick="toggleBirthdayMural('${p.id}')">🎉 Parabenizar</button>
+          </div>
+          <div class="birthday-mural-box" id="birthdayMural-${p.id}"></div>
+        </div>`;
+    }).join('');
+  }
+
+  async function toggleBirthdayMural(personId) {
+    const box = document.getElementById('birthdayMural-' + personId);
+    if (box.style.display === 'block') { box.style.display = 'none'; return; }
+    box.style.display = 'block';
+    await loadBirthdayMural(personId);
+  }
+
+  async function loadBirthdayMural(personId) {
+    const box = document.getElementById('birthdayMural-' + personId);
+    box.innerHTML = '<div class="empty-msg-sm">Carregando...</div>';
+
+    const { data: msgs } = await sb.from('birthday_messages').select('*').eq('birthday_person_id', personId).order('created_at', { ascending: true });
+    const authorIds = [...new Set((msgs || []).map(m => m.author_id))];
+    const { data: authors } = authorIds.length
+      ? await sb.from('profiles').select('id, full_name, community_display_name, avatar_url').in('id', authorIds)
+      : { data: [] };
+    const authorMap = {};
+    (authors || []).forEach(a => { authorMap[a.id] = a; });
+
+    const listHtml = (msgs || []).map(m => {
+      const canDelete = m.author_id === CURRENT_USER_ID || IS_BRENDA;
+      const author = authorMap[m.author_id];
+      const authorName = displayName(author);
+      const avatar = author?.avatar_url
+        ? `<img class="comment-avatar-img" src="${author.avatar_url}" />`
+        : `<div class="comment-avatar-fallback">${initials(authorName)}</div>`;
+      return `
+        <div class="comment-item">
           ${avatar}
-          <div class="birthday-name">${escapeHtml(displayName(p))}</div>
-          <button class="birthday-btn">🎉 Parabenizar</button>
+          <div class="comment-body">
+            <span class="comment-author">${escapeHtml(authorName)}:</span>
+            <span class="comment-text">${escapeHtml(m.message)}</span>
+          </div>
+          ${canDelete ? `<button class="comment-delete" onclick="deleteBirthdayMessage('${m.id}','${personId}')">🗑</button>` : ''}
         </div>`;
     }).join('');
 
-    document.querySelectorAll('#birthdayList .birthday-btn').forEach((btn, i) => {
-      btn.addEventListener('click', () => greetBirthday(displayName(todays[i])));
-    });
+    box.innerHTML = `
+      <div class="comments-list">${listHtml || '<div class="empty-msg-sm">Seja o primeiro a parabenizar! 🎉</div>'}</div>
+      <div class="comment-composer">
+        <input type="text" class="comment-input" id="birthdayMsgInput-${personId}" placeholder="Write a birthday message in English! 🎉" />
+        <div class="comment-composer-actions">
+          <div></div>
+          <button class="comment-send-btn" onclick="sendBirthdayMessage('${personId}')">Enviar</button>
+        </div>
+      </div>`;
+
+    const input = document.getElementById('birthdayMsgInput-' + personId);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendBirthdayMessage(personId); });
   }
 
-  function greetBirthday(name) {
-    const textarea = document.getElementById('postContent');
-    textarea.placeholder = `Write a birthday message for ${name} in English! 🎉`;
-    textarea.focus();
-    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  async function sendBirthdayMessage(personId) {
+    const input = document.getElementById('birthdayMsgInput-' + personId);
+    const text = input.value.trim();
+    if (!text) return;
+
+    const sendBtn = document.querySelector('#birthdayMural-' + personId + ' .comment-send-btn');
+    if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Enviando...'; }
+
+    const { error } = await sb.from('birthday_messages').insert({ birthday_person_id: personId, author_id: CURRENT_USER_ID, message: text });
+    if (error) {
+      alert('Erro ao enviar: ' + error.message);
+      if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Enviar'; }
+      return;
+    }
+    input.value = '';
+    await loadBirthdayMural(personId);
+  }
+
+  async function deleteBirthdayMessage(messageId, personId) {
+    if (!confirm('Excluir esta mensagem?')) return;
+    await sb.from('birthday_messages').delete().eq('id', messageId);
+    await loadBirthdayMural(personId);
   }
 
   // ---- Construtor de enquete ----

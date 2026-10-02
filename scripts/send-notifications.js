@@ -11,6 +11,7 @@
 //   7. Comentário em post da Comunidade
 //   8. Nova enquete publicada na Comunidade
 //   9. Aniversário de alguém da Comunidade (avisa todo mundo)
+//   10. Mensagem recebida no mural de aniversário (avisa o aniversariante)
 
 const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
 const ONESIGNAL_APP_ID = '58dbb455-e1d0-4871-9919-bdf37b56aafe';
@@ -394,6 +395,35 @@ async function communityBirthdayNotifications(now) {
   return sent;
 }
 
+// ─── 10. Mensagem recebida no mural de aniversário (avisa o aniversariante) ─
+async function birthdayMessageNotifications() {
+  const messages = await sb(`birthday_messages?select=id,birthday_person_id,author_id&notified_at=is.null`);
+  if (!messages.length) return 0;
+
+  const authorIds = [...new Set(messages.map((m) => m.author_id))];
+  const authors = await sb(`profiles?select=id,full_name,community_display_name&id=in.(${authorIds.join(',')})`);
+  const authorName = {};
+  authors.forEach((u) => { authorName[u.id] = u.community_display_name || u.full_name; });
+
+  const byPerson = {};
+  for (const m of messages) {
+    if (m.birthday_person_id !== m.author_id) (byPerson[m.birthday_person_id] = byPerson[m.birthday_person_id] || []).push(m);
+  }
+
+  for (const [personId, personMessages] of Object.entries(byPerson)) {
+    const msg = personMessages.length === 1
+      ? `${authorName[personMessages[0].author_id] || 'Alguém'} deixou uma mensagem no seu mural de aniversário!`
+      : `Seu mural de aniversário recebeu ${personMessages.length} mensagens novas!`;
+    await sendPush([personId], 'Mensagem de aniversário! 🎂', msg, COMUNIDADE_URL);
+  }
+
+  if (!DRY_RUN) {
+    const ids = messages.map((m) => m.id).join(',');
+    await sb(`birthday_messages?id=in.(${ids})`, { method: 'PATCH', body: JSON.stringify({ notified_at: new Date().toISOString() }) });
+  }
+  return messages.length;
+}
+
 // ─── Envio de teste avulso (não mexe em nenhum dos 9 lembretes reais) ───
 async function checkSubscription(externalId) {
   try {
@@ -474,6 +504,7 @@ async function main() {
   results.pollNotifications = await pollNotifications();
   results.pollVoteNotifications = await pollVoteNotifications();
   results.communityBirthdayNotifications = await communityBirthdayNotifications(now);
+  results.birthdayMessageNotifications = await birthdayMessageNotifications();
 
   console.log('Resumo:', JSON.stringify(results));
 }
