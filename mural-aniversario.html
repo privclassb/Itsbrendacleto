@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu mural de aniversário | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
+    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+    .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+    .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+    .hero-sub { font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+    main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 28px; }
+
+    .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+    .empty-msg-sm { text-align: center; padding: 10px; color: var(--muted); font-size: 12px; }
+
+    .comment-item { display: flex; align-items: flex-start; gap: 6px; padding: 8px 0; font-size: 13px; border-bottom: 1px solid var(--sand); }
+    .comment-item:last-child { border-bottom: none; }
+    .comment-avatar-img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; flex-shrink: 0; margin-top: 1px; }
+    .comment-avatar-fallback { width: 26px; height: 26px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .comment-body { flex: 1; min-width: 0; }
+    .comment-author { font-weight: 600; color: var(--text); }
+    .comment-text { color: var(--text); word-break: break-word; }
+    .comment-time { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .comment-delete { background: none; border: none; color: var(--muted); font-size: 12px; cursor: pointer; flex-shrink: 0; }
+    .comment-delete:hover { color: #C0392B; }
+
+    .comment-composer { margin-top: 14px; }
+    .comment-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 9px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; background: var(--cream); }
+    .comment-input:focus { border-color: var(--mint); background: var(--white); }
+    .comment-composer-actions { display: flex; justify-content: flex-end; align-items: center; margin-top: 8px; }
+    .comment-send-btn { background: var(--brown); color: var(--white); border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .comment-send-btn:hover { background: var(--brown-light); }
+    .comment-send-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        var active = document.activeElement;
+        var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+        if (isTyping) {
+          active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+        } else {
+          window.location.reload();
+        }
+      });
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
+  <div class="header-title">Meu mural de aniversário</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Suas mensagens</div>
+    <div class="hero-title">🎂 Meu mural de aniversário</div>
+    <div class="hero-sub">Todas as mensagens que você recebeu dos colegas na Comunidade ficam guardadas aqui pra sempre. Dá pra reler com calma e responder quando quiser.</div>
+  </div>
+</div>
+
+<main>
+  <div class="card">
+    <div id="muralList"><div class="empty-msg">Carregando...</div></div>
+    <div class="comment-composer">
+      <input type="text" class="comment-input" id="muralReplyInput" placeholder="Escreva uma resposta pros colegas..." />
+      <div class="comment-composer-actions">
+        <button class="comment-send-btn" id="muralSendBtn" onclick="sendReply()">Enviar</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  let CURRENT_USER_ID = null;
+  let IS_BRENDA = false;
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  function initials(name) {
+    return (name || '?').split(' ').filter(Boolean).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  }
+
+  function displayName(p) {
+    return (p && (p.community_display_name || p.full_name)) || 'Aluno';
+  }
+
+  function formatDateTime(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if (!profile || profile.role === 'kids' || profile.role === 'responsavel') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    CURRENT_USER_ID = user.id;
+    const fullName = profile.full_name || user.email.split('@')[0];
+    IS_BRENDA = fullName.toLowerCase().includes('brenda');
+
+    document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'home-adulto.html';
+
+    await loadMural();
+  }
+
+  async function loadMural() {
+    const box = document.getElementById('muralList');
+    box.innerHTML = '<div class="empty-msg">Carregando...</div>';
+
+    const { data: msgs } = await sb.from('birthday_messages').select('*').eq('birthday_person_id', CURRENT_USER_ID).order('created_at', { ascending: true });
+    const authorIds = [...new Set((msgs || []).map(m => m.author_id))];
+    const { data: authors } = authorIds.length
+      ? await sb.from('profiles').select('id, full_name, community_display_name, avatar_url').in('id', authorIds)
+      : { data: [] };
+    const authorMap = {};
+    (authors || []).forEach(a => { authorMap[a.id] = a; });
+
+    box.innerHTML = (msgs || []).map(m => {
+      const canDelete = m.author_id === CURRENT_USER_ID || IS_BRENDA;
+      const author = authorMap[m.author_id];
+      const authorName = displayName(author);
+      const avatar = author?.avatar_url
+        ? `<img class="comment-avatar-img" src="${author.avatar_url}" />`
+        : `<div class="comment-avatar-fallback">${initials(authorName)}</div>`;
+      return `
+        <div class="comment-item">
+          ${avatar}
+          <div class="comment-body">
+            <span class="comment-author">${escapeHtml(authorName)}:</span>
+            <span class="comment-text">${escapeHtml(m.message)}</span>
+            <div class="comment-time">${formatDateTime(m.created_at)}</div>
+          </div>
+          ${canDelete ? `<button class="comment-delete" onclick="deleteMessage('${m.id}')">🗑</button>` : ''}
+        </div>`;
+    }).join('') || '<div class="empty-msg">Nenhuma mensagem ainda. Elas aparecem aqui quando alguém te parabenizar na Comunidade! 🎉</div>';
+
+    // Marca tudo como lido pro badge do menu
+    const readIds = JSON.parse(localStorage.getItem('read_birthday_messages') || '[]');
+    const allIds = (msgs || []).map(m => m.id);
+    localStorage.setItem('read_birthday_messages', JSON.stringify([...new Set([...readIds, ...allIds])]));
+  }
+
+  async function sendReply() {
+    const input = document.getElementById('muralReplyInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const sendBtn = document.getElementById('muralSendBtn');
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Enviando...';
+
+    const { error } = await sb.from('birthday_messages').insert({ birthday_person_id: CURRENT_USER_ID, author_id: CURRENT_USER_ID, message: text });
+
+    sendBtn.disabled = false;
+    sendBtn.textContent = 'Enviar';
+
+    if (error) { alert('Erro ao enviar: ' + error.message); return; }
+
+    input.value = '';
+    await loadMural();
+  }
+
+  document.getElementById('muralReplyInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendReply(); });
+
+  async function deleteMessage(messageId) {
+    if (!confirm('Excluir esta mensagem?')) return;
+    await sb.from('birthday_messages').delete().eq('id', messageId);
+    await loadMural();
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

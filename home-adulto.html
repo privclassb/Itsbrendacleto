@@ -221,6 +221,10 @@
       <div class="menu-icon">👥</div>
       <div class="menu-title">Comunidade</div>
     </a>
+    <a href="mural-aniversario.html" class="menu-card" id="birthdayMuralMenuCard">
+      <div class="menu-icon">🎂</div>
+      <div class="menu-title">Meu mural</div>
+    </a>
     <a href="agenda-adulto.html" class="menu-card">
       <div class="menu-icon">📅</div>
       <div class="menu-title">Agenda</div>
@@ -391,6 +395,17 @@
       badge.className = 'menu-badge';
       badge.textContent = unreadCount;
       document.getElementById('reportsMenuCard').appendChild(badge);
+    }
+
+    // Notificação de mensagens novas no mural de aniversário
+    const { data: birthdayMsgs } = await sb.from('birthday_messages').select('id, author_id').eq('birthday_person_id', user.id);
+    const readBirthdayIds = JSON.parse(localStorage.getItem('read_birthday_messages') || '[]');
+    const unreadBirthdayCount = (birthdayMsgs || []).filter(function(m) { return m.author_id !== user.id && !readBirthdayIds.includes(m.id); }).length;
+    if (unreadBirthdayCount > 0) {
+      const birthdayBadge = document.createElement('span');
+      birthdayBadge.className = 'menu-badge';
+      birthdayBadge.textContent = unreadBirthdayCount;
+      document.getElementById('birthdayMuralMenuCard').appendChild(birthdayBadge);
     }
 
     // Avatar do aluno
