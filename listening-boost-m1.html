@@ -423,6 +423,11 @@
         <div class="pt-line">Tente acompanhar o ritmo, não copiar o sotaque.</div>
       </div>
 
+      <div class="pending-box">
+        <b>⚠️ Timestamps pendentes</b>
+        Os botões "Listen" abaixo tocam o clipe completo (00:12–00:54) temporariamente — aguardando os timestamps exatos de cada frase para isolar o microtrecho.
+      </div>
+
       <div class="drill-item">
         <div class="en-line">1. "My alarm went off..."</div>
         <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
@@ -732,11 +737,19 @@
 
     const box = document.getElementById('step9FeedbackBox');
     const bothMax = state.step2Rating === 3 && state.step9Rating === 3;
-    if (state.step9Rating > state.step2Rating || bothMax) {
+    if (state.step9Rating > state.step2Rating) {
       box.innerHTML = `<div class="big-line">Look at that! 👀</div>
         <div class="en-line">You understood more after training your ears.</div>
         <div class="en-line" style="margin-top:8px; font-weight:700;">The English didn't change. Your listening did. 🎧</div>
         <div class="pt-line" style="margin-top:6px;">O inglês não mudou. A sua escuta mudou.</div>`;
+    } else if (bothMax) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood a lot from the beginning — and after training, your ears had even more chances to notice the sounds. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">Você já entendia bastante desde o início — e o treino deu ao seu ouvido ainda mais oportunidades de perceber os sons.</div>`;
+    } else if (state.step9Rating < state.step2Rating) {
+      box.innerHTML = `<div class="big-line">That's okay! 💜</div>
+        <div class="en-line">Sometimes, after listening more carefully, you notice things you didn't notice before — including what is still difficult to hear. That's part of training your ears.</div>
+        <div class="pt-line" style="margin-top:6px;">Às vezes, depois de prestar mais atenção, você percebe melhor até aquilo que ainda é difícil de reconhecer. Isso também faz parte do treino.</div>`;
     } else {
       box.innerHTML = `<div class="en-line">That's okay!</div>
         <div class="en-line" style="margin-top:6px;">Your ears are learning to recognize new sounds. Repetition is part of listening practice.</div>
@@ -940,8 +953,58 @@
     btn.textContent = 'Saving...';
     if (CURRENT_USER_ID) {
       await sb.from('lesson_progress').upsert({ user_id: CURRENT_USER_ID, lesson_id: 'listening-boost-m1' }, { onConflict: 'user_id,lesson_id' });
+
+      const reflectionTags = Array.from(document.querySelectorAll('#step-10 .checkbox-list input:checked')).map(el => el.value);
+      const vocabulary = [1, 2, 3].map(i => ({
+        word: (document.getElementById(`vocabWord${i}`).value || '').trim(),
+        meaning: (document.getElementById(`vocabMeaning${i}`).value || '').trim(),
+      })).filter(v => v.word || v.meaning);
+
+      await sb.from('listening_boost_notes').upsert({
+        user_id: CURRENT_USER_ID,
+        mission_id: 'listening-boost-m1',
+        warmup_answer: document.getElementById('step1WakeTime').value || null,
+        first_listen_rating: state.step2Rating,
+        last_listen_rating: state.step9Rating,
+        reflection_tags: reflectionTags,
+        reflection_expression: document.getElementById('step10Expression').value || null,
+        vocabulary: vocabulary,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,mission_id' });
     }
     goToStep(TOTAL_STEPS + 1);
+  }
+
+  function prefillFromNotes(notes) {
+    if (!notes) return;
+    if (notes.warmup_answer) document.getElementById('step1WakeTime').value = notes.warmup_answer;
+
+    if (notes.first_listen_rating !== null && notes.first_listen_rating !== undefined) {
+      state.step2Rating = notes.first_listen_rating;
+      const btn = document.querySelector(`#ratingRow-2 .rating-btn[data-idx="${notes.first_listen_rating}"]`);
+      if (btn) btn.classList.add('selected');
+    }
+    if (notes.last_listen_rating !== null && notes.last_listen_rating !== undefined) {
+      state.step9Rating = notes.last_listen_rating;
+      const btn = document.querySelector(`#ratingRow-9 .rating-btn[data-idx="${notes.last_listen_rating}"]`);
+      if (btn) btn.classList.add('selected');
+    }
+    if (notes.reflection_tags) {
+      notes.reflection_tags.forEach(tag => {
+        const el = document.querySelector(`#step-10 .checkbox-list input[value="${tag}"]`);
+        if (el) el.checked = true;
+      });
+    }
+    if (notes.reflection_expression) document.getElementById('step10Expression').value = notes.reflection_expression;
+    if (notes.vocabulary && Array.isArray(notes.vocabulary)) {
+      notes.vocabulary.slice(0, 3).forEach((v, i) => {
+        const w = document.getElementById(`vocabWord${i + 1}`);
+        const m = document.getElementById(`vocabMeaning${i + 1}`);
+        if (w && v.word) w.value = v.word;
+        if (m && v.meaning) m.value = v.meaning;
+      });
+    }
+    if (state.step2Rating !== null && state.step9Rating !== null) renderStep9Comparison();
   }
 
   // ---- Init ----
@@ -959,6 +1022,9 @@
     renderQuiz();
     renderStep5();
     renderStep6();
+
+    const { data: existingNotes } = await sb.from('listening_boost_notes').select('*').eq('user_id', user.id).eq('mission_id', 'listening-boost-m1').maybeSingle();
+    prefillFromNotes(existingNotes);
 
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('missionCard').style.display = 'block';
