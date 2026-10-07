@@ -89,6 +89,9 @@
   .final-note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; }
 
   .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+
+  .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 12.5px; color: var(--brown); line-height: 1.5; }
+  .pending-box b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
 </style>
 <link rel="manifest" href="manifest.json" />
 <meta name="theme-color" content="#5C4033" />
@@ -145,15 +148,11 @@
         <div class="pt-line">Toque nas que você já conhece.</div>
       </div>
       <div class="chip-row" id="step1Chips">
-        <div class="chip" data-chip="wake up">wake up</div>
-        <div class="chip" data-chip="brush my teeth">brush my teeth</div>
-        <div class="chip" data-chip="get dressed">get dressed</div>
-        <div class="chip" data-chip="have breakfast">have breakfast</div>
-        <div class="chip" data-chip="brush my hair">brush my hair</div>
-        <div class="chip" data-chip="go to school">go to school</div>
+        <!-- PENDING: lista de palavras-chave aguardando o briefing original da Brenda -->
       </div>
-      <div class="instruction-block">
-        <div class="pt-line">Não existe certo ou errado aqui — é só pra você notar o que já sabe antes de escutar.</div>
+      <div class="pending-box">
+        <b>⚠️ Conteúdo pendente</b>
+        Lista de palavras-chave desta etapa ainda não confirmada — aguardando o texto exato do briefing.
       </div>
     </div>
 
@@ -184,15 +183,11 @@
         <div class="pt-line">Quais palavras você notou? Marque tudo que você ouviu.</div>
       </div>
       <div class="chip-row" id="step3Chips">
-        <div class="chip" data-chip="wake up">wake up</div>
-        <div class="chip" data-chip="brush my teeth">brush my teeth</div>
-        <div class="chip" data-chip="have breakfast">have breakfast</div>
-        <div class="chip" data-chip="get dressed">get dressed</div>
-        <div class="chip" data-chip="go to school">go to school</div>
-        <div class="chip" data-chip="cereal">cereal</div>
+        <!-- PENDING: opções de palavras aguardando o briefing original da Brenda -->
       </div>
-      <div class="instruction-block">
-        <div class="pt-line">De novo: não é teste. É só pra treinar a atenção do ouvido.</div>
+      <div class="pending-box">
+        <b>⚠️ Conteúdo pendente</b>
+        Opções de palavras desta etapa ainda não confirmadas — aguardando o texto exato do briefing.
       </div>
     </div>
 
@@ -223,13 +218,12 @@
         <div class="en-line">See? You already know these words. Your ears just caught real English.</div>
         <div class="pt-line">Viu? Você já conhece essas palavras. Seu ouvido acabou de captar inglês de verdade.</div>
       </div>
-      <div class="callout-box">
+      <div class="callout-box" id="secret1Callout">
         <div class="callout-label">🔑 Listening Secret #1</div>
-        <div class="en-line">In fast, natural speech, words connect and shorten. "Wake up" can sound like one word, not two.</div>
-        <div class="pt-line">Na fala rápida e natural, as palavras se conectam e encurtam. "Wake up" pode soar como uma palavra só, não duas.</div>
-      </div>
-      <div class="instruction-block">
-        <div class="pt-line">É por isso que às vezes você "sabe" a palavra escrita, mas não reconhece ela falada — seu ouvido ainda está se acostumando com o jeito conectado do inglês real.</div>
+        <div class="pending-box" style="margin:0;">
+          <b>⚠️ Conteúdo pendente</b>
+          Texto do "Listening Secret #1" ainda não confirmado — aguardando o texto exato do briefing.
+        </div>
       </div>
     </div>
 
@@ -242,12 +236,11 @@
         <div class="pt-line">Toque em qualquer parte da transcrição para ouvir aquele pedaço de novo.</div>
       </div>
       <div class="transcript-box" id="transcriptBox">
-        <span class="chunk" data-start="12" data-end="19">Every morning, I wake up at seven o'clock.</span>
-        <span class="chunk" data-start="19" data-end="26">First, I brush my teeth and wash my face.</span>
-        <span class="chunk" data-start="26" data-end="33">Then I get dressed for school.</span>
-        <span class="chunk" data-start="33" data-end="40">I have breakfast with my family.</span>
-        <span class="chunk" data-start="40" data-end="47">I usually eat cereal and juice.</span>
-        <span class="chunk" data-start="47" data-end="54">Finally, I grab my bag and go to school.</span>
+        <!-- PENDING: transcrição exata do trecho (00:12-00:54) aguardando o briefing original da Brenda -->
+      </div>
+      <div class="pending-box">
+        <b>⚠️ Conteúdo pendente</b>
+        Transcrição e divisão em trechos tocáveis ainda não confirmadas — aguardando o texto exato do briefing.
       </div>
       <div class="video-box" style="height:0; padding:0; margin:0; aspect-ratio:auto;" id="hiddenSlotWrap-6">
         <div class="video-slot" id="slot-6" style="height:1px;"></div>
@@ -262,26 +255,9 @@
         <div class="en-line">A few quick things worth noticing — not grammar rules, just noticing.</div>
         <div class="pt-line">Algumas coisas rápidas pra notar — não são regras de gramática, é só reparar.</div>
       </div>
-      <div class="notice-item">
-        <div class="notice-num">1</div>
-        <div>
-          <div class="en-line">"Wake up" — two words that sound connected, almost like one.</div>
-          <div class="pt-line">"Wake up" — duas palavras que soam conectadas, quase como uma só.</div>
-        </div>
-      </div>
-      <div class="notice-item">
-        <div class="notice-num">2</div>
-        <div>
-          <div class="en-line">"Get dressed" — the "t" and "d" sounds blend together.</div>
-          <div class="pt-line">"Get dressed" — os sons de "t" e "d" se misturam.</div>
-        </div>
-      </div>
-      <div class="notice-item">
-        <div class="notice-num">3</div>
-        <div>
-          <div class="en-line">"I usually" — "usually" often sounds shorter and faster in real speech.</div>
-          <div class="pt-line">"I usually" — "usually" costuma soar mais curto e rápido na fala real.</div>
-        </div>
+      <div class="pending-box">
+        <b>⚠️ Conteúdo pendente</b>
+        Os 3 "Did You Notice" (micro-observações de pronúncia/gramática) ainda não foram confirmados — aguardando o texto exato do briefing.
       </div>
     </div>
 
@@ -294,31 +270,24 @@
         <div class="pt-line">Toque cada trecho e repita em voz alta, logo depois de ouvir. Faça cada um 3 vezes.</div>
       </div>
 
-      <div class="drill-item">
-        <div class="en-line">"Every morning, I wake up at seven o'clock."</div>
-        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
-          <div class="video-slot" id="slot-8a" style="height:1px;"></div>
-        </div>
-        <button class="btn-secondary" style="margin-top:8px;" onclick="playInSlot('8a', 12, 19)">▶ Play (00:12–00:19)</button>
-        <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 1)"> I repeated it 3x</label>
+      <div class="pending-box">
+        <b>⚠️ Conteúdo pendente</b>
+        As 3 frases dos drills de shadowing e seus timestamps exatos ainda não foram confirmados — aguardando o texto exato do briefing. Os checkboxes abaixo ficam desativados até essa confirmação.
       </div>
 
       <div class="drill-item">
-        <div class="en-line">"Then I get dressed for school."</div>
-        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
-          <div class="video-slot" id="slot-8b" style="height:1px;"></div>
-        </div>
-        <button class="btn-secondary" style="margin-top:8px;" onclick="playInSlot('8b', 26, 33)">▶ Play (00:26–00:33)</button>
-        <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 2)"> I repeated it 3x</label>
+        <div class="en-line" style="opacity:.5;">Drill 1 — aguardando frase e timestamp exatos</div>
+        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 1)"> I repeated it 3x</label>
       </div>
 
       <div class="drill-item">
-        <div class="en-line">"Finally, I grab my bag and go to school."</div>
-        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
-          <div class="video-slot" id="slot-8c" style="height:1px;"></div>
-        </div>
-        <button class="btn-secondary" style="margin-top:8px;" onclick="playInSlot('8c', 47, 54)">▶ Play (00:47–00:54)</button>
-        <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 3)"> I repeated it 3x</label>
+        <div class="en-line" style="opacity:.5;">Drill 2 — aguardando frase e timestamp exatos</div>
+        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 2)"> I repeated it 3x</label>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line" style="opacity:.5;">Drill 3 — aguardando frase e timestamp exatos</div>
+        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 3)"> I repeated it 3x</label>
       </div>
     </div>
 
@@ -464,10 +433,10 @@
   };
 
   const QUIZ = [
-    { q: 'What is the first thing she does in the morning?', options: ['She wakes up and stretches', 'She brushes her teeth', 'She has breakfast', 'She gets dressed'], correct: 0 },
-    { q: 'What does she do right after waking up?', options: ['Goes to school', 'Brushes her teeth and washes her face', 'Watches TV', 'Goes back to sleep'], correct: 1 },
-    { q: 'What does she usually have for breakfast?', options: ['Pizza', 'Soup', 'Cereal and juice', 'Nothing'], correct: 2 },
-    { q: 'What does she do before leaving the house?', options: ['Takes a nap', 'Gets dressed', 'Calls a friend', 'Waters the plants'], correct: 1 },
+    { q: 'What time does her alarm go off?', options: ['8:58 a.m.', '9:58 a.m.', '10:58 a.m.'], correct: 1 },
+    { q: 'What does she open?', options: ['The window', 'The door', 'The curtains'], correct: 2 },
+    { q: 'How is she feeling?', options: ['Tired', 'A little sick', 'Hungry'], correct: 1 },
+    { q: 'What does she need to do?', options: ['Have breakfast', 'Go to work', 'Take a shower'], correct: 2 },
   ];
 
   function renderQuiz() {
