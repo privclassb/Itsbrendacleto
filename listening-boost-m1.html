@@ -22,21 +22,31 @@
   .step { display: none; }
   .step.active { display: block; }
   .step-indicator { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
-  .step-title { font-family: 'DM Serif Display', serif; font-size: 21px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
+  .step-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
+  .step-subtitle { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
 
   .en-line { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.55; }
   .pt-line { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
   .instruction-block { margin: 14px 0; }
 
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+  .meta-row b { color: var(--text); }
+
+  .clip-card { background: var(--cream); border: 1.5px solid var(--sand); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; }
+  .clip-card .clip-title { font-weight: 700; font-size: 14px; color: var(--brown); margin-bottom: 8px; }
+  .clip-card .clip-row { font-size: 13px; color: var(--text); margin-bottom: 3px; }
+
   .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
   .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--cream); font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif; }
   .chip.selected { background: var(--mint); border-color: var(--mint); color: var(--white); }
+
+  .short-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; margin-top: 8px; }
+  .short-input:focus { border-color: var(--mint); }
 
   .video-box { background: var(--text); border-radius: var(--radius); overflow: hidden; margin: 16px 0; position: relative; aspect-ratio: 16/9; }
   .video-slot { width: 100%; height: 100%; }
   .video-overlay-btn { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; border: none; width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; }
   .video-overlay-btn .play-icon { font-size: 38px; }
-  .video-overlay-btn.hidden-support .play-icon { font-size: 30px; }
   .video-timestamp { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
 
   .mcq-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--sand); }
@@ -51,31 +61,56 @@
 
   .callout-box { background: var(--cream); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; margin: 16px 0; }
   .callout-label { font-size: 11px; font-weight: 700; color: var(--brown); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-
-  .transcript-box { background: var(--cream); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; line-height: 2; font-size: 14px; }
-  .chunk { cursor: pointer; padding: 2px 3px; border-radius: 4px; transition: background .15s; }
-  .chunk:hover, .chunk.playing { background: var(--mint); color: var(--white); }
+  .callout-box .big-line { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); margin: 4px 0 8px; }
 
   .notice-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
   .notice-item:last-child { margin-bottom: 0; }
   .notice-num { width: 24px; height: 24px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .notice-item .word-map { font-family: 'DM Mono', monospace; background: var(--cream); display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; margin: 4px 0; }
+
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-word { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .toggle-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .toggle-btn { padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--sand); background: var(--white); font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .toggle-btn.selected.know { background: var(--mint); border-color: var(--mint); color: var(--white); }
+  .toggle-btn.selected.new { background: var(--rose); border-color: var(--rose); color: var(--white); }
+
+  .chunk-item { display: block; width: 100%; text-align: left; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .chunk-item.selected { background: var(--mint); border-color: var(--mint); color: var(--white); }
 
   .drill-item { background: var(--cream); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
   .drill-item:last-child { margin-bottom: 0; }
-  .drill-check { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: 13px; color: var(--text); cursor: pointer; }
+  .drill-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .drill-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
   .drill-check input { width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; }
 
   .rating-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
-  .rating-btn { flex: 1; min-width: 96px; padding: 11px 8px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 12.5px; font-weight: 600; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .rating-btn { flex: 1; min-width: 80px; padding: 12px 6px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 11.5px; font-weight: 600; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; }
+  .rating-btn .rating-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
   .rating-btn.selected { background: var(--brown); color: var(--white); border-color: var(--brown); }
 
-  .compare-box { display: flex; gap: 10px; margin: 16px 0; }
-  .compare-col { flex: 1; background: var(--cream); border-radius: 10px; padding: 12px; font-size: 12px; color: var(--muted); }
-  .compare-col b { display: block; color: var(--text); font-size: 12.5px; margin-bottom: 4px; }
+  .compare-box { display: flex; gap: 10px; margin: 16px 0; align-items: center; }
+  .compare-col { flex: 1; background: var(--cream); border-radius: 10px; padding: 12px; font-size: 12.5px; color: var(--text); text-align: center; }
+  .compare-col b { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .compare-arrow { font-size: 18px; color: var(--muted); }
 
-  .note-textarea { width: 100%; min-height: 90px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; resize: vertical; outline: none; margin-top: 10px; }
+  .checkbox-list label { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); padding: 8px 0; cursor: pointer; }
+  .checkbox-list input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; flex-shrink: 0; }
+
+  .vocab-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .vocab-row span { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+  .vocab-row input { flex: 1; min-width: 0; border: 1.5px solid var(--sand); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .vocab-row input:focus { border-color: var(--mint); }
+
+  .note-textarea { width: 100%; min-height: 80px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; resize: vertical; outline: none; margin-top: 10px; }
   .note-textarea:focus { border-color: var(--mint); }
-  .note-hint { font-size: 11.5px; color: var(--muted); margin-top: 6px; }
+
+  .reveal-block { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--sand); }
+  .reveal-block.shown { display: block; }
+
+  .result-box { background: var(--cream); border-radius: 10px; padding: 14px 16px; margin: 16px 0; text-align: center; }
+  .result-box .result-big { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px; }
 
   .nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
   .btn-primary { background: var(--brown); color: var(--white); border: none; border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
@@ -86,10 +121,10 @@
   .final-emoji { font-size: 50px; margin-bottom: 12px; }
   .final-title { font-family: 'DM Serif Display', serif; font-size: 23px; color: var(--text); margin-bottom: 10px; }
   .final-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
-  .final-note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; }
+  .final-note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; text-align: left; }
+  .final-note-tag { font-size: 11px; color: var(--muted); opacity: .8; }
 
   .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
-
   .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 12.5px; color: var(--brown); line-height: 1.5; }
   .pending-box b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
 </style>
@@ -135,34 +170,71 @@
 
   <div class="card" id="missionCard" style="display:none;">
 
+    <!-- STEP 0: INTRO / BRIEFING -->
+    <div class="step" id="step-0">
+      <div class="step-indicator">Mission 01 · Before You Begin</div>
+      <div class="step-title">🎧 Mission 01 — I Know This English!</div>
+      <div class="meta-row">
+        <span><b>Theme:</b> Morning Routine</span>
+        <span><b>Listening skill:</b> Recognizing English you already know</span>
+        <span><b>Level:</b> A1 / A1+</span>
+        <span><b>Time:</b> 10–15 min</span>
+      </div>
+
+      <div class="instruction-block" style="margin-top:20px;">
+        <div class="step-subtitle" style="margin-bottom:6px;">Today's goal</div>
+        <div class="en-line">You don't need to understand every word to understand English.</div>
+        <div class="pt-line">Hoje vamos treinar seu ouvido para reconhecer o inglês que você já conhece.</div>
+      </div>
+
+      <div class="clip-card">
+        <div class="clip-title">🎧 Today's Clip</div>
+        <div class="clip-row">Start: 00:12</div>
+        <div class="clip-row">Stop: 00:54</div>
+        <div class="clip-row">Only 42 seconds!</div>
+        <div class="pt-line" style="margin-top:6px;">Você só precisa assistir a este trecho.</div>
+      </div>
+    </div>
+
     <!-- STEP 1 -->
     <div class="step" id="step-1">
-      <div class="step-indicator">Step 1 of 10 · Before You Listen</div>
-      <div class="step-title">Before You Listen</div>
+      <div class="step-indicator">Step 1 of 10</div>
+      <div class="step-title">Before You Listen ☀️</div>
+      <div class="step-subtitle">Your morning</div>
       <div class="instruction-block">
-        <div class="en-line">You're about to watch a short clip about a morning routine. Look at these words first.</div>
-        <div class="pt-line">Você vai assistir a um trecho curto sobre uma rotina matinal. Antes, dê uma olhada nessas palavras.</div>
-      </div>
-      <div class="instruction-block">
-        <div class="en-line">Tap the ones you already know.</div>
-        <div class="pt-line">Toque nas que você já conhece.</div>
+        <div class="en-line">What do you usually do after you wake up?</div>
+        <div class="pt-line">O que você costuma fazer depois que acorda?</div>
       </div>
       <div class="chip-row" id="step1Chips">
-        <!-- PENDING: lista de palavras-chave aguardando o briefing original da Brenda -->
+        <div class="chip" data-chip="take a shower">take a shower</div>
+        <div class="chip" data-chip="open the curtains">open the curtains</div>
+        <div class="chip" data-chip="check my phone">check my phone</div>
+        <div class="chip" data-chip="have breakfast">have breakfast</div>
+        <div class="chip" data-chip="go back to sleep">go back to sleep</div>
+        <div class="chip" data-chip="drink coffee">drink coffee</div>
       </div>
-      <div class="pending-box">
-        <b>⚠️ Conteúdo pendente</b>
-        Lista de palavras-chave desta etapa ainda não confirmada — aguardando o texto exato do briefing.
+      <div class="instruction-block">
+        <div class="en-line">What time do you usually wake up?</div>
+        <div class="pt-line">Que horas você costuma acordar?</div>
+        <input type="text" class="short-input" id="step1WakeTime" placeholder="..." />
+        <div class="pt-line" style="margin-top:6px;">Não há resposta certa ou errada nesta etapa.</div>
       </div>
     </div>
 
     <!-- STEP 2 -->
     <div class="step" id="step-2">
-      <div class="step-indicator">Step 2 of 10 · First Listen</div>
-      <div class="step-title">First Listen</div>
+      <div class="step-indicator">Step 2 of 10</div>
+      <div class="step-title">First Listen 👂</div>
       <div class="instruction-block">
-        <div class="en-line">Just listen. Don't worry about understanding every word.</div>
-        <div class="pt-line">Só escute. Não se preocupe em entender cada palavra agora.</div>
+        <div class="en-line">Just listen.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">No subtitles. Don't pause. Don't translate. Just listen.</div>
+        <div class="pt-line">Sem legendas. Não pause nem tente traduzir. Apenas escute.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">You do NOT need to understand everything.</div>
+        <div class="pt-line">Você não precisa entender tudo.</div>
       </div>
       <div class="video-box">
         <div class="video-slot" id="slot-2"></div>
@@ -171,33 +243,69 @@
           <div>Play clip</div>
         </button>
       </div>
-      <div class="video-timestamp">Miss Honey · 00:12 → 00:54</div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much did you understand?</div>
+        <div class="pt-line">Quanto você acha que conseguiu entender?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-2"></div>
     </div>
 
     <!-- STEP 3 -->
     <div class="step" id="step-3">
-      <div class="step-indicator">Step 3 of 10 · What Did Your Ears Catch</div>
-      <div class="step-title">What Did Your Ears Catch?</div>
+      <div class="step-indicator">Step 3 of 10</div>
+      <div class="step-title">What Did Your Ears Catch? 🔎</div>
       <div class="instruction-block">
-        <div class="en-line">Which words did you notice? Select everything you heard.</div>
-        <div class="pt-line">Quais palavras você notou? Marque tudo que você ouviu.</div>
+        <div class="en-line">Which words did you hear?</div>
+        <div class="pt-line">Quais palavras você conseguiu ouvir?</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't listen again yet. Choose what you remember hearing.</div>
+        <div class="pt-line">Ainda não escute novamente. Marque apenas o que você lembra de ter ouvido.</div>
       </div>
       <div class="chip-row" id="step3Chips">
-        <!-- PENDING: opções de palavras aguardando o briefing original da Brenda -->
+        <div class="chip" data-chip="alarm">alarm</div>
+        <div class="chip" data-chip="shower">shower</div>
+        <div class="chip" data-chip="curtains">curtains</div>
+        <div class="chip" data-chip="hair">hair</div>
+        <div class="chip" data-chip="sick">sick</div>
+        <div class="chip" data-chip="morning">morning</div>
+        <div class="chip" data-chip="breakfast">breakfast</div>
+        <div class="chip" data-chip="coffee">coffee</div>
+        <div class="chip" data-chip="school">school</div>
+        <div class="chip" data-chip="sun">sun</div>
       </div>
-      <div class="pending-box">
-        <b>⚠️ Conteúdo pendente</b>
-        Opções de palavras desta etapa ainda não confirmadas — aguardando o texto exato do briefing.
+
+      <div class="reveal-block" id="step3ReplaySection">
+        <div class="instruction-block">
+          <div class="en-line">Now listen again and check your choices.</div>
+          <div class="pt-line">Agora escute novamente e confira suas escolhas.</div>
+        </div>
+        <div class="video-box">
+          <div class="video-slot" id="slot-3"></div>
+          <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 12, 54)">
+            <div class="play-icon">▶</div>
+            <div>Play clip</div>
+          </button>
+        </div>
+        <div class="video-timestamp">00:12 → 00:54</div>
+        <button class="btn-primary" style="margin-top:6px;" onclick="checkMyEars()" id="checkEarsBtn">CHECK MY EARS 👂</button>
       </div>
+
+      <div class="result-box" id="step3Result" style="display:none;"></div>
     </div>
 
     <!-- STEP 4 -->
     <div class="step" id="step-4">
-      <div class="step-indicator">Step 4 of 10 · Listen With a Mission</div>
-      <div class="step-title">Listen With a Mission</div>
+      <div class="step-indicator">Step 4 of 10</div>
+      <div class="step-title">Listen With a Mission 🎯</div>
       <div class="instruction-block">
-        <div class="en-line">Listen one more time, now with a mission: answer the 4 questions below.</div>
-        <div class="pt-line">Escute mais uma vez, agora com uma missão: responda as 4 perguntas abaixo.</div>
+        <div class="en-line">Don't listen for everything.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">This time, listen ONLY for the answers.</div>
+        <div class="pt-line">Desta vez, procure apenas as informações necessárias para responder.</div>
       </div>
       <div class="video-box">
         <div class="video-slot" id="slot-4"></div>
@@ -212,96 +320,48 @@
 
     <!-- STEP 5 -->
     <div class="step" id="step-5">
-      <div class="step-indicator">Step 5 of 10 · The "I Know This!" Moment</div>
-      <div class="step-title">The "I Know This!" Moment</div>
+      <div class="step-indicator">Step 5 of 10</div>
+      <div class="step-title">The "I Know This!" Moment 🤯</div>
       <div class="instruction-block">
-        <div class="en-line">See? You already know these words. Your ears just caught real English.</div>
-        <div class="pt-line">Viu? Você já conhece essas palavras. Seu ouvido acabou de captar inglês de verdade.</div>
+        <div class="en-line">Do you know these words and expressions?</div>
+        <div class="pt-line">Você já conhece estas palavras e expressões?</div>
       </div>
-      <div class="callout-box" id="secret1Callout">
-        <div class="callout-label">🔑 Listening Secret #1</div>
-        <div class="pending-box" style="margin:0;">
-          <b>⚠️ Conteúdo pendente</b>
-          Texto do "Listening Secret #1" ainda não confirmado — aguardando o texto exato do briefing.
-        </div>
+      <div id="step5KnowList"></div>
+
+      <div class="instruction-block" style="margin-top:20px;">
+        <div class="en-line">Now here's the interesting part...</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">You KNOW these words. But could you HEAR all of them?</div>
+        <div class="pt-line">Você conhece essas palavras. Mas conseguiu reconhecê-las quando ouviu?</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Which ones were difficult to hear?</div>
+        <div class="pt-line">Quais foram difíceis de reconhecer?</div>
+      </div>
+      <div class="chip-row" id="step5DifficultChips"></div>
+
+      <div class="callout-box">
+        <div class="callout-label">🧠 Listening Secret #1</div>
+        <div class="big-line">Knowing a word ≠ Hearing a word</div>
+        <div class="en-line">You may recognize a word when you read it... but your brain also needs to learn how it sounds when someone says it naturally.</div>
+        <div class="en-line" style="margin-top:8px;">That's why we're training your ears. 👂 You don't need to translate everything.</div>
+        <div class="pt-line" style="margin-top:8px;">💡 Em outras palavras: Você pode já conhecer o inglês. Seu ouvido só ainda não aprendeu a reconhecê-lo rápido o suficiente.</div>
       </div>
     </div>
 
     <!-- STEP 6 -->
     <div class="step" id="step-6">
-      <div class="step-indicator">Step 6 of 10 · Now Check What You Heard</div>
-      <div class="step-title">Now Check What You Heard</div>
+      <div class="step-indicator">Step 6 of 10</div>
+      <div class="step-title">Now Check What You Heard 👀</div>
+      <div class="step-subtitle">Listen + read</div>
       <div class="instruction-block">
-        <div class="en-line">Tap any part of the transcript to hear just that part again.</div>
-        <div class="pt-line">Toque em qualquer parte da transcrição para ouvir aquele pedaço de novo.</div>
-      </div>
-      <div class="transcript-box" id="transcriptBox">
-        <!-- PENDING: transcrição exata do trecho (00:12-00:54) aguardando o briefing original da Brenda -->
-      </div>
-      <div class="pending-box">
-        <b>⚠️ Conteúdo pendente</b>
-        Transcrição e divisão em trechos tocáveis ainda não confirmadas — aguardando o texto exato do briefing.
-      </div>
-      <div class="video-box" style="height:0; padding:0; margin:0; aspect-ratio:auto;" id="hiddenSlotWrap-6">
-        <div class="video-slot" id="slot-6" style="height:1px;"></div>
-      </div>
-    </div>
-
-    <!-- STEP 7 -->
-    <div class="step" id="step-7">
-      <div class="step-indicator">Step 7 of 10 · Did You Notice?</div>
-      <div class="step-title">Did You Notice?</div>
-      <div class="instruction-block">
-        <div class="en-line">A few quick things worth noticing — not grammar rules, just noticing.</div>
-        <div class="pt-line">Algumas coisas rápidas pra notar — não são regras de gramática, é só reparar.</div>
-      </div>
-      <div class="pending-box">
-        <b>⚠️ Conteúdo pendente</b>
-        Os 3 "Did You Notice" (micro-observações de pronúncia/gramática) ainda não foram confirmados — aguardando o texto exato do briefing.
-      </div>
-    </div>
-
-    <!-- STEP 8 -->
-    <div class="step" id="step-8">
-      <div class="step-indicator">Step 8 of 10 · Shadow It</div>
-      <div class="step-title">Shadow It</div>
-      <div class="instruction-block">
-        <div class="en-line">Play each clip and repeat it out loud, right after you hear it. Do each one 3 times.</div>
-        <div class="pt-line">Toque cada trecho e repita em voz alta, logo depois de ouvir. Faça cada um 3 vezes.</div>
-      </div>
-
-      <div class="pending-box">
-        <b>⚠️ Conteúdo pendente</b>
-        As 3 frases dos drills de shadowing e seus timestamps exatos ainda não foram confirmados — aguardando o texto exato do briefing. Os checkboxes abaixo ficam desativados até essa confirmação.
-      </div>
-
-      <div class="drill-item">
-        <div class="en-line" style="opacity:.5;">Drill 1 — aguardando frase e timestamp exatos</div>
-        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 1)"> I repeated it 3x</label>
-      </div>
-
-      <div class="drill-item">
-        <div class="en-line" style="opacity:.5;">Drill 2 — aguardando frase e timestamp exatos</div>
-        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 2)"> I repeated it 3x</label>
-      </div>
-
-      <div class="drill-item">
-        <div class="en-line" style="opacity:.5;">Drill 3 — aguardando frase e timestamp exatos</div>
-        <label class="drill-check"><input type="checkbox" disabled onchange="onDrillCheck(this, 3)"> I repeated it 3x</label>
-      </div>
-    </div>
-
-    <!-- STEP 9 -->
-    <div class="step" id="step-9">
-      <div class="step-indicator">Step 9 of 10 · The Magic Listen</div>
-      <div class="step-title">The Magic Listen</div>
-      <div class="instruction-block">
-        <div class="en-line">Now listen one more time — no transcript, no questions. Just you and your ears.</div>
-        <div class="pt-line">Agora escute mais uma vez — sem transcrição, sem perguntas. Só você e seu ouvido.</div>
+        <div class="en-line">Now listen again while you read.</div>
+        <div class="pt-line">Agora escute novamente acompanhando os trechos.</div>
       </div>
       <div class="video-box">
-        <div class="video-slot" id="slot-9"></div>
-        <button class="video-overlay-btn hidden-support" id="playBtn-9" onclick="playInSlot(9, 12, 54)">
+        <div class="video-slot" id="slot-6"></div>
+        <button class="video-overlay-btn" id="playBtn-6" onclick="playInSlot(6, 12, 54)">
           <div class="play-icon">▶</div>
           <div>Play clip</div>
         </button>
@@ -309,39 +369,194 @@
       <div class="video-timestamp">00:12 → 00:54</div>
 
       <div class="instruction-block">
-        <div class="en-line">How did it feel this time, compared to the first listen?</div>
-        <div class="pt-line">Como foi dessa vez, comparado com a primeira escuta?</div>
+        <div class="en-line">Which ones did you already know but couldn't hear?</div>
+        <div class="pt-line">Quais você já conhecia, mas não conseguiu reconhecer no áudio?</div>
       </div>
-      <div class="rating-row" id="ratingRow">
-        <div class="rating-btn" data-rating="easier">Much easier</div>
-        <div class="rating-btn" data-rating="little-easier">A little easier</div>
-        <div class="rating-btn" data-rating="same">About the same</div>
+      <div id="step6Chunks"></div>
+
+      <div class="callout-box" style="border-left-color: var(--mint);">
+        <div class="big-line">🤯 Look at that!</div>
+        <div class="en-line">You already knew some of this English.</div>
+        <div class="en-line" style="margin-top:6px;">Your vocabulary wasn't necessarily the problem. Your ears just needed another chance.</div>
+        <div class="pt-line" style="margin-top:8px;">Você já conhecia parte desse inglês. Seu ouvido só precisava de mais uma chance.</div>
       </div>
-      <div class="compare-box">
-        <div class="compare-col"><b>First listen</b>just sounds, no clear words.</div>
-        <div class="compare-col"><b>Now</b>real sentences you actually understand. 🎧</div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step" id="step-7">
+      <div class="step-indicator">Step 7 of 10</div>
+      <div class="step-title">Did You Notice? 👂</div>
+
+      <div class="notice-item">
+        <div class="notice-num">1</div>
+        <div>
+          <div class="step-subtitle" style="margin-bottom:4px;">Go off</div>
+          <div class="word-map">My alarm went off.</div>
+          <div class="en-line" style="margin-top:6px;">go off = ring</div>
+          <div class="pt-line">O alarme tocou.</div>
+          <div class="en-line" style="margin-top:8px;">"Go off" is very common when we talk about alarms.</div>
+        </div>
+      </div>
+
+      <div class="notice-item">
+        <div class="notice-num">2</div>
+        <div>
+          <div class="step-subtitle" style="margin-bottom:4px;">Wake up → woke up</div>
+          <div class="word-map">wake up → woke up</div>
+          <div class="en-line" style="margin-top:6px;">She is talking about what happened that morning.</div>
+          <div class="en-line" style="margin-top:8px;">Don't worry about memorizing it now. Just notice the sound.</div>
+          <div class="pt-line">Não precisa memorizar agora. Apenas perceba como o som muda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step" id="step-8">
+      <div class="step-indicator">Step 8 of 10</div>
+      <div class="step-title">Shadow It! 🗣️</div>
+      <div class="instruction-block">
+        <div class="en-line">Listen. Repeat. Follow the rhythm.</div>
+        <div class="pt-line">Escute, repita e tente acompanhar o ritmo.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Copy the rhythm, not the accent.</div>
+        <div class="pt-line">Tente acompanhar o ritmo, não copiar o sotaque.</div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">1. "My alarm went off..."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8a" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8a', 12, 54)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 1)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">2. "I woke up feeling a little sick."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8b" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8b', 12, 54)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 2)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">3. "I need to take a shower."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8c" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8c', 12, 54)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 3)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="callout-box" style="border-left-color: var(--rose);">
+        <div class="en-line">Your accent is part of you. 💜</div>
+        <div class="en-line" style="margin-top:6px;">We're training your ears and rhythm, not trying to make you sound like someone else.</div>
+        <div class="pt-line" style="margin-top:8px;">O objetivo é melhorar sua compreensão e seu ritmo — não apagar seu sotaque.</div>
+      </div>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="step" id="step-9">
+      <div class="step-indicator">Step 9 of 10</div>
+      <div class="step-title">The Magic Listen ✨</div>
+      <div class="instruction-block">
+        <div class="en-line">One last time.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Remember your first listen? Now listen to the SAME 42 seconds again.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't read. Don't translate. Just listen.</div>
+        <div class="pt-line">Agora escute o mesmo trecho mais uma vez, sem ler e sem traduzir.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-9"></div>
+        <button class="video-overlay-btn" id="playBtn-9" onclick="playInSlot(9, 12, 54)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much do you understand NOW?</div>
+        <div class="pt-line">E agora, quanto você consegue entender?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-9"></div>
+
+      <div class="reveal-block" id="step9CompareBlock">
+        <div class="compare-box">
+          <div class="compare-col"><b>Before</b><span id="compareBefore"></span></div>
+          <div class="compare-arrow">→</div>
+          <div class="compare-col"><b>Now</b><span id="compareNow"></span></div>
+        </div>
+        <div class="callout-box" id="step9FeedbackBox"></div>
       </div>
     </div>
 
     <!-- STEP 10 -->
     <div class="step" id="step-10">
-      <div class="step-indicator">Step 10 of 10 · My Listening Note</div>
-      <div class="step-title">My Listening Note</div>
+      <div class="step-indicator">Step 10 of 10</div>
+      <div class="step-title">My Listening Note 📝</div>
       <div class="instruction-block">
-        <div class="en-line">What's one thing you noticed about your own listening today?</div>
-        <div class="pt-line">O que você percebeu sobre o seu próprio listening hoje?</div>
+        <div class="en-line">Today I discovered that...</div>
+        <div class="pt-line">Hoje eu percebi que...</div>
       </div>
-      <textarea class="note-textarea" id="noteText" placeholder="Write a few words... (in English or Portuguese, up to you)"></textarea>
-      <div class="note-hint">Essa nota é só pra você — ela não é enviada pra ninguém.</div>
+      <div class="checkbox-list">
+        <label><input type="checkbox" value="understand-more"> I understand more than I think.</label>
+        <label><input type="checkbox" value="know-words-difficult"> I know words that are still difficult to hear.</label>
+        <label><input type="checkbox" value="translate-too-much"> I try to translate too much.</label>
+        <label><input type="checkbox" value="listening-more-helps"> Listening more than once helps me.</label>
+        <label><input type="checkbox" value="need-more-practice"> I need more practice — and that's okay.</label>
+      </div>
+
+      <div class="instruction-block" style="margin-top:18px;">
+        <div class="en-line">One expression I can hear better now:</div>
+        <div class="pt-line">Uma expressão que consigo reconhecer melhor agora:</div>
+        <input type="text" class="short-input" id="step10Expression" placeholder="..." />
+      </div>
+
+      <div class="callout-box" style="margin-top:22px;">
+        <div class="callout-label">🔎 Vocabulary Boost</div>
+        <div class="en-line">Found a word you don't know? Look it up! 🔎</div>
+        <div class="pt-line">Encontrou alguma palavra ou expressão nova? Agora sim é hora de pesquisar.</div>
+        <div class="en-line" style="margin-top:8px;">Choose up to 3 new words or expressions from today's mission.</div>
+        <div class="pt-line">Escolha até 3 palavras ou expressões novas de hoje.</div>
+
+        <div style="margin-top:14px;">
+          <div class="vocab-row"><span>1.</span><input type="text" id="vocabWord1" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning1" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>2.</span><input type="text" id="vocabWord2" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning2" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>3.</span><input type="text" id="vocabWord3" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning3" placeholder="meaning" /></div>
+        </div>
+
+        <div class="en-line" style="margin-top:10px;">During listening → don't stop for every unknown word.</div>
+        <div class="en-line">After listening → explore the new vocabulary.</div>
+        <div class="pt-line" style="margin-top:6px;">Durante o listening, não precisamos traduzir tudo. Depois do treino, podemos usar a tradução para aprender ainda mais.</div>
+      </div>
     </div>
 
     <!-- FINAL SCREEN -->
     <div class="step" id="step-final">
       <div class="final-screen">
         <div class="final-emoji">🎧</div>
-        <div class="final-title">MISSION 01 COMPLETE</div>
-        <div class="final-sub">You trained your ears today. That's exactly what real listening progress looks like.<br><span style="opacity:.8;">Você treinou seu ouvido hoje. É exatamente assim que o progresso em listening acontece.</span></div>
-        <div class="final-note">💡 Listen again tomorrow to reinforce what you learned. / Escute de novo amanhã para reforçar o que você aprendeu.</div>
+        <div class="final-title">Mission 01 Complete!</div>
+        <div class="final-sub">You just trained your ears for real English.<br><span style="opacity:.8;">Você acabou de treinar seu ouvido para o inglês da vida real.</span></div>
+        <div class="final-note">
+          <b style="display:block; margin-bottom:4px;">🔁 Listen again tomorrow <span class="final-note-tag">(opcional)</span></b>
+          You don't need to repeat the activities. Tomorrow, listen to the clip ONE TIME without subtitles and see what you can still understand.<br>
+          <span style="opacity:.8;">Você não precisa refazer os exercícios. Amanhã, escute o trecho apenas uma vez, sem legenda, e perceba quanto ainda consegue entender.</span>
+        </div>
         <a href="listening-boost.html" class="btn-primary" style="text-decoration:none; display:inline-block;">Back to Listening Boost</a>
       </div>
     </div>
@@ -419,18 +634,30 @@
   }
 
   const VIDEO_ID = '4GtF4TuFps4';
-  const TOTAL_STEPS = 10;
-  let currentStep = 1;
+  const TOTAL_STEPS = 10; // steps 1-10; step 0 is the mission briefing, shown before Step 1
+  let currentStep = 0;
   let CURRENT_USER_ID = null;
-  let PROFILE_ROLE = null;
 
-  // ---- Step state ----
-  const state = {
-    quizAnswered: [false, false, false, false],
-    quizCorrect: [false, false, false, false],
-    drillsDone: [false, false, false],
-    ratingPicked: false,
-  };
+  // ---- Content constants (verbatim from Brenda's brief) ----
+  const RATING_SCALE = [
+    { emoji: '😵', en: 'Almost nothing' },
+    { emoji: '😕', en: 'A little' },
+    { emoji: '🙂', en: 'About half' },
+    { emoji: '😎', en: 'Most of it' },
+  ];
+
+  const STEP3_TARGETS = new Set(['alarm', 'shower', 'curtains', 'hair', 'sick', 'sun']);
+
+  const STEP5_ITEMS = ['wake up', 'take a shower', 'open the curtains', 'feel sick', 'hair', 'alarm'];
+
+  const STEP6_CHUNKS = [
+    'my alarm went off',
+    'pressed snooze',
+    'open the curtains',
+    'woke up feeling a little sick',
+    'take a shower',
+    'my hair',
+  ];
 
   const QUIZ = [
     { q: 'What time does her alarm go off?', options: ['8:58 a.m.', '9:58 a.m.', '10:58 a.m.'], correct: 1 },
@@ -439,6 +666,86 @@
     { q: 'What does she need to do?', options: ['Have breakfast', 'Go to work', 'Take a shower'], correct: 2 },
   ];
 
+  // ---- State ----
+  const state = {
+    step2Rating: null,
+    step3Checked: false,
+    step3EarsCaught: 0,
+    quizAnswered: [false, false, false, false],
+    quizCorrect: [false, false, false, false],
+    step5Know: {},      // item -> 'know' | 'new'
+    step5Difficult: new Set(),
+    step6Selected: new Set(),
+    drillsDone: [false, false, false],
+    step9Rating: null,
+  };
+
+  function renderChipRow(containerId, onToggle) {
+    document.getElementById(containerId).querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        if (onToggle) onToggle(chip);
+      });
+    });
+  }
+  renderChipRow('step1Chips');
+  renderChipRow('step3Chips', () => {
+    const anySelected = document.querySelectorAll('#step3Chips .chip.selected').length > 0;
+    if (anySelected) document.getElementById('step3ReplaySection').classList.add('shown');
+  });
+
+  function checkMyEars() {
+    const selected = Array.from(document.querySelectorAll('#step3Chips .chip.selected')).map(c => c.dataset.chip);
+    const caught = selected.filter(w => STEP3_TARGETS.has(w)).length;
+    state.step3EarsCaught = caught;
+    state.step3Checked = true;
+    const box = document.getElementById('step3Result');
+    box.style.display = 'block';
+    box.innerHTML = `<div class="result-big">🎉 Your ears caught ${caught} word${caught === 1 ? '' : 's'}!</div>
+      <div class="pt-line">Talvez você tenha entendido mais do que imaginava.</div>`;
+    updateContinueState();
+  }
+
+  // ---- Step 2 / Step 9 rating rows ----
+  function renderRatingRow(rowId, onPick) {
+    const row = document.getElementById(rowId);
+    row.innerHTML = RATING_SCALE.map((r, i) =>
+      `<div class="rating-btn" data-idx="${i}"><span class="rating-emoji">${r.emoji}</span>${r.en}</div>`
+    ).join('');
+    row.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        onPick(parseInt(btn.dataset.idx, 10));
+      });
+    });
+  }
+  renderRatingRow('ratingRow-2', (idx) => { state.step2Rating = idx; updateContinueState(); });
+  renderRatingRow('ratingRow-9', (idx) => { state.step9Rating = idx; renderStep9Comparison(); updateContinueState(); });
+
+  function renderStep9Comparison() {
+    if (state.step2Rating === null || state.step9Rating === null) return;
+    const before = RATING_SCALE[state.step2Rating];
+    const now = RATING_SCALE[state.step9Rating];
+    document.getElementById('compareBefore').textContent = before.emoji + ' ' + before.en;
+    document.getElementById('compareNow').textContent = now.emoji + ' ' + now.en;
+
+    const box = document.getElementById('step9FeedbackBox');
+    const bothMax = state.step2Rating === 3 && state.step9Rating === 3;
+    if (state.step9Rating > state.step2Rating || bothMax) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood more after training your ears.</div>
+        <div class="en-line" style="margin-top:8px; font-weight:700;">The English didn't change. Your listening did. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">O inglês não mudou. A sua escuta mudou.</div>`;
+    } else {
+      box.innerHTML = `<div class="en-line">That's okay!</div>
+        <div class="en-line" style="margin-top:6px;">Your ears are learning to recognize new sounds. Repetition is part of listening practice.</div>
+        <div class="pt-line" style="margin-top:6px;">Tudo bem. Seu ouvido ainda está aprendendo a reconhecer esses sons. Repetição faz parte do processo.</div>`;
+    }
+    document.getElementById('step9CompareBlock').classList.add('shown');
+  }
+
+  // ---- Quiz (Step 4) ----
   function renderQuiz() {
     const box = document.getElementById('quizBlock');
     box.innerHTML = QUIZ.map((item, qi) => {
@@ -461,40 +768,59 @@
       state.quizAnswered[qi] = true;
       state.quizCorrect[qi] = true;
       chosenBtn.classList.add('correct');
-      fb.textContent = '✓ You caught it!';
+      fb.innerHTML = 'You caught it! 🎯';
       fb.className = 'mcq-feedback correct';
       item.options.forEach((_, i) => { document.getElementById(`q${qi}o${i}`).disabled = true; });
     } else {
       chosenBtn.classList.add('wrong');
-      fb.textContent = 'Almost! Listen again and try once more.';
+      fb.innerHTML = 'Not quite! Listen one more time. 👂<br><span style="font-weight:400; color:var(--muted);">Quase! Escute mais uma vez.</span>';
       fb.className = 'mcq-feedback wrong';
       setTimeout(() => { chosenBtn.classList.remove('wrong'); }, 900);
     }
     updateContinueState();
   }
 
-  // ---- Chip toggles (steps 1 and 3 — self-check only, no grading) ----
-  document.addEventListener('click', function (e) {
-    const chip = e.target.closest('.chip');
-    if (chip) chip.classList.toggle('selected');
+  // ---- Step 5: know / new toggles + difficult-to-hear chips ----
+  function renderStep5() {
+    const box = document.getElementById('step5KnowList');
+    box.innerHTML = STEP5_ITEMS.map((item, i) => `
+      <div class="toggle-row">
+        <div class="toggle-word">${item}</div>
+        <div class="toggle-btns">
+          <button class="toggle-btn know" id="know-${i}-know" onclick="setStep5Know(${i}, 'know')">I KNOW IT ✓</button>
+          <button class="toggle-btn new" id="know-${i}-new" onclick="setStep5Know(${i}, 'new')">NEW TO ME</button>
+        </div>
+      </div>`).join('');
 
-    const ratingBtn = e.target.closest('.rating-btn');
-    if (ratingBtn) {
-      document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
-      ratingBtn.classList.add('selected');
-      state.ratingPicked = true;
-      updateContinueState();
-    }
+    const chips = document.getElementById('step5DifficultChips');
+    chips.innerHTML = STEP5_ITEMS.map((item, i) => `<div class="chip" data-chip="${item}" id="diff-chip-${i}">${item}</div>`).join('');
+    chips.querySelectorAll('.chip').forEach((chip, i) => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        if (chip.classList.contains('selected')) state.step5Difficult.add(STEP5_ITEMS[i]);
+        else state.step5Difficult.delete(STEP5_ITEMS[i]);
+      });
+    });
+  }
 
-    const chunk = e.target.closest('.chunk');
-    if (chunk) {
-      document.querySelectorAll('.chunk').forEach(c => c.classList.remove('playing'));
-      chunk.classList.add('playing');
-      const start = parseFloat(chunk.dataset.start);
-      const end = parseFloat(chunk.dataset.end);
-      playInSlot(6, start, end);
-    }
-  });
+  function setStep5Know(i, value) {
+    state.step5Know[STEP5_ITEMS[i]] = value;
+    document.getElementById(`know-${i}-know`).classList.toggle('selected', value === 'know');
+    document.getElementById(`know-${i}-new`).classList.toggle('selected', value === 'new');
+  }
+
+  // ---- Step 6: tappable chunks ----
+  function renderStep6() {
+    const box = document.getElementById('step6Chunks');
+    box.innerHTML = STEP6_CHUNKS.map((c, i) => `<button type="button" class="chunk-item" id="chunk6-${i}">${c}</button>`).join('');
+    box.querySelectorAll('.chunk-item').forEach((el, i) => {
+      el.addEventListener('click', () => {
+        el.classList.toggle('selected');
+        if (el.classList.contains('selected')) state.step6Selected.add(STEP6_CHUNKS[i]);
+        else state.step6Selected.delete(STEP6_CHUNKS[i]);
+      });
+    });
+  }
 
   function onDrillCheck(checkbox, idx) {
     state.drillsDone[idx - 1] = checkbox.checked;
@@ -565,17 +891,21 @@
   }
 
   // ---- Step navigation ----
+  const STEP_LABELS = { 1: "I'M READY 🎧" };
+
   function updateContinueState() {
     const btn = document.getElementById('continueBtn');
     let ok = true;
+    if (currentStep === 2) ok = state.step2Rating !== null;
+    if (currentStep === 3) ok = state.step3Checked;
     if (currentStep === 4) ok = state.quizCorrect.every(Boolean);
     if (currentStep === 8) ok = state.drillsDone.every(Boolean);
-    if (currentStep === 9) ok = state.ratingPicked;
+    if (currentStep === 9) ok = state.step9Rating !== null;
     btn.disabled = !ok;
   }
 
   function goToStep(n) {
-    if (n < 1) return;
+    if (n < 0) return;
     document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
     currentStep = n;
 
@@ -587,10 +917,11 @@
 
     document.getElementById('step-' + n).classList.add('active');
     document.getElementById('navRow').style.display = 'flex';
-    document.getElementById('backStepBtn').style.visibility = n === 1 ? 'hidden' : 'visible';
+    document.getElementById('backStepBtn').style.visibility = n === 0 ? 'hidden' : 'visible';
 
     const btn = document.getElementById('continueBtn');
-    btn.textContent = n === TOTAL_STEPS ? '✓ Complete Mission' : 'Continue →';
+    if (n === TOTAL_STEPS) btn.textContent = '✓ COMPLETE MISSION';
+    else btn.textContent = STEP_LABELS[n] || 'Continue →';
     btn.disabled = false;
     updateContinueState();
   }
@@ -624,12 +955,14 @@
     }
 
     CURRENT_USER_ID = user.id;
-    PROFILE_ROLE = profile.role;
 
     renderQuiz();
+    renderStep5();
+    renderStep6();
+
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('missionCard').style.display = 'block';
-    goToStep(1);
+    goToStep(0);
   }
 
   // Auth with retry for slow session loading
