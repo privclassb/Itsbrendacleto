@@ -89,7 +89,7 @@
 <body>
 
 <header>
-  <a href="home-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
+  <a href="materiais-extras-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
   <div class="header-title">Listening Boost</div>
 </header>
 
@@ -224,7 +224,7 @@
       return;
     }
 
-    document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'home-adulto.html';
+    document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'materiais-extras-adulto.html';
 
     const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
     const completedIds = new Set((progress || []).map(p => p.lesson_id));
