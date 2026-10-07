@@ -873,31 +873,20 @@
   }
 
   // ---- YouTube IFrame API integration ----
-  let ytPlayer = null;
-  let ytReady = false;
-  let pendingPlay = null;
-  let watchdogTimer = null;
+  // Each video slot gets its OWN player, created once and left in place for
+  // good. Moving a single shared iframe between slots (appendChild to a new
+  // parent) makes the browser reload the iframe from scratch, which was
+  // silently dropping the start/end cueing - that's why clips kept starting
+  // from the beginning. Keeping one player per slot avoids that entirely.
+  let ytApiReady = false;
+  const players = {};        // slotId -> YT.Player
+  const watchdogTimers = {}; // slotId -> interval id
+  const pendingPlays = [];   // queued { slotId, start, end } while API loads
 
   window.onYouTubeIframeAPIReady = function () {
-    const holder = document.createElement('div');
-    holder.id = 'ytPlayerSlot';
-    document.getElementById('slot-2').appendChild(holder);
-    ytPlayer = new YT.Player('ytPlayerSlot', {
-      height: '100%',
-      width: '100%',
-      videoId: VIDEO_ID,
-      playerVars: { rel: 0, modestbranding: 1, playsinline: 1 },
-      events: {
-        onReady: function () {
-          ytReady = true;
-          if (pendingPlay) {
-            const p = pendingPlay;
-            pendingPlay = null;
-            doPlayClip(p.slotId, p.start, p.end);
-          }
-        }
-      }
-    });
+    ytApiReady = true;
+    pendingPlays.forEach(p => createAndPlay(p.slotId, p.start, p.end));
+    pendingPlays.length = 0;
   };
 
   (function loadYouTubeApi() {
@@ -906,35 +895,60 @@
     document.head.appendChild(tag);
   })();
 
-  function doPlayClip(slotId, start, end) {
-    const slotEl = document.getElementById('slot-' + slotId);
-    const playerHolder = document.getElementById('ytPlayerSlot');
-    if (slotEl && playerHolder) slotEl.appendChild(playerHolder);
-    const overlayBtn = document.getElementById('playBtn-' + slotId);
-    if (overlayBtn) overlayBtn.style.display = 'none';
-
-    clearInterval(watchdogTimer);
-    // loadVideoById with startSeconds/endSeconds reliably jumps to the exact
-    // clip point; seekTo() on a freshly-created/idle player is not reliable
-    // enough to guarantee starting at the right second.
-    ytPlayer.loadVideoById({ videoId: VIDEO_ID, startSeconds: start, endSeconds: end });
-    watchdogTimer = setInterval(() => {
-      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
-      const t = ytPlayer.getCurrentTime();
+  function startWatchdog(slotId, end, overlayBtn) {
+    clearInterval(watchdogTimers[slotId]);
+    watchdogTimers[slotId] = setInterval(() => {
+      const p = players[slotId];
+      if (!p || typeof p.getCurrentTime !== 'function') return;
+      const t = p.getCurrentTime();
       if (t >= end) {
-        ytPlayer.pauseVideo();
-        clearInterval(watchdogTimer);
+        p.pauseVideo();
+        clearInterval(watchdogTimers[slotId]);
         if (overlayBtn) overlayBtn.style.display = 'flex';
       }
     }, 200);
   }
 
-  function playInSlot(slotId, start, end) {
-    if (!ytReady) {
-      pendingPlay = { slotId, start, end };
+  function createAndPlay(slotId, start, end) {
+    const overlayBtn = document.getElementById('playBtn-' + slotId);
+    if (overlayBtn) overlayBtn.style.display = 'none';
+
+    if (players[slotId]) {
+      // Player already exists for this slot: just re-cue it in place, still
+      // without touching the DOM.
+      players[slotId].loadVideoById({ videoId: VIDEO_ID, startSeconds: start, endSeconds: end });
+      startWatchdog(slotId, end, overlayBtn);
       return;
     }
-    doPlayClip(slotId, start, end);
+
+    const slotEl = document.getElementById('slot-' + slotId);
+    const holderId = 'ytPlayerHolder-' + slotId;
+    const holder = document.createElement('div');
+    holder.id = holderId;
+    slotEl.appendChild(holder);
+
+    players[slotId] = new YT.Player(holderId, {
+      height: '100%',
+      width: '100%',
+      videoId: VIDEO_ID,
+      // start/end baked into playerVars at creation is the most reliable way
+      // to land on the right second the very first time this slot plays.
+      playerVars: { rel: 0, modestbranding: 1, playsinline: 1, start, end },
+      events: {
+        onReady: function (e) {
+          e.target.playVideo();
+          startWatchdog(slotId, end, overlayBtn);
+        }
+      }
+    });
+  }
+
+  function playInSlot(slotId, start, end) {
+    if (!ytApiReady) {
+      pendingPlays.push({ slotId, start, end });
+      return;
+    }
+    createAndPlay(slotId, start, end);
   }
 
   // ---- Step navigation ----
