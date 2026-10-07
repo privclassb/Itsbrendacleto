@@ -551,6 +551,7 @@
         </div>
         <div class="mcq-question">What do you think NOW?</div>
         <div id="hypothesisBlockNow"></div>
+        <div class="callout-box" id="step10ClueRevealBox" style="display:none;"></div>
 
         <div class="reveal-block" id="step10SlowerBlock">
           <div class="instruction-block">
@@ -885,7 +886,7 @@
   function renderQuiz7() {
     renderChoiceQuestion('step7Q1', QUIZ7[0].options, {
       mode: 'graded-retry', correct: QUIZ7[0].correct,
-      wrongText: 'Not quite! Think about the clue words above. 👂', wrongTextPt: null,
+      wrongText: 'Not quite! Look at the clues again. 👀', wrongTextPt: 'Quase! Observe as pistas novamente.',
       correctText: 'Exactly! 🎯', correctTextPt: null,
       onAnswer: (oi, isCorrect) => {
         if (isCorrect) { state.quiz7Correct[0] = true; document.getElementById('step7Reveal').classList.add('shown'); }
@@ -971,25 +972,42 @@
     renderHypothesisNow();
   }
 
+  // Unlike the other MCQs in this mission, this one does NOT force the
+  // student to get it right to continue - per Brenda's instruction, a wrong
+  // final guess reveals the answer gently instead of looping on retry.
   function renderHypothesisNow() {
-    renderChoiceQuestion('hypothesisBlockNow', HYPOTHESIS_OPTIONS, {
-      mode: 'graded-retry', correct: HYPOTHESIS_CORRECT,
-      wrongText: 'Listen to your clues again — think about what the chorus promises. 👂', wrongTextPt: null,
-      correctText: '', correctTextPt: null,
-      onAnswer: (oi, isCorrect) => {
+    const box = document.getElementById('hypothesisBlockNow');
+    box.innerHTML = HYPOTHESIS_OPTIONS.map((opt, oi) => `<button class="mcq-option" id="hypothesisBlockNow-o${oi}">${opt}</button>`).join('') +
+      `<div class="mcq-feedback" id="hypothesisBlockNow-fb"></div>`;
+
+    box.querySelectorAll('.mcq-option').forEach((btn, oi) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
         state.nowHypothesis = oi;
+        box.querySelectorAll('.mcq-option').forEach(b => { b.disabled = true; });
         const fb = document.getElementById('hypothesisBlockNow-fb');
-        if (isCorrect) {
+        const revealBox = document.getElementById('step10ClueRevealBox');
+
+        if (oi === HYPOTHESIS_CORRECT) {
+          btn.classList.add('correct');
           if (state.firstHypothesis !== HYPOTHESIS_CORRECT) {
             fb.innerHTML = 'You figured it out! 🎯<br><span style="font-weight:400; color:var(--muted);">Você não precisou entender todas as palavras. Usou pistas para compreender a mensagem.</span>';
           } else {
             fb.innerHTML = 'Your first instinct was right! 🎧<br><span style="font-weight:400; color:var(--muted);">Você percebeu a ideia principal antes mesmo de entender todos os detalhes.</span>';
           }
           fb.className = 'mcq-feedback correct';
-          document.getElementById('step10SlowerBlock').classList.add('shown');
+        } else {
+          document.getElementById(`hypothesisBlockNow-o${HYPOTHESIS_CORRECT}`).classList.add('correct');
+          revealBox.style.display = 'block';
+          revealBox.innerHTML = `<div class="big-line">Let's connect the clues! 🧩</div>
+            <div class="en-line">This song is about friendship and being there for someone.</div>
+            <div class="en-line" style="margin-top:6px;">Remember "count on me"? It means someone can trust you and depend on you. 💜</div>
+            <div class="pt-line" style="margin-top:6px;">Essa música fala sobre amizade e sobre estar presente quando alguém precisa. Lembra de "count on me"? Significa que alguém pode contar com você.</div>
+            <div class="en-line" style="margin-top:8px; font-weight:700;">You don't need every word to understand the message. Keep practicing! 🎧</div>`;
         }
+        document.getElementById('step10SlowerBlock').classList.add('shown');
         updateContinueState();
-      },
+      });
     });
   }
 
