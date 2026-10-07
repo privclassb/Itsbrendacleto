@@ -886,8 +886,10 @@
     if (overlayBtn) overlayBtn.style.display = 'none';
 
     clearInterval(watchdogTimer);
-    ytPlayer.seekTo(start, true);
-    ytPlayer.playVideo();
+    // loadVideoById with startSeconds/endSeconds reliably jumps to the exact
+    // clip point; seekTo() on a freshly-created/idle player is not reliable
+    // enough to guarantee starting at the right second.
+    ytPlayer.loadVideoById({ videoId: VIDEO_ID, startSeconds: start, endSeconds: end });
     watchdogTimer = setInterval(() => {
       if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
       const t = ytPlayer.getCurrentTime();
