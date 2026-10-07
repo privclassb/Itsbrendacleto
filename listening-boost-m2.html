@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mission 02 · Listening Boost | itsbrendacleto</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+  header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+  .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+  .btn-back:hover { background: rgba(255,255,255,0.25); }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); font-weight: 400; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 24px 20px 70px; }
+  .card { background: var(--white); border-radius: var(--radius); padding: 22px 22px; box-shadow: var(--shadow); }
+
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-indicator { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .step-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
+  .step-subtitle { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+
+  .en-line { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.55; }
+  .pt-line { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .instruction-block { margin: 14px 0; }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+  .meta-row b { color: var(--text); }
+
+  .clip-card { background: var(--cream); border: 1.5px solid var(--sand); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; }
+  .clip-card .clip-title { font-weight: 700; font-size: 14px; color: var(--brown); margin-bottom: 8px; }
+  .clip-card .clip-row { font-size: 13px; color: var(--text); margin-bottom: 3px; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--cream); font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+  .chip.selected { background: var(--mint); border-color: var(--mint); color: var(--white); }
+  .chip.static { cursor: default; opacity: .85; }
+
+  .short-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; margin-top: 8px; }
+  .short-input:focus { border-color: var(--mint); }
+
+  .video-box { background: var(--text); border-radius: var(--radius); overflow: hidden; margin: 16px 0; position: relative; aspect-ratio: 16/9; }
+  .video-slot { width: 100%; height: 100%; }
+  .video-overlay-btn { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; border: none; width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; }
+  .video-overlay-btn .play-icon { font-size: 38px; }
+
+  .clip-instruction { margin: 14px 0 10px; text-align: center; }
+  .clip-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--brown); color: var(--white); font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 99px; }
+  .clip-instruction .pt-line { margin-top: 6px; text-align: center; }
+
+  .mcq-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--sand); }
+  .mcq-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .mcq-question { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+  .mcq-option { display: block; width: 100%; text-align: left; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 13px; color: var(--text); margin-bottom: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .mcq-option.correct { background: #E7F3EC; border-color: var(--mint); color: #2E6B4B; font-weight: 600; }
+  .mcq-option.wrong { background: #FBEDEA; border-color: var(--rose); }
+  .mcq-option.neutral-selected { background: var(--sand); border-color: var(--brown-light); font-weight: 600; }
+  .mcq-feedback { font-size: 12.5px; margin-top: 4px; font-weight: 600; min-height: 16px; }
+  .mcq-feedback.correct { color: #2E6B4B; }
+  .mcq-feedback.wrong { color: #B05A4A; }
+  .mcq-feedback.neutral { color: var(--brown); }
+
+  .callout-box { background: var(--cream); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; margin: 16px 0; }
+  .callout-label { font-size: 11px; font-weight: 700; color: var(--brown); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .callout-box .big-line { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); margin: 4px 0 8px; }
+
+  .two-choice-row { display: flex; gap: 10px; margin: 14px 0; }
+  .two-choice-btn { flex: 1; padding: 16px 10px; border-radius: 12px; border: 1.5px solid var(--sand); background: var(--white); font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; }
+  .two-choice-btn.selected { background: var(--brown); color: var(--white); border-color: var(--brown); }
+
+  .reveal-stagger > * { opacity: 0; animation: fadeInUp .5s ease forwards; }
+  .reveal-stagger > *:nth-child(1) { animation-delay: .1s; }
+  .reveal-stagger > *:nth-child(2) { animation-delay: .5s; }
+  .reveal-stagger > *:nth-child(3) { animation-delay: .9s; }
+  .reveal-stagger > *:nth-child(4) { animation-delay: 1.3s; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .drill-item { background: var(--cream); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+  .drill-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .drill-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
+  .drill-check input { width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; }
+
+  .rating-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .rating-btn { flex: 1; min-width: 80px; padding: 12px 6px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 11.5px; font-weight: 600; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; }
+  .rating-btn .rating-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+  .rating-btn.selected { background: var(--brown); color: var(--white); border-color: var(--brown); }
+
+  .compare-box { display: flex; gap: 10px; margin: 16px 0; align-items: center; }
+  .compare-col { flex: 1; background: var(--cream); border-radius: 10px; padding: 12px; font-size: 12.5px; color: var(--text); text-align: center; }
+  .compare-col b { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .compare-arrow { font-size: 18px; color: var(--muted); }
+
+  .checkbox-list label { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); padding: 8px 0; cursor: pointer; }
+  .checkbox-list input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; flex-shrink: 0; }
+
+  .vocab-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .vocab-row span { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+  .vocab-row input { flex: 1; min-width: 0; border: 1.5px solid var(--sand); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .vocab-row input:focus { border-color: var(--mint); }
+  .vocab-suggestions { font-size: 12px; color: var(--muted); margin: 6px 0 14px; }
+
+  .note-textarea { width: 100%; min-height: 80px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; resize: vertical; outline: none; margin-top: 10px; }
+  .note-textarea:focus { border-color: var(--mint); }
+
+  .reveal-block { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--sand); }
+  .reveal-block.shown { display: block; }
+
+  .result-box { background: var(--cream); border-radius: 10px; padding: 14px 16px; margin: 16px 0; text-align: center; }
+  .result-box .result-big { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px; }
+
+  .nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+  .btn-primary { background: var(--brown); color: var(--white); border: none; border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-secondary { background: none; border: 1.5px solid var(--sand); color: var(--muted); border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  .final-screen { text-align: center; padding: 30px 10px; }
+  .final-emoji { font-size: 50px; margin-bottom: 12px; }
+  .final-title { font-family: 'DM Serif Display', serif; font-size: 23px; color: var(--text); margin-bottom: 10px; }
+  .final-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .final-note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; text-align: left; }
+
+  .journey { margin: 0 auto 24px; max-width: 280px; text-align: left; }
+  .journey-item { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; }
+  .journey-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--mint); color: var(--white); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .journey-dot.locked { background: var(--sand); color: var(--muted); }
+  .journey-text { font-size: 12.5px; color: var(--text); padding-top: 2px; }
+  .journey-text b { display: block; font-size: 12.5px; }
+  .journey-arrow { text-align: center; color: var(--muted); font-size: 13px; margin-left: 11px; }
+
+  .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+  .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 12.5px; color: var(--brown); line-height: 1.5; }
+  .pending-box b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+</style>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#5C4033" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        setInterval(function () { reg.update(); }, 60000);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') reg.update();
+        });
+      }).catch(function () {});
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      var active = document.activeElement;
+      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+      if (isTyping) {
+        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+      } else {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <a href="listening-boost.html" class="btn-back" id="backBtn">← Voltar</a>
+  <div class="header-title">Mission 02</div>
+</header>
+
+<main>
+  <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
+
+  <div class="card" id="missionCard" style="display:none;">
+
+    <!-- STEP 0: INTRO / BRIEFING -->
+    <div class="step" id="step-0">
+      <div class="step-indicator">Mission 02 · Before You Begin</div>
+      <div class="step-title">🎵 Mission 02 — Can You Hear The Song?</div>
+      <div class="meta-row">
+        <span><b>Song:</b> Count on Me — Bruno Mars</span>
+        <span><b>Level:</b> A1 / A1+</span>
+        <span><b>Time:</b> 15–20 min</span>
+      </div>
+
+      <div class="instruction-block" style="margin-top:20px;">
+        <div class="step-subtitle" style="margin-bottom:6px;">Today's goal</div>
+        <div class="en-line">I don't need every word to understand the message.</div>
+        <div class="pt-line">Hoje você vai descobrir que não precisa de cada palavra para entender uma mensagem.</div>
+      </div>
+
+      <div class="clip-card">
+        <div class="clip-title">🎧 Today's Song</div>
+        <div class="clip-row">Count on Me — Bruno Mars (Official Lyric Video)</div>
+        <div class="pt-line" style="margin-top:6px;">Você vai ouvir a música inteira e também alguns trechos específicos durante a missão.</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step" id="step-1">
+      <div class="step-indicator">Step 1 of 11</div>
+      <div class="step-title">Before You Listen 💜</div>
+      <div class="step-subtitle">Friendship</div>
+      <div class="instruction-block">
+        <div class="en-line">What makes someone a good friend?</div>
+        <div class="pt-line">O que faz alguém ser um bom amigo?</div>
+      </div>
+      <div class="chip-row" id="step1Chips">
+        <div class="chip" data-chip="listens to you">listens to you</div>
+        <div class="chip" data-chip="helps you">helps you</div>
+        <div class="chip" data-chip="makes you laugh">makes you laugh</div>
+        <div class="chip" data-chip="stays with you when you're sad">stays with you when you're sad</div>
+        <div class="chip" data-chip="remembers everything">remembers everything 😂</div>
+        <div class="chip" data-chip="gives you presents">gives you presents</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Who can you always count on?</div>
+        <div class="pt-line">Em quem você sempre pode contar?</div>
+        <input type="text" class="short-input" id="step1Answer" placeholder="..." />
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step-2">
+      <div class="step-indicator">Step 2 of 11</div>
+      <div class="step-title">First Listen 🎧</div>
+      <div class="instruction-block">
+        <div class="en-line">No lyrics. Don't pause. Don't translate. Just listen.</div>
+        <div class="pt-line">Sem legendas. Não pause nem tente traduzir. Apenas escute.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">You don't need to understand every word.</div>
+        <div class="pt-line">Você não precisa entender todas as palavras.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-2"></div>
+        <button class="video-overlay-btn" id="playBtn-2" onclick="playInSlot(2, 0, null)">
+          <div class="play-icon">▶</div>
+          <div>Play song</div>
+        </button>
+      </div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much did you understand?</div>
+        <div class="pt-line">Quanto você acha que conseguiu entender?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-2"></div>
+
+      <div class="reveal-block" id="step2HypothesisBlock">
+        <div class="instruction-block">
+          <div class="en-line">What do you think this song is about?</div>
+          <div class="pt-line">Sobre o que você acha que essa música fala?</div>
+        </div>
+        <div id="hypothesisBlockFirst"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="step-3">
+      <div class="step-indicator">Step 3 of 11</div>
+      <div class="step-title">Catch What You Know 🔎</div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:07 → 00:34</span>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-3"></div>
+        <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 7, 34)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Which words can your ears catch?</div>
+        <div class="pt-line">Quais palavras você consegue reconhecer?</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't worry about the whole sentence. Catch what you can.</div>
+        <div class="pt-line">Não se preocupe em entender a frase inteira. Reconheça o que conseguir.</div>
+      </div>
+      <div class="chip-row" id="step3Chips">
+        <div class="chip" data-chip="world">world</div>
+        <div class="chip" data-chip="help">help</div>
+        <div class="chip" data-chip="light">light</div>
+        <div class="chip" data-chip="school">school</div>
+        <div class="chip" data-chip="sea">sea</div>
+        <div class="chip" data-chip="money">money</div>
+        <div class="chip" data-chip="dark">dark</div>
+        <div class="chip" data-chip="family">family</div>
+        <div class="chip" data-chip="need">need</div>
+        <div class="chip" data-chip="friends">friends</div>
+      </div>
+
+      <div class="reveal-block" id="step3ReplaySection">
+        <div class="instruction-block">
+          <div class="en-line">Now listen one more time and check your choices. 👂</div>
+          <div class="pt-line">Agora escute mais uma vez e confira suas escolhas.</div>
+        </div>
+        <div class="video-box">
+          <div class="video-slot" id="slot-3b"></div>
+          <button class="video-overlay-btn" id="playBtn-3b" onclick="playInSlot('3b', 7, 34)">
+            <div class="play-icon">▶</div>
+            <div>Play clip</div>
+          </button>
+        </div>
+        <button class="btn-primary" style="margin-top:6px;" onclick="checkEarsM2()" id="checkEarsBtn2">CHECK MY EARS 👂</button>
+      </div>
+
+      <div class="result-box" id="step3Result" style="display:none;"></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" id="step-4">
+      <div class="step-indicator">Step 4 of 11</div>
+      <div class="step-title">Same Sound, Different Word 🤯</div>
+      <div class="instruction-block">
+        <div class="en-line">Which one did you hear? 👂</div>
+        <div class="pt-line">Qual palavra você ouviu?</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-4"></div>
+        <button class="video-overlay-btn" id="playBtn-4" onclick="playInSlot(4, 7, 34)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="two-choice-row" id="seaSeeRow">
+        <button class="two-choice-btn" data-choice="sea" onclick="pickSeaSee('sea')">SEA 🌊</button>
+        <button class="two-choice-btn" data-choice="see" onclick="pickSeaSee('see')">SEE 👀</button>
+      </div>
+
+      <div class="reveal-block" id="step4Reveal">
+        <div class="callout-box">
+          <div class="big-line">SEA / SEE 🤯</div>
+          <div class="en-line">Different words. Same sound.</div>
+          <div class="pt-line">Palavras diferentes. Mesmo som.</div>
+        </div>
+        <div class="instruction-block">
+          <div class="en-line">Your ears can't see spelling.</div>
+          <div class="pt-line">Quando você está ouvindo, não existe ortografia para ajudar.</div>
+        </div>
+        <div class="instruction-block">
+          <div class="en-line">When you're listening, context helps your brain decide which word makes sense.</div>
+          <div class="pt-line">O contexto ajuda seu cérebro a entender qual palavra faz sentido.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" id="step-5">
+      <div class="step-indicator">Step 5 of 11</div>
+      <div class="step-title">Listen for the Message 🎯</div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:45 → 01:18</span>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-5"></div>
+        <button class="video-overlay-btn" id="playBtn-5" onclick="playInSlot(5, 45, 78)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">This time, don't hunt for individual words. Listen for the MESSAGE.</div>
+        <div class="pt-line">Desta vez, não tente caçar palavras. Tente entender a ideia.</div>
+      </div>
+      <div class="mcq-question">What does "count on me" mean in this song?</div>
+      <div id="step5Q1"></div>
+
+      <div class="reveal-block" id="step5CalloutBlock">
+        <div class="callout-box">
+          <div class="callout-label">🧩 Count on someone</div>
+          <div class="en-line">count → contar números</div>
+          <div class="en-line" style="margin-top:6px;">BUT... count on someone → contar com alguém / confiar que aquela pessoa estará lá</div>
+          <div class="en-line" style="margin-top:8px; font-style:italic;">You can count on me. 💜</div>
+          <div class="pt-line">Você pode contar comigo.</div>
+        </div>
+        <div class="mcq-question">So... what is Bruno promising?</div>
+        <div id="step5Q2"></div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" id="step-6">
+      <div class="step-indicator">Step 6 of 11</div>
+      <div class="step-title">Can You Understand the Situation? 🌙</div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 01:18 → 01:39</span>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-6"></div>
+        <button class="video-overlay-btn" id="playBtn-6" onclick="playInSlot(6, 78, 99)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Listen for the situation. You don't need every word.</div>
+        <div class="pt-line">Não tente entender tudo. Descubra apenas o que está acontecendo.</div>
+      </div>
+      <div class="mcq-question">What's happening?</div>
+      <div id="step6Q1"></div>
+      <div class="mcq-question">What does the friend offer to do?</div>
+      <div id="step6Q2"></div>
+
+      <div class="result-box" id="step6Result" style="display:none;">
+        <div class="result-big">Exactly! 🎯</div>
+        <div class="en-line">You understood the situation without translating the whole verse.</div>
+        <div class="pt-line">Você entendeu a situação sem precisar traduzir o verso inteiro.</div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step" id="step-7">
+      <div class="step-indicator">Step 7 of 11</div>
+      <div class="step-title">Put the Clues Together 🧩</div>
+      <div class="chip-row">
+        <div class="chip static">friends</div>
+        <div class="chip static">help</div>
+        <div class="chip static">need</div>
+        <div class="chip static">count on</div>
+        <div class="chip static">song</div>
+      </div>
+      <div class="mcq-question">What message do these clues create?</div>
+      <div id="step7Q1"></div>
+
+      <div class="reveal-block" id="step7Reveal">
+        <div class="instruction-block">
+          <div class="en-line">Look what your brain just did. 👀</div>
+          <div class="en-line" style="margin-top:6px;">You used a few words + context to understand a much bigger message.</div>
+          <div class="pt-line">Você usou algumas palavras + contexto para entender uma mensagem muito maior.</div>
+        </div>
+        <div class="callout-box">
+          <div class="callout-label">🧠 Listening Secret #2</div>
+          <div class="big-line">You don't need every word.</div>
+          <div class="reveal-stagger">
+            <div class="en-line">Maybe there were words you didn't understand.</div>
+            <div class="en-line">Maybe some words were too fast.</div>
+            <div class="en-line">Maybe you couldn't separate every sentence.</div>
+            <div class="en-line" style="margin-top:8px; font-weight:700;">But... do you understand what the song is about? Then you understood. 🎧</div>
+          </div>
+          <div class="pt-line" style="margin-top:8px;">Entender inglês não significa traduzir palavra por palavra. Seu cérebro pode usar palavras conhecidas + contexto + situação para construir significado.</div>
+          <div class="en-line" style="margin-top:10px; font-weight:700;">Don't listen for every word. Listen for meaning. 💜</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step" id="step-8">
+      <div class="step-indicator">Step 8 of 11</div>
+      <div class="step-title">Wait... Where Did the Words Go? 👀</div>
+      <div class="instruction-block">
+        <div class="en-line">Songs don't always sound like textbook English.</div>
+        <div class="pt-line">Na música, ritmo e melodia podem mudar a forma como percebemos as palavras.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-8"></div>
+        <button class="video-overlay-btn" id="playBtn-8" onclick="playInSlot(8, 45, 78)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Which form do you think you'll actually hear in the song?</div>
+      </div>
+      <div class="two-choice-row">
+        <button class="two-choice-btn" data-choice="I WILL" onclick="pickWillForm(this.dataset.choice)">I WILL</button>
+        <button class="two-choice-btn" data-choice="I'LL" onclick="pickWillForm(this.dataset.choice)">I'LL</button>
+      </div>
+
+      <div class="reveal-block" id="step8Reveal">
+        <div class="instruction-block">
+          <div class="en-line">Short forms are everywhere in real English. Your ears need practice recognizing them. 👂</div>
+          <div class="pt-line">Formas reduzidas aparecem o tempo todo no inglês real. Seu ouvido precisa aprender a reconhecê-las.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="step" id="step-9">
+      <div class="step-indicator">Step 9 of 11</div>
+      <div class="step-title">Sing It! 🎤</div>
+      <div class="instruction-block">
+        <div class="en-line">Okay... you've listened enough. Now you can sing. 😂</div>
+        <div class="pt-line">Agora vale cantar!</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Listen → Sing → Repeat</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't worry about singing well. Follow the rhythm and the sounds.</div>
+        <div class="pt-line">Não precisa cantar bem. Tente acompanhar o ritmo e os sons.</div>
+      </div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 00:45 → 00:50</span>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-9"></div>
+        <button class="video-overlay-btn" id="playBtn-9" onclick="playInSlot(9, 45, 50)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <label class="drill-check" style="margin-top:12px;"><input type="checkbox" id="singItCheck" onchange="onSingItCheck(this)"> I did it 3x 🎤</label>
+
+      <div class="instruction-block" style="margin-top:14px;">
+        <div class="en-line">Copy the rhythm, not the accent. 💜</div>
+        <div class="pt-line">Seu objetivo é acompanhar o ritmo — não apagar seu sotaque.</div>
+      </div>
+    </div>
+
+    <!-- STEP 10 -->
+    <div class="step" id="step-10">
+      <div class="step-indicator">Step 10 of 11</div>
+      <div class="step-title">The Magic Listen ✨</div>
+      <div class="instruction-block">
+        <div class="en-line">One last listen.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Listen to the WHOLE song again. Don't analyze it. Just listen. 🎧</div>
+        <div class="pt-line">Escute a música inteira novamente. Não tente analisar. Apenas escute.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-10"></div>
+        <button class="video-overlay-btn" id="playBtn-10" onclick="playInSlot(10, 0, null)">
+          <div class="play-icon">▶</div>
+          <div>Play song</div>
+        </button>
+      </div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much do you understand NOW?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-10"></div>
+
+      <div class="reveal-block" id="step10CompareBlock">
+        <div class="compare-box">
+          <div class="compare-col"><b>Before</b><span id="compareBefore"></span></div>
+          <div class="compare-arrow">→</div>
+          <div class="compare-col"><b>Now</b><span id="compareNow"></span></div>
+        </div>
+        <div class="callout-box" id="step10FeedbackBox"></div>
+
+        <div class="instruction-block">
+          <div class="en-line">Remember your first guess?</div>
+          <div class="en-line" id="firstGuessRecap" style="margin-top:4px; font-style:italic;"></div>
+        </div>
+        <div class="mcq-question">What do you think NOW?</div>
+        <div id="hypothesisBlockNow"></div>
+
+        <div class="reveal-block" id="step10SlowerBlock">
+          <div class="instruction-block">
+            <div class="en-line">Did the song sound slower this time?</div>
+          </div>
+          <div class="rating-row" id="slowerRow">
+            <div class="rating-btn" data-choice="yes">🤯 YES!</div>
+            <div class="rating-btn" data-choice="little">🙂 A little!</div>
+            <div class="rating-btn" data-choice="not-yet">👂 Not yet.</div>
+          </div>
+          <div class="callout-box" id="slowerFeedbackBox" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 11 -->
+    <div class="step" id="step-11">
+      <div class="step-indicator">Step 11 of 11</div>
+      <div class="step-title">My Listening Note 📝</div>
+      <div class="instruction-block">
+        <div class="en-line">Today I discovered that...</div>
+        <div class="pt-line">Hoje eu percebi que...</div>
+      </div>
+      <div class="checkbox-list">
+        <label><input type="checkbox" value="main-idea-without-every-word"> I can understand the main idea without understanding every word.</label>
+        <label><input type="checkbox" value="context-helps"> Context helps me understand.</label>
+        <label><input type="checkbox" value="songs-sound-different"> Songs make familiar words sound different.</label>
+        <label><input type="checkbox" value="recognize-more-on-replay"> I recognize more words after listening again.</label>
+        <label><input type="checkbox" value="need-more-practice"> I need more practice — and that's okay.</label>
+      </div>
+
+      <div class="instruction-block" style="margin-top:18px;">
+        <div class="en-line">One expression I want to remember:</div>
+        <div class="pt-line">Uma expressão que quero lembrar:</div>
+        <input type="text" class="short-input" id="step11Expression" placeholder="..." />
+      </div>
+
+      <div class="callout-box" style="margin-top:22px;">
+        <div class="callout-label">🔎 Vocabulary Boost</div>
+        <div class="en-line">Now you can look things up! 😂</div>
+        <div class="pt-line">Agora sim pode pesquisar!</div>
+        <div class="en-line" style="margin-top:8px;">Choose up to 3 words or expressions you didn't know.</div>
+        <div class="pt-line">Escolha até 3 palavras ou expressões que você não conhecia.</div>
+        <div class="vocab-suggestions">Ideias: stuck · sail · guide · count on · in need · shoulder</div>
+
+        <div style="margin-top:4px;">
+          <div class="vocab-row"><span>1.</span><input type="text" id="vocabWord1" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning1" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>2.</span><input type="text" id="vocabWord2" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning2" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>3.</span><input type="text" id="vocabWord3" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning3" placeholder="meaning" /></div>
+        </div>
+
+        <div class="en-line" style="margin-top:10px;">During listening → don't stop for every unknown word.</div>
+        <div class="en-line">After listening → explore the new vocabulary.</div>
+        <div class="pt-line" style="margin-top:6px;">Durante o listening, não precisamos traduzir tudo. Depois do treino, podemos usar tradução e dicionário para aprender ainda mais.</div>
+      </div>
+
+      <div class="callout-box" style="border-left-color: var(--mint); margin-top:16px;">
+        <div class="big-line">Now listen for fun! 🎵💜</div>
+        <div class="en-line">No more exercises. 😂 Now find the lyrics and translation of "Count on Me" and listen one more time while following the meaning.</div>
+        <div class="pt-line" style="margin-top:6px;">Agora você pode procurar a letra e a tradução da música e ouvir mais uma vez acompanhando o significado.</div>
+        <div class="en-line" style="margin-top:8px; font-weight:700;">No questions. No scores. Just enjoy the song. 💜</div>
+      </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="step" id="step-final">
+      <div class="final-screen">
+        <div class="final-emoji">🎧</div>
+        <div class="final-title">Mission 02 Complete!</div>
+        <div class="final-sub">Today you trained your ears to understand MEANING — not just words.<br><span style="opacity:.8;">Hoje você treinou seu ouvido para compreender significado — não apenas palavras.</span></div>
+        <div class="journey">
+          <div class="journey-item">
+            <div class="journey-dot">✓</div>
+            <div class="journey-text"><b>Mission 01</b>I know more English than I can hear.</div>
+          </div>
+          <div class="journey-arrow">↓</div>
+          <div class="journey-item">
+            <div class="journey-dot">✓</div>
+            <div class="journey-text"><b>Mission 02</b>I don't need every word to understand.</div>
+          </div>
+          <div class="journey-arrow">↓</div>
+          <div class="journey-item">
+            <div class="journey-dot locked">🔒</div>
+            <div class="journey-text"><b>Mission 03</b>Coming next... 👀</div>
+          </div>
+        </div>
+        <a href="listening-boost.html" class="btn-primary" style="text-decoration:none; display:inline-block;">Back to Listening Boost</a>
+      </div>
+    </div>
+
+    <div class="nav-row" id="navRow">
+      <button class="btn-secondary" id="backStepBtn" onclick="goToStep(currentStep - 1)">← Back</button>
+      <button class="btn-primary" id="continueBtn" onclick="onContinue()">Continue →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, {
+          user: Object.assign({}, real.data.session.user, { id: __previewAs })
+        });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, {
+        get: function (t, prop) {
+          if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+          return function () { return p; };
+        }
+      });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+        qb[m] = function () { return __previewNoop(); };
+      });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+        '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as');
+        sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+  const VIDEO_ID = '6k8cpUkKK4c';
+  const TOTAL_STEPS = 11;
+  let currentStep = 0;
+  let CURRENT_USER_ID = null;
+
+  const RATING_SCALE = [
+    { emoji: '😵', en: 'Almost nothing' },
+    { emoji: '😕', en: 'A little' },
+    { emoji: '🙂', en: 'About half' },
+    { emoji: '😎', en: 'Most of it' },
+  ];
+
+  const HYPOTHESIS_OPTIONS = [
+    'Traveling around the world',
+    'Friendship and supporting someone',
+    'Falling in love',
+    'Missing your family',
+  ];
+  const HYPOTHESIS_CORRECT = 1; // B
+
+  // Target words actually present in Clip A's lyrics ("...stuck in the middle
+  // of the SEA... I'll sail the WORLD... lost in the DARK... I'll be the
+  // LIGHT..."); the rest are distractors. Flagged to Brenda for confirmation.
+  const STEP3_TARGETS = new Set(['world', 'light', 'sea', 'dark']);
+
+  const QUIZ5 = [
+    { q: 'What does "count on me" mean in this song?', options: ['Count numbers with me', 'Trust me / depend on me', 'Talk to me', 'Come with me'], correct: 1,
+      wrongText: 'Not quite. 👂 Listen to the chorus again and think about the friendship theme.', wrongTextPt: 'Quase! Escute novamente e pense no tema da amizade.',
+      correctText: 'You caught the message! 🎯', correctTextPt: null },
+    { q: "So... what is Bruno promising?", options: ["I'll always help my friend when they need me.", "I'll travel with my friend.", "I'll call my friend every day.", "I'll buy something for my friend."], correct: 0,
+      wrongText: 'Not quite! Listen again. 👂', wrongTextPt: null,
+      correctText: 'You caught the message! 🎯', correctTextPt: 'Você entendeu a mensagem!' },
+  ];
+
+  const QUIZ6 = [
+    { q: "What's happening?", options: ["Someone can't sleep.", 'Someone is hungry.', 'Someone is working.', 'Someone is exercising.'], correct: 0 },
+    { q: 'What does the friend offer to do?', options: ['Sing a song.', 'Make a phone call.', 'Make breakfast.', 'Go somewhere.'], correct: 0 },
+  ];
+
+  const QUIZ7 = [
+    { q: 'What message do these clues create?', options: ['Friends should always have fun together.', 'Friends can support each other when they need help.', 'Friends should listen to music together.', 'Friends need to talk every day.'], correct: 1 },
+  ];
+
+  // ---- State ----
+  const state = {
+    firstListenRating: null,
+    firstHypothesis: null,
+    step3Checked: false,
+    step4Picked: null,
+    quiz5Correct: [false, false],
+    quiz6Correct: [false, false],
+    quiz7Correct: [false],
+    step8Picked: null,
+    singItDone: false,
+    lastListenRating: null,
+    nowHypothesis: null,
+    slowerPick: null,
+  };
+
+  function renderChipRow(containerId) {
+    document.getElementById(containerId).querySelectorAll('.chip:not(.static)').forEach(chip => {
+      chip.addEventListener('click', () => chip.classList.toggle('selected'));
+    });
+  }
+  renderChipRow('step1Chips');
+
+  renderChipRow('step3Chips');
+  document.querySelectorAll('#step3Chips .chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const anySelected = document.querySelectorAll('#step3Chips .chip.selected').length > 0;
+      if (anySelected) document.getElementById('step3ReplaySection').classList.add('shown');
+    });
+  });
+
+  function checkEarsM2() {
+    const selected = Array.from(document.querySelectorAll('#step3Chips .chip.selected')).map(c => c.dataset.chip);
+    const caught = selected.filter(w => STEP3_TARGETS.has(w)).length;
+    state.step3Checked = true;
+    const box = document.getElementById('step3Result');
+    box.style.display = 'block';
+    box.innerHTML = `<div class="result-big">Your ears caught ${caught} word${caught === 1 ? '' : 's'}! 🎯</div>
+      <div class="en-line">You didn't need to understand every sentence to recognize parts of the English.</div>
+      <div class="pt-line">Você não precisou entender todas as frases para reconhecer partes do inglês.</div>`;
+    updateContinueState();
+  }
+
+  // ---- Generic single-choice question renderer ----
+  // mode 'graded-retry': wrong answers show a retry message and stay open; correct locks in and shows correctText.
+  // mode 'neutral': any answer is accepted, records the choice, shows a neutral message, locks in.
+  function renderChoiceQuestion(containerId, options, opts) {
+    const box = document.getElementById(containerId);
+    box.innerHTML = options.map((opt, oi) => `<button class="mcq-option" id="${containerId}-o${oi}">${opt}</button>`).join('') +
+      `<div class="mcq-feedback" id="${containerId}-fb"></div>`;
+    box.querySelectorAll('.mcq-option').forEach((btn, oi) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        const fb = document.getElementById(`${containerId}-fb`);
+        if (opts.mode === 'neutral') {
+          box.querySelectorAll('.mcq-option').forEach(b => { b.disabled = true; b.classList.remove('neutral-selected'); });
+          btn.classList.add('neutral-selected');
+          fb.textContent = opts.neutralText;
+          fb.className = 'mcq-feedback neutral';
+          opts.onAnswer(oi);
+          return;
+        }
+        if (oi === opts.correct) {
+          btn.classList.add('correct');
+          fb.innerHTML = opts.correctText + (opts.correctTextPt ? `<br><span style="font-weight:400; color:var(--muted);">${opts.correctTextPt}</span>` : '');
+          fb.className = 'mcq-feedback correct';
+          options.forEach((_, i) => { document.getElementById(`${containerId}-o${i}`).disabled = true; });
+          opts.onAnswer(oi, true);
+        } else {
+          btn.classList.add('wrong');
+          fb.innerHTML = opts.wrongText + (opts.wrongTextPt ? `<br><span style="font-weight:400; color:var(--muted);">${opts.wrongTextPt}</span>` : '');
+          fb.className = 'mcq-feedback wrong';
+          setTimeout(() => btn.classList.remove('wrong'), 900);
+          opts.onAnswer(oi, false);
+        }
+      });
+    });
+  }
+
+  function renderHypothesisFirst() {
+    renderChoiceQuestion('hypothesisBlockFirst', HYPOTHESIS_OPTIONS, {
+      mode: 'neutral',
+      neutralText: 'Interesting! Keep your answer in mind. 👀',
+      onAnswer: (oi) => {
+        state.firstHypothesis = oi;
+        document.getElementById('hypothesisBlockFirst').nextElementSibling; // no-op, kept for clarity
+        updateContinueState();
+      },
+    });
+  }
+
+  function renderQuiz5() {
+    renderChoiceQuestion('step5Q1', QUIZ5[0].options, {
+      mode: 'graded-retry', correct: QUIZ5[0].correct,
+      wrongText: QUIZ5[0].wrongText, wrongTextPt: QUIZ5[0].wrongTextPt,
+      correctText: QUIZ5[0].correctText, correctTextPt: QUIZ5[0].correctTextPt,
+      onAnswer: (oi, isCorrect) => {
+        if (isCorrect) { state.quiz5Correct[0] = true; document.getElementById('step5CalloutBlock').classList.add('shown'); }
+        updateContinueState();
+      },
+    });
+    renderChoiceQuestion('step5Q2', QUIZ5[1].options, {
+      mode: 'graded-retry', correct: QUIZ5[1].correct,
+      wrongText: QUIZ5[1].wrongText, wrongTextPt: QUIZ5[1].wrongTextPt,
+      correctText: QUIZ5[1].correctText, correctTextPt: QUIZ5[1].correctTextPt,
+      onAnswer: (oi, isCorrect) => { if (isCorrect) state.quiz5Correct[1] = true; updateContinueState(); },
+    });
+  }
+
+  function renderQuiz6() {
+    QUIZ6.forEach((item, qi) => {
+      renderChoiceQuestion('step6Q' + (qi + 1), item.options, {
+        mode: 'graded-retry', correct: item.correct,
+        wrongText: 'Not quite! Listen again. 👂', wrongTextPt: null,
+        correctText: 'Exactly! 🎯', correctTextPt: null,
+        onAnswer: (oi, isCorrect) => {
+          if (isCorrect) {
+            state.quiz6Correct[qi] = true;
+            if (state.quiz6Correct.every(Boolean)) document.getElementById('step6Result').style.display = 'block';
+          }
+          updateContinueState();
+        },
+      });
+    });
+  }
+
+  function renderQuiz7() {
+    renderChoiceQuestion('step7Q1', QUIZ7[0].options, {
+      mode: 'graded-retry', correct: QUIZ7[0].correct,
+      wrongText: 'Not quite! Think about the clue words above. 👂', wrongTextPt: null,
+      correctText: 'Exactly! 🎯', correctTextPt: null,
+      onAnswer: (oi, isCorrect) => {
+        if (isCorrect) { state.quiz7Correct[0] = true; document.getElementById('step7Reveal').classList.add('shown'); }
+        updateContinueState();
+      },
+    });
+  }
+
+  function pickSeaSee(choice) {
+    state.step4Picked = choice;
+    document.querySelectorAll('#seaSeeRow .two-choice-btn').forEach(b => b.classList.toggle('selected', b.dataset.choice === choice));
+    document.getElementById('step4Reveal').classList.add('shown');
+    updateContinueState();
+  }
+
+  function pickWillForm(choice) {
+    state.step8Picked = choice;
+    document.querySelectorAll('#step-8 .two-choice-btn').forEach(b => b.classList.toggle('selected', b.dataset.choice === choice));
+    document.getElementById('step8Reveal').classList.add('shown');
+    updateContinueState();
+  }
+
+  function onSingItCheck(checkbox) {
+    state.singItDone = checkbox.checked;
+    updateContinueState();
+  }
+
+  // ---- Step 2 / Step 10 rating rows ----
+  function renderRatingRow(rowId, onPick) {
+    const row = document.getElementById(rowId);
+    row.innerHTML = RATING_SCALE.map((r, i) =>
+      `<div class="rating-btn" data-idx="${i}"><span class="rating-emoji">${r.emoji}</span>${r.en}</div>`
+    ).join('');
+    row.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        onPick(parseInt(btn.dataset.idx, 10));
+      });
+    });
+  }
+  renderRatingRow('ratingRow-2', (idx) => {
+    state.firstListenRating = idx;
+    document.getElementById('step2HypothesisBlock').classList.add('shown');
+    updateContinueState();
+  });
+  renderRatingRow('ratingRow-10', (idx) => {
+    state.lastListenRating = idx;
+    renderStep10Comparison();
+    updateContinueState();
+  });
+
+  function renderStep10Comparison() {
+    if (state.firstListenRating === null || state.lastListenRating === null) return;
+    const before = RATING_SCALE[state.firstListenRating];
+    const now = RATING_SCALE[state.lastListenRating];
+    document.getElementById('compareBefore').textContent = before.emoji + ' ' + before.en;
+    document.getElementById('compareNow').textContent = now.emoji + ' ' + now.en;
+
+    const box = document.getElementById('step10FeedbackBox');
+    const bothMax = state.firstListenRating === 3 && state.lastListenRating === 3;
+    if (state.lastListenRating > state.firstListenRating) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood more after training your ears.</div>
+        <div class="en-line" style="margin-top:8px; font-weight:700;">The English didn't change. Your listening did. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">O inglês não mudou. A sua escuta mudou.</div>`;
+    } else if (bothMax) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood a lot from the beginning — and after training, your ears had even more chances to notice the sounds. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">Você já entendia bastante desde o início — e o treino deu ao seu ouvido ainda mais oportunidades de perceber os sons.</div>`;
+    } else if (state.lastListenRating < state.firstListenRating) {
+      box.innerHTML = `<div class="big-line">That's okay! 💜</div>
+        <div class="en-line">Sometimes, after listening more carefully, you notice things you didn't notice before — including what is still difficult to hear. That's part of training your ears.</div>
+        <div class="pt-line" style="margin-top:6px;">Às vezes, depois de prestar mais atenção, você percebe melhor até aquilo que ainda é difícil de reconhecer. Isso também faz parte do treino.</div>`;
+    } else {
+      box.innerHTML = `<div class="en-line">That's okay!</div>
+        <div class="en-line" style="margin-top:6px;">Your ears are learning to recognize new sounds. Repetition is part of listening practice.</div>
+        <div class="pt-line" style="margin-top:6px;">Tudo bem. Seu ouvido ainda está aprendendo a reconhecer esses sons. Repetição faz parte do processo.</div>`;
+    }
+    document.getElementById('step10CompareBlock').classList.add('shown');
+
+    document.getElementById('firstGuessRecap').textContent = '"' + HYPOTHESIS_OPTIONS[state.firstHypothesis] + '"';
+    renderHypothesisNow();
+  }
+
+  function renderHypothesisNow() {
+    renderChoiceQuestion('hypothesisBlockNow', HYPOTHESIS_OPTIONS, {
+      mode: 'graded-retry', correct: HYPOTHESIS_CORRECT,
+      wrongText: 'Listen to your clues again — think about what the chorus promises. 👂', wrongTextPt: null,
+      correctText: '', correctTextPt: null,
+      onAnswer: (oi, isCorrect) => {
+        state.nowHypothesis = oi;
+        const fb = document.getElementById('hypothesisBlockNow-fb');
+        if (isCorrect) {
+          if (state.firstHypothesis !== HYPOTHESIS_CORRECT) {
+            fb.innerHTML = 'You figured it out! 🎯<br><span style="font-weight:400; color:var(--muted);">Você não precisou entender todas as palavras. Usou pistas para compreender a mensagem.</span>';
+          } else {
+            fb.innerHTML = 'Your first instinct was right! 🎧<br><span style="font-weight:400; color:var(--muted);">Você percebeu a ideia principal antes mesmo de entender todos os detalhes.</span>';
+          }
+          fb.className = 'mcq-feedback correct';
+          document.getElementById('step10SlowerBlock').classList.add('shown');
+        }
+        updateContinueState();
+      },
+    });
+  }
+
+  document.querySelectorAll('#slowerRow .rating-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#slowerRow .rating-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.slowerPick = btn.dataset.choice;
+      const box = document.getElementById('slowerFeedbackBox');
+      box.style.display = 'block';
+      if (btn.dataset.choice === 'not-yet') {
+        box.innerHTML = `<div class="en-line">Not yet? That's okay. 👂 This gets easier with repetition.</div>
+          <div class="pt-line">Ainda não? Tudo bem. Isso fica mais fácil com repetição.</div>`;
+      } else {
+        box.innerHTML = `<div class="en-line">The song didn't get slower. Your brain had more chances to recognize and separate the sounds. 🎧</div>
+          <div class="pt-line">A música não ficou mais lenta. Seu cérebro teve mais oportunidades de reconhecer e separar os sons.</div>`;
+      }
+      updateContinueState();
+    });
+  });
+
+  // ---- YouTube IFrame API integration (one independent player per slot) ----
+  let ytApiReady = false;
+  const players = {};
+  const watchdogTimers = {};
+  const pendingPlays = [];
+
+  window.onYouTubeIframeAPIReady = function () {
+    ytApiReady = true;
+    pendingPlays.forEach(p => createAndPlay(p.slotId, p.start, p.end));
+    pendingPlays.length = 0;
+  };
+
+  (function loadYouTubeApi() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  })();
+
+  function startWatchdog(slotId, end, overlayBtn) {
+    if (end === null || end === undefined) return; // full-song plays have no cut-off
+    clearInterval(watchdogTimers[slotId]);
+    watchdogTimers[slotId] = setInterval(() => {
+      const p = players[slotId];
+      if (!p || typeof p.getCurrentTime !== 'function') return;
+      const t = p.getCurrentTime();
+      if (t >= end) {
+        p.pauseVideo();
+        clearInterval(watchdogTimers[slotId]);
+        if (overlayBtn) overlayBtn.style.display = 'flex';
+      }
+    }, 200);
+  }
+
+  function createAndPlay(slotId, start, end) {
+    const overlayBtn = document.getElementById('playBtn-' + slotId);
+    if (overlayBtn) overlayBtn.style.display = 'none';
+
+    if (players[slotId]) {
+      players[slotId].loadVideoById({ videoId: VIDEO_ID, startSeconds: start, endSeconds: end || undefined });
+      startWatchdog(slotId, end, overlayBtn);
+      return;
+    }
+
+    const slotEl = document.getElementById('slot-' + slotId);
+    const holderId = 'ytPlayerHolder-' + slotId;
+    const holder = document.createElement('div');
+    holder.id = holderId;
+    slotEl.appendChild(holder);
+
+    players[slotId] = new YT.Player(holderId, {
+      height: '100%',
+      width: '100%',
+      videoId: VIDEO_ID,
+      playerVars: { rel: 0, modestbranding: 1, playsinline: 1, start: start, end: end || undefined },
+      events: {
+        onReady: function (e) {
+          e.target.playVideo();
+          startWatchdog(slotId, end, overlayBtn);
+        }
+      }
+    });
+  }
+
+  function playInSlot(slotId, start, end) {
+    if (!ytApiReady) {
+      pendingPlays.push({ slotId, start, end });
+      return;
+    }
+    createAndPlay(slotId, start, end);
+  }
+
+  // ---- Step navigation ----
+  const STEP_LABELS = { 1: "I'M READY 🎧" };
+
+  function updateContinueState() {
+    const btn = document.getElementById('continueBtn');
+    let ok = true;
+    if (currentStep === 2) ok = state.firstListenRating !== null && state.firstHypothesis !== null;
+    if (currentStep === 3) ok = state.step3Checked;
+    if (currentStep === 4) ok = state.step4Picked !== null;
+    if (currentStep === 5) ok = state.quiz5Correct.every(Boolean);
+    if (currentStep === 6) ok = state.quiz6Correct.every(Boolean);
+    if (currentStep === 7) ok = state.quiz7Correct.every(Boolean);
+    if (currentStep === 8) ok = state.step8Picked !== null;
+    if (currentStep === 9) ok = state.singItDone;
+    if (currentStep === 10) ok = state.lastListenRating !== null && state.nowHypothesis !== null && state.slowerPick !== null;
+    btn.disabled = !ok;
+  }
+
+  function goToStep(n) {
+    if (n < 0) return;
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    currentStep = n;
+
+    if (n > TOTAL_STEPS) {
+      document.getElementById('step-final').classList.add('active');
+      document.getElementById('navRow').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('step-' + n).classList.add('active');
+    document.getElementById('navRow').style.display = 'flex';
+    document.getElementById('backStepBtn').style.visibility = n === 0 ? 'hidden' : 'visible';
+
+    const btn = document.getElementById('continueBtn');
+    if (n === TOTAL_STEPS) btn.textContent = '✓ COMPLETE MISSION';
+    else btn.textContent = STEP_LABELS[n] || 'Continue →';
+    btn.disabled = false;
+    updateContinueState();
+  }
+
+  async function onContinue() {
+    if (currentStep === TOTAL_STEPS) {
+      await completeMission();
+      return;
+    }
+    goToStep(currentStep + 1);
+  }
+
+  async function completeMission() {
+    const btn = document.getElementById('continueBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    if (CURRENT_USER_ID) {
+      await sb.from('lesson_progress').upsert({ user_id: CURRENT_USER_ID, lesson_id: 'listening-boost-m2' }, { onConflict: 'user_id,lesson_id' });
+
+      const reflectionTags = Array.from(document.querySelectorAll('#step-11 .checkbox-list input:checked')).map(el => el.value);
+      const vocabulary = [1, 2, 3].map(i => ({
+        word: (document.getElementById(`vocabWord${i}`).value || '').trim(),
+        meaning: (document.getElementById(`vocabMeaning${i}`).value || '').trim(),
+      })).filter(v => v.word || v.meaning);
+
+      await sb.from('listening_boost_notes').upsert({
+        user_id: CURRENT_USER_ID,
+        mission_id: 'listening-boost-m2',
+        warmup_answer: document.getElementById('step1Answer').value || null,
+        first_listen_rating: state.firstListenRating,
+        last_listen_rating: state.lastListenRating,
+        first_hypothesis: HYPOTHESIS_OPTIONS[state.firstHypothesis] || null,
+        final_hypothesis: HYPOTHESIS_OPTIONS[state.nowHypothesis] || null,
+        reflection_tags: reflectionTags,
+        reflection_expression: document.getElementById('step11Expression').value || null,
+        vocabulary: vocabulary,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,mission_id' });
+    }
+    goToStep(TOTAL_STEPS + 1);
+  }
+
+  function prefillFromNotes(notes) {
+    if (!notes) return;
+    if (notes.warmup_answer) document.getElementById('step1Answer').value = notes.warmup_answer;
+    if (notes.reflection_tags) {
+      notes.reflection_tags.forEach(tag => {
+        const el = document.querySelector(`#step-11 .checkbox-list input[value="${tag}"]`);
+        if (el) el.checked = true;
+      });
+    }
+    if (notes.reflection_expression) document.getElementById('step11Expression').value = notes.reflection_expression;
+    if (notes.vocabulary && Array.isArray(notes.vocabulary)) {
+      notes.vocabulary.slice(0, 3).forEach((v, i) => {
+        const w = document.getElementById(`vocabWord${i + 1}`);
+        const m = document.getElementById(`vocabMeaning${i + 1}`);
+        if (w && v.word) w.value = v.word;
+        if (m && v.meaning) m.value = v.meaning;
+      });
+    }
+  }
+
+  // ---- Init ----
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if (!profile || profile.role === 'kids' || profile.role === 'responsavel') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    CURRENT_USER_ID = user.id;
+
+    // Sequential unlock enforcement: don't trust the overview page link alone —
+    // a student could still type this URL directly before finishing Mission 01.
+    if (!__previewAs) {
+      const { data: priorProgress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id).eq('lesson_id', 'listening-boost-m1').maybeSingle();
+      if (!priorProgress) {
+        window.location.href = 'listening-boost.html';
+        return;
+      }
+    }
+
+    renderHypothesisFirst();
+    renderQuiz5();
+    renderQuiz6();
+    renderQuiz7();
+
+    const { data: existingNotes } = await sb.from('listening_boost_notes').select('*').eq('user_id', user.id).eq('mission_id', 'listening-boost-m2').maybeSingle();
+    prefillFromNotes(existingNotes);
+
+    document.getElementById('loadingCard').style.display = 'none';
+    document.getElementById('missionCard').style.display = 'block';
+    goToStep(0);
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>
