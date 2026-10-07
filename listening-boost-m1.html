@@ -49,6 +49,10 @@
   .video-overlay-btn .play-icon { font-size: 38px; }
   .video-timestamp { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
 
+  .clip-instruction { margin: 14px 0 10px; text-align: center; }
+  .clip-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--brown); color: var(--white); font-weight: 700; font-size: 13px; padding: 7px 16px; border-radius: 99px; }
+  .clip-instruction .pt-line { margin-top: 6px; text-align: center; }
+
   .mcq-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--sand); }
   .mcq-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
   .mcq-question { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
@@ -236,6 +240,10 @@
         <div class="en-line">You do NOT need to understand everything.</div>
         <div class="pt-line">Você não precisa entender tudo.</div>
       </div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:12 → 00:54</span>
+        <div class="pt-line">Escute só esse trecho — não precisa assistir o resto do vídeo.</div>
+      </div>
       <div class="video-box">
         <div class="video-slot" id="slot-2"></div>
         <button class="video-overlay-btn" id="playBtn-2" onclick="playInSlot(2, 12, 54)">
@@ -243,7 +251,6 @@
           <div>Play clip</div>
         </button>
       </div>
-      <div class="video-timestamp">00:12 → 00:54</div>
 
       <div class="instruction-block">
         <div class="en-line">How much did you understand?</div>
@@ -282,6 +289,10 @@
           <div class="en-line">Now listen again and check your choices.</div>
           <div class="pt-line">Agora escute novamente e confira suas escolhas.</div>
         </div>
+        <div class="clip-instruction">
+          <span class="clip-badge">🎯 Listen only to 00:12 → 00:54</span>
+          <div class="pt-line">Escute só esse trecho — não precisa assistir o resto do vídeo.</div>
+        </div>
         <div class="video-box">
           <div class="video-slot" id="slot-3"></div>
           <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 12, 54)">
@@ -289,7 +300,6 @@
             <div>Play clip</div>
           </button>
         </div>
-        <div class="video-timestamp">00:12 → 00:54</div>
         <button class="btn-primary" style="margin-top:6px;" onclick="checkMyEars()" id="checkEarsBtn">CHECK MY EARS 👂</button>
       </div>
 
@@ -307,6 +317,10 @@
         <div class="en-line">This time, listen ONLY for the answers.</div>
         <div class="pt-line">Desta vez, procure apenas as informações necessárias para responder.</div>
       </div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:12 → 00:54</span>
+        <div class="pt-line">Escute só esse trecho — não precisa assistir o resto do vídeo.</div>
+      </div>
       <div class="video-box">
         <div class="video-slot" id="slot-4"></div>
         <button class="video-overlay-btn" id="playBtn-4" onclick="playInSlot(4, 12, 54)">
@@ -314,7 +328,6 @@
           <div>Play clip</div>
         </button>
       </div>
-      <div class="video-timestamp">00:12 → 00:54</div>
       <div id="quizBlock"></div>
     </div>
 
@@ -359,6 +372,10 @@
         <div class="en-line">Now listen again while you read.</div>
         <div class="pt-line">Agora escute novamente acompanhando os trechos.</div>
       </div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:12 → 00:54</span>
+        <div class="pt-line">Escute só esse trecho — não precisa assistir o resto do vídeo.</div>
+      </div>
       <div class="video-box">
         <div class="video-slot" id="slot-6"></div>
         <button class="video-overlay-btn" id="playBtn-6" onclick="playInSlot(6, 12, 54)">
@@ -366,7 +383,6 @@
           <div>Play clip</div>
         </button>
       </div>
-      <div class="video-timestamp">00:12 → 00:54</div>
 
       <div class="instruction-block">
         <div class="en-line">Which ones did you already know but couldn't hear?</div>
@@ -425,6 +441,9 @@
 
       <div class="drill-item">
         <div class="en-line">1. "My alarm went off..."</div>
+        <div class="clip-instruction">
+          <span class="clip-badge">🎯 Listen only to 00:12 → 00:22</span>
+        </div>
         <div class="video-box" style="margin:10px 0 0;">
           <div class="video-slot" id="slot-8a"></div>
           <button class="video-overlay-btn" id="playBtn-8a" onclick="playInSlot('8a', 12, 22)">
@@ -440,6 +459,9 @@
 
       <div class="drill-item">
         <div class="en-line">2. "I woke up feeling a little sick."</div>
+        <div class="clip-instruction">
+          <span class="clip-badge">🎯 Listen only to 00:37 → 00:45</span>
+        </div>
         <div class="video-box" style="margin:10px 0 0;">
           <div class="video-slot" id="slot-8b"></div>
           <button class="video-overlay-btn" id="playBtn-8b" onclick="playInSlot('8b', 37, 45)">
@@ -455,6 +477,9 @@
 
       <div class="drill-item">
         <div class="en-line">3. "I need to take a shower."</div>
+        <div class="clip-instruction">
+          <span class="clip-badge">🎯 Listen only to 00:45 → 00:49</span>
+        </div>
         <div class="video-box" style="margin:10px 0 0;">
           <div class="video-slot" id="slot-8c"></div>
           <button class="video-overlay-btn" id="playBtn-8c" onclick="playInSlot('8c', 45, 49)">
@@ -489,6 +514,10 @@
         <div class="en-line">Don't read. Don't translate. Just listen.</div>
         <div class="pt-line">Agora escute o mesmo trecho mais uma vez, sem ler e sem traduzir.</div>
       </div>
+      <div class="clip-instruction">
+        <span class="clip-badge">🎯 Listen only to 00:12 → 00:54</span>
+        <div class="pt-line">Escute só esse trecho — não precisa assistir o resto do vídeo.</div>
+      </div>
       <div class="video-box">
         <div class="video-slot" id="slot-9"></div>
         <button class="video-overlay-btn" id="playBtn-9" onclick="playInSlot(9, 12, 54)">
@@ -496,7 +525,6 @@
           <div>Play clip</div>
         </button>
       </div>
-      <div class="video-timestamp">00:12 → 00:54</div>
 
       <div class="instruction-block">
         <div class="en-line">How much do you understand NOW?</div>
