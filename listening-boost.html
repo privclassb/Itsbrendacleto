@@ -196,19 +196,23 @@
   }
 
   const TOTAL_MISSIONS = 12;
+  // `href` is null until that mission's content is actually built. Whether a
+  // mission with content is actually unlocked for a given student is NOT
+  // stored here — it's computed from lesson_progress at render time, so a
+  // new mission only opens up once every previous one is completed.
   const MISSIONS = [
-    { id: 'listening-boost-m1', num: '01', title: "I Know This English!", meta: 'Morning Routine · 10–15 min', href: 'listening-boost-m1.html', ready: true },
-    { id: 'listening-boost-m2', num: '02', title: 'Mission 02', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m3', num: '03', title: 'Mission 03', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m4', num: '04', title: 'Mission 04', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m5', num: '05', title: 'Mission 05', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m6', num: '06', title: 'Mission 06', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m7', num: '07', title: 'Mission 07', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m8', num: '08', title: 'Mission 08', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m9', num: '09', title: 'Mission 09', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m10', num: '10', title: 'Mission 10', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m11', num: '11', title: 'Mission 11', meta: 'Em breve', href: null, ready: false },
-    { id: 'listening-boost-m12', num: '12', title: 'Mission 12', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m1', num: '01', title: "I Know This English!", meta: 'Morning Routine · 10–15 min', href: 'listening-boost-m1.html' },
+    { id: 'listening-boost-m2', num: '02', title: 'Mission 02', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m3', num: '03', title: 'Mission 03', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m4', num: '04', title: 'Mission 04', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m5', num: '05', title: 'Mission 05', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m6', num: '06', title: 'Mission 06', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m7', num: '07', title: 'Mission 07', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m8', num: '08', title: 'Mission 08', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m9', num: '09', title: 'Mission 09', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m10', num: '10', title: 'Mission 10', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m11', num: '11', title: 'Mission 11', meta: 'Em breve', href: null },
+    { id: 'listening-boost-m12', num: '12', title: 'Mission 12', meta: 'Em breve', href: null },
   ];
 
   async function init(session) {
@@ -233,8 +237,13 @@
     document.getElementById('progressLabel').textContent = `${completedCount}/${TOTAL_MISSIONS} missions completed`;
     document.getElementById('progressFill').style.width = (completedCount / TOTAL_MISSIONS * 100) + '%';
 
+    let allPriorCompleted = true; // mission 1 has no prerequisite
     document.getElementById('missionsList').innerHTML = MISSIONS.map(m => {
       const done = completedIds.has(m.id);
+      const contentExists = !!m.href;
+      const unlockedBySequence = allPriorCompleted;
+      allPriorCompleted = allPriorCompleted && done; // gates the NEXT mission in the list
+
       if (done) {
         return `<a class="mission-row mission-done" href="${m.href}">
           <div class="mission-num">${m.num}</div>
@@ -242,17 +251,24 @@
           <div class="mission-status">✓ Done</div>
         </a>`;
       }
-      if (m.ready) {
+      if (contentExists && unlockedBySequence) {
         return `<a class="mission-row" href="${m.href}">
           <div class="mission-num">${m.num}</div>
           <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
           <div class="mission-status">Start →</div>
         </a>`;
       }
+      if (!contentExists) {
+        return `<div class="mission-row mission-locked">
+          <div class="mission-num">${m.num}</div>
+          <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
+          <div class="mission-status">🔒 Soon</div>
+        </div>`;
+      }
       return `<div class="mission-row mission-locked">
         <div class="mission-num">${m.num}</div>
-        <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
-        <div class="mission-status">🔒 Soon</div>
+        <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">Complete a missão anterior</div></div>
+        <div class="mission-status">🔒 Locked</div>
       </div>`;
     }).join('');
   }
