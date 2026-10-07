@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Listening Boost | itsbrendacleto</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+  header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+  .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+  .btn-back:hover { background: rgba(255,255,255,0.25); }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+
+  .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
+  .hero-inner { max-width: 680px; margin: 0 auto; }
+  .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
+  .hero-title { font-family: 'DM Serif Display', serif; font-size: 30px; color: var(--text); font-weight: 400; }
+  .hero-sub-en { font-size: 15px; font-weight: 600; color: var(--text); margin-top: 10px; }
+  .hero-sub-pt { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .lb-badge-row { display: inline-flex; margin-top: 16px; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 7px 16px; font-size: 12.5px; font-weight: 600; color: var(--brown); }
+
+  main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+  .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 24px; }
+
+  .en-line { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.55; }
+  .pt-line { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .instruction-block { margin-bottom: 16px; }
+  .instruction-block:last-child { margin-bottom: 0; }
+
+  /* Progress */
+  .progress-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .progress-label { font-size: 13px; font-weight: 600; color: var(--text); }
+  .progress-bar { height: 8px; background: var(--sand); border-radius: 99px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--mint), #90C9F9); border-radius: 99px; transition: width 0.8s ease; }
+
+  /* Journey list */
+  .mission-row { display: flex; align-items: center; gap: 14px; padding: 16px 18px; border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow); margin-bottom: 10px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; text-decoration: none; }
+  .mission-row:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(92,64,51,0.12); }
+  .mission-row.mission-locked { cursor: default; opacity: 0.55; }
+  .mission-row.mission-locked:hover { transform: none; box-shadow: var(--shadow); }
+  .mission-num { width: 42px; height: 42px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-family: 'DM Serif Display', serif; font-size: 17px; flex-shrink: 0; }
+  .mission-row.mission-done .mission-num { background: var(--mint); color: var(--white); }
+  .mission-info { flex: 1; min-width: 0; }
+  .mission-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .mission-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .mission-status { font-size: 12px; font-weight: 600; color: var(--brown); flex-shrink: 0; white-space: nowrap; }
+  .mission-row.mission-done .mission-status { color: #3D7A5E; }
+  .mission-row.mission-locked .mission-status { color: var(--muted); }
+
+  .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+</style>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#5C4033" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        setInterval(function () { reg.update(); }, 60000);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') reg.update();
+        });
+      }).catch(function () {});
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      var active = document.activeElement;
+      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+      if (isTyping) {
+        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+      } else {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <a href="home-adulto.html" class="btn-back" id="backBtn">← Voltar</a>
+  <div class="header-title">Listening Boost</div>
+</header>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-label">Listening Boost</div>
+    <div class="hero-title">🎧 LISTENING BOOST</div>
+    <div class="hero-sub-en">4 weeks to train your ears for real English.</div>
+    <div class="hero-sub-pt">4 semanas para treinar seu ouvido para o inglês da vida real.</div>
+    <div class="lb-badge-row">12 missions • 10–15 min each • A1 → A2</div>
+  </div>
+</div>
+
+<main>
+  <div class="card">
+    <div class="instruction-block">
+      <div class="en-line">Complete one mission at a time.</div>
+      <div class="pt-line">Faça uma missão por vez.</div>
+    </div>
+    <div class="instruction-block">
+      <div class="en-line">For better results, try to complete 3–4 missions per week.</div>
+      <div class="pt-line">Para melhores resultados, tente fazer de 3 a 4 missões por semana.</div>
+    </div>
+    <div class="instruction-block">
+      <div class="en-line">Don't rush! Your goal isn't to finish the planner. Your goal is to train your ears. 🎧</div>
+      <div class="pt-line">Não tenha pressa. O objetivo não é terminar rápido — é treinar seu ouvido.</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="progress-row">
+      <div class="progress-label" id="progressLabel">0/12 missions completed</div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+
+  <div class="section-title">Your journey</div>
+  <div id="missionsList"><div class="empty-msg">Carregando...</div></div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, {
+          user: Object.assign({}, real.data.session.user, { id: __previewAs })
+        });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, {
+        get: function (t, prop) {
+          if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+          return function () { return p; };
+        }
+      });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+        qb[m] = function () { return __previewNoop(); };
+      });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+        '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as');
+        sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+  const TOTAL_MISSIONS = 12;
+  const MISSIONS = [
+    { id: 'listening-boost-m1', num: '01', title: "I Know This English!", meta: 'Morning Routine · 10–15 min', href: 'listening-boost-m1.html', ready: true },
+    { id: 'listening-boost-m2', num: '02', title: 'Mission 02', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m3', num: '03', title: 'Mission 03', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m4', num: '04', title: 'Mission 04', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m5', num: '05', title: 'Mission 05', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m6', num: '06', title: 'Mission 06', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m7', num: '07', title: 'Mission 07', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m8', num: '08', title: 'Mission 08', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m9', num: '09', title: 'Mission 09', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m10', num: '10', title: 'Mission 10', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m11', num: '11', title: 'Mission 11', meta: 'Em breve', href: null, ready: false },
+    { id: 'listening-boost-m12', num: '12', title: 'Mission 12', meta: 'Em breve', href: null, ready: false },
+  ];
+
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if (!profile || profile.role === 'kids' || profile.role === 'responsavel') {
+      window.location.href = 'index.html';
+      return;
+    }
+    if (profile.role === 'professora' && !__previewAs) {
+      window.location.href = 'painel-professora.html';
+      return;
+    }
+
+    document.getElementById('backBtn').href = profile.role === 'professora' ? 'painel-professora.html' : 'home-adulto.html';
+
+    const { data: progress } = await sb.from('lesson_progress').select('lesson_id').eq('user_id', user.id);
+    const completedIds = new Set((progress || []).map(p => p.lesson_id));
+    const completedCount = MISSIONS.filter(m => completedIds.has(m.id)).length;
+
+    document.getElementById('progressLabel').textContent = `${completedCount}/${TOTAL_MISSIONS} missions completed`;
+    document.getElementById('progressFill').style.width = (completedCount / TOTAL_MISSIONS * 100) + '%';
+
+    document.getElementById('missionsList').innerHTML = MISSIONS.map(m => {
+      const done = completedIds.has(m.id);
+      if (done) {
+        return `<a class="mission-row mission-done" href="${m.href}">
+          <div class="mission-num">${m.num}</div>
+          <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
+          <div class="mission-status">✓ Done</div>
+        </a>`;
+      }
+      if (m.ready) {
+        return `<a class="mission-row" href="${m.href}">
+          <div class="mission-num">${m.num}</div>
+          <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
+          <div class="mission-status">Start →</div>
+        </a>`;
+      }
+      return `<div class="mission-row mission-locked">
+        <div class="mission-num">${m.num}</div>
+        <div class="mission-info"><div class="mission-title">${m.title}</div><div class="mission-meta">${m.meta}</div></div>
+        <div class="mission-status">🔒 Soon</div>
+      </div>`;
+    }).join('');
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

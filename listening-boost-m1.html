@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mission 01 · Listening Boost | itsbrendacleto</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+  header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+  .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+  .btn-back:hover { background: rgba(255,255,255,0.25); }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--white); font-weight: 400; }
+
+  main { max-width: 640px; margin: 0 auto; padding: 24px 20px 70px; }
+  .card { background: var(--white); border-radius: var(--radius); padding: 22px 22px; box-shadow: var(--shadow); }
+
+  .step { display: none; }
+  .step.active { display: block; }
+  .step-indicator { font-size: 11.5px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; }
+  .step-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
+  .step-subtitle { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+
+  .en-line { font-size: 14px; font-weight: 600; color: var(--text); line-height: 1.55; }
+  .pt-line { font-size: 12.5px; color: var(--muted); margin-top: 3px; line-height: 1.45; }
+  .instruction-block { margin: 14px 0; }
+
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin: 10px 0 0; }
+  .meta-row b { color: var(--text); }
+
+  .clip-card { background: var(--cream); border: 1.5px solid var(--sand); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; }
+  .clip-card .clip-title { font-weight: 700; font-size: 14px; color: var(--brown); margin-bottom: 8px; }
+  .clip-card .clip-row { font-size: 13px; color: var(--text); margin-bottom: 3px; }
+
+  .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .chip { padding: 8px 14px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--cream); font-size: 13px; font-weight: 600; color: var(--text); cursor: pointer; transition: all .15s; font-family: 'DM Sans', sans-serif; }
+  .chip.selected { background: var(--mint); border-color: var(--mint); color: var(--white); }
+
+  .short-input { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 10px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; margin-top: 8px; }
+  .short-input:focus { border-color: var(--mint); }
+
+  .video-box { background: var(--text); border-radius: var(--radius); overflow: hidden; margin: 16px 0; position: relative; aspect-ratio: 16/9; }
+  .video-slot { width: 100%; height: 100%; }
+  .video-overlay-btn { position: absolute; inset: 0; background: rgba(0,0,0,0.35); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; border: none; width: 100%; height: 100%; font-family: 'DM Sans', sans-serif; }
+  .video-overlay-btn .play-icon { font-size: 38px; }
+  .video-timestamp { font-size: 11px; color: var(--muted); margin-top: 6px; text-align: center; }
+
+  .mcq-block { margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--sand); }
+  .mcq-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .mcq-question { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 10px; }
+  .mcq-option { display: block; width: 100%; text-align: left; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 13px; color: var(--text); margin-bottom: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .mcq-option.correct { background: #E7F3EC; border-color: var(--mint); color: #2E6B4B; font-weight: 600; }
+  .mcq-option.wrong { background: #FBEDEA; border-color: var(--rose); }
+  .mcq-feedback { font-size: 12.5px; margin-top: 4px; font-weight: 600; min-height: 16px; }
+  .mcq-feedback.correct { color: #2E6B4B; }
+  .mcq-feedback.wrong { color: #B05A4A; }
+
+  .callout-box { background: var(--cream); border-left: 4px solid var(--gold); border-radius: 10px; padding: 14px 16px; margin: 16px 0; }
+  .callout-label { font-size: 11px; font-weight: 700; color: var(--brown); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .callout-box .big-line { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); margin: 4px 0 8px; }
+
+  .notice-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .notice-item:last-child { margin-bottom: 0; }
+  .notice-num { width: 24px; height: 24px; border-radius: 50%; background: var(--sand); color: var(--brown); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+  .notice-item .word-map { font-family: 'DM Mono', monospace; background: var(--cream); display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 13px; margin: 4px 0; }
+
+  .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); }
+  .toggle-row:last-child { border-bottom: none; }
+  .toggle-word { font-size: 13.5px; font-weight: 600; color: var(--text); }
+  .toggle-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .toggle-btn { padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--sand); background: var(--white); font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .toggle-btn.selected.know { background: var(--mint); border-color: var(--mint); color: var(--white); }
+  .toggle-btn.selected.new { background: var(--rose); border-color: var(--rose); color: var(--white); }
+
+  .chunk-item { display: block; width: 100%; text-align: left; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 10px; padding: 10px 14px; margin-bottom: 8px; font-size: 13px; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .chunk-item.selected { background: var(--mint); border-color: var(--mint); color: var(--white); }
+
+  .drill-item { background: var(--cream); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; }
+  .drill-item:last-child { margin-bottom: 0; }
+  .drill-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+  .drill-check { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); cursor: pointer; }
+  .drill-check input { width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; }
+
+  .rating-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0; }
+  .rating-btn { flex: 1; min-width: 80px; padding: 12px 6px; border-radius: 10px; border: 1.5px solid var(--sand); background: var(--white); font-size: 11.5px; font-weight: 600; color: var(--text); cursor: pointer; font-family: 'DM Sans', sans-serif; text-align: center; }
+  .rating-btn .rating-emoji { font-size: 20px; display: block; margin-bottom: 4px; }
+  .rating-btn.selected { background: var(--brown); color: var(--white); border-color: var(--brown); }
+
+  .compare-box { display: flex; gap: 10px; margin: 16px 0; align-items: center; }
+  .compare-col { flex: 1; background: var(--cream); border-radius: 10px; padding: 12px; font-size: 12.5px; color: var(--text); text-align: center; }
+  .compare-col b { display: block; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+  .compare-arrow { font-size: 18px; color: var(--muted); }
+
+  .checkbox-list label { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); padding: 8px 0; cursor: pointer; }
+  .checkbox-list input { margin-top: 2px; width: 16px; height: 16px; accent-color: var(--mint); cursor: pointer; flex-shrink: 0; }
+
+  .vocab-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+  .vocab-row span { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+  .vocab-row input { flex: 1; min-width: 0; border: 1.5px solid var(--sand); border-radius: 8px; padding: 8px 10px; font-size: 12.5px; font-family: 'DM Sans', sans-serif; outline: none; }
+  .vocab-row input:focus { border-color: var(--mint); }
+
+  .note-textarea { width: 100%; min-height: 80px; border: 1.5px solid var(--sand); border-radius: 10px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; resize: vertical; outline: none; margin-top: 10px; }
+  .note-textarea:focus { border-color: var(--mint); }
+
+  .reveal-block { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--sand); }
+  .reveal-block.shown { display: block; }
+
+  .result-box { background: var(--cream); border-radius: 10px; padding: 14px 16px; margin: 16px 0; text-align: center; }
+  .result-box .result-big { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 4px; }
+
+  .nav-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+  .btn-primary { background: var(--brown); color: var(--white); border: none; border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-secondary { background: none; border: 1.5px solid var(--sand); color: var(--muted); border-radius: 10px; padding: 12px 22px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
+
+  .final-screen { text-align: center; padding: 30px 10px; }
+  .final-emoji { font-size: 50px; margin-bottom: 12px; }
+  .final-title { font-family: 'DM Serif Display', serif; font-size: 23px; color: var(--text); margin-bottom: 10px; }
+  .final-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .final-note { background: var(--cream); border-radius: 10px; padding: 12px 16px; font-size: 12.5px; color: var(--muted); margin-bottom: 20px; text-align: left; }
+  .final-note-tag { font-size: 11px; color: var(--muted); opacity: .8; }
+
+  .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+  .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; margin: 14px 0; font-size: 12.5px; color: var(--brown); line-height: 1.5; }
+  .pending-box b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 4px; }
+</style>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#5C4033" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        setInterval(function () { reg.update(); }, 60000);
+        document.addEventListener('visibilitychange', function () {
+          if (document.visibilityState === 'visible') reg.update();
+        });
+      }).catch(function () {});
+    });
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      var active = document.activeElement;
+      var isTyping = active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.tagName === 'SELECT');
+      if (isTyping) {
+        active.addEventListener('blur', function () { window.location.reload(); }, { once: true });
+      } else {
+        window.location.reload();
+      }
+    });
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <a href="listening-boost.html" class="btn-back" id="backBtn">← Voltar</a>
+  <div class="header-title">Mission 01</div>
+</header>
+
+<main>
+  <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
+
+  <div class="card" id="missionCard" style="display:none;">
+
+    <!-- STEP 0: INTRO / BRIEFING -->
+    <div class="step" id="step-0">
+      <div class="step-indicator">Mission 01 · Before You Begin</div>
+      <div class="step-title">🎧 Mission 01 — I Know This English!</div>
+      <div class="meta-row">
+        <span><b>Theme:</b> Morning Routine</span>
+        <span><b>Listening skill:</b> Recognizing English you already know</span>
+        <span><b>Level:</b> A1 / A1+</span>
+        <span><b>Time:</b> 10–15 min</span>
+      </div>
+
+      <div class="instruction-block" style="margin-top:20px;">
+        <div class="step-subtitle" style="margin-bottom:6px;">Today's goal</div>
+        <div class="en-line">You don't need to understand every word to understand English.</div>
+        <div class="pt-line">Hoje vamos treinar seu ouvido para reconhecer o inglês que você já conhece.</div>
+      </div>
+
+      <div class="clip-card">
+        <div class="clip-title">🎧 Today's Clip</div>
+        <div class="clip-row">Start: 00:12</div>
+        <div class="clip-row">Stop: 00:54</div>
+        <div class="clip-row">Only 42 seconds!</div>
+        <div class="pt-line" style="margin-top:6px;">Você só precisa assistir a este trecho.</div>
+      </div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step" id="step-1">
+      <div class="step-indicator">Step 1 of 10</div>
+      <div class="step-title">Before You Listen ☀️</div>
+      <div class="step-subtitle">Your morning</div>
+      <div class="instruction-block">
+        <div class="en-line">What do you usually do after you wake up?</div>
+        <div class="pt-line">O que você costuma fazer depois que acorda?</div>
+      </div>
+      <div class="chip-row" id="step1Chips">
+        <div class="chip" data-chip="take a shower">take a shower</div>
+        <div class="chip" data-chip="open the curtains">open the curtains</div>
+        <div class="chip" data-chip="check my phone">check my phone</div>
+        <div class="chip" data-chip="have breakfast">have breakfast</div>
+        <div class="chip" data-chip="go back to sleep">go back to sleep</div>
+        <div class="chip" data-chip="drink coffee">drink coffee</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">What time do you usually wake up?</div>
+        <div class="pt-line">Que horas você costuma acordar?</div>
+        <input type="text" class="short-input" id="step1WakeTime" placeholder="..." />
+        <div class="pt-line" style="margin-top:6px;">Não há resposta certa ou errada nesta etapa.</div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" id="step-2">
+      <div class="step-indicator">Step 2 of 10</div>
+      <div class="step-title">First Listen 👂</div>
+      <div class="instruction-block">
+        <div class="en-line">Just listen.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">No subtitles. Don't pause. Don't translate. Just listen.</div>
+        <div class="pt-line">Sem legendas. Não pause nem tente traduzir. Apenas escute.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">You do NOT need to understand everything.</div>
+        <div class="pt-line">Você não precisa entender tudo.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-2"></div>
+        <button class="video-overlay-btn" id="playBtn-2" onclick="playInSlot(2, 12, 54)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much did you understand?</div>
+        <div class="pt-line">Quanto você acha que conseguiu entender?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-2"></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" id="step-3">
+      <div class="step-indicator">Step 3 of 10</div>
+      <div class="step-title">What Did Your Ears Catch? 🔎</div>
+      <div class="instruction-block">
+        <div class="en-line">Which words did you hear?</div>
+        <div class="pt-line">Quais palavras você conseguiu ouvir?</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't listen again yet. Choose what you remember hearing.</div>
+        <div class="pt-line">Ainda não escute novamente. Marque apenas o que você lembra de ter ouvido.</div>
+      </div>
+      <div class="chip-row" id="step3Chips">
+        <div class="chip" data-chip="alarm">alarm</div>
+        <div class="chip" data-chip="shower">shower</div>
+        <div class="chip" data-chip="curtains">curtains</div>
+        <div class="chip" data-chip="hair">hair</div>
+        <div class="chip" data-chip="sick">sick</div>
+        <div class="chip" data-chip="morning">morning</div>
+        <div class="chip" data-chip="breakfast">breakfast</div>
+        <div class="chip" data-chip="coffee">coffee</div>
+        <div class="chip" data-chip="school">school</div>
+        <div class="chip" data-chip="sun">sun</div>
+      </div>
+
+      <div class="reveal-block" id="step3ReplaySection">
+        <div class="instruction-block">
+          <div class="en-line">Now listen again and check your choices.</div>
+          <div class="pt-line">Agora escute novamente e confira suas escolhas.</div>
+        </div>
+        <div class="video-box">
+          <div class="video-slot" id="slot-3"></div>
+          <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 12, 54)">
+            <div class="play-icon">▶</div>
+            <div>Play clip</div>
+          </button>
+        </div>
+        <div class="video-timestamp">00:12 → 00:54</div>
+        <button class="btn-primary" style="margin-top:6px;" onclick="checkMyEars()" id="checkEarsBtn">CHECK MY EARS 👂</button>
+      </div>
+
+      <div class="result-box" id="step3Result" style="display:none;"></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" id="step-4">
+      <div class="step-indicator">Step 4 of 10</div>
+      <div class="step-title">Listen With a Mission 🎯</div>
+      <div class="instruction-block">
+        <div class="en-line">Don't listen for everything.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">This time, listen ONLY for the answers.</div>
+        <div class="pt-line">Desta vez, procure apenas as informações necessárias para responder.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-4"></div>
+        <button class="video-overlay-btn" id="playBtn-4" onclick="playInSlot(4, 12, 54)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+      <div id="quizBlock"></div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="step" id="step-5">
+      <div class="step-indicator">Step 5 of 10</div>
+      <div class="step-title">The "I Know This!" Moment 🤯</div>
+      <div class="instruction-block">
+        <div class="en-line">Do you know these words and expressions?</div>
+        <div class="pt-line">Você já conhece estas palavras e expressões?</div>
+      </div>
+      <div id="step5KnowList"></div>
+
+      <div class="instruction-block" style="margin-top:20px;">
+        <div class="en-line">Now here's the interesting part...</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">You KNOW these words. But could you HEAR all of them?</div>
+        <div class="pt-line">Você conhece essas palavras. Mas conseguiu reconhecê-las quando ouviu?</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Which ones were difficult to hear?</div>
+        <div class="pt-line">Quais foram difíceis de reconhecer?</div>
+      </div>
+      <div class="chip-row" id="step5DifficultChips"></div>
+
+      <div class="callout-box">
+        <div class="callout-label">🧠 Listening Secret #1</div>
+        <div class="big-line">Knowing a word ≠ Hearing a word</div>
+        <div class="en-line">You may recognize a word when you read it... but your brain also needs to learn how it sounds when someone says it naturally.</div>
+        <div class="en-line" style="margin-top:8px;">That's why we're training your ears. 👂 You don't need to translate everything.</div>
+        <div class="pt-line" style="margin-top:8px;">💡 Em outras palavras: Você pode já conhecer o inglês. Seu ouvido só ainda não aprendeu a reconhecê-lo rápido o suficiente.</div>
+      </div>
+    </div>
+
+    <!-- STEP 6 -->
+    <div class="step" id="step-6">
+      <div class="step-indicator">Step 6 of 10</div>
+      <div class="step-title">Now Check What You Heard 👀</div>
+      <div class="step-subtitle">Listen + read</div>
+      <div class="instruction-block">
+        <div class="en-line">Now listen again while you read.</div>
+        <div class="pt-line">Agora escute novamente acompanhando os trechos.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-6"></div>
+        <button class="video-overlay-btn" id="playBtn-6" onclick="playInSlot(6, 12, 54)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+
+      <div class="instruction-block">
+        <div class="en-line">Which ones did you already know but couldn't hear?</div>
+        <div class="pt-line">Quais você já conhecia, mas não conseguiu reconhecer no áudio?</div>
+      </div>
+      <div id="step6Chunks"></div>
+
+      <div class="callout-box" style="border-left-color: var(--mint);">
+        <div class="big-line">🤯 Look at that!</div>
+        <div class="en-line">You already knew some of this English.</div>
+        <div class="en-line" style="margin-top:6px;">Your vocabulary wasn't necessarily the problem. Your ears just needed another chance.</div>
+        <div class="pt-line" style="margin-top:8px;">Você já conhecia parte desse inglês. Seu ouvido só precisava de mais uma chance.</div>
+      </div>
+    </div>
+
+    <!-- STEP 7 -->
+    <div class="step" id="step-7">
+      <div class="step-indicator">Step 7 of 10</div>
+      <div class="step-title">Did You Notice? 👂</div>
+
+      <div class="notice-item">
+        <div class="notice-num">1</div>
+        <div>
+          <div class="step-subtitle" style="margin-bottom:4px;">Go off</div>
+          <div class="word-map">My alarm went off.</div>
+          <div class="en-line" style="margin-top:6px;">go off = ring</div>
+          <div class="pt-line">O alarme tocou.</div>
+          <div class="en-line" style="margin-top:8px;">"Go off" is very common when we talk about alarms.</div>
+        </div>
+      </div>
+
+      <div class="notice-item">
+        <div class="notice-num">2</div>
+        <div>
+          <div class="step-subtitle" style="margin-bottom:4px;">Wake up → woke up</div>
+          <div class="word-map">wake up → woke up</div>
+          <div class="en-line" style="margin-top:6px;">She is talking about what happened that morning.</div>
+          <div class="en-line" style="margin-top:8px;">Don't worry about memorizing it now. Just notice the sound.</div>
+          <div class="pt-line">Não precisa memorizar agora. Apenas perceba como o som muda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 8 -->
+    <div class="step" id="step-8">
+      <div class="step-indicator">Step 8 of 10</div>
+      <div class="step-title">Shadow It! 🗣️</div>
+      <div class="instruction-block">
+        <div class="en-line">Listen. Repeat. Follow the rhythm.</div>
+        <div class="pt-line">Escute, repita e tente acompanhar o ritmo.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Copy the rhythm, not the accent.</div>
+        <div class="pt-line">Tente acompanhar o ritmo, não copiar o sotaque.</div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">1. "My alarm went off..."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8a" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8a', 12, 22)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 1)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">2. "I woke up feeling a little sick."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8b" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8b', 37, 45)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 2)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="drill-item">
+        <div class="en-line">3. "I need to take a shower."</div>
+        <div class="video-box" style="aspect-ratio:auto; height:0; padding:0; margin:10px 0 0;">
+          <div class="video-slot" id="slot-8c" style="height:1px;"></div>
+        </div>
+        <div class="drill-actions">
+          <button class="btn-secondary" onclick="playInSlot('8c', 45, 49)">▶ Listen</button>
+          <span class="en-line" style="font-size:12px;">🗣️ Repeat</span>
+          <label class="drill-check"><input type="checkbox" onchange="onDrillCheck(this, 3)"> I did it 3x</label>
+        </div>
+      </div>
+
+      <div class="callout-box" style="border-left-color: var(--rose);">
+        <div class="en-line">Your accent is part of you. 💜</div>
+        <div class="en-line" style="margin-top:6px;">We're training your ears and rhythm, not trying to make you sound like someone else.</div>
+        <div class="pt-line" style="margin-top:8px;">O objetivo é melhorar sua compreensão e seu ritmo — não apagar seu sotaque.</div>
+      </div>
+    </div>
+
+    <!-- STEP 9 -->
+    <div class="step" id="step-9">
+      <div class="step-indicator">Step 9 of 10</div>
+      <div class="step-title">The Magic Listen ✨</div>
+      <div class="instruction-block">
+        <div class="en-line">One last time.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Remember your first listen? Now listen to the SAME 42 seconds again.</div>
+      </div>
+      <div class="instruction-block">
+        <div class="en-line">Don't read. Don't translate. Just listen.</div>
+        <div class="pt-line">Agora escute o mesmo trecho mais uma vez, sem ler e sem traduzir.</div>
+      </div>
+      <div class="video-box">
+        <div class="video-slot" id="slot-9"></div>
+        <button class="video-overlay-btn" id="playBtn-9" onclick="playInSlot(9, 12, 54)">
+          <div class="play-icon">▶</div>
+          <div>Play clip</div>
+        </button>
+      </div>
+      <div class="video-timestamp">00:12 → 00:54</div>
+
+      <div class="instruction-block">
+        <div class="en-line">How much do you understand NOW?</div>
+        <div class="pt-line">E agora, quanto você consegue entender?</div>
+      </div>
+      <div class="rating-row" id="ratingRow-9"></div>
+
+      <div class="reveal-block" id="step9CompareBlock">
+        <div class="compare-box">
+          <div class="compare-col"><b>Before</b><span id="compareBefore"></span></div>
+          <div class="compare-arrow">→</div>
+          <div class="compare-col"><b>Now</b><span id="compareNow"></span></div>
+        </div>
+        <div class="callout-box" id="step9FeedbackBox"></div>
+      </div>
+    </div>
+
+    <!-- STEP 10 -->
+    <div class="step" id="step-10">
+      <div class="step-indicator">Step 10 of 10</div>
+      <div class="step-title">My Listening Note 📝</div>
+      <div class="instruction-block">
+        <div class="en-line">Today I discovered that...</div>
+        <div class="pt-line">Hoje eu percebi que...</div>
+      </div>
+      <div class="checkbox-list">
+        <label><input type="checkbox" value="understand-more"> I understand more than I think.</label>
+        <label><input type="checkbox" value="know-words-difficult"> I know words that are still difficult to hear.</label>
+        <label><input type="checkbox" value="translate-too-much"> I try to translate too much.</label>
+        <label><input type="checkbox" value="listening-more-helps"> Listening more than once helps me.</label>
+        <label><input type="checkbox" value="need-more-practice"> I need more practice — and that's okay.</label>
+      </div>
+
+      <div class="instruction-block" style="margin-top:18px;">
+        <div class="en-line">One expression I can hear better now:</div>
+        <div class="pt-line">Uma expressão que consigo reconhecer melhor agora:</div>
+        <input type="text" class="short-input" id="step10Expression" placeholder="..." />
+      </div>
+
+      <div class="callout-box" style="margin-top:22px;">
+        <div class="callout-label">🔎 Vocabulary Boost</div>
+        <div class="en-line">Found a word you don't know? Look it up! 🔎</div>
+        <div class="pt-line">Encontrou alguma palavra ou expressão nova? Agora sim é hora de pesquisar.</div>
+        <div class="en-line" style="margin-top:8px;">Choose up to 3 new words or expressions from today's mission.</div>
+        <div class="pt-line">Escolha até 3 palavras ou expressões novas de hoje.</div>
+
+        <div style="margin-top:14px;">
+          <div class="vocab-row"><span>1.</span><input type="text" id="vocabWord1" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning1" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>2.</span><input type="text" id="vocabWord2" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning2" placeholder="meaning" /></div>
+          <div class="vocab-row"><span>3.</span><input type="text" id="vocabWord3" placeholder="word / expression" /><span>→</span><input type="text" id="vocabMeaning3" placeholder="meaning" /></div>
+        </div>
+
+        <div class="en-line" style="margin-top:10px;">During listening → don't stop for every unknown word.</div>
+        <div class="en-line">After listening → explore the new vocabulary.</div>
+        <div class="pt-line" style="margin-top:6px;">Durante o listening, não precisamos traduzir tudo. Depois do treino, podemos usar a tradução para aprender ainda mais.</div>
+      </div>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="step" id="step-final">
+      <div class="final-screen">
+        <div class="final-emoji">🎧</div>
+        <div class="final-title">Mission 01 Complete!</div>
+        <div class="final-sub">You just trained your ears for real English.<br><span style="opacity:.8;">Você acabou de treinar seu ouvido para o inglês da vida real.</span></div>
+        <div class="final-note">
+          <b style="display:block; margin-bottom:4px;">🔁 Listen again tomorrow <span class="final-note-tag">(opcional)</span></b>
+          You don't need to repeat the activities. Tomorrow, listen to the clip ONE TIME without subtitles and see what you can still understand.<br>
+          <span style="opacity:.8;">Você não precisa refazer os exercícios. Amanhã, escute o trecho apenas uma vez, sem legenda, e perceba quanto ainda consegue entender.</span>
+        </div>
+        <a href="listening-boost.html" class="btn-primary" style="text-decoration:none; display:inline-block;">Back to Listening Boost</a>
+      </div>
+    </div>
+
+    <div class="nav-row" id="navRow">
+      <button class="btn-secondary" id="backStepBtn" onclick="goToStep(currentStep - 1)">← Back</button>
+      <button class="btn-primary" id="continueBtn" onclick="onContinue()">Continue →</button>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  // ---- Modo "Ver como aluno" (Brenda) -- so leitura, nao grava nada ----
+  var __previewAs = sessionStorage.getItem('__preview_as');
+  if (__previewAs) {
+    var __origGetSession = sb.auth.getSession.bind(sb.auth);
+    sb.auth.getSession = async function () {
+      var real = await __origGetSession();
+      if (real && real.data && real.data.session) {
+        real.data.session = Object.assign({}, real.data.session, {
+          user: Object.assign({}, real.data.session.user, { id: __previewAs })
+        });
+      }
+      return real;
+    };
+    var __previewNoop = function () {
+      var p = new Proxy(function () {}, {
+        get: function (t, prop) {
+          if (prop === 'then') return function (resolve) { resolve({ data: null, error: null, count: 0 }); };
+          return function () { return p; };
+        }
+      });
+      return p;
+    };
+    var __origFrom = sb.from.bind(sb);
+    sb.from = function (table) {
+      var qb = __origFrom(table);
+      ['insert', 'update', 'upsert', 'delete'].forEach(function (m) {
+        qb[m] = function () { return __previewNoop(); };
+      });
+      return qb;
+    };
+    if (sb.rpc) sb.rpc = function () { return __previewNoop(); };
+    var __insertPreviewBanner = function () {
+      if (document.getElementById('previewModeBanner')) return;
+      var banner = document.createElement('div');
+      banner.id = 'previewModeBanner';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
+      banner.innerHTML = '🔍 Modo visualização — você é a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada é salvo) ' +
+        '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualização</button>';
+      document.body.insertBefore(banner, document.body.firstChild);
+    };
+    if (document.body) { __insertPreviewBanner(); } else { document.addEventListener('DOMContentLoaded', __insertPreviewBanner); }
+    document.addEventListener('click', function (e) {
+      if (e.target && e.target.id === 'previewExitBtn') {
+        sessionStorage.removeItem('__preview_as');
+        sessionStorage.removeItem('__preview_name');
+        window.location.href = 'painel-professora.html';
+      }
+    });
+  }
+
+  const VIDEO_ID = '4GtF4TuFps4';
+  const TOTAL_STEPS = 10; // steps 1-10; step 0 is the mission briefing, shown before Step 1
+  let currentStep = 0;
+  let CURRENT_USER_ID = null;
+
+  // ---- Content constants (verbatim from Brenda's brief) ----
+  const RATING_SCALE = [
+    { emoji: '😵', en: 'Almost nothing' },
+    { emoji: '😕', en: 'A little' },
+    { emoji: '🙂', en: 'About half' },
+    { emoji: '😎', en: 'Most of it' },
+  ];
+
+  const STEP3_TARGETS = new Set(['alarm', 'shower', 'curtains', 'hair', 'sick', 'sun']);
+
+  const STEP5_ITEMS = ['wake up', 'take a shower', 'open the curtains', 'feel sick', 'hair', 'alarm'];
+
+  const STEP6_CHUNKS = [
+    'my alarm went off',
+    'pressed snooze',
+    'open the curtains',
+    'woke up feeling a little sick',
+    'take a shower',
+    'my hair',
+  ];
+
+  const QUIZ = [
+    { q: 'What time does her alarm go off?', options: ['8:58 a.m.', '9:58 a.m.', '10:58 a.m.'], correct: 1 },
+    { q: 'What does she open?', options: ['The window', 'The door', 'The curtains'], correct: 2 },
+    { q: 'How is she feeling?', options: ['Tired', 'A little sick', 'Hungry'], correct: 1 },
+    { q: 'What does she need to do?', options: ['Have breakfast', 'Go to work', 'Take a shower'], correct: 2 },
+  ];
+
+  // ---- State ----
+  const state = {
+    step2Rating: null,
+    step3Checked: false,
+    step3EarsCaught: 0,
+    quizAnswered: [false, false, false, false],
+    quizCorrect: [false, false, false, false],
+    step5Know: {},      // item -> 'know' | 'new'
+    step5Difficult: new Set(),
+    step6Selected: new Set(),
+    drillsDone: [false, false, false],
+    step9Rating: null,
+  };
+
+  function renderChipRow(containerId, onToggle) {
+    document.getElementById(containerId).querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        if (onToggle) onToggle(chip);
+      });
+    });
+  }
+  renderChipRow('step1Chips');
+  renderChipRow('step3Chips', () => {
+    const anySelected = document.querySelectorAll('#step3Chips .chip.selected').length > 0;
+    if (anySelected) document.getElementById('step3ReplaySection').classList.add('shown');
+  });
+
+  function checkMyEars() {
+    const selected = Array.from(document.querySelectorAll('#step3Chips .chip.selected')).map(c => c.dataset.chip);
+    const caught = selected.filter(w => STEP3_TARGETS.has(w)).length;
+    state.step3EarsCaught = caught;
+    state.step3Checked = true;
+    const box = document.getElementById('step3Result');
+    box.style.display = 'block';
+    box.innerHTML = `<div class="result-big">🎉 Your ears caught ${caught} word${caught === 1 ? '' : 's'}!</div>
+      <div class="pt-line">Talvez você tenha entendido mais do que imaginava.</div>`;
+    updateContinueState();
+  }
+
+  // ---- Step 2 / Step 9 rating rows ----
+  function renderRatingRow(rowId, onPick) {
+    const row = document.getElementById(rowId);
+    row.innerHTML = RATING_SCALE.map((r, i) =>
+      `<div class="rating-btn" data-idx="${i}"><span class="rating-emoji">${r.emoji}</span>${r.en}</div>`
+    ).join('');
+    row.querySelectorAll('.rating-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        row.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        onPick(parseInt(btn.dataset.idx, 10));
+      });
+    });
+  }
+  renderRatingRow('ratingRow-2', (idx) => { state.step2Rating = idx; updateContinueState(); });
+  renderRatingRow('ratingRow-9', (idx) => { state.step9Rating = idx; renderStep9Comparison(); updateContinueState(); });
+
+  function renderStep9Comparison() {
+    if (state.step2Rating === null || state.step9Rating === null) return;
+    const before = RATING_SCALE[state.step2Rating];
+    const now = RATING_SCALE[state.step9Rating];
+    document.getElementById('compareBefore').textContent = before.emoji + ' ' + before.en;
+    document.getElementById('compareNow').textContent = now.emoji + ' ' + now.en;
+
+    const box = document.getElementById('step9FeedbackBox');
+    const bothMax = state.step2Rating === 3 && state.step9Rating === 3;
+    if (state.step9Rating > state.step2Rating) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood more after training your ears.</div>
+        <div class="en-line" style="margin-top:8px; font-weight:700;">The English didn't change. Your listening did. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">O inglês não mudou. A sua escuta mudou.</div>`;
+    } else if (bothMax) {
+      box.innerHTML = `<div class="big-line">Look at that! 👀</div>
+        <div class="en-line">You understood a lot from the beginning — and after training, your ears had even more chances to notice the sounds. 🎧</div>
+        <div class="pt-line" style="margin-top:6px;">Você já entendia bastante desde o início — e o treino deu ao seu ouvido ainda mais oportunidades de perceber os sons.</div>`;
+    } else if (state.step9Rating < state.step2Rating) {
+      box.innerHTML = `<div class="big-line">That's okay! 💜</div>
+        <div class="en-line">Sometimes, after listening more carefully, you notice things you didn't notice before — including what is still difficult to hear. That's part of training your ears.</div>
+        <div class="pt-line" style="margin-top:6px;">Às vezes, depois de prestar mais atenção, você percebe melhor até aquilo que ainda é difícil de reconhecer. Isso também faz parte do treino.</div>`;
+    } else {
+      box.innerHTML = `<div class="en-line">That's okay!</div>
+        <div class="en-line" style="margin-top:6px;">Your ears are learning to recognize new sounds. Repetition is part of listening practice.</div>
+        <div class="pt-line" style="margin-top:6px;">Tudo bem. Seu ouvido ainda está aprendendo a reconhecer esses sons. Repetição faz parte do processo.</div>`;
+    }
+    document.getElementById('step9CompareBlock').classList.add('shown');
+  }
+
+  // ---- Quiz (Step 4) ----
+  function renderQuiz() {
+    const box = document.getElementById('quizBlock');
+    box.innerHTML = QUIZ.map((item, qi) => {
+      const opts = item.options.map((opt, oi) =>
+        `<button class="mcq-option" id="q${qi}o${oi}" onclick="answerQuiz(${qi},${oi})">${opt}</button>`
+      ).join('');
+      return `<div class="mcq-block">
+        <div class="mcq-question">${qi + 1}. ${item.q}</div>
+        ${opts}
+        <div class="mcq-feedback" id="feedback-${qi}"></div>
+      </div>`;
+    }).join('');
+  }
+
+  function answerQuiz(qi, oi) {
+    const item = QUIZ[qi];
+    const fb = document.getElementById(`feedback-${qi}`);
+    const chosenBtn = document.getElementById(`q${qi}o${oi}`);
+    if (oi === item.correct) {
+      state.quizAnswered[qi] = true;
+      state.quizCorrect[qi] = true;
+      chosenBtn.classList.add('correct');
+      fb.innerHTML = 'You caught it! 🎯';
+      fb.className = 'mcq-feedback correct';
+      item.options.forEach((_, i) => { document.getElementById(`q${qi}o${i}`).disabled = true; });
+    } else {
+      chosenBtn.classList.add('wrong');
+      fb.innerHTML = 'Not quite! Listen one more time. 👂<br><span style="font-weight:400; color:var(--muted);">Quase! Escute mais uma vez.</span>';
+      fb.className = 'mcq-feedback wrong';
+      setTimeout(() => { chosenBtn.classList.remove('wrong'); }, 900);
+    }
+    updateContinueState();
+  }
+
+  // ---- Step 5: know / new toggles + difficult-to-hear chips ----
+  function renderStep5() {
+    const box = document.getElementById('step5KnowList');
+    box.innerHTML = STEP5_ITEMS.map((item, i) => `
+      <div class="toggle-row">
+        <div class="toggle-word">${item}</div>
+        <div class="toggle-btns">
+          <button class="toggle-btn know" id="know-${i}-know" onclick="setStep5Know(${i}, 'know')">I KNOW IT ✓</button>
+          <button class="toggle-btn new" id="know-${i}-new" onclick="setStep5Know(${i}, 'new')">NEW TO ME</button>
+        </div>
+      </div>`).join('');
+
+    const chips = document.getElementById('step5DifficultChips');
+    chips.innerHTML = STEP5_ITEMS.map((item, i) => `<div class="chip" data-chip="${item}" id="diff-chip-${i}">${item}</div>`).join('');
+    chips.querySelectorAll('.chip').forEach((chip, i) => {
+      chip.addEventListener('click', () => {
+        chip.classList.toggle('selected');
+        if (chip.classList.contains('selected')) state.step5Difficult.add(STEP5_ITEMS[i]);
+        else state.step5Difficult.delete(STEP5_ITEMS[i]);
+      });
+    });
+  }
+
+  function setStep5Know(i, value) {
+    state.step5Know[STEP5_ITEMS[i]] = value;
+    document.getElementById(`know-${i}-know`).classList.toggle('selected', value === 'know');
+    document.getElementById(`know-${i}-new`).classList.toggle('selected', value === 'new');
+  }
+
+  // ---- Step 6: tappable chunks ----
+  function renderStep6() {
+    const box = document.getElementById('step6Chunks');
+    box.innerHTML = STEP6_CHUNKS.map((c, i) => `<button type="button" class="chunk-item" id="chunk6-${i}">${c}</button>`).join('');
+    box.querySelectorAll('.chunk-item').forEach((el, i) => {
+      el.addEventListener('click', () => {
+        el.classList.toggle('selected');
+        if (el.classList.contains('selected')) state.step6Selected.add(STEP6_CHUNKS[i]);
+        else state.step6Selected.delete(STEP6_CHUNKS[i]);
+      });
+    });
+  }
+
+  function onDrillCheck(checkbox, idx) {
+    state.drillsDone[idx - 1] = checkbox.checked;
+    updateContinueState();
+  }
+
+  // ---- YouTube IFrame API integration ----
+  let ytPlayer = null;
+  let ytReady = false;
+  let pendingPlay = null;
+  let watchdogTimer = null;
+
+  window.onYouTubeIframeAPIReady = function () {
+    const holder = document.createElement('div');
+    holder.id = 'ytPlayerSlot';
+    document.getElementById('slot-2').appendChild(holder);
+    ytPlayer = new YT.Player('ytPlayerSlot', {
+      height: '100%',
+      width: '100%',
+      videoId: VIDEO_ID,
+      playerVars: { rel: 0, modestbranding: 1, playsinline: 1 },
+      events: {
+        onReady: function () {
+          ytReady = true;
+          if (pendingPlay) {
+            const p = pendingPlay;
+            pendingPlay = null;
+            doPlayClip(p.slotId, p.start, p.end);
+          }
+        }
+      }
+    });
+  };
+
+  (function loadYouTubeApi() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+  })();
+
+  function doPlayClip(slotId, start, end) {
+    const slotEl = document.getElementById('slot-' + slotId);
+    const playerHolder = document.getElementById('ytPlayerSlot');
+    if (slotEl && playerHolder) slotEl.appendChild(playerHolder);
+    const overlayBtn = document.getElementById('playBtn-' + slotId);
+    if (overlayBtn) overlayBtn.style.display = 'none';
+
+    clearInterval(watchdogTimer);
+    ytPlayer.seekTo(start, true);
+    ytPlayer.playVideo();
+    watchdogTimer = setInterval(() => {
+      if (!ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+      const t = ytPlayer.getCurrentTime();
+      if (t >= end) {
+        ytPlayer.pauseVideo();
+        clearInterval(watchdogTimer);
+        if (overlayBtn) overlayBtn.style.display = 'flex';
+      }
+    }, 200);
+  }
+
+  function playInSlot(slotId, start, end) {
+    if (!ytReady) {
+      pendingPlay = { slotId, start, end };
+      return;
+    }
+    doPlayClip(slotId, start, end);
+  }
+
+  // ---- Step navigation ----
+  const STEP_LABELS = { 1: "I'M READY 🎧" };
+
+  function updateContinueState() {
+    const btn = document.getElementById('continueBtn');
+    let ok = true;
+    if (currentStep === 2) ok = state.step2Rating !== null;
+    if (currentStep === 3) ok = state.step3Checked;
+    if (currentStep === 4) ok = state.quizCorrect.every(Boolean);
+    if (currentStep === 8) ok = state.drillsDone.every(Boolean);
+    if (currentStep === 9) ok = state.step9Rating !== null;
+    btn.disabled = !ok;
+  }
+
+  function goToStep(n) {
+    if (n < 0) return;
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    currentStep = n;
+
+    if (n > TOTAL_STEPS) {
+      document.getElementById('step-final').classList.add('active');
+      document.getElementById('navRow').style.display = 'none';
+      return;
+    }
+
+    document.getElementById('step-' + n).classList.add('active');
+    document.getElementById('navRow').style.display = 'flex';
+    document.getElementById('backStepBtn').style.visibility = n === 0 ? 'hidden' : 'visible';
+
+    const btn = document.getElementById('continueBtn');
+    if (n === TOTAL_STEPS) btn.textContent = '✓ COMPLETE MISSION';
+    else btn.textContent = STEP_LABELS[n] || 'Continue →';
+    btn.disabled = false;
+    updateContinueState();
+  }
+
+  async function onContinue() {
+    if (currentStep === TOTAL_STEPS) {
+      await completeMission();
+      return;
+    }
+    goToStep(currentStep + 1);
+  }
+
+  async function completeMission() {
+    const btn = document.getElementById('continueBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    if (CURRENT_USER_ID) {
+      await sb.from('lesson_progress').upsert({ user_id: CURRENT_USER_ID, lesson_id: 'listening-boost-m1' }, { onConflict: 'user_id,lesson_id' });
+
+      const reflectionTags = Array.from(document.querySelectorAll('#step-10 .checkbox-list input:checked')).map(el => el.value);
+      const vocabulary = [1, 2, 3].map(i => ({
+        word: (document.getElementById(`vocabWord${i}`).value || '').trim(),
+        meaning: (document.getElementById(`vocabMeaning${i}`).value || '').trim(),
+      })).filter(v => v.word || v.meaning);
+
+      await sb.from('listening_boost_notes').upsert({
+        user_id: CURRENT_USER_ID,
+        mission_id: 'listening-boost-m1',
+        warmup_answer: document.getElementById('step1WakeTime').value || null,
+        first_listen_rating: state.step2Rating,
+        last_listen_rating: state.step9Rating,
+        reflection_tags: reflectionTags,
+        reflection_expression: document.getElementById('step10Expression').value || null,
+        vocabulary: vocabulary,
+        updated_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,mission_id' });
+    }
+    goToStep(TOTAL_STEPS + 1);
+  }
+
+  function prefillFromNotes(notes) {
+    if (!notes) return;
+    if (notes.warmup_answer) document.getElementById('step1WakeTime').value = notes.warmup_answer;
+
+    if (notes.first_listen_rating !== null && notes.first_listen_rating !== undefined) {
+      state.step2Rating = notes.first_listen_rating;
+      const btn = document.querySelector(`#ratingRow-2 .rating-btn[data-idx="${notes.first_listen_rating}"]`);
+      if (btn) btn.classList.add('selected');
+    }
+    if (notes.last_listen_rating !== null && notes.last_listen_rating !== undefined) {
+      state.step9Rating = notes.last_listen_rating;
+      const btn = document.querySelector(`#ratingRow-9 .rating-btn[data-idx="${notes.last_listen_rating}"]`);
+      if (btn) btn.classList.add('selected');
+    }
+    if (notes.reflection_tags) {
+      notes.reflection_tags.forEach(tag => {
+        const el = document.querySelector(`#step-10 .checkbox-list input[value="${tag}"]`);
+        if (el) el.checked = true;
+      });
+    }
+    if (notes.reflection_expression) document.getElementById('step10Expression').value = notes.reflection_expression;
+    if (notes.vocabulary && Array.isArray(notes.vocabulary)) {
+      notes.vocabulary.slice(0, 3).forEach((v, i) => {
+        const w = document.getElementById(`vocabWord${i + 1}`);
+        const m = document.getElementById(`vocabMeaning${i + 1}`);
+        if (w && v.word) w.value = v.word;
+        if (m && v.meaning) m.value = v.meaning;
+      });
+    }
+    if (state.step2Rating !== null && state.step9Rating !== null) renderStep9Comparison();
+  }
+
+  // ---- Init ----
+  async function init(session) {
+    const user = session.user;
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+
+    if (!profile || profile.role === 'kids' || profile.role === 'responsavel') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    CURRENT_USER_ID = user.id;
+
+    renderQuiz();
+    renderStep5();
+    renderStep6();
+
+    const { data: existingNotes } = await sb.from('listening_boost_notes').select('*').eq('user_id', user.id).eq('mission_id', 'listening-boost-m1').maybeSingle();
+    prefillFromNotes(existingNotes);
+
+    document.getElementById('loadingCard').style.display = 'none';
+    document.getElementById('missionCard').style.display = 'block';
+    goToStep(0);
+  }
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(session); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>
