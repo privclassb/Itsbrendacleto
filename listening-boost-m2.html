@@ -265,11 +265,11 @@
       <div class="step-indicator">Step 3 of 11</div>
       <div class="step-title">Catch What You Know 🔎</div>
       <div class="clip-instruction">
-        <span class="clip-badge">🎯 Listen only to 00:07 → 00:34</span>
+        <span class="clip-badge">🎯 Listen only to 00:02 → 00:21</span>
       </div>
       <div class="video-box">
         <div class="video-slot" id="slot-3"></div>
-        <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 7, 34)">
+        <button class="video-overlay-btn" id="playBtn-3" onclick="playInSlot(3, 2, 21)">
           <div class="play-icon">▶</div>
           <div>Play clip</div>
         </button>
@@ -302,7 +302,7 @@
         </div>
         <div class="video-box">
           <div class="video-slot" id="slot-3b"></div>
-          <button class="video-overlay-btn" id="playBtn-3b" onclick="playInSlot('3b', 7, 34)">
+          <button class="video-overlay-btn" id="playBtn-3b" onclick="playInSlot('3b', 2, 21)">
             <div class="play-icon">▶</div>
             <div>Play clip</div>
           </button>
@@ -318,20 +318,24 @@
       <div class="step-indicator">Step 4 of 11</div>
       <div class="step-title">Same Sound, Different Word 🤯</div>
       <div class="instruction-block">
-        <div class="en-line">Which one did you hear? 👂</div>
-        <div class="pt-line">Qual palavra você ouviu?</div>
+        <div class="en-line">SEA and SEE sound exactly the same. Your ears alone can't tell them apart.</div>
+        <div class="pt-line">SEA e SEE têm o mesmo som. Só pelo ouvido não é possível diferenciá-las.</div>
       </div>
       <div class="video-box">
         <div class="video-slot" id="slot-4"></div>
-        <button class="video-overlay-btn" id="playBtn-4" onclick="playInSlot(4, 7, 34)">
+        <button class="video-overlay-btn" id="playBtn-4" onclick="playInSlot(4, 2, 21)">
           <div class="play-icon">▶</div>
           <div>Play clip</div>
         </button>
       </div>
-      <div class="two-choice-row" id="seaSeeRow">
-        <button class="two-choice-btn" data-choice="sea" onclick="pickSeaSee('sea')">SEA 🌊</button>
-        <button class="two-choice-btn" data-choice="see" onclick="pickSeaSee('see')">SEE 👀</button>
+      <div class="instruction-block">
+        <div class="en-line">Which word makes sense here?</div>
+        <div class="pt-line">Qual palavra faz sentido aqui?</div>
       </div>
+      <div class="clip-card">
+        <div class="clip-row">"...stuck in the middle of the ___"</div>
+      </div>
+      <div id="seaSeeQuestion"></div>
 
       <div class="reveal-block" id="step4Reveal">
         <div class="callout-box">
@@ -895,11 +899,21 @@
     });
   }
 
-  function pickSeaSee(choice) {
-    state.step4Picked = choice;
-    document.querySelectorAll('#seaSeeRow .two-choice-btn').forEach(b => b.classList.toggle('selected', b.dataset.choice === choice));
-    document.getElementById('step4Reveal').classList.add('shown');
-    updateContinueState();
+  // Sea/see are true homophones - identical sound - so this is graded on
+  // CONTEXT (which word fits the sentence), not on audio discrimination.
+  function renderSeaSeeQuestion() {
+    renderChoiceQuestion('seaSeeQuestion', ['SEA 🌊', 'SEE 👀'], {
+      mode: 'graded-retry', correct: 0,
+      wrongText: "Not quite! Think about what fits after \"the\". 👂", wrongTextPt: 'Quase! Pense no que faz sentido depois de "the".',
+      correctText: 'You got it using context — not just sound! 🧠', correctTextPt: 'Você descobriu usando o contexto — não só o som!',
+      onAnswer: (oi, isCorrect) => {
+        if (isCorrect) {
+          state.step4Picked = true;
+          document.getElementById('step4Reveal').classList.add('shown');
+        }
+        updateContinueState();
+      },
+    });
   }
 
   function pickWillForm(choice) {
@@ -1221,6 +1235,7 @@
     }
 
     renderHypothesisFirst();
+    renderSeaSeeQuestion();
     renderQuiz5();
     renderQuiz6();
     renderQuiz7();
