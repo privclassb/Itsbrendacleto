@@ -25,9 +25,32 @@
     .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
     .welcome-strip p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 
-    .fin-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 14px; }
-    .fin-tab-btn { flex-shrink: 0; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; }
-    .fin-tab-btn.active { background: var(--brown); color: var(--white); border-color: var(--brown); }
+    /* ── Layout: menu lateral + conteúdo (mesmo padrão do painel-professora.html) ── */
+    .menu-toggle-btn { display: none; background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; color: var(--white); font-size: 16px; padding: 5px 10px; cursor: pointer; }
+
+    .app-layout { display: flex; align-items: flex-start; }
+
+    .sidebar { width: 230px; flex-shrink: 0; background: var(--white); border-right: 1px solid var(--sand); min-height: calc(100vh - 61px); position: sticky; top: 61px; padding: 18px 12px; align-self: stretch; }
+    .sidebar-top { display: none; }
+    .sidebar-brand { font-weight: 700; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-close-btn { background: none; border: none; font-size: 16px; color: var(--muted); cursor: pointer; }
+    .sidebar-backdrop { display: none; }
+
+    .content-area { flex: 1; min-width: 0; }
+
+    .panel-nav { display: flex; flex-direction: column; gap: 3px; }
+    .nav-btn { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 10px 12px; border-radius: 10px; border: none; background: transparent; font-family: 'DM Sans', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; text-decoration: none; }
+    .nav-icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-btn.active { background: var(--brown); color: var(--white); }
+    .nav-btn:hover:not(.active) { background: var(--sand); color: var(--text); }
+
+    @media (max-width: 900px) {
+      .menu-toggle-btn { display: inline-flex; align-items: center; }
+      .sidebar { position: fixed; top: 0; left: 0; height: 100vh; min-height: 100vh; width: 260px; box-shadow: var(--shadow); z-index: 100; transform: translateX(-100%); transition: transform 0.25s ease; overflow-y: auto; }
+      .sidebar.open { transform: translateX(0); }
+      .sidebar-top { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--sand); }
+      .sidebar-backdrop.open { display: block; position: fixed; inset: 0; background: rgba(44,31,26,0.4); z-index: 99; }
+    }
 
     main { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
     .fin-panel { display: none; }
@@ -138,6 +161,7 @@
 
 <header>
   <div class="header-left">
+    <button class="menu-toggle-btn" id="menuToggleBtn" onclick="toggleSidebar()" aria-label="Abrir menu">☰</button>
     <div class="header-brand">itsbrendacleto</div>
     <div class="header-tag">Gestão Financeira</div>
   </div>
@@ -147,23 +171,36 @@
   </div>
 </header>
 
-<div class="welcome-strip">
-  <h1 id="welcomeTitle">Olá!</h1>
-  <p>Gestão financeira da escola.</p>
-  <div class="fin-tabs">
-    <button class="fin-tab-btn active" data-tab="visao" onclick="showFinTab('visao')">Visão Geral</button>
-    <button class="fin-tab-btn" data-tab="entradas" onclick="showFinTab('entradas')">Entradas</button>
-    <button class="fin-tab-btn" data-tab="saidas" onclick="showFinTab('saidas')">Saídas</button>
-    <button class="fin-tab-btn" data-tab="previstos" onclick="showFinTab('previstos')">Previstos</button>
-    <button class="fin-tab-btn" data-tab="reserva" onclick="showFinTab('reserva')">Reserva de Emergência</button>
-    <button class="fin-tab-btn" data-tab="metas" onclick="showFinTab('metas')">Metas</button>
-  </div>
-</div>
+<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
-<main>
-  <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
+<div class="app-layout">
 
-  <div id="mainContent" style="display:none;">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-top">
+      <span class="sidebar-brand">Menu</span>
+      <button class="sidebar-close-btn" onclick="closeSidebar()" aria-label="Fechar menu">✕</button>
+    </div>
+    <div class="panel-nav">
+      <button class="nav-btn active" data-tab="visao" onclick="showFinTab('visao')"><span class="nav-icon">📊</span>Visão Geral</button>
+      <button class="nav-btn" data-tab="entradas" onclick="showFinTab('entradas')"><span class="nav-icon">💵</span>Entradas</button>
+      <button class="nav-btn" data-tab="saidas" onclick="showFinTab('saidas')"><span class="nav-icon">💸</span>Saídas</button>
+      <button class="nav-btn" data-tab="previstos" onclick="showFinTab('previstos')"><span class="nav-icon">🗓️</span>Previstos</button>
+      <button class="nav-btn" data-tab="reserva" onclick="showFinTab('reserva')"><span class="nav-icon">🛟</span>Reserva de Emergência</button>
+      <button class="nav-btn" data-tab="metas" onclick="showFinTab('metas')"><span class="nav-icon">🎯</span>Metas</button>
+    </div>
+  </aside>
+
+  <div class="content-area">
+
+    <div class="welcome-strip">
+      <h1 id="welcomeTitle">Olá!</h1>
+      <p>Gestão financeira da escola.</p>
+    </div>
+
+    <main>
+      <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
+
+      <div id="mainContent" style="display:none;">
 
     <div class="pending-box">
       <b>📊 Primeira versão</b>
@@ -360,6 +397,9 @@
   </div>
 </main>
 
+  </div>
+</div>
+
 <!-- Modal: Nova entrada -->
 <div class="modal-overlay" id="modalEntrada">
   <div class="modal-box">
@@ -525,7 +565,20 @@
   // ---- Tabs ----
   function showFinTab(tab) {
     document.querySelectorAll('.fin-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
-    document.querySelectorAll('.fin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    closeSidebar();
+  }
+
+  function openSidebar() {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('sidebarBackdrop').classList.add('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarBackdrop').classList.remove('open');
+  }
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.contains('open') ? closeSidebar() : openSidebar();
   }
 
   function closeModal(id) {
