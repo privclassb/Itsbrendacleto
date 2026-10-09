@@ -101,6 +101,14 @@
     .modal-error { background: #FBEDEA; color: #B05A4A; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; margin-bottom: 10px; display: none; }
 
     .reserve-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+
+    .progress-block { margin-bottom: 18px; }
+    .progress-block:last-child { margin-bottom: 0; }
+    .progress-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; gap: 10px; }
+    .progress-label-row span:first-child { font-family: 'DM Serif Display', serif; font-size: 14.5px; color: var(--text); }
+    .progress-label-row span:last-child { color: var(--muted); font-size: 12.5px; text-align: right; }
+    .progress-track { background: var(--sand); border-radius: 99px; height: 14px; overflow: hidden; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--mint), var(--brown-light)); border-radius: 99px; transition: width 0.4s ease; }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -164,6 +172,24 @@
 
     <!-- VISÃO GERAL -->
     <div class="fin-panel active" id="panel-visao">
+      <div class="card">
+        <div class="card-title">Progresso das metas</div>
+        <div class="progress-block">
+          <div class="progress-label-row">
+            <span>Meta mensal</span>
+            <span id="progressoMensalTexto">—</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressoMensalFill"></div></div>
+        </div>
+        <div class="progress-block">
+          <div class="progress-label-row">
+            <span>Meta anual</span>
+            <span id="progressoAnualTexto">—</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressoAnualFill"></div></div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-title">Mês atual</div>
         <div class="stat-grid">
@@ -1102,6 +1128,18 @@
     const pct = meta > 0 ? saldo / meta : 0;
     document.getElementById('vgReservaSaldo').textContent = formatBRL(saldo);
     document.getElementById('vgReservaPct').textContent = (pct * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '% da meta';
+
+    updateProgressBar('progressoMensalFill', 'progressoMensalTexto', entradasMes, metaMensal);
+    updateProgressBar('progressoAnualFill', 'progressoAnualTexto', entradasAno, metaAnual);
+  }
+
+  function updateProgressBar(fillId, textId, recebido, meta) {
+    const pct = meta > 0 ? Math.min(100, (recebido / meta) * 100) : 0;
+    document.getElementById(fillId).style.width = pct.toFixed(1) + '%';
+    const falta = Math.max(0, meta - recebido);
+    document.getElementById(textId).textContent = (meta > 0 && falta === 0)
+      ? 'Meta batida! 🎉 — recebido ' + formatBRL(recebido)
+      : 'Recebido ' + formatBRL(recebido) + ' · Falta ' + formatBRL(falta);
   }
 
   // ---- Generic delete ----
