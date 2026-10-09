@@ -1524,11 +1524,17 @@
     const finalSession = session;
 
     const user = finalSession.user;
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+    let profile = null, profileError = null;
+    for (let i = 0; i < 5; i++) {
+      const { data, error } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle();
+      profileError = error;
+      if (data) { profile = data; break; }
+      if (i < 4) await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
 
     if (!profile) {
       // Profile not loaded yet - don't redirect
-      console.warn('Profile not found for user:', user.id);
+      console.warn('Profile not found for user:', user.id, profileError);
     }
     if (profile && profile.role !== 'professora') {
       window.location.href = 'index.html';
