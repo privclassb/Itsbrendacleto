@@ -274,7 +274,8 @@
 <!-- Modal: Nova entrada -->
 <div class="modal-overlay" id="modalEntrada">
   <div class="modal-box">
-    <div class="modal-title">Nova entrada</div>
+    <div class="modal-title" id="modalEntradaTitle">Nova entrada</div>
+    <input type="hidden" id="entradaId" />
     <div class="modal-error" id="entradaError"></div>
     <div class="modal-row"><label class="modal-label">Aluno / Descrição</label><input type="text" class="modal-input" id="entradaDescricao" /></div>
     <div class="modal-row"><label class="modal-label">Tipo de entrada</label>
@@ -297,7 +298,8 @@
 <!-- Modal: Nova saída -->
 <div class="modal-overlay" id="modalSaida">
   <div class="modal-box">
-    <div class="modal-title">Nova saída</div>
+    <div class="modal-title" id="modalSaidaTitle">Nova saída</div>
+    <input type="hidden" id="saidaId" />
     <div class="modal-error" id="saidaError"></div>
     <div class="modal-row"><label class="modal-label">Data do pagamento</label><input type="date" class="modal-input" id="saidaData" /></div>
     <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="saidaDescricao" /></div>
@@ -319,7 +321,8 @@
 <!-- Modal: Novo previsto -->
 <div class="modal-overlay" id="modalPrevisto">
   <div class="modal-box">
-    <div class="modal-title">Novo previsto</div>
+    <div class="modal-title" id="modalPrevistoTitle">Novo previsto</div>
+    <input type="hidden" id="previstoId" />
     <div class="modal-error" id="previstoError"></div>
     <div class="modal-row"><label class="modal-label">Data prevista</label><input type="date" class="modal-input" id="previstoData" /></div>
     <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="previstoDescricao" /></div>
@@ -344,7 +347,8 @@
 <!-- Modal: Novo registro de reserva -->
 <div class="modal-overlay" id="modalMovimento">
   <div class="modal-box">
-    <div class="modal-title">Novo registro na reserva</div>
+    <div class="modal-title" id="modalMovimentoTitle">Novo registro na reserva</div>
+    <input type="hidden" id="movimentoId" />
     <div class="modal-error" id="movimentoError"></div>
     <div class="modal-row"><label class="modal-label">Data</label><input type="date" class="modal-input" id="movimentoData" /></div>
     <div class="modal-row"><label class="modal-label">Tipo</label>
@@ -439,10 +443,20 @@
   let CURRENT_USER_ID = null;
   let entradas = [], saidas = [], previstos = [], movimentos = [], reservaConfig = null;
 
-  // ---- Load + render: Entradas ----
+  // ---- Load + render: Entradas (agora é o mesmo dado do Financeiro, tabela payments) ----
   async function loadEntradas() {
-    const { data } = await sb.from('finance_entradas').select('*').order('vencimento', { ascending: false });
-    entradas = data || [];
+    const { data } = await sb.from('payments').select('*').eq('type', 'entrada').order('due_date', { ascending: false });
+    entradas = (data || []).map(p => ({
+      id: p.id,
+      descricao: p.description,
+      tipo_entrada: p.tipo_entrada,
+      vencimento: p.due_date,
+      valor: p.amount,
+      data_pagamento: p.paid ? p.paid_at : null,
+      forma_pagamento: p.payment_method,
+      observacoes: p.observacoes,
+      student_id: p.student_id,
+    }));
     renderEntradas();
     renderVisaoGeral();
   }
@@ -458,50 +472,74 @@
         <td>${formatBRL(e.valor)}</td>
         <td><span class="status-badge ${statusBadgeClass(status)}">${status}${status === 'Atrasado' ? ' · ' + diasAtraso + 'd' : ''}</span></td>
         <td>${e.data_pagamento ? formatDateBR(e.data_pagamento) + (e.forma_pagamento ? ' · ' + escapeHtml(e.forma_pagamento) : '') : (status !== 'Pago' ? `<button class="btn-icon" title="Marcar como pago" onclick="marcarEntradaPaga('${e.id}')">✓ Marcar pago</button>` : '')}</td>
-        <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_entradas','${e.id}', loadEntradas)">🗑</button></td>
+        <td class="row-actions">
+          <button class="btn-icon" title="Editar" onclick="openEntradaModal('${e.id}')">✎</button>
+          <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${e.id}', loadEntradas)">🗑</button>
+        </td>
       </tr>`;
     }).join('');
   }
   async function marcarEntradaPaga(id) {
-    await sb.from('finance_entradas').update({ data_pagamento: todayISO() }).eq('id', id);
+    await sb.from('payments').update({ paid: true, paid_at: todayISO() }).eq('id', id);
     await loadEntradas();
   }
 
-  function openEntradaModal() {
-    document.getElementById('entradaDescricao').value = '';
-    document.getElementById('entradaTipo').value = TIPOS_ENTRADA[0];
-    document.getElementById('entradaVencimento').value = todayISO();
-    document.getElementById('entradaValor').value = '';
-    document.getElementById('entradaDataPagamento').value = '';
-    document.getElementById('entradaFormaPagamento').value = '';
-    document.getElementById('entradaObservacoes').value = '';
+  function openEntradaModal(id) {
+    const e = id ? entradas.find(x => x.id === id) : null;
+    document.getElementById('entradaId').value = e ? e.id : '';
+    document.getElementById('modalEntradaTitle').textContent = e ? 'Editar entrada' : 'Nova entrada';
+    document.getElementById('entradaDescricao').value = e ? e.descricao : '';
+    document.getElementById('entradaTipo').value = e && e.tipo_entrada ? e.tipo_entrada : TIPOS_ENTRADA[0];
+    document.getElementById('entradaVencimento').value = e ? e.vencimento : todayISO();
+    document.getElementById('entradaValor').value = e ? e.valor : '';
+    document.getElementById('entradaDataPagamento').value = e && e.data_pagamento ? e.data_pagamento : '';
+    document.getElementById('entradaFormaPagamento').value = e && e.forma_pagamento ? e.forma_pagamento : '';
+    document.getElementById('entradaObservacoes').value = e && e.observacoes ? e.observacoes : '';
     document.getElementById('entradaError').style.display = 'none';
     document.getElementById('modalEntrada').classList.add('open');
   }
   async function saveEntrada() {
+    const id = document.getElementById('entradaId').value;
     const descricao = document.getElementById('entradaDescricao').value.trim();
     const vencimento = document.getElementById('entradaVencimento').value;
     const valor = parseFloat(document.getElementById('entradaValor').value);
+    const dataPagamento = document.getElementById('entradaDataPagamento').value || null;
     const errEl = document.getElementById('entradaError');
     if (!descricao || !vencimento || !valor) { errEl.textContent = 'Preencha descrição, vencimento e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSaveEntrada');
     btn.disabled = true;
-    const { error } = await sb.from('finance_entradas').insert({
-      descricao, tipo_entrada: document.getElementById('entradaTipo').value, vencimento, valor,
-      data_pagamento: document.getElementById('entradaDataPagamento').value || null,
-      forma_pagamento: document.getElementById('entradaFormaPagamento').value || null,
+    const payload = {
+      type: 'entrada',
+      description: descricao,
+      tipo_entrada: document.getElementById('entradaTipo').value,
+      due_date: vencimento,
+      amount: valor,
+      paid: !!dataPagamento,
+      paid_at: dataPagamento,
+      payment_method: document.getElementById('entradaFormaPagamento').value || null,
       observacoes: document.getElementById('entradaObservacoes').value.trim() || null,
-    });
+    };
+    const { error } = id
+      ? await sb.from('payments').update(payload).eq('id', id)
+      : await sb.from('payments').insert({ ...payload, created_by: CURRENT_USER_ID });
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalEntrada');
     await loadEntradas();
   }
 
-  // ---- Load + render: Saídas ----
+  // ---- Load + render: Saídas (agora é o mesmo dado do Financeiro, tabela payments) ----
   async function loadSaidas() {
-    const { data } = await sb.from('finance_saidas').select('*').order('data_pagamento', { ascending: false });
-    saidas = data || [];
+    const { data } = await sb.from('payments').select('*').eq('type', 'saida').order('due_date', { ascending: false });
+    saidas = (data || []).map(p => ({
+      id: p.id,
+      data_pagamento: p.paid_at || p.due_date,
+      descricao: p.description,
+      categoria: p.categoria,
+      forma_pagamento: p.payment_method,
+      valor: p.amount,
+      observacoes: p.observacoes,
+    }));
     renderSaidas();
     renderVisaoGeral();
   }
@@ -514,20 +552,27 @@
       <td>${escapeHtml(s.categoria || '')}</td>
       <td>${escapeHtml(s.forma_pagamento || '')}</td>
       <td>${formatBRL(s.valor)}</td>
-      <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_saidas','${s.id}', loadSaidas)">🗑</button></td>
+      <td class="row-actions">
+        <button class="btn-icon" title="Editar" onclick="openSaidaModal('${s.id}')">✎</button>
+        <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${s.id}', loadSaidas)">🗑</button>
+      </td>
     </tr>`).join('');
   }
-  function openSaidaModal() {
-    document.getElementById('saidaData').value = todayISO();
-    document.getElementById('saidaDescricao').value = '';
-    document.getElementById('saidaCategoria').value = CATEGORIAS_SAIDA[0];
-    document.getElementById('saidaFormaPagamento').value = FORMAS_PAGAMENTO[0];
-    document.getElementById('saidaValor').value = '';
-    document.getElementById('saidaObservacoes').value = '';
+  function openSaidaModal(id) {
+    const s = id ? saidas.find(x => x.id === id) : null;
+    document.getElementById('saidaId').value = s ? s.id : '';
+    document.getElementById('modalSaidaTitle').textContent = s ? 'Editar saída' : 'Nova saída';
+    document.getElementById('saidaData').value = s ? s.data_pagamento : todayISO();
+    document.getElementById('saidaDescricao').value = s ? s.descricao : '';
+    document.getElementById('saidaCategoria').value = s && s.categoria ? s.categoria : CATEGORIAS_SAIDA[0];
+    document.getElementById('saidaFormaPagamento').value = s && s.forma_pagamento ? s.forma_pagamento : FORMAS_PAGAMENTO[0];
+    document.getElementById('saidaValor').value = s ? s.valor : '';
+    document.getElementById('saidaObservacoes').value = s && s.observacoes ? s.observacoes : '';
     document.getElementById('saidaError').style.display = 'none';
     document.getElementById('modalSaida').classList.add('open');
   }
   async function saveSaida() {
+    const id = document.getElementById('saidaId').value;
     const data_pagamento = document.getElementById('saidaData').value;
     const descricao = document.getElementById('saidaDescricao').value.trim();
     const valor = parseFloat(document.getElementById('saidaValor').value);
@@ -535,11 +580,20 @@
     if (!data_pagamento || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSaveSaida');
     btn.disabled = true;
-    const { error } = await sb.from('finance_saidas').insert({
-      data_pagamento, descricao, categoria: document.getElementById('saidaCategoria').value,
-      forma_pagamento: document.getElementById('saidaFormaPagamento').value, valor,
+    const payload = {
+      type: 'saida',
+      description: descricao,
+      categoria: document.getElementById('saidaCategoria').value,
+      payment_method: document.getElementById('saidaFormaPagamento').value,
+      amount: valor,
+      due_date: data_pagamento,
+      paid: true,
+      paid_at: data_pagamento,
       observacoes: document.getElementById('saidaObservacoes').value.trim() || null,
-    });
+    };
+    const { error } = id
+      ? await sb.from('payments').update(payload).eq('id', id)
+      : await sb.from('payments').insert({ ...payload, created_by: CURRENT_USER_ID });
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalSaida');
@@ -568,6 +622,7 @@
         <td><span class="status-badge ${statusBadgeClass(p.status)}">${p.status}</span></td>
         <td class="row-actions">
           ${p.status === 'Pendente' ? `<button class="btn-icon" title="Marcar como realizado" onclick="marcarPrevistoRealizado('${p.id}')">✓</button>` : ''}
+          <button class="btn-icon" title="Editar" onclick="openPrevistoModal('${p.id}')">✎</button>
           <button class="btn-icon" title="Excluir" onclick="deleteRow('finance_previstos','${p.id}', loadPrevistos)">🗑</button>
         </td>
       </tr>`;
@@ -577,17 +632,22 @@
     await sb.from('finance_previstos').update({ status: 'Realizado' }).eq('id', id);
     await loadPrevistos();
   }
-  function openPrevistoModal() {
-    document.getElementById('previstoData').value = todayISO();
-    document.getElementById('previstoDescricao').value = '';
-    document.getElementById('previstoTipo').value = 'Entrada';
+  function openPrevistoModal(id) {
+    const p = id ? previstos.find(x => x.id === id) : null;
+    document.getElementById('previstoId').value = p ? p.id : '';
+    document.getElementById('modalPrevistoTitle').textContent = p ? 'Editar previsto' : 'Novo previsto';
+    document.getElementById('previstoData').value = p ? p.data_prevista : todayISO();
+    document.getElementById('previstoDescricao').value = p ? p.descricao : '';
+    document.getElementById('previstoTipo').value = p ? p.tipo : 'Entrada';
     onPrevistoTipoChange();
-    document.getElementById('previstoValor').value = '';
-    document.getElementById('previstoObservacoes').value = '';
+    document.getElementById('previstoValor').value = p ? p.valor : '';
+    document.getElementById('previstoObservacoes').value = p && p.observacoes ? p.observacoes : '';
+    if (p && p.categoria) document.getElementById('previstoCategoria').value = p.categoria;
     document.getElementById('previstoError').style.display = 'none';
     document.getElementById('modalPrevisto').classList.add('open');
   }
   async function savePrevisto() {
+    const id = document.getElementById('previstoId').value;
     const data_prevista = document.getElementById('previstoData').value;
     const descricao = document.getElementById('previstoDescricao').value.trim();
     const valor = parseFloat(document.getElementById('previstoValor').value);
@@ -595,11 +655,14 @@
     if (!data_prevista || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSavePrevisto');
     btn.disabled = true;
-    const { error } = await sb.from('finance_previstos').insert({
+    const payload = {
       data_prevista, descricao, tipo: document.getElementById('previstoTipo').value,
-      categoria: document.getElementById('previstoCategoria').value || null, valor, status: 'Pendente',
+      categoria: document.getElementById('previstoCategoria').value || null, valor,
       observacoes: document.getElementById('previstoObservacoes').value.trim() || null,
-    });
+    };
+    const { error } = id
+      ? await sb.from('finance_previstos').update(payload).eq('id', id)
+      : await sb.from('finance_previstos').insert({ ...payload, status: 'Pendente' });
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalPrevisto');
@@ -629,7 +692,10 @@
       <td><span class="status-badge ${statusBadgeClass(m.tipo)}">${m.tipo}</span></td>
       <td>${formatBRL(m.valor)}</td>
       <td>${escapeHtml(m.observacoes || '')}</td>
-      <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_reserva_movimentos','${m.id}', loadReserva)">🗑</button></td>
+      <td class="row-actions">
+        <button class="btn-icon" title="Editar" onclick="openMovimentoModal('${m.id}')">✎</button>
+        <button class="btn-icon" title="Excluir" onclick="deleteRow('finance_reserva_movimentos','${m.id}', loadReserva)">🗑</button>
+      </td>
     </tr>`).join('');
   }
   function reservaSaldoAtual() {
@@ -668,25 +734,32 @@
     renderReservaStats();
     renderVisaoGeral();
   }
-  function openMovimentoModal() {
-    document.getElementById('movimentoData').value = todayISO();
-    document.getElementById('movimentoTipo').value = 'Aporte';
-    document.getElementById('movimentoValor').value = '';
-    document.getElementById('movimentoObservacoes').value = '';
+  function openMovimentoModal(id) {
+    const m = id ? movimentos.find(x => x.id === id) : null;
+    document.getElementById('movimentoId').value = m ? m.id : '';
+    document.getElementById('modalMovimentoTitle').textContent = m ? 'Editar registro da reserva' : 'Novo registro na reserva';
+    document.getElementById('movimentoData').value = m ? m.data : todayISO();
+    document.getElementById('movimentoTipo').value = m ? m.tipo : 'Aporte';
+    document.getElementById('movimentoValor').value = m ? m.valor : '';
+    document.getElementById('movimentoObservacoes').value = m && m.observacoes ? m.observacoes : '';
     document.getElementById('movimentoError').style.display = 'none';
     document.getElementById('modalMovimento').classList.add('open');
   }
   async function saveMovimento() {
+    const id = document.getElementById('movimentoId').value;
     const data = document.getElementById('movimentoData').value;
     const valor = parseFloat(document.getElementById('movimentoValor').value);
     const errEl = document.getElementById('movimentoError');
     if (!data || !valor) { errEl.textContent = 'Preencha data e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSaveMovimento');
     btn.disabled = true;
-    const { error } = await sb.from('finance_reserva_movimentos').insert({
+    const payload = {
       data, tipo: document.getElementById('movimentoTipo').value, valor,
       observacoes: document.getElementById('movimentoObservacoes').value.trim() || null,
-    });
+    };
+    const { error } = id
+      ? await sb.from('finance_reserva_movimentos').update(payload).eq('id', id)
+      : await sb.from('finance_reserva_movimentos').insert(payload);
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalMovimento');
@@ -786,6 +859,7 @@
           window.location.href = 'index.html';
           return;
         }
+        CURRENT_USER_ID = session.user.id;
         await init(profile);
         return;
       }
