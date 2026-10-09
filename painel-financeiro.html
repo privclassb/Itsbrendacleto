@@ -68,6 +68,7 @@
     .status-realizado { background: #E7F3EC; color: #2E6B4B; }
     .status-aporte { background: #E7F3EC; color: #2E6B4B; }
     .status-resgate { background: #FBEDEA; color: #B05A4A; }
+    .status-renegociado { background: var(--sand); color: var(--muted); }
 
     .row-actions { display: flex; gap: 4px; }
     .btn-icon { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--muted); padding: 4px 6px; border-radius: 6px; }
@@ -477,7 +478,11 @@
     const d = new Date();
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
-  function computeEntradaStatus(vencimento, dataPagamento) {
+  function computeEntradaStatus(vencimento, dataPagamento, renegotiated) {
+    // Dívida renegociada: a parcela antiga foi substituída por um novo
+    // parcelamento (ver saveRenegotiate em painel-professora.html) - não
+    // conta mais como em atraso, só fica registrada pra histórico.
+    if (renegotiated) return { status: 'Renegociado', diasAtraso: 0 };
     if (dataPagamento) return { status: 'Pago', diasAtraso: 0 };
     const today = new Date(); today.setHours(0, 0, 0, 0);
     const venc = new Date(vencimento + 'T00:00:00');
@@ -488,7 +493,7 @@
     return { status: 'A vencer', diasAtraso: 0 };
   }
   function statusBadgeClass(status) {
-    return { 'Pago': 'status-pago', 'Atrasado': 'status-atrasado', 'A vencer': 'status-a-vencer', 'Pendente': 'status-pendente', 'Realizado': 'status-realizado', 'Aporte': 'status-aporte', 'Resgate': 'status-resgate' }[status] || '';
+    return { 'Pago': 'status-pago', 'Atrasado': 'status-atrasado', 'A vencer': 'status-a-vencer', 'Pendente': 'status-pendente', 'Realizado': 'status-realizado', 'Aporte': 'status-aporte', 'Resgate': 'status-resgate', 'Renegociado': 'status-renegociado' }[status] || '';
   }
 
   // ---- Tabs ----
@@ -713,6 +718,7 @@
       forma_pagamento: p.payment_method,
       observacoes: p.observacoes,
       student_id: p.student_id,
+      renegotiated: !!p.renegotiated,
     }));
     renderEntradas();
     renderVisaoGeral();
@@ -727,15 +733,16 @@
       .sort((a, b) => (a.vencimento || '').localeCompare(b.vencimento || ''));
     if (!monthEntradas.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhuma entrada com vencimento nesse mês.</td></tr>'; return; }
     el.innerHTML = monthEntradas.map(e => {
-      const { status, diasAtraso } = computeEntradaStatus(e.vencimento, e.data_pagamento);
+      const { status, diasAtraso } = computeEntradaStatus(e.vencimento, e.data_pagamento, e.renegotiated);
       const quem = e.aluno ? `${escapeHtml(e.aluno)} — ${escapeHtml(e.descricao)}` : escapeHtml(e.descricao);
+      const podeMarcarPago = status !== 'Pago' && status !== 'Renegociado';
       return `<tr>
         <td>${quem}</td>
         <td>${escapeHtml(e.tipo_entrada || '')}</td>
         <td>${formatDateBR(e.vencimento)}</td>
         <td>${formatBRL(e.valor)}</td>
         <td><span class="status-badge ${statusBadgeClass(status)}">${status}${status === 'Atrasado' ? ' · ' + diasAtraso + 'd' : ''}</span></td>
-        <td>${e.data_pagamento ? formatDateBR(e.data_pagamento) + (e.forma_pagamento ? ' · ' + escapeHtml(e.forma_pagamento) : '') : (status !== 'Pago' ? `<button class="btn-icon" title="Marcar como pago" onclick="marcarEntradaPaga('${e.id}')">✓ Marcar pago</button>` : '')}</td>
+        <td>${e.data_pagamento ? formatDateBR(e.data_pagamento) + (e.forma_pagamento ? ' · ' + escapeHtml(e.forma_pagamento) : '') : (podeMarcarPago ? `<button class="btn-icon" title="Marcar como pago" onclick="marcarEntradaPaga('${e.id}')">✓ Marcar pago</button>` : (status === 'Renegociado' ? 'Substituída por novo parcelamento' : ''))}</td>
         <td class="row-actions">
           <button class="btn-icon" title="Editar" onclick="openEntradaModal('${e.id}')">✎</button>
           <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${e.id}', loadEntradas)">🗑</button>
@@ -1062,7 +1069,7 @@
     const lucroAno = entradasAno - custosAno;
     const margemAno = entradasAno > 0 ? lucroAno / entradasAno : 0;
 
-    const atrasadas = entradas.filter(e => computeEntradaStatus(e.vencimento, e.data_pagamento).status === 'Atrasado');
+    const atrasadas = entradas.filter(e => computeEntradaStatus(e.vencimento, e.data_pagamento, e.renegotiated).status === 'Atrasado');
     const atrasoValor = atrasadas.reduce((s, e) => s + Number(e.valor), 0);
 
     document.getElementById('vgMesEntradas').textContent = formatBRL(entradasMes);
