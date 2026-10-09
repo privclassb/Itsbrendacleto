@@ -18,17 +18,70 @@
     .btn-logout { background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; }
     .btn-logout:hover { border-color: white; color: white; }
 
-    .welcome-strip { background: var(--white); border-bottom: 1px solid var(--sand); padding: 28px 28px 24px; }
-    .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
-    .welcome-strip p { font-size: 14px; color: var(--muted); }
+    .welcome-strip { background: var(--white); border-bottom: 1px solid var(--sand); padding: 20px 20px 0; }
+    .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
+    .welcome-strip p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 
-    main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
-    .card { background: var(--white); border-radius: var(--radius); padding: 24px 26px; box-shadow: var(--shadow); margin-bottom: 24px; }
+    .fin-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 14px; }
+    .fin-tab-btn { flex-shrink: 0; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; }
+    .fin-tab-btn.active { background: var(--brown); color: var(--white); border-color: var(--brown); }
 
-    .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 18px 20px; font-size: 13.5px; color: var(--brown); line-height: 1.6; }
-    .pending-box b { display: block; font-size: 15px; margin-bottom: 8px; color: var(--text); }
+    main { max-width: 900px; margin: 0 auto; padding: 20px 20px 60px; }
+    .fin-panel { display: none; }
+    .fin-panel.active { display: block; }
+
+    .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 20px; }
+    .card-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; font-size: 12.5px; color: var(--brown); line-height: 1.55; margin-bottom: 20px; }
+    .pending-box b { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text); }
 
     .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+    .empty-msg { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+    .stat-card { background: var(--cream); border-radius: 12px; padding: 14px 16px; }
+    .stat-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+    .stat-value { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); }
+    .stat-value.positive { color: #2E6B4B; }
+    .stat-value.negative { color: #B05A4A; }
+    .stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+    .btn-primary { background: var(--brown); color: var(--white); border: none; border-radius: 8px; padding: 9px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-primary:hover { background: var(--brown-light); }
+    .btn-secondary { background: none; border: 1.5px solid var(--sand); color: var(--muted); border-radius: 8px; padding: 9px 16px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+
+    .fin-table-wrap { overflow-x: auto; }
+    .fin-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .fin-table th { text-align: left; font-size: 10.5px; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); padding: 8px 10px; border-bottom: 2px solid var(--sand); white-space: nowrap; }
+    .fin-table td { padding: 10px; border-bottom: 1px solid var(--sand); white-space: nowrap; color: var(--text); }
+    .fin-table tr:last-child td { border-bottom: none; }
+
+    .status-badge { display: inline-block; padding: 3px 10px; border-radius: 99px; font-size: 10.5px; font-weight: 700; white-space: nowrap; }
+    .status-pago { background: #E7F3EC; color: #2E6B4B; }
+    .status-atrasado { background: #FBEDEA; color: #B05A4A; }
+    .status-a-vencer { background: var(--sand); color: var(--brown); }
+    .status-pendente { background: #FBF3E3; color: var(--brown); }
+    .status-realizado { background: #E7F3EC; color: #2E6B4B; }
+    .status-aporte { background: #E7F3EC; color: #2E6B4B; }
+    .status-resgate { background: #FBEDEA; color: #B05A4A; }
+
+    .row-actions { display: flex; gap: 4px; }
+    .btn-icon { background: none; border: none; cursor: pointer; font-size: 14px; color: var(--muted); padding: 4px 6px; border-radius: 6px; }
+    .btn-icon:hover { color: var(--brown); background: var(--cream); }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,31,26,0.5); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--white); border-radius: var(--radius); padding: 22px; max-width: 420px; width: 100%; max-height: 90vh; overflow-y: auto; }
+    .modal-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 14px; }
+    .modal-row { margin-bottom: 12px; }
+    .modal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 5px; display: block; }
+    .modal-input, .modal-select { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 9px 11px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; outline: none; background: var(--white); }
+    .modal-input:focus, .modal-select:focus { border-color: var(--mint); }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px; }
+    .modal-error { background: #FBEDEA; color: #B05A4A; border-radius: 8px; padding: 8px 12px; font-size: 12.5px; margin-bottom: 10px; display: none; }
+
+    .reserve-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
   </style>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5C4033" />
@@ -67,20 +120,247 @@
 <div class="welcome-strip">
   <h1 id="welcomeTitle">Olá!</h1>
   <p>Gestão financeira da escola.</p>
+  <div class="fin-tabs">
+    <button class="fin-tab-btn active" data-tab="visao" onclick="showFinTab('visao')">Visão Geral</button>
+    <button class="fin-tab-btn" data-tab="entradas" onclick="showFinTab('entradas')">Entradas</button>
+    <button class="fin-tab-btn" data-tab="saidas" onclick="showFinTab('saidas')">Saídas</button>
+    <button class="fin-tab-btn" data-tab="previstos" onclick="showFinTab('previstos')">Previstos</button>
+    <button class="fin-tab-btn" data-tab="reserva" onclick="showFinTab('reserva')">Reserva de Emergência</button>
+  </div>
 </div>
 
 <main>
   <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
 
   <div id="mainContent" style="display:none;">
-    <div class="card">
-      <div class="pending-box">
-        <b>📊 Gestão Financeira — em construção</b>
-        Esta área vai reunir a gestão financeira completa da escola, com base na planilha que a Brenda está organizando. Assim que a estrutura for definida, o conteúdo aparece aqui.
+
+    <div class="pending-box">
+      <b>📊 Primeira versão</b>
+      Esta é a primeira versão da Gestão Financeira, montada em cima da planilha. Ainda faltam os quadros mensais detalhados (mês a mês e por categoria) da Visão Geral — essa parte vem numa próxima rodada, depois de ajustarmos o resto junto com você.
+    </div>
+
+    <!-- VISÃO GERAL -->
+    <div class="fin-panel active" id="panel-visao">
+      <div class="card">
+        <div class="card-title">Mês atual</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Entradas recebidas</div><div class="stat-value" id="vgMesEntradas">—</div></div>
+          <div class="stat-card"><div class="stat-label">Custos</div><div class="stat-value" id="vgMesCustos">—</div></div>
+          <div class="stat-card"><div class="stat-label">Lucro líquido</div><div class="stat-value" id="vgMesLucro">—</div></div>
+          <div class="stat-card"><div class="stat-label">Margem</div><div class="stat-value" id="vgMesMargem">—</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Ano</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Entradas recebidas</div><div class="stat-value" id="vgAnoEntradas">—</div></div>
+          <div class="stat-card"><div class="stat-label">Custos</div><div class="stat-value" id="vgAnoCustos">—</div></div>
+          <div class="stat-card"><div class="stat-label">Lucro líquido</div><div class="stat-value" id="vgAnoLucro">—</div></div>
+          <div class="stat-card"><div class="stat-label">Margem</div><div class="stat-value" id="vgAnoMargem">—</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Mensalidades em atraso</div><div class="stat-value negative" id="vgAtrasoValor">—</div><div class="stat-sub" id="vgAtrasoQtd"></div></div>
+          <div class="stat-card"><div class="stat-label">Saldo da reserva</div><div class="stat-value" id="vgReservaSaldo">—</div><div class="stat-sub" id="vgReservaPct"></div></div>
+        </div>
       </div>
     </div>
+
+    <!-- ENTRADAS -->
+    <div class="fin-panel" id="panel-entradas">
+      <div class="card">
+        <div class="card-title">
+          <span>Entradas — mensalidades e outros recebimentos</span>
+          <button class="btn-primary" onclick="openEntradaModal()">+ Nova entrada</button>
+        </div>
+        <div class="fin-table-wrap">
+          <table class="fin-table">
+            <thead><tr><th>Aluno / Descrição</th><th>Tipo</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Pagamento</th><th></th></tr></thead>
+            <tbody id="entradasList"><tr><td colspan="7" class="empty-msg">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAÍDAS -->
+    <div class="fin-panel" id="panel-saidas">
+      <div class="card">
+        <div class="card-title">
+          <span>Saídas — tudo o que já foi pago</span>
+          <button class="btn-primary" onclick="openSaidaModal()">+ Nova saída</button>
+        </div>
+        <div class="fin-table-wrap">
+          <table class="fin-table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma</th><th>Valor</th><th></th></tr></thead>
+            <tbody id="saidasList"><tr><td colspan="6" class="empty-msg">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- PREVISTOS -->
+    <div class="fin-panel" id="panel-previstos">
+      <div class="card">
+        <div class="card-title">
+          <span>Previstos — contas a pagar e entradas esperadas</span>
+          <button class="btn-primary" onclick="openPrevistoModal()">+ Novo previsto</button>
+        </div>
+        <div class="fin-table-wrap">
+          <table class="fin-table">
+            <thead><tr><th>Data prevista</th><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Status</th><th></th></tr></thead>
+            <tbody id="previstosList"><tr><td colspan="7" class="empty-msg">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESERVA -->
+    <div class="fin-panel" id="panel-reserva">
+      <div class="card">
+        <div class="card-title">Configuração da reserva</div>
+        <div class="reserve-form-row">
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Custo mensal total (R$)</label>
+            <input type="number" step="0.01" class="modal-input" id="reservaCustoMensal" />
+          </div>
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Meses de cobertura</label>
+            <input type="number" step="0.5" class="modal-input" id="reservaMeses" />
+          </div>
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Saldo inicial (R$)</label>
+            <input type="number" step="0.01" class="modal-input" id="reservaSaldoInicial" />
+          </div>
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Aporte mensal planejado (R$)</label>
+            <input type="number" step="0.01" class="modal-input" id="reservaAportePlanejado" />
+          </div>
+        </div>
+        <button class="btn-primary" onclick="saveReservaConfig()">Salvar configuração</button>
+        <div class="modal-error" id="reservaConfigError" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Meta da reserva</div><div class="stat-value" id="reservaMeta">—</div></div>
+          <div class="stat-card"><div class="stat-label">Saldo atual</div><div class="stat-value" id="reservaSaldoAtual">—</div></div>
+          <div class="stat-card"><div class="stat-label">% da meta atingido</div><div class="stat-value" id="reservaPct">—</div></div>
+          <div class="stat-card"><div class="stat-label">Quanto falta</div><div class="stat-value" id="reservaFalta">—</div></div>
+          <div class="stat-card"><div class="stat-label">Meses de custo cobertos</div><div class="stat-value" id="reservaMesesCobertos">—</div></div>
+          <div class="stat-card"><div class="stat-label">Meses p/ atingir a meta</div><div class="stat-value" id="reservaMesesParaMeta">—</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>Movimentações da reserva</span>
+          <button class="btn-primary" onclick="openMovimentoModal()">+ Novo registro</button>
+        </div>
+        <div class="fin-table-wrap">
+          <table class="fin-table">
+            <thead><tr><th>Data</th><th>Tipo</th><th>Valor</th><th>Observações</th><th></th></tr></thead>
+            <tbody id="movimentosList"><tr><td colspan="5" class="empty-msg">Carregando...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </main>
+
+<!-- Modal: Nova entrada -->
+<div class="modal-overlay" id="modalEntrada">
+  <div class="modal-box">
+    <div class="modal-title">Nova entrada</div>
+    <div class="modal-error" id="entradaError"></div>
+    <div class="modal-row"><label class="modal-label">Aluno / Descrição</label><input type="text" class="modal-input" id="entradaDescricao" /></div>
+    <div class="modal-row"><label class="modal-label">Tipo de entrada</label>
+      <select class="modal-select" id="entradaTipo"></select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Vencimento</label><input type="date" class="modal-input" id="entradaVencimento" /></div>
+    <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="entradaValor" /></div>
+    <div class="modal-row"><label class="modal-label">Data de pagamento (deixe em branco se ainda não pagou)</label><input type="date" class="modal-input" id="entradaDataPagamento" /></div>
+    <div class="modal-row"><label class="modal-label">Forma de pagamento</label>
+      <select class="modal-select" id="entradaFormaPagamento"></select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="entradaObservacoes" /></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modalEntrada')">Cancelar</button>
+      <button class="btn-primary" id="btnSaveEntrada" onclick="saveEntrada()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nova saída -->
+<div class="modal-overlay" id="modalSaida">
+  <div class="modal-box">
+    <div class="modal-title">Nova saída</div>
+    <div class="modal-error" id="saidaError"></div>
+    <div class="modal-row"><label class="modal-label">Data do pagamento</label><input type="date" class="modal-input" id="saidaData" /></div>
+    <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="saidaDescricao" /></div>
+    <div class="modal-row"><label class="modal-label">Categoria</label>
+      <select class="modal-select" id="saidaCategoria"></select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Forma de pagamento</label>
+      <select class="modal-select" id="saidaFormaPagamento"></select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="saidaValor" /></div>
+    <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="saidaObservacoes" /></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modalSaida')">Cancelar</button>
+      <button class="btn-primary" id="btnSaveSaida" onclick="saveSaida()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo previsto -->
+<div class="modal-overlay" id="modalPrevisto">
+  <div class="modal-box">
+    <div class="modal-title">Novo previsto</div>
+    <div class="modal-error" id="previstoError"></div>
+    <div class="modal-row"><label class="modal-label">Data prevista</label><input type="date" class="modal-input" id="previstoData" /></div>
+    <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="previstoDescricao" /></div>
+    <div class="modal-row"><label class="modal-label">Tipo</label>
+      <select class="modal-select" id="previstoTipo" onchange="onPrevistoTipoChange()">
+        <option value="Entrada">Entrada</option>
+        <option value="Saída">Saída</option>
+      </select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Categoria</label>
+      <select class="modal-select" id="previstoCategoria"></select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="previstoValor" /></div>
+    <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="previstoObservacoes" /></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modalPrevisto')">Cancelar</button>
+      <button class="btn-primary" id="btnSavePrevisto" onclick="savePrevisto()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo registro de reserva -->
+<div class="modal-overlay" id="modalMovimento">
+  <div class="modal-box">
+    <div class="modal-title">Novo registro na reserva</div>
+    <div class="modal-error" id="movimentoError"></div>
+    <div class="modal-row"><label class="modal-label">Data</label><input type="date" class="modal-input" id="movimentoData" /></div>
+    <div class="modal-row"><label class="modal-label">Tipo</label>
+      <select class="modal-select" id="movimentoTipo">
+        <option value="Aporte">Aporte</option>
+        <option value="Resgate">Resgate</option>
+      </select>
+    </div>
+    <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="movimentoValor" /></div>
+    <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="movimentoObservacoes" /></div>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal('modalMovimento')">Cancelar</button>
+      <button class="btn-primary" id="btnSaveMovimento" onclick="saveMovimento()">Salvar</button>
+    </div>
+  </div>
+</div>
 
 <script>
   const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
@@ -96,21 +376,398 @@
     }
   });
 
-  async function init() {
-    const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = 'index.html'; return; }
+  // ---- Reference lists (from the "Categorias" sheet) ----
+  const TIPOS_ENTRADA = ['Mensalidade — aula individual', 'Mensalidade — aula em grupo', 'Cursos e produtos digitais', 'Outras entradas'];
+  const CATEGORIAS_SAIDA = ['Pró-labore / Retirada', 'Impostos (DAS, INSS etc.)', 'Contabilidade', 'Plataformas e assinaturas', 'Internet e telefone', 'Marketing e anúncios', 'Colaboradores e freelancers', 'Taxas de pagamento e bancárias', 'Cursos e capacitação', 'Materiais e equipamentos', 'Outras saídas'];
+  const FORMAS_PAGAMENTO = ['Pix', 'Cartão de crédito', 'Cartão de débito', 'Boleto', 'Transferência', 'Dinheiro', 'Plataforma de pagamento'];
 
-    const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+  function fillSelect(id, options, placeholder) {
+    const el = document.getElementById(id);
+    el.innerHTML = (placeholder ? `<option value="">${placeholder}</option>` : '') + options.map(o => `<option value="${o}">${o}</option>`).join('');
+  }
+  fillSelect('entradaTipo', TIPOS_ENTRADA);
+  fillSelect('entradaFormaPagamento', FORMAS_PAGAMENTO, 'Selecione...');
+  fillSelect('saidaCategoria', CATEGORIAS_SAIDA);
+  fillSelect('saidaFormaPagamento', FORMAS_PAGAMENTO);
+  fillSelect('previstoCategoria', CATEGORIAS_SAIDA);
 
-    if (!profile || profile.role !== 'administrativo') {
-      window.location.href = 'index.html';
-      return;
+  function onPrevistoTipoChange() {
+    const tipo = document.getElementById('previstoTipo').value;
+    fillSelect('previstoCategoria', tipo === 'Saída' ? CATEGORIAS_SAIDA : TIPOS_ENTRADA, 'Opcional');
+  }
+  onPrevistoTipoChange();
+
+  // ---- Helpers ----
+  function formatBRL(v) {
+    const n = Number(v) || 0;
+    return n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  }
+  function formatDateBR(iso) {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function computeEntradaStatus(vencimento, dataPagamento) {
+    if (dataPagamento) return { status: 'Pago', diasAtraso: 0 };
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const venc = new Date(vencimento + 'T00:00:00');
+    if (venc < today) {
+      const dias = Math.round((today - venc) / 86400000);
+      return { status: 'Atrasado', diasAtraso: dias };
+    }
+    return { status: 'A vencer', diasAtraso: 0 };
+  }
+  function statusBadgeClass(status) {
+    return { 'Pago': 'status-pago', 'Atrasado': 'status-atrasado', 'A vencer': 'status-a-vencer', 'Pendente': 'status-pendente', 'Realizado': 'status-realizado', 'Aporte': 'status-aporte', 'Resgate': 'status-resgate' }[status] || '';
+  }
+
+  // ---- Tabs ----
+  function showFinTab(tab) {
+    document.querySelectorAll('.fin-panel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + tab));
+    document.querySelectorAll('.fin-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).classList.remove('open');
+  }
+
+  // ---- State ----
+  let CURRENT_USER_ID = null;
+  let entradas = [], saidas = [], previstos = [], movimentos = [], reservaConfig = null;
+
+  // ---- Load + render: Entradas ----
+  async function loadEntradas() {
+    const { data } = await sb.from('finance_entradas').select('*').order('vencimento', { ascending: false });
+    entradas = data || [];
+    renderEntradas();
+    renderVisaoGeral();
+  }
+  function renderEntradas() {
+    const el = document.getElementById('entradasList');
+    if (!entradas.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhuma entrada lançada ainda.</td></tr>'; return; }
+    el.innerHTML = entradas.map(e => {
+      const { status, diasAtraso } = computeEntradaStatus(e.vencimento, e.data_pagamento);
+      return `<tr>
+        <td>${escapeHtml(e.descricao)}</td>
+        <td>${escapeHtml(e.tipo_entrada || '')}</td>
+        <td>${formatDateBR(e.vencimento)}</td>
+        <td>${formatBRL(e.valor)}</td>
+        <td><span class="status-badge ${statusBadgeClass(status)}">${status}${status === 'Atrasado' ? ' · ' + diasAtraso + 'd' : ''}</span></td>
+        <td>${e.data_pagamento ? formatDateBR(e.data_pagamento) + (e.forma_pagamento ? ' · ' + escapeHtml(e.forma_pagamento) : '') : (status !== 'Pago' ? `<button class="btn-icon" title="Marcar como pago" onclick="marcarEntradaPaga('${e.id}')">✓ Marcar pago</button>` : '')}</td>
+        <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_entradas','${e.id}', loadEntradas)">🗑</button></td>
+      </tr>`;
+    }).join('');
+  }
+  async function marcarEntradaPaga(id) {
+    await sb.from('finance_entradas').update({ data_pagamento: todayISO() }).eq('id', id);
+    await loadEntradas();
+  }
+
+  function openEntradaModal() {
+    document.getElementById('entradaDescricao').value = '';
+    document.getElementById('entradaTipo').value = TIPOS_ENTRADA[0];
+    document.getElementById('entradaVencimento').value = todayISO();
+    document.getElementById('entradaValor').value = '';
+    document.getElementById('entradaDataPagamento').value = '';
+    document.getElementById('entradaFormaPagamento').value = '';
+    document.getElementById('entradaObservacoes').value = '';
+    document.getElementById('entradaError').style.display = 'none';
+    document.getElementById('modalEntrada').classList.add('open');
+  }
+  async function saveEntrada() {
+    const descricao = document.getElementById('entradaDescricao').value.trim();
+    const vencimento = document.getElementById('entradaVencimento').value;
+    const valor = parseFloat(document.getElementById('entradaValor').value);
+    const errEl = document.getElementById('entradaError');
+    if (!descricao || !vencimento || !valor) { errEl.textContent = 'Preencha descrição, vencimento e valor.'; errEl.style.display = 'block'; return; }
+    const btn = document.getElementById('btnSaveEntrada');
+    btn.disabled = true;
+    const { error } = await sb.from('finance_entradas').insert({
+      descricao, tipo_entrada: document.getElementById('entradaTipo').value, vencimento, valor,
+      data_pagamento: document.getElementById('entradaDataPagamento').value || null,
+      forma_pagamento: document.getElementById('entradaFormaPagamento').value || null,
+      observacoes: document.getElementById('entradaObservacoes').value.trim() || null,
+    });
+    btn.disabled = false;
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    closeModal('modalEntrada');
+    await loadEntradas();
+  }
+
+  // ---- Load + render: Saídas ----
+  async function loadSaidas() {
+    const { data } = await sb.from('finance_saidas').select('*').order('data_pagamento', { ascending: false });
+    saidas = data || [];
+    renderSaidas();
+    renderVisaoGeral();
+  }
+  function renderSaidas() {
+    const el = document.getElementById('saidasList');
+    if (!saidas.length) { el.innerHTML = '<tr><td colspan="6" class="empty-msg">Nenhuma saída lançada ainda.</td></tr>'; return; }
+    el.innerHTML = saidas.map(s => `<tr>
+      <td>${formatDateBR(s.data_pagamento)}</td>
+      <td>${escapeHtml(s.descricao)}</td>
+      <td>${escapeHtml(s.categoria || '')}</td>
+      <td>${escapeHtml(s.forma_pagamento || '')}</td>
+      <td>${formatBRL(s.valor)}</td>
+      <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_saidas','${s.id}', loadSaidas)">🗑</button></td>
+    </tr>`).join('');
+  }
+  function openSaidaModal() {
+    document.getElementById('saidaData').value = todayISO();
+    document.getElementById('saidaDescricao').value = '';
+    document.getElementById('saidaCategoria').value = CATEGORIAS_SAIDA[0];
+    document.getElementById('saidaFormaPagamento').value = FORMAS_PAGAMENTO[0];
+    document.getElementById('saidaValor').value = '';
+    document.getElementById('saidaObservacoes').value = '';
+    document.getElementById('saidaError').style.display = 'none';
+    document.getElementById('modalSaida').classList.add('open');
+  }
+  async function saveSaida() {
+    const data_pagamento = document.getElementById('saidaData').value;
+    const descricao = document.getElementById('saidaDescricao').value.trim();
+    const valor = parseFloat(document.getElementById('saidaValor').value);
+    const errEl = document.getElementById('saidaError');
+    if (!data_pagamento || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
+    const btn = document.getElementById('btnSaveSaida');
+    btn.disabled = true;
+    const { error } = await sb.from('finance_saidas').insert({
+      data_pagamento, descricao, categoria: document.getElementById('saidaCategoria').value,
+      forma_pagamento: document.getElementById('saidaFormaPagamento').value, valor,
+      observacoes: document.getElementById('saidaObservacoes').value.trim() || null,
+    });
+    btn.disabled = false;
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    closeModal('modalSaida');
+    await loadSaidas();
+  }
+
+  // ---- Load + render: Previstos ----
+  async function loadPrevistos() {
+    const { data } = await sb.from('finance_previstos').select('*').order('data_prevista', { ascending: true });
+    previstos = data || [];
+    renderPrevistos();
+    renderVisaoGeral();
+  }
+  function renderPrevistos() {
+    const el = document.getElementById('previstosList');
+    if (!previstos.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhum previsto lançado ainda.</td></tr>'; return; }
+    const today = todayISO();
+    el.innerHTML = previstos.map(p => {
+      const vencido = p.status === 'Pendente' && p.data_prevista < today;
+      return `<tr>
+        <td style="${vencido ? 'color:#B05A4A;font-weight:700;' : ''}">${formatDateBR(p.data_prevista)}</td>
+        <td>${escapeHtml(p.descricao)}</td>
+        <td>${escapeHtml(p.tipo)}</td>
+        <td>${escapeHtml(p.categoria || '')}</td>
+        <td>${formatBRL(p.valor)}</td>
+        <td><span class="status-badge ${statusBadgeClass(p.status)}">${p.status}</span></td>
+        <td class="row-actions">
+          ${p.status === 'Pendente' ? `<button class="btn-icon" title="Marcar como realizado" onclick="marcarPrevistoRealizado('${p.id}')">✓</button>` : ''}
+          <button class="btn-icon" title="Excluir" onclick="deleteRow('finance_previstos','${p.id}', loadPrevistos)">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+  async function marcarPrevistoRealizado(id) {
+    await sb.from('finance_previstos').update({ status: 'Realizado' }).eq('id', id);
+    await loadPrevistos();
+  }
+  function openPrevistoModal() {
+    document.getElementById('previstoData').value = todayISO();
+    document.getElementById('previstoDescricao').value = '';
+    document.getElementById('previstoTipo').value = 'Entrada';
+    onPrevistoTipoChange();
+    document.getElementById('previstoValor').value = '';
+    document.getElementById('previstoObservacoes').value = '';
+    document.getElementById('previstoError').style.display = 'none';
+    document.getElementById('modalPrevisto').classList.add('open');
+  }
+  async function savePrevisto() {
+    const data_prevista = document.getElementById('previstoData').value;
+    const descricao = document.getElementById('previstoDescricao').value.trim();
+    const valor = parseFloat(document.getElementById('previstoValor').value);
+    const errEl = document.getElementById('previstoError');
+    if (!data_prevista || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
+    const btn = document.getElementById('btnSavePrevisto');
+    btn.disabled = true;
+    const { error } = await sb.from('finance_previstos').insert({
+      data_prevista, descricao, tipo: document.getElementById('previstoTipo').value,
+      categoria: document.getElementById('previstoCategoria').value || null, valor, status: 'Pendente',
+      observacoes: document.getElementById('previstoObservacoes').value.trim() || null,
+    });
+    btn.disabled = false;
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    closeModal('modalPrevisto');
+    await loadPrevistos();
+  }
+
+  // ---- Reserva de Emergência ----
+  async function loadReserva() {
+    const { data: config } = await sb.from('finance_reserva_config').select('*').eq('id', true).maybeSingle();
+    reservaConfig = config || { custo_mensal_total: 0, meses_cobertura: 6, saldo_inicial: 0, aporte_mensal_planejado: 0 };
+    document.getElementById('reservaCustoMensal').value = reservaConfig.custo_mensal_total;
+    document.getElementById('reservaMeses').value = reservaConfig.meses_cobertura;
+    document.getElementById('reservaSaldoInicial').value = reservaConfig.saldo_inicial;
+    document.getElementById('reservaAportePlanejado').value = reservaConfig.aporte_mensal_planejado;
+
+    const { data } = await sb.from('finance_reserva_movimentos').select('*').order('data', { ascending: false });
+    movimentos = data || [];
+    renderMovimentos();
+    renderReservaStats();
+    renderVisaoGeral();
+  }
+  function renderMovimentos() {
+    const el = document.getElementById('movimentosList');
+    if (!movimentos.length) { el.innerHTML = '<tr><td colspan="5" class="empty-msg">Nenhuma movimentação ainda.</td></tr>'; return; }
+    el.innerHTML = movimentos.map(m => `<tr>
+      <td>${formatDateBR(m.data)}</td>
+      <td><span class="status-badge ${statusBadgeClass(m.tipo)}">${m.tipo}</span></td>
+      <td>${formatBRL(m.valor)}</td>
+      <td>${escapeHtml(m.observacoes || '')}</td>
+      <td class="row-actions"><button class="btn-icon" title="Excluir" onclick="deleteRow('finance_reserva_movimentos','${m.id}', loadReserva)">🗑</button></td>
+    </tr>`).join('');
+  }
+  function reservaSaldoAtual() {
+    const aportes = movimentos.filter(m => m.tipo === 'Aporte').reduce((s, m) => s + Number(m.valor), 0);
+    const resgates = movimentos.filter(m => m.tipo === 'Resgate').reduce((s, m) => s + Number(m.valor), 0);
+    return Number(reservaConfig.saldo_inicial || 0) + aportes - resgates;
+  }
+  function renderReservaStats() {
+    const meta = Number(reservaConfig.custo_mensal_total || 0) * Number(reservaConfig.meses_cobertura || 0);
+    const saldo = reservaSaldoAtual();
+    const pct = meta > 0 ? saldo / meta : 0;
+    const falta = Math.max(meta - saldo, 0);
+    const mesesCobertos = Number(reservaConfig.custo_mensal_total) > 0 ? saldo / Number(reservaConfig.custo_mensal_total) : 0;
+    const aportePlanejado = Number(reservaConfig.aporte_mensal_planejado || 0);
+    document.getElementById('reservaMeta').textContent = formatBRL(meta);
+    document.getElementById('reservaSaldoAtual').textContent = formatBRL(saldo);
+    document.getElementById('reservaPct').textContent = (pct * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+    document.getElementById('reservaFalta').textContent = formatBRL(falta);
+    document.getElementById('reservaMesesCobertos').textContent = mesesCobertos.toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+    document.getElementById('reservaMesesParaMeta').textContent = aportePlanejado > 0 ? Math.ceil(falta / aportePlanejado) : 'Defina um aporte';
+  }
+  async function saveReservaConfig() {
+    const errEl = document.getElementById('reservaConfigError');
+    errEl.style.display = 'none';
+    const payload = {
+      id: true,
+      custo_mensal_total: parseFloat(document.getElementById('reservaCustoMensal').value) || 0,
+      meses_cobertura: parseFloat(document.getElementById('reservaMeses').value) || 0,
+      saldo_inicial: parseFloat(document.getElementById('reservaSaldoInicial').value) || 0,
+      aporte_mensal_planejado: parseFloat(document.getElementById('reservaAportePlanejado').value) || 0,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await sb.from('finance_reserva_config').upsert(payload, { onConflict: 'id' });
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    reservaConfig = payload;
+    renderReservaStats();
+    renderVisaoGeral();
+  }
+  function openMovimentoModal() {
+    document.getElementById('movimentoData').value = todayISO();
+    document.getElementById('movimentoTipo').value = 'Aporte';
+    document.getElementById('movimentoValor').value = '';
+    document.getElementById('movimentoObservacoes').value = '';
+    document.getElementById('movimentoError').style.display = 'none';
+    document.getElementById('modalMovimento').classList.add('open');
+  }
+  async function saveMovimento() {
+    const data = document.getElementById('movimentoData').value;
+    const valor = parseFloat(document.getElementById('movimentoValor').value);
+    const errEl = document.getElementById('movimentoError');
+    if (!data || !valor) { errEl.textContent = 'Preencha data e valor.'; errEl.style.display = 'block'; return; }
+    const btn = document.getElementById('btnSaveMovimento');
+    btn.disabled = true;
+    const { error } = await sb.from('finance_reserva_movimentos').insert({
+      data, tipo: document.getElementById('movimentoTipo').value, valor,
+      observacoes: document.getElementById('movimentoObservacoes').value.trim() || null,
+    });
+    btn.disabled = false;
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    closeModal('modalMovimento');
+    await loadReserva();
+  }
+
+  // ---- Visão Geral ----
+  function renderVisaoGeral() {
+    if (!reservaConfig) return; // wait until all four loads have happened at least once
+    const now = new Date();
+    const curYear = now.getFullYear();
+    const curMonth = now.getMonth() + 1;
+
+    function inMonth(iso, y, m) {
+      if (!iso) return false;
+      const [yy, mm] = iso.split('-').map(Number);
+      return yy === y && mm === m;
+    }
+    function inYear(iso, y) {
+      if (!iso) return false;
+      return Number(iso.split('-')[0]) === y;
     }
 
+    const entradasMes = entradas.filter(e => inMonth(e.data_pagamento, curYear, curMonth)).reduce((s, e) => s + Number(e.valor), 0);
+    const custosMes = saidas.filter(s => inMonth(s.data_pagamento, curYear, curMonth)).reduce((s, x) => s + Number(x.valor), 0);
+    const lucroMes = entradasMes - custosMes;
+    const margemMes = entradasMes > 0 ? lucroMes / entradasMes : 0;
+
+    const entradasAno = entradas.filter(e => inYear(e.data_pagamento, curYear)).reduce((s, e) => s + Number(e.valor), 0);
+    const custosAno = saidas.filter(s => inYear(s.data_pagamento, curYear)).reduce((s, x) => s + Number(x.valor), 0);
+    const lucroAno = entradasAno - custosAno;
+    const margemAno = entradasAno > 0 ? lucroAno / entradasAno : 0;
+
+    const atrasadas = entradas.filter(e => computeEntradaStatus(e.vencimento, e.data_pagamento).status === 'Atrasado');
+    const atrasoValor = atrasadas.reduce((s, e) => s + Number(e.valor), 0);
+
+    document.getElementById('vgMesEntradas').textContent = formatBRL(entradasMes);
+    document.getElementById('vgMesCustos').textContent = formatBRL(custosMes);
+    const lucroMesEl = document.getElementById('vgMesLucro');
+    lucroMesEl.textContent = formatBRL(lucroMes);
+    lucroMesEl.className = 'stat-value ' + (lucroMes >= 0 ? 'positive' : 'negative');
+    document.getElementById('vgMesMargem').textContent = (margemMes * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+
+    document.getElementById('vgAnoEntradas').textContent = formatBRL(entradasAno);
+    document.getElementById('vgAnoCustos').textContent = formatBRL(custosAno);
+    const lucroAnoEl = document.getElementById('vgAnoLucro');
+    lucroAnoEl.textContent = formatBRL(lucroAno);
+    lucroAnoEl.className = 'stat-value ' + (lucroAno >= 0 ? 'positive' : 'negative');
+    document.getElementById('vgAnoMargem').textContent = (margemAno * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+
+    document.getElementById('vgAtrasoValor').textContent = formatBRL(atrasoValor);
+    document.getElementById('vgAtrasoQtd').textContent = atrasadas.length + (atrasadas.length === 1 ? ' mensalidade' : ' mensalidades');
+
+    const meta = Number(reservaConfig.custo_mensal_total || 0) * Number(reservaConfig.meses_cobertura || 0);
+    const saldo = reservaSaldoAtual();
+    const pct = meta > 0 ? saldo / meta : 0;
+    document.getElementById('vgReservaSaldo').textContent = formatBRL(saldo);
+    document.getElementById('vgReservaPct').textContent = (pct * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '% da meta';
+  }
+
+  // ---- Generic delete ----
+  async function deleteRow(table, id, reload) {
+    if (!confirm('Excluir este lançamento?')) return;
+    await sb.from(table).delete().eq('id', id);
+    await reload();
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  // ---- Init ----
+  async function init(profile) {
     document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Administrativo') + '!';
 
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
+
+    await Promise.all([loadEntradas(), loadSaidas(), loadPrevistos(), loadReserva()]);
   }
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -122,7 +779,16 @@
   (async () => {
     for (let i = 0; i < 5; i++) {
       const { data: { session } } = await sb.auth.getSession();
-      if (session) { await init(); return; }
+      if (session) {
+        const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+        const isBrenda = profile && profile.role === 'professora' && (profile.full_name || '').toLowerCase().includes('brenda');
+        if (!profile || !(profile.role === 'administrativo' || isBrenda)) {
+          window.location.href = 'index.html';
+          return;
+        }
+        await init(profile);
+        return;
+      }
       await new Promise(r => setTimeout(r, 400 * (i + 1)));
     }
     window.location.href = 'index.html';
