@@ -466,6 +466,11 @@
     </div>
     <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="previstoValor" /></div>
     <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="previstoObservacoes" /></div>
+    <div class="modal-row" id="previstoRepeatRow">
+      <label class="modal-label">Repetir por quantos meses?</label>
+      <input type="number" min="1" max="36" class="modal-input" id="previstoRepeat" placeholder="1" />
+      <div style="font-size:12px;color:var(--muted);margin-top:6px;">Cria um previsto por mês a partir da data acima (útil pra uma compra parcelada ou um gasto fixo por alguns meses).</div>
+    </div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modalPrevisto')">Cancelar</button>
       <button class="btn-primary" id="btnSavePrevisto" onclick="savePrevisto()">Salvar</button>
@@ -998,6 +1003,8 @@
     document.getElementById('previstoValor').value = p ? p.valor : '';
     document.getElementById('previstoObservacoes').value = p && p.observacoes ? p.observacoes : '';
     if (p && p.categoria) document.getElementById('previstoCategoria').value = p.categoria;
+    document.getElementById('previstoRepeatRow').style.display = id ? 'none' : 'block';
+    document.getElementById('previstoRepeat').value = '1';
     document.getElementById('previstoError').style.display = 'none';
     document.getElementById('modalPrevisto').classList.add('open');
   }
@@ -1006,18 +1013,34 @@
     const data_prevista = document.getElementById('previstoData').value;
     const descricao = document.getElementById('previstoDescricao').value.trim();
     const valor = parseFloat(document.getElementById('previstoValor').value);
+    const tipo = document.getElementById('previstoTipo').value;
+    const categoria = document.getElementById('previstoCategoria').value || null;
+    const observacoes = document.getElementById('previstoObservacoes').value.trim() || null;
+    const repeatMonths = id ? 1 : (parseInt(document.getElementById('previstoRepeat').value, 10) || 1);
     const errEl = document.getElementById('previstoError');
     if (!data_prevista || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSavePrevisto');
     btn.disabled = true;
-    const payload = {
-      data_prevista, descricao, tipo: document.getElementById('previstoTipo').value,
-      categoria: document.getElementById('previstoCategoria').value || null, valor,
-      observacoes: document.getElementById('previstoObservacoes').value.trim() || null,
-    };
-    const { error } = id
-      ? await sb.from('finance_previstos').update(payload).eq('id', id)
-      : await sb.from('finance_previstos').insert({ ...payload, status: 'Pendente' });
+
+    let error;
+    if (!id && repeatMonths > 1) {
+      const baseDate = new Date(data_prevista + 'T00:00:00');
+      const entries = [];
+      for (let i = 0; i < repeatMonths; i++) {
+        const d = new Date(baseDate);
+        d.setMonth(d.getMonth() + i);
+        entries.push({
+          data_prevista: d.toISOString().slice(0, 10), descricao, tipo, categoria, valor,
+          status: 'Pendente', observacoes,
+        });
+      }
+      ({ error } = await sb.from('finance_previstos').insert(entries));
+    } else {
+      const payload = { data_prevista, descricao, tipo, categoria, valor, observacoes };
+      ({ error } = id
+        ? await sb.from('finance_previstos').update(payload).eq('id', id)
+        : await sb.from('finance_previstos').insert({ ...payload, status: 'Pendente' }));
+    }
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalPrevisto');
