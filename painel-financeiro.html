@@ -306,6 +306,11 @@
           <span>Previstos — o que ainda não foi pago/recebido em Entradas e Saídas</span>
           <button class="btn-primary" onclick="openPrevistoModal()">+ Novo previsto</button>
         </div>
+        <div class="month-nav">
+          <button class="btn-icon" onclick="shiftPrevistosMonth(-1)" title="Mês anterior">◀</button>
+          <span id="previstosMonthLabel">—</span>
+          <button class="btn-icon" onclick="shiftPrevistosMonth(1)" title="Próximo mês">▶</button>
+        </div>
         <div class="fin-table-wrap">
           <table class="fin-table">
             <thead><tr><th>Data prevista</th><th>Descrição</th><th>Tipo</th><th>Categoria</th><th>Valor</th><th>Status</th><th></th></tr></thead>
@@ -603,6 +608,7 @@
   }
   let entradasMonth = startOfMonth(new Date());
   let saidasMonth = startOfMonth(new Date());
+  let previstosMonth = startOfMonth(new Date());
   function shiftEntradasMonth(delta) {
     entradasMonth = new Date(entradasMonth.getFullYear(), entradasMonth.getMonth() + delta, 1);
     renderEntradas();
@@ -610,6 +616,10 @@
   function shiftSaidasMonth(delta) {
     saidasMonth = new Date(saidasMonth.getFullYear(), saidasMonth.getMonth() + delta, 1);
     renderSaidas();
+  }
+  function shiftPrevistosMonth(delta) {
+    previstosMonth = new Date(previstosMonth.getFullYear(), previstosMonth.getMonth() + delta, 1);
+    renderPrevistos();
   }
 
   // ---- Metas financeiras (mensal/anual) ----
@@ -980,6 +990,8 @@
   // nenhum. Criar um previsto já cria direto a entrada/saída correspondente.
   function renderPrevistos() {
     const el = document.getElementById('previstosList');
+    document.getElementById('previstosMonthLabel').textContent = monthLabelOf(previstosMonth);
+    const monthKey = monthKeyOf(previstosMonth);
     const items = [
       ...entradas.filter(e => !e.data_pagamento && !e.renegotiated).map(e => ({
         id: e.id, tipo: 'Entrada', data: e.vencimento,
@@ -990,9 +1002,10 @@
         id: s.id, tipo: 'Saída', data: s.vencimento,
         descricao: s.descricao, categoria: s.categoria, valor: s.valor,
       })),
-    ].sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+    ].filter(p => (p.data || '').slice(0, 7) === monthKey)
+      .sort((a, b) => (a.data || '').localeCompare(b.data || ''));
 
-    if (!items.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nada previsto por enquanto.</td></tr>'; return; }
+    if (!items.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nada previsto nesse mês.</td></tr>'; return; }
     const today = todayISO();
     el.innerHTML = items.map(p => {
       const vencido = p.data && p.data < today;
