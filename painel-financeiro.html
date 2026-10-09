@@ -282,7 +282,7 @@
     <div class="fin-panel" id="panel-saidas">
       <div class="card">
         <div class="card-title">
-          <span>Saídas — tudo o que já foi pago</span>
+          <span>Saídas — pagas e previstas</span>
           <button class="btn-primary" onclick="openSaidaModal()">+ Nova saída</button>
         </div>
         <div class="month-nav">
@@ -292,8 +292,8 @@
         </div>
         <div class="fin-table-wrap">
           <table class="fin-table">
-            <thead><tr><th>Data</th><th>Descrição</th><th>Categoria</th><th>Forma</th><th>Valor</th><th></th></tr></thead>
-            <tbody id="saidasList"><tr><td colspan="6" class="empty-msg">Carregando...</td></tr></tbody>
+            <thead><tr><th>Descrição</th><th>Categoria</th><th>Vencimento</th><th>Valor</th><th>Status</th><th>Pagamento</th><th></th></tr></thead>
+            <tbody id="saidasList"><tr><td colspan="7" class="empty-msg">Carregando...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -303,7 +303,7 @@
     <div class="fin-panel" id="panel-previstos">
       <div class="card">
         <div class="card-title">
-          <span>Previstos — contas a pagar e entradas esperadas</span>
+          <span>Previstos — o que ainda não foi pago/recebido em Entradas e Saídas</span>
           <button class="btn-primary" onclick="openPrevistoModal()">+ Novo previsto</button>
         </div>
         <div class="fin-table-wrap">
@@ -430,7 +430,7 @@
     <div class="modal-title" id="modalSaidaTitle">Nova saída</div>
     <input type="hidden" id="saidaId" />
     <div class="modal-error" id="saidaError"></div>
-    <div class="modal-row"><label class="modal-label">Data do pagamento</label><input type="date" class="modal-input" id="saidaData" /></div>
+    <div class="modal-row"><label class="modal-label">Vencimento</label><input type="date" class="modal-input" id="saidaVencimento" /></div>
     <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="saidaDescricao" /></div>
     <div class="modal-row"><label class="modal-label">Categoria</label>
       <select class="modal-select" id="saidaCategoria"></select>
@@ -439,6 +439,7 @@
       <select class="modal-select" id="saidaFormaPagamento"></select>
     </div>
     <div class="modal-row"><label class="modal-label">Valor (R$)</label><input type="number" step="0.01" class="modal-input" id="saidaValor" /></div>
+    <div class="modal-row"><label class="modal-label">Data de pagamento (deixe em branco se ainda não pagou)</label><input type="date" class="modal-input" id="saidaDataPagamento" /></div>
     <div class="modal-row"><label class="modal-label">Observações</label><input type="text" class="modal-input" id="saidaObservacoes" /></div>
     <div class="modal-actions">
       <button class="btn-secondary" onclick="closeModal('modalSaida')">Cancelar</button>
@@ -450,8 +451,7 @@
 <!-- Modal: Novo previsto -->
 <div class="modal-overlay" id="modalPrevisto">
   <div class="modal-box">
-    <div class="modal-title" id="modalPrevistoTitle">Novo previsto</div>
-    <input type="hidden" id="previstoId" />
+    <div class="modal-title">Novo previsto</div>
     <div class="modal-error" id="previstoError"></div>
     <div class="modal-row"><label class="modal-label">Data prevista</label><input type="date" class="modal-input" id="previstoData" /></div>
     <div class="modal-row"><label class="modal-label">Descrição</label><input type="text" class="modal-input" id="previstoDescricao" /></div>
@@ -592,7 +592,7 @@
 
   // ---- State ----
   let CURRENT_USER_ID = null;
-  let entradas = [], saidas = [], previstos = [], movimentos = [], reservaConfig = null, metas = null;
+  let entradas = [], saidas = [], movimentos = [], reservaConfig = null, metas = null;
 
   // ---- Navegação por mês (Entradas / Saídas) ----
   function startOfMonth(d) { return new Date(d.getFullYear(), d.getMonth(), 1); }
@@ -807,6 +807,7 @@
     renderEntradas();
     renderVisaoGeral();
     renderMetasChart();
+    renderPrevistos();
   }
   function renderEntradas() {
     const el = document.getElementById('entradasList');
@@ -888,56 +889,69 @@
     const { data } = await sb.from('payments').select('*').eq('type', 'saida').order('due_date', { ascending: false });
     saidas = (data || []).map(p => ({
       id: p.id,
-      data_pagamento: p.paid_at || p.due_date,
       descricao: p.description,
       categoria: p.categoria,
-      forma_pagamento: p.payment_method,
+      vencimento: p.due_date,
       valor: p.amount,
+      data_pagamento: p.paid ? p.paid_at : null,
+      forma_pagamento: p.payment_method,
       observacoes: p.observacoes,
     }));
     renderSaidas();
     renderVisaoGeral();
+    renderMetasChart();
+    renderPrevistos();
   }
   function renderSaidas() {
     const el = document.getElementById('saidasList');
     document.getElementById('saidasMonthLabel').textContent = monthLabelOf(saidasMonth);
     const monthKey = monthKeyOf(saidasMonth);
     const monthSaidas = saidas
-      .filter(s => (s.data_pagamento || '').slice(0, 7) === monthKey)
-      .sort((a, b) => (a.data_pagamento || '').localeCompare(b.data_pagamento || ''));
-    if (!monthSaidas.length) { el.innerHTML = '<tr><td colspan="6" class="empty-msg">Nenhuma saída nesse mês.</td></tr>'; return; }
-    el.innerHTML = monthSaidas.map(s => `<tr>
-      <td>${formatDateBR(s.data_pagamento)}</td>
-      <td>${escapeHtml(s.descricao)}</td>
-      <td>${escapeHtml(s.categoria || '')}</td>
-      <td>${escapeHtml(s.forma_pagamento || '')}</td>
-      <td>${formatBRL(s.valor)}</td>
-      <td class="row-actions">
-        <button class="btn-icon" title="Editar" onclick="openSaidaModal('${s.id}')">✎</button>
-        <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${s.id}', loadSaidas)">🗑</button>
-      </td>
-    </tr>`).join('');
+      .filter(s => (s.vencimento || '').slice(0, 7) === monthKey)
+      .sort((a, b) => (a.vencimento || '').localeCompare(b.vencimento || ''));
+    if (!monthSaidas.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhuma saída nesse mês.</td></tr>'; return; }
+    el.innerHTML = monthSaidas.map(s => {
+      const { status, diasAtraso } = computeEntradaStatus(s.vencimento, s.data_pagamento, false);
+      return `<tr>
+        <td>${escapeHtml(s.descricao)}</td>
+        <td>${escapeHtml(s.categoria || '')}</td>
+        <td>${formatDateBR(s.vencimento)}</td>
+        <td>${formatBRL(s.valor)}</td>
+        <td><span class="status-badge ${statusBadgeClass(status)}">${status}${status === 'Atrasado' ? ' · ' + diasAtraso + 'd' : ''}</span></td>
+        <td>${s.data_pagamento ? formatDateBR(s.data_pagamento) + (s.forma_pagamento ? ' · ' + escapeHtml(s.forma_pagamento) : '') : (status !== 'Pago' ? `<button class="btn-icon" title="Marcar como pago" onclick="marcarSaidaPaga('${s.id}')">✓ Marcar pago</button>` : '')}</td>
+        <td class="row-actions">
+          <button class="btn-icon" title="Editar" onclick="openSaidaModal('${s.id}')">✎</button>
+          <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${s.id}', loadSaidas)">🗑</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+  async function marcarSaidaPaga(id) {
+    await sb.from('payments').update({ paid: true, paid_at: todayISO() }).eq('id', id);
+    await loadSaidas();
   }
   function openSaidaModal(id) {
     const s = id ? saidas.find(x => x.id === id) : null;
     document.getElementById('saidaId').value = s ? s.id : '';
     document.getElementById('modalSaidaTitle').textContent = s ? 'Editar saída' : 'Nova saída';
-    document.getElementById('saidaData').value = s ? s.data_pagamento : todayISO();
+    document.getElementById('saidaVencimento').value = s ? s.vencimento : todayISO();
     document.getElementById('saidaDescricao').value = s ? s.descricao : '';
     document.getElementById('saidaCategoria').value = s && s.categoria ? s.categoria : CATEGORIAS_SAIDA[0];
     document.getElementById('saidaFormaPagamento').value = s && s.forma_pagamento ? s.forma_pagamento : FORMAS_PAGAMENTO[0];
     document.getElementById('saidaValor').value = s ? s.valor : '';
+    document.getElementById('saidaDataPagamento').value = s ? (s.data_pagamento || '') : todayISO();
     document.getElementById('saidaObservacoes').value = s && s.observacoes ? s.observacoes : '';
     document.getElementById('saidaError').style.display = 'none';
     document.getElementById('modalSaida').classList.add('open');
   }
   async function saveSaida() {
     const id = document.getElementById('saidaId').value;
-    const data_pagamento = document.getElementById('saidaData').value;
+    const vencimento = document.getElementById('saidaVencimento').value;
     const descricao = document.getElementById('saidaDescricao').value.trim();
     const valor = parseFloat(document.getElementById('saidaValor').value);
+    const dataPagamento = document.getElementById('saidaDataPagamento').value || null;
     const errEl = document.getElementById('saidaError');
-    if (!data_pagamento || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
+    if (!vencimento || !descricao || !valor) { errEl.textContent = 'Preencha vencimento, descrição e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSaveSaida');
     btn.disabled = true;
     const payload = {
@@ -946,9 +960,9 @@
       categoria: document.getElementById('saidaCategoria').value,
       payment_method: document.getElementById('saidaFormaPagamento').value,
       amount: valor,
-      due_date: data_pagamento,
-      paid: true,
-      paid_at: data_pagamento,
+      due_date: vencimento,
+      paid: !!dataPagamento,
+      paid_at: dataPagamento,
       observacoes: document.getElementById('saidaObservacoes').value.trim() || null,
     };
     const { error } = id
@@ -960,91 +974,88 @@
     await loadSaidas();
   }
 
-  // ---- Load + render: Previstos ----
-  async function loadPrevistos() {
-    const { data } = await sb.from('finance_previstos').select('*').order('data_prevista', { ascending: true });
-    previstos = data || [];
-    renderPrevistos();
-    renderVisaoGeral();
-  }
+  // ---- Previstos: NÃO é mais uma tabela própria - é uma visão filtrada de
+  // Entradas e Saídas (tudo que ainda não foi pago/recebido), pra tudo na
+  // Gestão Financeira se comunicar com tudo, sem duplicar dado em lugar
+  // nenhum. Criar um previsto já cria direto a entrada/saída correspondente.
   function renderPrevistos() {
     const el = document.getElementById('previstosList');
-    if (!previstos.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhum previsto lançado ainda.</td></tr>'; return; }
+    const items = [
+      ...entradas.filter(e => !e.data_pagamento && !e.renegotiated).map(e => ({
+        id: e.id, tipo: 'Entrada', data: e.vencimento,
+        descricao: e.aluno ? `${e.aluno} — ${e.descricao}` : e.descricao,
+        categoria: e.tipo_entrada, valor: e.valor,
+      })),
+      ...saidas.filter(s => !s.data_pagamento).map(s => ({
+        id: s.id, tipo: 'Saída', data: s.vencimento,
+        descricao: s.descricao, categoria: s.categoria, valor: s.valor,
+      })),
+    ].sort((a, b) => (a.data || '').localeCompare(b.data || ''));
+
+    if (!items.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nada previsto por enquanto.</td></tr>'; return; }
     const today = todayISO();
-    el.innerHTML = previstos.map(p => {
-      const vencido = p.status === 'Pendente' && p.data_prevista < today;
+    el.innerHTML = items.map(p => {
+      const vencido = p.data && p.data < today;
+      const reload = p.tipo === 'Entrada' ? 'loadEntradas' : 'loadSaidas';
+      const editModal = p.tipo === 'Entrada' ? 'openEntradaModal' : 'openSaidaModal';
       return `<tr>
-        <td style="${vencido ? 'color:#B05A4A;font-weight:700;' : ''}">${formatDateBR(p.data_prevista)}</td>
+        <td style="${vencido ? 'color:#B05A4A;font-weight:700;' : ''}">${formatDateBR(p.data)}</td>
         <td>${escapeHtml(p.descricao)}</td>
         <td>${escapeHtml(p.tipo)}</td>
         <td>${escapeHtml(p.categoria || '')}</td>
         <td>${formatBRL(p.valor)}</td>
-        <td><span class="status-badge ${statusBadgeClass(p.status)}">${p.status}</span></td>
+        <td><span class="status-badge ${statusBadgeClass(vencido ? 'Atrasado' : 'Pendente')}">${vencido ? 'Atrasado' : 'Pendente'}</span></td>
         <td class="row-actions">
-          ${p.status === 'Pendente' ? `<button class="btn-icon" title="Marcar como realizado" onclick="marcarPrevistoRealizado('${p.id}')">✓</button>` : ''}
-          <button class="btn-icon" title="Editar" onclick="openPrevistoModal('${p.id}')">✎</button>
-          <button class="btn-icon" title="Excluir" onclick="deleteRow('finance_previstos','${p.id}', loadPrevistos)">🗑</button>
+          <button class="btn-icon" title="Marcar como realizado" onclick="marcarPrevistoRealizado('${p.id}', '${p.tipo}')">✓</button>
+          <button class="btn-icon" title="Editar" onclick="${editModal}('${p.id}')">✎</button>
+          <button class="btn-icon" title="Excluir" onclick="deleteRow('payments','${p.id}', ${reload})">🗑</button>
         </td>
       </tr>`;
     }).join('');
   }
-  async function marcarPrevistoRealizado(id) {
-    await sb.from('finance_previstos').update({ status: 'Realizado' }).eq('id', id);
-    await loadPrevistos();
+  async function marcarPrevistoRealizado(id, tipo) {
+    await sb.from('payments').update({ paid: true, paid_at: todayISO() }).eq('id', id);
+    await (tipo === 'Entrada' ? loadEntradas() : loadSaidas());
   }
-  function openPrevistoModal(id) {
-    const p = id ? previstos.find(x => x.id === id) : null;
-    document.getElementById('previstoId').value = p ? p.id : '';
-    document.getElementById('modalPrevistoTitle').textContent = p ? 'Editar previsto' : 'Novo previsto';
-    document.getElementById('previstoData').value = p ? p.data_prevista : todayISO();
-    document.getElementById('previstoDescricao').value = p ? p.descricao : '';
-    document.getElementById('previstoTipo').value = p ? p.tipo : 'Entrada';
+  function openPrevistoModal() {
+    document.getElementById('previstoData').value = todayISO();
+    document.getElementById('previstoDescricao').value = '';
+    document.getElementById('previstoTipo').value = 'Entrada';
     onPrevistoTipoChange();
-    document.getElementById('previstoValor').value = p ? p.valor : '';
-    document.getElementById('previstoObservacoes').value = p && p.observacoes ? p.observacoes : '';
-    if (p && p.categoria) document.getElementById('previstoCategoria').value = p.categoria;
-    document.getElementById('previstoRepeatRow').style.display = id ? 'none' : 'block';
+    document.getElementById('previstoValor').value = '';
+    document.getElementById('previstoObservacoes').value = '';
     document.getElementById('previstoRepeat').value = '1';
     document.getElementById('previstoError').style.display = 'none';
     document.getElementById('modalPrevisto').classList.add('open');
   }
   async function savePrevisto() {
-    const id = document.getElementById('previstoId').value;
     const data_prevista = document.getElementById('previstoData').value;
     const descricao = document.getElementById('previstoDescricao').value.trim();
     const valor = parseFloat(document.getElementById('previstoValor').value);
     const tipo = document.getElementById('previstoTipo').value;
-    const categoria = document.getElementById('previstoCategoria').value || null;
+    const categoriaValue = document.getElementById('previstoCategoria').value || null;
     const observacoes = document.getElementById('previstoObservacoes').value.trim() || null;
-    const repeatMonths = id ? 1 : (parseInt(document.getElementById('previstoRepeat').value, 10) || 1);
+    const repeatMonths = parseInt(document.getElementById('previstoRepeat').value, 10) || 1;
     const errEl = document.getElementById('previstoError');
     if (!data_prevista || !descricao || !valor) { errEl.textContent = 'Preencha data, descrição e valor.'; errEl.style.display = 'block'; return; }
     const btn = document.getElementById('btnSavePrevisto');
     btn.disabled = true;
 
-    let error;
-    if (!id && repeatMonths > 1) {
-      const baseDate = new Date(data_prevista + 'T00:00:00');
-      const entries = [];
-      for (let i = 0; i < repeatMonths; i++) {
-        const d = new Date(baseDate);
-        d.setMonth(d.getMonth() + i);
-        entries.push({
-          data_prevista: d.toISOString().slice(0, 10), descricao, tipo, categoria, valor,
-          status: 'Pendente', observacoes,
-        });
-      }
-      ({ error } = await sb.from('finance_previstos').insert(entries));
-    } else {
-      const payload = { data_prevista, descricao, tipo, categoria, valor, observacoes };
-      ({ error } = id
-        ? await sb.from('finance_previstos').update(payload).eq('id', id)
-        : await sb.from('finance_previstos').insert({ ...payload, status: 'Pendente' }));
+    const baseDate = new Date(data_prevista + 'T00:00:00');
+    const entries = [];
+    for (let i = 0; i < repeatMonths; i++) {
+      const d = new Date(baseDate);
+      d.setMonth(d.getMonth() + i);
+      const due_date = d.toISOString().slice(0, 10);
+      entries.push(tipo === 'Entrada'
+        ? { type: 'entrada', description: descricao, tipo_entrada: categoriaValue, due_date, amount: valor, paid: false, paid_at: null, observacoes, created_by: CURRENT_USER_ID }
+        : { type: 'saida', description: descricao, categoria: categoriaValue, due_date, amount: valor, paid: false, paid_at: null, observacoes, created_by: CURRENT_USER_ID });
     }
+    const { error } = await sb.from('payments').insert(entries);
     btn.disabled = false;
     if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
     closeModal('modalPrevisto');
-    await loadPrevistos();
+    await Promise.all([loadEntradas(), loadSaidas()]);
   }
 
   // ---- Reserva de Emergência ----
@@ -1241,7 +1252,7 @@
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
 
-    await Promise.all([loadEntradas(), loadSaidas(), loadPrevistos(), loadReserva(), loadMetas()]);
+    await Promise.all([loadEntradas(), loadSaidas(), loadReserva(), loadMetas()]);
   }
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
