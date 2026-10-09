@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestão Financeira | itsbrendacleto</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
+
+    header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-tag { background: rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-logout { background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; }
+    .btn-logout:hover { border-color: white; color: white; }
+
+    .welcome-strip { background: var(--white); border-bottom: 1px solid var(--sand); padding: 28px 28px 24px; }
+    .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); font-weight: 400; margin-bottom: 4px; }
+    .welcome-strip p { font-size: 14px; color: var(--muted); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
+    .card { background: var(--white); border-radius: var(--radius); padding: 24px 26px; box-shadow: var(--shadow); margin-bottom: 24px; }
+
+    .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 18px 20px; font-size: 13.5px; color: var(--brown); line-height: 1.6; }
+    .pending-box b { display: block; font-size: 15px; margin-bottom: 8px; color: var(--text); }
+
+    .loading-box { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 13px; }
+  </style>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#5C4033" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').then(function (reg) {
+          setInterval(function () { reg.update(); }, 60000);
+          document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible') reg.update();
+          });
+        }).catch(function () {});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        window.location.reload();
+      });
+    }
+  </script>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-brand">itsbrendacleto</div>
+    <div class="header-tag">Gestão Financeira</div>
+  </div>
+  <button class="btn-logout" id="logoutBtn">Sair</button>
+</header>
+
+<div class="welcome-strip">
+  <h1 id="welcomeTitle">Olá!</h1>
+  <p>Gestão financeira da escola.</p>
+</div>
+
+<main>
+  <div class="card" id="loadingCard"><div class="loading-box">Carregando...</div></div>
+
+  <div id="mainContent" style="display:none;">
+    <div class="card">
+      <div class="pending-box">
+        <b>📊 Gestão Financeira — em construção</b>
+        Esta área vai reunir a gestão financeira completa da escola, com base na planilha que a Brenda está organizando. Assim que a estrutura for definida, o conteúdo aparece aqui.
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+    auth: {
+      persistSession: true,
+      storage: window.localStorage,
+      autoRefreshToken: true,
+      detectSessionInUrl: false,
+      lock: async (_name, _acquireTimeout, fn) => fn(),
+    }
+  });
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = 'index.html'; return; }
+
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+
+    if (!profile || profile.role !== 'administrativo') {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Administrativo') + '!';
+
+    document.getElementById('loadingCard').style.display = 'none';
+    document.getElementById('mainContent').style.display = 'block';
+  }
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  });
+
+  // Auth with retry for slow session loading
+  (async () => {
+    for (let i = 0; i < 5; i++) {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session) { await init(); return; }
+      await new Promise(r => setTimeout(r, 400 * (i + 1)));
+    }
+    window.location.href = 'index.html';
+  })();
+</script>
+</body>
+</html>

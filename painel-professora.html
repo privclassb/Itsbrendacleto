@@ -984,7 +984,10 @@
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>Equipe</span>
-        <button class="btn-sm" id="addTeacherBtn" onclick="openAddTeacher()" style="display:none;">+ Nova professora</button>
+        <div style="display:flex;gap:8px;">
+          <button class="btn-sm" id="addTeacherBtn" onclick="openAddTeacher()" style="display:none;">+ Nova professora</button>
+          <button class="btn-sm" id="addAdminBtn" onclick="openAddAdmin()" style="display:none;">+ Novo administrativo</button>
+        </div>
       </div>
       <div class="folder-list" id="teacherFolderList">Carregando...</div>
       <div class="add-folder-form" id="addTeacherFolderForm" style="display:none;">
@@ -1561,6 +1564,7 @@
       await loadLinks();
       await loadStudentsForSelect();
       document.getElementById('addTeacherBtn').style.display = 'inline-flex';
+      document.getElementById('addAdminBtn').style.display = 'inline-flex';
       document.getElementById('addTeacherFolderForm').style.display = 'grid';
       document.getElementById('teacherBirthdaysBlock').style.display = 'block';
       await loadTeachers();
@@ -4329,6 +4333,93 @@
     } finally {
       btn.disabled = false;
       btn.textContent = 'Criar professora';
+    }
+  }
+
+  // ---- Novo usuário administrativo (acesso só à Gestão Financeira) ----
+
+  function openAddAdmin() {
+    document.getElementById('newAdminName').value = '';
+    document.getElementById('newAdminEmail').value = '';
+    document.getElementById('newAdminPassword').value = '';
+    document.getElementById('addAdminError').style.display = 'none';
+    document.getElementById('addAdminSuccess').style.display = 'none';
+    document.getElementById('modalAddAdmin').classList.add('open');
+  }
+
+  function closeAddAdmin() {
+    document.getElementById('modalAddAdmin').classList.remove('open');
+  }
+
+  async function createAdmin() {
+    const name = document.getElementById('newAdminName').value.trim();
+    const email = document.getElementById('newAdminEmail').value.trim();
+    const password = document.getElementById('newAdminPassword').value.trim();
+    const errEl = document.getElementById('addAdminError');
+    const sucEl = document.getElementById('addAdminSuccess');
+    errEl.style.display = 'none';
+    sucEl.style.display = 'none';
+
+    if (!name || !email || !password) {
+      errEl.textContent = 'Preencha todos os campos.';
+      errEl.style.display = 'block';
+      return;
+    }
+    if (password.length < 6) {
+      errEl.textContent = 'A senha precisa ter pelo menos 6 caracteres.';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    const btn = document.getElementById('btnSaveAdmin');
+    btn.disabled = true;
+    btn.textContent = 'Criando...';
+
+    try {
+      // Guarda a sessão da Brenda: criar um novo usuário troca a sessão ativa do navegador
+      const { data: { session: adminSession } } = await sb.auth.getSession();
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: name, role: 'administrativo' } }
+      });
+      if (error) throw error;
+
+      if (data.user) {
+        if (data.session) {
+          await sb.auth.setSession({ access_token: data.session.access_token, refresh_token: data.session.refresh_token });
+        }
+        await new Promise(r => setTimeout(r, 1000));
+
+        await sb.from('profiles').update({ full_name: name, email, role: 'administrativo' }).eq('id', data.user.id);
+
+        await fetch('https://vbqumpzlxseakvmyvkem.supabase.co/auth/v1/user', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + (await sb.auth.getSession()).data.session.access_token,
+            'apikey': 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj'
+          },
+          body: JSON.stringify({ data: { role: 'administrativo', full_name: name } })
+        });
+      }
+
+      // Restaura a sessão da Brenda
+      if (adminSession) {
+        await sb.auth.setSession({ access_token: adminSession.access_token, refresh_token: adminSession.refresh_token });
+      }
+
+      sucEl.textContent = 'Usuário ' + name + ' criado com sucesso! Acesso restrito à Gestão Financeira.';
+      sucEl.style.display = 'block';
+
+      setTimeout(closeAddAdmin, 2000);
+    } catch (err) {
+      errEl.textContent = 'Erro: ' + (err.message || 'Tente novamente.');
+      errEl.style.display = 'block';
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Criar usuário';
     }
   }
 
@@ -7616,6 +7707,37 @@
     <div class="modal-actions">
       <button class="btn-modal-cancel" onclick="closeAddTeacher()">Cancelar</button>
       <button class="btn-modal-save" id="btnSaveTeacher" onclick="createTeacher()">Criar professora</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Novo administrativo (acesso só à Gestão Financeira) -->
+<div class="modal-overlay" id="modalAddAdmin">
+  <div class="modal-box">
+    <div class="modal-title">Novo administrativo</div>
+    <div class="modal-sub">Esse acesso é restrito à Gestão Financeira — sem acesso a alunos, turmas ou relatórios pedagógicos.</div>
+
+    <div class="modal-error" id="addAdminError"></div>
+    <div class="modal-success" id="addAdminSuccess"></div>
+
+    <div class="modal-row">
+      <label class="modal-label">Nome completo</label>
+      <input type="text" class="modal-input" id="newAdminName" placeholder="Nome" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">E-mail</label>
+      <input type="email" class="modal-input" id="newAdminEmail" placeholder="email@exemplo.com" />
+    </div>
+
+    <div class="modal-row">
+      <label class="modal-label">Senha provisória</label>
+      <input type="text" class="modal-input" id="newAdminPassword" placeholder="Mínimo 6 caracteres" />
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-modal-cancel" onclick="closeAddAdmin()">Cancelar</button>
+      <button class="btn-modal-save" id="btnSaveAdmin" onclick="createAdmin()">Criar usuário</button>
     </div>
   </div>
 </div>
