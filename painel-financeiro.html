@@ -17,6 +17,9 @@
     .header-tag { background: rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
     .btn-logout { background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; }
     .btn-logout:hover { border-color: white; color: white; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; color: var(--white); text-decoration: none; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.25); }
 
     .welcome-strip { background: var(--white); border-bottom: 1px solid var(--sand); padding: 20px 20px 0; }
     .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
@@ -114,7 +117,10 @@
     <div class="header-brand">itsbrendacleto</div>
     <div class="header-tag">Gestão Financeira</div>
   </div>
-  <button class="btn-logout" id="logoutBtn">Sair</button>
+  <div class="header-actions">
+    <a href="painel-professora.html" class="btn-back" id="backBtn" style="display:none;">← Voltar</a>
+    <button class="btn-logout" id="logoutBtn">Sair</button>
+  </div>
 </header>
 
 <div class="welcome-strip">
@@ -885,6 +891,9 @@
   // ---- Init ----
   async function init(profile) {
     document.getElementById('welcomeTitle').textContent = 'Olá, ' + (profile.full_name || 'Administrativo') + '!';
+    if (profile.role === 'professora') {
+      document.getElementById('backBtn').style.display = 'inline-flex';
+    }
 
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
