@@ -6565,8 +6565,13 @@
     if (error) { listEl.innerHTML = '<div class="empty-reports">Erro ao carregar financeiro.</div>'; return; }
 
     // Gráfico de crescimento usa todos os lançamentos, sem os filtros da
-    // lista abaixo - é uma visão fixa do histórico completo até a meta.
-    await renderGrowthChart(payments || []);
+    // lista abaixo - é uma visão fixa do histórico completo até a meta. Isolado
+    // em try/catch pra uma falha aqui nunca impedir o resto do Financeiro de carregar.
+    try {
+      await renderGrowthChart(payments || []);
+    } catch (e) {
+      console.warn('Erro ao renderizar o gráfico de crescimento.', e);
+    }
 
     const filterStudent = filterSelect.value;
     const filterFrom = document.getElementById('financeFilterFrom').value;
@@ -6727,8 +6732,12 @@
 
   let GROWTH_GOAL = 15000;
   async function loadGrowthGoal() {
-    const { data } = await sb.from('finance_metas').select('meta_mensal').eq('id', true).maybeSingle();
-    if (data && data.meta_mensal != null) GROWTH_GOAL = Number(data.meta_mensal);
+    try {
+      const { data } = await sb.from('finance_metas').select('meta_mensal').eq('id', true).maybeSingle();
+      if (data && data.meta_mensal != null) GROWTH_GOAL = Number(data.meta_mensal);
+    } catch (e) {
+      console.warn('Não foi possível carregar a meta financeira, usando o valor padrão.', e);
+    }
   }
 
   function niceStep(rough) {
