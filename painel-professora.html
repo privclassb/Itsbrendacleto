@@ -984,11 +984,9 @@
     <div class="report-list" style="margin-bottom:24px;">
       <div class="report-list-title" style="display:flex;justify-content:space-between;align-items:center;">
         <span>Equipe</span>
-        <div style="display:flex;gap:8px;">
-          <button class="btn-sm" id="addTeacherBtn" onclick="openAddTeacher()" style="display:none;">+ Nova professora</button>
-          <button class="btn-sm" id="addAdminBtn" onclick="openAddAdmin()" style="display:none;">+ Novo administrativo</button>
-        </div>
+        <button class="btn-sm" id="addTeacherBtn" onclick="openAddTeacher()" style="display:none;">+ Nova professora</button>
       </div>
+      <button class="btn-sm" id="addAdminBtn" onclick="openAddAdmin()" style="display:none;margin-bottom:12px;">+ Novo administrativo</button>
       <div class="folder-list" id="teacherFolderList">Carregando...</div>
       <div class="add-folder-form" id="addTeacherFolderForm" style="display:none;">
         <select id="teacherFolderTeacher">
