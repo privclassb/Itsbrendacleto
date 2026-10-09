@@ -493,9 +493,19 @@
   // ---- Load + render: Entradas (agora é o mesmo dado do Financeiro, tabela payments) ----
   async function loadEntradas() {
     const { data } = await sb.from('payments').select('*').eq('type', 'entrada').order('due_date', { ascending: false });
-    entradas = (data || []).map(p => ({
+    const rows = data || [];
+
+    const studentIds = [...new Set(rows.map(p => p.student_id).filter(Boolean))];
+    const studentNames = {};
+    if (studentIds.length) {
+      const { data: students } = await sb.from('profiles').select('id, full_name').in('id', studentIds);
+      (students || []).forEach(s => { studentNames[s.id] = s.full_name; });
+    }
+
+    entradas = rows.map(p => ({
       id: p.id,
       descricao: p.description,
+      aluno: p.student_id ? (studentNames[p.student_id] || null) : null,
       tipo_entrada: p.tipo_entrada,
       vencimento: p.due_date,
       valor: p.amount,
@@ -512,8 +522,9 @@
     if (!entradas.length) { el.innerHTML = '<tr><td colspan="7" class="empty-msg">Nenhuma entrada lançada ainda.</td></tr>'; return; }
     el.innerHTML = entradas.map(e => {
       const { status, diasAtraso } = computeEntradaStatus(e.vencimento, e.data_pagamento);
+      const quem = e.aluno ? `${escapeHtml(e.aluno)} — ${escapeHtml(e.descricao)}` : escapeHtml(e.descricao);
       return `<tr>
-        <td>${escapeHtml(e.descricao)}</td>
+        <td>${quem}</td>
         <td>${escapeHtml(e.tipo_entrada || '')}</td>
         <td>${formatDateBR(e.vencimento)}</td>
         <td>${formatBRL(e.valor)}</td>
