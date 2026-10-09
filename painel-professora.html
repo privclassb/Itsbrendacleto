@@ -6566,7 +6566,7 @@
 
     // Gráfico de crescimento usa todos os lançamentos, sem os filtros da
     // lista abaixo - é uma visão fixa do histórico completo até a meta.
-    renderGrowthChart(payments || []);
+    await renderGrowthChart(payments || []);
 
     const filterStudent = filterSelect.value;
     const filterFrom = document.getElementById('financeFilterFrom').value;
@@ -6725,7 +6725,11 @@
 
   // ---- Gráfico de crescimento (meta de faturamento mensal até dezembro) ----
 
-  const GROWTH_GOAL = 15000;
+  let GROWTH_GOAL = 15000;
+  async function loadGrowthGoal() {
+    const { data } = await sb.from('finance_metas').select('meta_mensal').eq('id', true).maybeSingle();
+    if (data && data.meta_mensal != null) GROWTH_GOAL = Number(data.meta_mensal);
+  }
 
   function niceStep(rough) {
     if (rough <= 0) return 1000;
@@ -6753,7 +6757,8 @@
     return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString('pt-BR', { month: 'short' }).replace('.', '');
   }
 
-  function renderGrowthChart(payments) {
+  async function renderGrowthChart(payments) {
+    await loadGrowthGoal();
     const entradas = payments.filter(p => p.type === 'entrada');
     const monthly = financeMonthlyBreakdown(entradas);
 
@@ -6838,7 +6843,7 @@
       <svg class="growth-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMinYMin meet">
         ${gridlines}
         <line class="growth-goal-line" x1="${marginLeft}" x2="${width - marginRight}" y1="${goalY.toFixed(1)}" y2="${goalY.toFixed(1)}" />
-        <text class="growth-goal-label" x="${width - marginRight}" y="${(goalY - 6).toFixed(1)}" text-anchor="end">Meta: R$ 15.000</text>
+        <text class="growth-goal-label" x="${width - marginRight}" y="${(goalY - 6).toFixed(1)}" text-anchor="end">Meta: ${formatBRLFull(GROWTH_GOAL)}</text>
         ${bars}
         ${xLabels}
       </svg>

@@ -142,12 +142,29 @@
     <!-- VISÃO GERAL -->
     <div class="fin-panel active" id="panel-visao">
       <div class="card">
+        <div class="card-title">Metas financeiras</div>
+        <div class="reserve-form-row">
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Meta mensal (R$)</label>
+            <input type="number" step="0.01" class="modal-input" id="metaMensalInput" />
+          </div>
+          <div class="modal-row" style="margin-bottom:0;">
+            <label class="modal-label">Meta anual (R$)</label>
+            <input type="number" step="0.01" class="modal-input" id="metaAnualInput" />
+          </div>
+        </div>
+        <button class="btn-primary" onclick="saveMetas()">Salvar metas</button>
+        <div class="modal-error" id="metasError" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
         <div class="card-title">Mês atual</div>
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">Entradas recebidas</div><div class="stat-value" id="vgMesEntradas">—</div></div>
           <div class="stat-card"><div class="stat-label">Custos</div><div class="stat-value" id="vgMesCustos">—</div></div>
           <div class="stat-card"><div class="stat-label">Lucro líquido</div><div class="stat-value" id="vgMesLucro">—</div></div>
           <div class="stat-card"><div class="stat-label">Margem</div><div class="stat-value" id="vgMesMargem">—</div></div>
+          <div class="stat-card"><div class="stat-label">Meta mensal</div><div class="stat-value" id="vgMetaMensal">—</div><div class="stat-sub" id="vgMetaMensalPct"></div></div>
         </div>
       </div>
 
@@ -158,6 +175,7 @@
           <div class="stat-card"><div class="stat-label">Custos</div><div class="stat-value" id="vgAnoCustos">—</div></div>
           <div class="stat-card"><div class="stat-label">Lucro líquido</div><div class="stat-value" id="vgAnoLucro">—</div></div>
           <div class="stat-card"><div class="stat-label">Margem</div><div class="stat-value" id="vgAnoMargem">—</div></div>
+          <div class="stat-card"><div class="stat-label">Meta anual</div><div class="stat-value" id="vgMetaAnual">—</div><div class="stat-sub" id="vgMetaAnualPct"></div></div>
         </div>
       </div>
 
@@ -441,7 +459,30 @@
 
   // ---- State ----
   let CURRENT_USER_ID = null;
-  let entradas = [], saidas = [], previstos = [], movimentos = [], reservaConfig = null;
+  let entradas = [], saidas = [], previstos = [], movimentos = [], reservaConfig = null, metas = null;
+
+  // ---- Metas financeiras (mensal/anual) ----
+  async function loadMetas() {
+    const { data } = await sb.from('finance_metas').select('*').eq('id', true).maybeSingle();
+    metas = data || { meta_mensal: 15000, meta_anual: 180000 };
+    document.getElementById('metaMensalInput').value = metas.meta_mensal;
+    document.getElementById('metaAnualInput').value = metas.meta_anual;
+    renderVisaoGeral();
+  }
+  async function saveMetas() {
+    const errEl = document.getElementById('metasError');
+    errEl.style.display = 'none';
+    const payload = {
+      id: true,
+      meta_mensal: parseFloat(document.getElementById('metaMensalInput').value) || 0,
+      meta_anual: parseFloat(document.getElementById('metaAnualInput').value) || 0,
+      updated_at: new Date().toISOString(),
+    };
+    const { error } = await sb.from('finance_metas').upsert(payload, { onConflict: 'id' });
+    if (error) { errEl.textContent = 'Erro: ' + error.message; errEl.style.display = 'block'; return; }
+    metas = payload;
+    renderVisaoGeral();
+  }
 
   // ---- Load + render: Entradas (agora é o mesmo dado do Financeiro, tabela payments) ----
   async function loadEntradas() {
@@ -768,7 +809,7 @@
 
   // ---- Visão Geral ----
   function renderVisaoGeral() {
-    if (!reservaConfig) return; // wait until all four loads have happened at least once
+    if (!reservaConfig || !metas) return; // wait until all loads have happened at least once
     const now = new Date();
     const curYear = now.getFullYear();
     const curMonth = now.getMonth() + 1;
@@ -803,12 +844,20 @@
     lucroMesEl.className = 'stat-value ' + (lucroMes >= 0 ? 'positive' : 'negative');
     document.getElementById('vgMesMargem').textContent = (margemMes * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
 
+    const metaMensal = Number(metas.meta_mensal || 0);
+    document.getElementById('vgMetaMensal').textContent = formatBRL(metaMensal);
+    document.getElementById('vgMetaMensalPct').textContent = metaMensal > 0 ? (entradasMes / metaMensal * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '% da meta' : '';
+
     document.getElementById('vgAnoEntradas').textContent = formatBRL(entradasAno);
     document.getElementById('vgAnoCustos').textContent = formatBRL(custosAno);
     const lucroAnoEl = document.getElementById('vgAnoLucro');
     lucroAnoEl.textContent = formatBRL(lucroAno);
     lucroAnoEl.className = 'stat-value ' + (lucroAno >= 0 ? 'positive' : 'negative');
     document.getElementById('vgAnoMargem').textContent = (margemAno * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%';
+
+    const metaAnual = Number(metas.meta_anual || 0);
+    document.getElementById('vgMetaAnual').textContent = formatBRL(metaAnual);
+    document.getElementById('vgMetaAnualPct').textContent = metaAnual > 0 ? (entradasAno / metaAnual * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '% da meta' : '';
 
     document.getElementById('vgAtrasoValor').textContent = formatBRL(atrasoValor);
     document.getElementById('vgAtrasoQtd').textContent = atrasadas.length + (atrasadas.length === 1 ? ' mensalidade' : ' mensalidades');
@@ -840,7 +889,7 @@
     document.getElementById('loadingCard').style.display = 'none';
     document.getElementById('mainContent').style.display = 'block';
 
-    await Promise.all([loadEntradas(), loadSaidas(), loadPrevistos(), loadReserva()]);
+    await Promise.all([loadEntradas(), loadSaidas(), loadPrevistos(), loadReserva(), loadMetas()]);
   }
 
   document.getElementById('logoutBtn').addEventListener('click', async () => {
