@@ -87,16 +87,29 @@
 <main id="folders">
   <div class="folder-group open">
     <div class="folder-group-header" onclick="this.parentElement.classList.toggle('open')">
-      <span class="folder-group-name">Book 1<span class="folder-group-badge">2</span></span>
+      <span class="folder-group-name">Kids</span>
       <span class="folder-group-chevron">▶</span>
     </div>
     <div class="folder-group-body">
-      <a class="lesson-item" href="apresentacao-book1-aula1.html">
-        <span class="name">Aula 1 — Hello! What's your name?</span>
-      </a>
-      <a class="lesson-item" href="apresentacao-book1-aula2.html">
-        <span class="name">Aula 2 — Introducing Yourself</span>
-      </a>
+      <div class="folder-group open">
+        <div class="folder-group-header" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
+          <span class="folder-group-name">Book 1</span>
+          <span class="folder-group-chevron">▶</span>
+        </div>
+        <div class="folder-group-body">
+          <div class="empty-msg">Nenhuma aula adicionada ainda.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="folder-group">
+    <div class="folder-group-header" onclick="this.parentElement.classList.toggle('open')">
+      <span class="folder-group-name">Adultos</span>
+      <span class="folder-group-chevron">▶</span>
+    </div>
+    <div class="folder-group-body">
+      <div class="empty-msg">Em breve.</div>
     </div>
   </div>
 </main>
