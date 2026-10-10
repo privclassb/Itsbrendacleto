@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 7 · Let's Play Sports!</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:center;gap:14px;z-index:20;background:#ffffffd9}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12)}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}.gaps .ans{display:block;min-height:1.4em;color:transparent;font-size:.9em}.gaps .rv{cursor:pointer;border-radius:12px;padding:2px 8px}.gaps .rv:hover{background:#f3fbff}.gaps .rv.shown b,.gaps .rv.shown .ans{color:var(--blue)}.ab{margin-left:10px;border:none;background:#FFD97D;border-radius:12px;padding:3px 10px;font-family:Nunito;font-weight:900;font-size:13px;cursor:pointer;vertical-align:middle;box-shadow:0 2px 0 #0002}.gaps .rv.hasab{cursor:default}.gaps .rv.hasab:hover{background:none}.tapnote{font-size:13px;color:#888;margin:0 0 6px;font-weight:700}.gaps.show .ans{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 7</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">TALKING ABOUT SPORTS</div><h1>Let's Play<br>Sports!</h1><div class="pill">⚽🏀🎾</div></div></section>
+<section class="slide "><h2>🔁 Let's remember!</h2><p class="sub">Warm-up</p><div class="linkcard"><div class="e">📚</div><div class="big2">He studies Math.<br>She doesn't like History.</div><p>🙋 Can you make a <b>negative</b> sentence about yourself?</p><p>Today we're talking about sports! 🏆</p></div></section>
+<section class="slide "><h2>⚽ Sports</h2><p class="sub">Sports we PLAY!</p><div class="row"><div class="card" style="background:#F2A7C3"><div class=e>⚽</div><div class="lab">Soccer</div><div class=sm><i>Futebol</i></div></div><div class="card" style="background:#9fdcf2"><div class=e>🏀</div><div class="lab">Basketball</div><div class=sm><i>Basquete</i></div></div><div class="card" style="background:#A8E6CF"><div class=e>🏐</div><div class="lab">Volleyball</div><div class=sm><i>Vôlei</i></div></div><div class="card" style="background:#C9A8E8"><div class=e>🎾</div><div class="lab">Tennis</div><div class=sm><i>Tênis</i></div></div><div class="card" style="background:#FFD97D"><div class=e>🏒</div><div class="lab">Hockey</div><div class=sm><i>Hockey</i></div></div><div class="card" style="background:#FFB3A7"><div class=e>⚾</div><div class="lab">Baseball</div><div class=sm><i>Beisebol</i></div></div></div></section>
+<section class="slide "><h2>🎮 TO PLAY</h2><p class="sub">JOGAR · I play · He plays · doesn't play</p><div class="row"><div class="card" style="background:#F2A7C3"><div class="lab">I play</div><div class="val">I play soccer ⚽</div></div><div class="card" style="background:#9fdcf2"><div class="lab">He plays</div><div class="val">He plays tennis 🎾</div></div><div class="card" style="background:#A8E6CF"><div class="lab">She doesn't play</div><div class="val">She doesn't play hockey 🏒</div></div></div></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>🎮 <b>play</b> / <b>plays</b> / <b>doesn't play</b></p></div></section>
+<section class="slide "><h2>📊 Class Survey</h2><p class="sub">Ask: "Do you play Soccer?" Mark ✅ or ❌</p><table class="tb"><tr><th>Name</th><th>⚽ Soccer</th><th>🏀 Basketball</th><th>🏐 Volleyball</th><th>🎾 Tennis</th></tr><tr><td class="ed" contenteditable="true">&nbsp;</td><td class="ck"></td><td class="ck"></td><td class="ck"></td><td class="ck"></td></tr><tr><td class="ed" contenteditable="true">&nbsp;</td><td class="ck"></td><td class="ck"></td><td class="ck"></td><td class="ck"></td></tr><tr><td class="ed" contenteditable="true">&nbsp;</td><td class="ck"></td><td class="ck"></td><td class="ck"></td><td class="ck"></td></tr><tr><td class="ed" contenteditable="true">&nbsp;</td><td class="ck"></td><td class="ck"></td><td class="ck"></td><td class="ck"></td></tr></table><p class="tapnote" style="margin-top:8px">👆 Click a cell to mark ✅ or ❌. Click the Name cell to type a name.</p></section>
+<section class="slide "><h2>Sentence Swap 🔁</h2><p class="sub">Spin the wheel and change into NEGATIVES!</p><div class="linkcard"><div class="e">🎡</div><p>Click the button to open the activity in a new tab. Share your screen so everyone can play!</p><a class="btn" target="_blank" rel="noopener" href="https://wordwall.net/resource/117156405?wwmethod=link">🎡 OPEN THE WORDWALL WHEEL</a></div></section>
+<section class="slide "><h2>My Favorite Sport 🏆</h2><p class="sub">Tell the group about you and someone you know!</p><div class="linkcard"><div class="e">🏆</div><p style="font-style:italic;font-size:1.2em">"I play Soccer."</p><p style="font-style:italic;font-size:1.2em">"My brother doesn't play Soccer, he plays Basketball."</p></div></section>
+<section class="slide "><h2>🥅 Get ready: Sports Shootout!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Type your <b>name</b>.</div></div><div class="st"><span class="n">2</span><div>Click <b>⚽ Shoot!</b> and see where the ball goes.</div></div><div class="st"><span class="n">3</span><div>You get a <b>person</b> and a <b>sport</b>.</div></div><div class="st"><span class="n">4</span><div>Tell us about <b>YOU</b> and about <b>that person</b>! Use play / plays / doesn't play.</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🥅 Sports Shootout!</span><small>Shoot and talk about you and someone you know</small></div><iframe title="Sports Shootout!" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--dark:#3A3A3A}*{box-sizing:border-box}
+html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{padding:8px 14px 20px;max-width:900px;margin:0 auto;text-align:center}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}.names input{width:100px;border:2px solid #C9A8E8;border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.turn{font-family:Nunito;font-weight:900;color:#e0719c;font-size:20px;min-height:28px}
+.hint{font-weight:800;color:#666;margin:2px 0 8px}
+.goal{position:relative;border:6px solid #fff;border-bottom:none;border-radius:14px 14px 0 0;background:repeating-linear-gradient(45deg,#e8f6ec 0 12px,#d6efde 12px 24px);padding:14px;box-shadow:0 6px 0 #0002;max-width:760px;margin:0 auto}
+.zones{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.z{height:128px;border-radius:14px;background:#fff8;border:3px dashed #9bd3ac;font-family:Nunito;font-weight:900;font-size:26px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.25s;color:#9bd3ac}
+.z.hit{background:#FFD97D;border:3px solid #f0b429;color:var(--dark);transform:scale(1.06);animation:pop .4s}
+.z .p{font-size:36px;line-height:1}.z .s{font-size:44px;line-height:1.1}.z small{font-size:14px;font-weight:900}
+@keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.14)}100%{transform:scale(1.06)}}
+.ball{position:absolute;font-size:38px;left:50%;bottom:14px;transition:all .7s cubic-bezier(.2,.8,.3,1);transform:translateX(-50%)}
+.grass{height:70px;background:#7ccf8e;border-radius:0 0 14px 14px;max-width:760px;margin:0 auto;position:relative}
+.btn{margin-top:12px;border:none;border-radius:18px;padding:10px 22px;font-family:Nunito;font-weight:900;font-size:17px;cursor:pointer;background:#FFD97D;box-shadow:0 4px 0 #0002}
+.task{font-family:Nunito;font-weight:900;font-size:clamp(15px,2vw,20px);margin-top:10px;min-height:28px;color:#2a7fa8}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input placeholder=&quot;Student 1&quot;&gt;&lt;input placeholder=&quot;Student 2&quot;&gt;&lt;input placeholder=&quot;Student 3&quot;&gt;&lt;input placeholder=&quot;Student 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;turn&quot; id=&quot;turn&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hint&quot;&gt;Shoot the ball! 🥅 You get a PERSON and a SPORT: tell us about YOU and about that person!&lt;/div&gt;
+&lt;div class=&quot;goal&quot;&gt;&lt;div class=&quot;zones&quot; id=&quot;zones&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;grass&quot;&gt;&lt;span class=&quot;ball&quot; id=&quot;ball&quot;&gt;⚽&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&quot;task&quot; id=&quot;task&quot;&gt;&lt;/div&gt;
+&lt;button class=&quot;btn&quot; id=&quot;shoot&quot;&gt;⚽ Shoot!&lt;/button&gt;&lt;button class=&quot;btn&quot; id=&quot;next&quot; style=&quot;background:#C9A8E8&quot;&gt;👉 Next student&lt;/button&gt;
+&lt;/div&gt;&lt;script&gt;
+var PEOPLE=[[&quot;👦&quot;,&quot;My brother&quot;],[&quot;👧&quot;,&quot;My sister&quot;],[&quot;👩&quot;,&quot;My mom&quot;],[&quot;👨&quot;,&quot;My dad&quot;],[&quot;🧒&quot;,&quot;My friend&quot;],[&quot;👵&quot;,&quot;My grandma&quot;],[&quot;👴&quot;,&quot;My grandpa&quot;],[&quot;🧑‍🏫&quot;,&quot;My teacher&quot;],[&quot;🧒&quot;,&quot;My cousin&quot;]];
+var SP=[&quot;⚽&quot;,&quot;🏀&quot;,&quot;🏐&quot;,&quot;🎾&quot;,&quot;🏒&quot;,&quot;⚾&quot;];
+var turn=0,busy=false;
+function nm(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
+function who(){var N=nm();document.getElementById(&#x27;turn&#x27;).textContent=N.length?&#x27;👉 &#x27;+N[turn%N.length]+&#x27; is up! 🎤&#x27;:&#x27;&#x27;;}
+function build(){var z=document.getElementById(&#x27;zones&#x27;);z.innerHTML=&#x27;&#x27;;for(var i=0;i&lt;6;i++){var d=document.createElement(&#x27;div&#x27;);d.className=&#x27;z&#x27;;d.innerHTML=&#x27;🥅&#x27;;z.appendChild(d);}
+ var b=document.getElementById(&#x27;ball&#x27;);b.style.opacity=1;b.style.transition=&#x27;none&#x27;;b.style.left=&#x27;50%&#x27;;b.style.bottom=&#x27;14px&#x27;;document.getElementById(&#x27;task&#x27;).textContent=&#x27;&#x27;;}
+document.getElementById(&#x27;shoot&#x27;).addEventListener(&#x27;click&#x27;,function(){
+ if(busy)return;busy=true;build();var zs=document.querySelectorAll(&#x27;.z&#x27;),k=Math.floor(Math.random()*6),el=zs[k];
+ var b=document.getElementById(&#x27;ball&#x27;),g=document.querySelector(&#x27;.goal&#x27;).getBoundingClientRect(),r=el.getBoundingClientRect(),gr=document.querySelector(&#x27;.grass&#x27;).getBoundingClientRect();
+ void b.offsetWidth;b.style.transition=&#x27;all .7s cubic-bezier(.2,.8,.3,1)&#x27;;
+ b.style.left=(r.left+r.width/2-gr.left)+&#x27;px&#x27;;b.style.bottom=(gr.bottom-r.top-r.height/2-20)+&#x27;px&#x27;;
+ setTimeout(function(){var p=PEOPLE[Math.floor(Math.random()*PEOPLE.length)],s=SP[Math.floor(Math.random()*SP.length)];
+  b.style.opacity=0;el.classList.add(&#x27;hit&#x27;);el.innerHTML=&#x27;&lt;span class=&quot;p&quot;&gt;&#x27;+p[0]+&#x27;&lt;/span&gt;&lt;small&gt;&#x27;+p[1]+&#x27;&lt;/small&gt;&lt;span class=&quot;s&quot;&gt;&#x27;+s+&#x27;&lt;/span&gt;&#x27;;
+  document.getElementById(&#x27;task&#x27;).textContent=&#x27;GOAL! 🎉 Say about YOU and about &#x27;+p[1].toLowerCase()+&#x27;!&#x27;;busy=false;},720);});
+document.getElementById(&#x27;next&#x27;).addEventListener(&#x27;click&#x27;,function(){turn++;build();who();});
+document.getElementById(&#x27;names&#x27;).addEventListener(&#x27;input&#x27;,who);build();who();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Fill in the Gaps ✏️</h2><p class="sub">Choose the right answer: play / plays / doesn't play</p><div class="linkcard"><div class="e">📦</div><p>Click the button to open the activity in a new tab. Share your screen so everyone can play!</p><a class="btn" target="_blank" rel="noopener" href="https://wordwall.net/resource/117156470?wwmethod=link">📦 OPEN THE WORDWALL GAME</a></div></section>
+<section class="slide "><h2>Now it's your turn! 🙌</h2><p class="sub">Tell the group: What sport do you play?</p><div class="linkcard"><div class="e">🏆</div><div class="big2">"I play... / I don't play..."</div><p>Your homework for this lesson is waiting on the platform:<br>practice sports, third person and negative sentences!</p><p>See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); });
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+[].forEach.call(document.querySelectorAll('.gaps .rv'),function(p){var ab=p.querySelector('.ab');(ab||p).addEventListener('click',function(){p.classList.toggle('shown'); if(ab) ab.textContent=p.classList.contains('shown')?'🙈 Hide':'👁 Answer';});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Lesson 7 · Let's Play Sports!</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Sports</a> · <a href=\"#s3\">To play</a> · <a href=\"#s4\">Drills</a> · <a href=\"#s5\">Class Survey</a> · <a href=\"#s6\">Sentence Swap</a> · <a href=\"#s7\">My Favorite Sport</a> · <a href=\"#s8\">Fill in the Gaps</a> · <a href=\"#s9\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li>Vocabulário: esportes de bola/jogo, os únicos que usam <b>play</b> (Soccer, Basketball, Volleyball, Tennis, Hockey, Baseball).</li><li>Estrutura: <b>to play</b>, já misturando afirmativa, 3ª pessoa e negativa, para seguir fixando o que foi revisado na Aula 6.</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-5</td><td>1-2</td><td>Abertura + warm-up (Aula 6)</td></tr><tr><td>5-13</td><td>3</td><td>Sports</td></tr><tr><td>13-18</td><td>4</td><td>To play</td></tr><tr><td>18-28</td><td>5</td><td>Drills: afirmativa e negativa</td></tr><tr><td>28-33</td><td>6</td><td>Class Survey</td></tr><tr><td>33-40</td><td>7</td><td>Sentence Swap (Wordwall)</td></tr><tr><td>40-52</td><td>8-10</td><td>My Favorite Sport (Sports Shootout)</td></tr><tr><td>52-58</td><td>11</td><td>Fill in the Gaps (Wordwall)</td></tr><tr><td>58-60</td><td>12</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes do jogo (Sports Shootout) há um slide \"Get ready\". Os dois Wordwalls abrem em nova aba (o site não permite ser embutido). O slide \"Speaking Time\" não mostra frases: os drills ficam só neste guia.</div>\n<h2 id=\"s1\">⏱️ 0-5 min | Abertura e warm-up (slides 1-2)</h2>\n<p>Cumprimente cada aluno (\"How are you today?\") e faça o warm-up do slide, relembrando a Aula 6: \"He studies Math.\" / \"She doesn't like History.\" Depois peça que cada aluno diga <b>uma frase negativa sobre si mesmo</b> (\"I don't like...\"). Isso reativa a 3ª pessoa e o don't/doesn't. Feche anunciando: hoje vamos falar de esportes!</p>\n<h2 id=\"s2\">⏱️ 5-13 min | Sports (slide 3)</h2>\n<p>Apresente os 6 cartões: Soccer, Basketball, Volleyball, Tennis, Hockey, Baseball. Diga, repetição em coro, depois individual. A tradução em português está em itálico: use só se travarem. Pergunte \"Do you like soccer?\" para aquecer. <b>Decisão pedagógica:</b> só esportes com \"play\"; não introduza go/do (swimming, karate...) nessa fase para não sobrecarregar.</p>\n<h2 id=\"s3\">⏱️ 13-18 min | To play (slide 4)</h2>\n<p>Mostre os três exemplos: <b>I play</b> soccer / <b>He plays</b> tennis / <b>She doesn't play</b> hockey. Já aparecem juntas a afirmativa, a 3ª pessoa (-s) e a negativa (doesn't + verbo sem -s), continuando a estrutura da Aula 6.</p>\n<h2 id=\"s4\">⏱️ 18-28 min | Drills: afirmativa e negativa (slide 5)</h2>\n<p>Mostre o slide \"Speaking Time\" (sem frases) e conduza oralmente, do <b>português para o inglês</b>. Cada aluno faz <b>1 afirmativa e 1 negativa</b> (4 + 4), com <b>2 substituições</b>. Respostas em letra pequena.</p>\n<p><b>Afirmativas</b> (substituições de esporte):</p>\n<ol><li>Eu jogo futebol. / basquete / vôlei<br><small>I play soccer. I play basketball. I play volleyball.</small></li><li>Ele joga tênis. / hockey / beisebol<br><small>He plays tennis. He plays hockey. He plays baseball.</small></li><li>Nós jogamos vôlei. / futebol / basquete<br><small>We play volleyball. We play soccer. We play basketball.</small></li><li>Ela joga basquete. / tênis / hockey<br><small>She plays basketball. She plays tennis. She plays hockey.</small></li></ol>\n<p><b>Negativas</b> (substituições de sujeito, para praticar don't / doesn't):</p>\n<ol><li>Eu não jogo hockey. / ela / ele<br><small>I don't play hockey. She doesn't play hockey. He doesn't play hockey.</small></li><li>Ela não joga beisebol. / eu / eles<br><small>She doesn't play baseball. I don't play baseball. They don't play baseball.</small></li><li>Ele não joga tênis. / nós / ela<br><small>He doesn't play tennis. We don't play tennis. She doesn't play tennis.</small></li><li>Eles não jogam vôlei. / eu / ele<br><small>They don't play volleyball. I don't play volleyball. He doesn't play volleyball.</small></li></ol>\n<p>Se esquecerem o -s em \"He plays\" ou usarem \"doesn't plays\", corrija na hora e peça para repetir a frase certa.</p>\n<h2 id=\"s5\">⏱️ 28-33 min | Class Survey (slide 6)</h2>\n<p>Compartilhe a tela com a tabela (Name × Soccer / Basketball / Volleyball / Tennis). Pergunte a cada aluno \"Do you play Soccer?\" e preencha ao vivo clicando na célula (✅ ou ❌); clique no nome para digitar. No fim, use a 3ª pessoa: \"Who plays tennis? Does Ana play soccer?\"</p>\n<h2 id=\"s6\">⏱️ 33-40 min | Sentence Swap (slide 7)</h2>\n<p>Abra o Wordwall <b>\"Change into negatives\"</b> (roleta) no botão do slide e compartilhe a tela. Gire a roleta: cada rodada é uma frase afirmativa sobre esportes e o aluno transforma em negativa na hora, em voz alta, passando a vez. São 8 frases (2 rodadas por aluno): He plays soccer. / She plays tennis. / They play basketball. / I play volleyball. / We play hockey. / She plays baseball. / He plays tennis. / They play soccer.</p>\n<h2 id=\"s7\">⏱️ 40-52 min | My Favorite Sport (slides 8-10)</h2>\n<p>Mostre o slide \"My Favorite Sport\" com o modelo: \"I play Soccer. My brother doesn't play Soccer, he plays Basketball.\" Depois do \"Get ready\", abra o <b>Sports Shootout</b>: digite os nomes e clique em \"⚽ Shoot!\". A bola cai em uma das metas e mostra <b>uma pessoa e um esporte</b> (nunca a frase pronta). O aluno fala sobre si mesmo e sobre essa pessoa, misturando afirmativa e negativa de forma livre. Use \"Next student\" para passar a vez. É a produção livre da aula.</p>\n<h2 id=\"s8\">⏱️ 52-58 min | Fill in the Gaps (slide 11)</h2>\n<p>Abra o Wordwall <b>\"Complete the sentences\"</b> pelo botão do slide: fecha misturando play / plays / doesn't play / don't play. Os alunos escolhem a opção correta; comente cada resposta (principalmente o -s e o doesn't).</p>\n<h2 id=\"s9\">⏱️ 58-60 min | Encerramento (slide 12)</h2>\n<p>Cada aluno diz: \"I play... / I don't play...\". Avise que o homework (esportes, 3ª pessoa e negativas) já está na plataforma. \"See you next class!\"</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> manter o vocabulário reduzido (só esportes com \"play\") evita sobrecarregar os kids nessa fase; o foco real da aula é continuar fixando a 3ª pessoa e as negativas de forma natural e comunicativa. Coloque-os para falar bastante!</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 7</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ nw.focus(); return; }
+  try{ nw=window.open('','guiaProfessora','width=640,height=760,resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); } });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>
