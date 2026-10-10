@@ -24,16 +24,22 @@
 
     main { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
 
-    .folder-group { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
-    .folder-group-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 18px 22px; cursor: pointer; user-select: none; }
-    .folder-group-name { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); font-weight: 400; }
-    .folder-group-badge { font-size: 11px; font-weight: 600; color: var(--muted); background: var(--cream); border-radius: 99px; padding: 3px 10px; margin-left: 10px; }
-    .folder-group-chevron { font-size: 13px; color: var(--muted); transition: transform 0.15s; }
-    .folder-group.open .folder-group-chevron { transform: rotate(90deg); }
-    .folder-group-body { display: none; padding: 0 22px 20px; }
-    .folder-group.open .folder-group-body { display: block; }
+    .breadcrumb { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 18px; font-size: 13px; }
+    .crumb { color: var(--muted); cursor: pointer; }
+    .crumb:hover { color: var(--brown); text-decoration: underline; }
+    .crumb.current { color: var(--text); font-weight: 600; cursor: default; }
+    .crumb.current:hover { text-decoration: none; }
+    .crumb-sep { color: var(--muted); }
 
-    .lesson-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--cream); border-radius: 12px; margin-bottom: 8px; text-decoration: none; transition: background 0.15s; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .folder-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 22px; margin-bottom: 12px; cursor: pointer; transition: background 0.15s; }
+    .folder-card:hover { background: var(--sand); }
+    .folder-card .folder-name { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); font-weight: 400; display: flex; align-items: center; gap: 10px; }
+    .folder-card .folder-chevron { font-size: 16px; color: var(--muted); }
+
+    .lesson-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--white); box-shadow: var(--shadow); border-radius: 12px; margin-bottom: 8px; text-decoration: none; transition: background 0.15s; }
     .lesson-item:hover { background: var(--sand); }
     .lesson-item .emoji { font-size: 20px; flex-shrink: 0; }
     .lesson-item .name { font-size: 14px; font-weight: 600; color: var(--text); }
@@ -84,37 +90,59 @@
   </div>
 </div>
 
-<main id="folders">
-  <div class="folder-group open">
-    <div class="folder-group-header" onclick="this.parentElement.classList.toggle('open')">
-      <span class="folder-group-name">Kids</span>
-      <span class="folder-group-chevron">▶</span>
+<main>
+  <div class="breadcrumb" id="breadcrumb"></div>
+
+  <div class="screen active" id="screen-root">
+    <div class="folder-card" onclick="goTo('kids')">
+      <span class="folder-name">📁 Kids</span>
+      <span class="folder-chevron">›</span>
     </div>
-    <div class="folder-group-body">
-      <div class="folder-group open">
-        <div class="folder-group-header" onclick="event.stopPropagation(); this.parentElement.classList.toggle('open')">
-          <span class="folder-group-name">Book 1</span>
-          <span class="folder-group-chevron">▶</span>
-        </div>
-        <div class="folder-group-body">
-          <div class="empty-msg">Nenhuma aula adicionada ainda.</div>
-        </div>
-      </div>
+    <div class="folder-card" onclick="goTo('adultos')">
+      <span class="folder-name">📁 Adultos</span>
+      <span class="folder-chevron">›</span>
     </div>
   </div>
 
-  <div class="folder-group">
-    <div class="folder-group-header" onclick="this.parentElement.classList.toggle('open')">
-      <span class="folder-group-name">Adultos</span>
-      <span class="folder-group-chevron">▶</span>
+  <div class="screen" id="screen-kids">
+    <div class="folder-card" onclick="goTo('kids-book1')">
+      <span class="folder-name">📁 Book 1</span>
+      <span class="folder-chevron">›</span>
     </div>
-    <div class="folder-group-body">
-      <div class="empty-msg">Em breve.</div>
-    </div>
+  </div>
+
+  <div class="screen" id="screen-kids-book1">
+    <div class="empty-msg">Nenhuma aula adicionada ainda.</div>
+  </div>
+
+  <div class="screen" id="screen-adultos">
+    <div class="empty-msg">Em breve.</div>
   </div>
 </main>
 
 <script>
+  // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
+  // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', adultos: 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', adultos: 'Adultos' };
+
+  function goTo(level) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
+    renderBreadcrumb(level);
+  }
+
+  function renderBreadcrumb(level) {
+    const path = [];
+    let cur = level;
+    while (cur !== undefined) { path.unshift(cur); cur = FOLDER_PARENT[cur]; }
+    document.getElementById('breadcrumb').innerHTML = path.map((lvl, i) => {
+      const isLast = i === path.length - 1;
+      return `<span class="crumb${isLast ? ' current' : ''}"${isLast ? '' : ` onclick="goTo('${lvl}')"`}>${FOLDER_LABEL[lvl]}</span>`;
+    }).join('<span class="crumb-sep">›</span>');
+  }
+
+  renderBreadcrumb('root');
+
   const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
   const { createClient } = supabase;
