@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 1 · Hello! My Name Is...</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}.gaps .ans{display:block;min-height:1.4em;color:transparent;font-size:.9em}.gaps .rv{cursor:pointer;border-radius:12px;padding:2px 8px}.gaps .rv:hover{background:#f3fbff}.gaps .rv.shown b,.gaps .rv.shown .ans{color:var(--blue)}.ab{margin-left:10px;border:none;background:#FFD97D;border-radius:12px;padding:3px 10px;font-family:Nunito;font-weight:900;font-size:13px;cursor:pointer;vertical-align:middle;box-shadow:0 2px 0 #0002}.gaps .rv.hasab{cursor:default}.gaps .rv.hasab:hover{background:none}.tapnote{font-size:13px;color:#888;margin:0 0 6px;font-weight:700}.gaps.show .ans{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 1</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<script>
+window.speakEn = (function(){
+  var enVoice = null;
+  function pickVoice(){
+    try{
+      var vs = speechSynthesis.getVoices();
+      if(!vs || !vs.length) return null;
+      return vs.filter(function(v){ return v.lang==='en-US'; })[0] || vs.filter(function(v){ return /^en-/i.test(v.lang); })[0] || null;
+    }catch(e){ return null; }
+  }
+  if('speechSynthesis' in window){
+    enVoice = pickVoice();
+    speechSynthesis.onvoiceschanged = function(){ enVoice = pickVoice() || enVoice; };
+  }
+  var timer = null;
+  return function(text){
+    try{
+      speechSynthesis.cancel();
+      clearTimeout(timer);
+      timer = setTimeout(function(){
+        var u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US'; u.rate = .8; u.pitch = 1; u.volume = 1;
+        if(enVoice) u.voice = enVoice;
+        speechSynthesis.speak(u);
+      }, 60);
+    }catch(e){}
+  };
+})();
+</script>
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">LESSON 1</div><h1>HELLO!<br>MY NAME IS...</h1><div class="pill">👧🏽🧒🏻👧🏻</div></div></section>
+<section class="slide "><h2>👋 Greetings</h2><p class="sub">How do we say hello?</p><div class="row"><div class="card" style="background:#F2A7C3"><div class=e>🌅</div><div class="lab">Good morning</div><div class=sm><i>bom dia</i></div></div><div class="card" style="background:#9fdcf2"><div class=e>☀️</div><div class="lab">Good afternoon</div><div class=sm><i>boa tarde</i></div></div><div class="card" style="background:#A8E6CF"><div class=e>🌆</div><div class="lab">Good evening</div><div class=sm><i>boa noite (chegada)</i></div></div><div class="card" style="background:#C9A8E8"><div class=e>🌙</div><div class="lab">Good night</div><div class=sm><i>boa noite (saída)</i></div></div><div class="card" style="background:#FFD97D"><div class=e>👋</div><div class="lab">Hi / Hi there</div><div class=sm><i>oi</i></div></div><div class="card" style="background:#FFB3A7"><div class=e>😊</div><div class="lab">Hello</div><div class=sm><i>olá</i></div></div><div class="card" style="background:#F2A7C3"><div class=e>🤙</div><div class="lab">What's up?</div><div class=sm><i>e aí?</i></div></div><div class="card" style="background:#9fdcf2"><div class=e>🤝</div><div class="lab">Nice to meet you!</div><div class=sm><i>prazer em conhecê-lo</i></div></div><div class="card" style="background:#A8E6CF"><div class=e>😄</div><div class="lab">Nice to meet you too</div><div class=sm><i>prazer também</i></div></div></div><p class="sub" style="margin-top:10px">💡 Tip: greet each classmate at the start of class!</p></section>
+<section class="slide "><h2>🙋 What is your name?</h2><p class="sub">QUAL É O SEU NOME?</p><div class="row"><div class="card" style="background:#F2A7C3"><div class="lab">My name is</div><div class="val">My name is Luana</div></div><div class="card" style="background:#9fdcf2"><div class="lab">My name's</div><div class="val">My name's Luana</div></div><div class="card" style="background:#A8E6CF"><div class="lab">I am</div><div class="val">I am Luana</div></div><div class="card" style="background:#FFD97D"><div class="lab">I'm</div><div class="val">I'm Luana</div></div></div></section>
+<section class="slide "><h2>👋 Meet your new classmates!</h2><p class="sub">Practice: "Hi! My name is ___. What's your name?"</p><div class="row"><div class="card" style="background:#F2A7C3"><div class=e>🧒🏻</div><div class="lab">Charlie</div><div class=sm>Student A</div></div><div class="card" style="background:#9fdcf2"><div class=e>👧🏻</div><div class="lab">Mia</div><div class=sm>Student B</div></div><div class="card" style="background:#A8E6CF"><div class=e>🧒🏽</div><div class="lab">Joseph</div><div class=sm>Student C</div></div><div class="card" style="background:#C9A8E8"><div class=e>👧🏽</div><div class="lab">Ruby</div><div class=sm>Student D</div></div><div class="card" style="background:#FFD97D"><div class=e>👦🏼</div><div class="lab">Elliot</div><div class=sm>Student E</div></div><div class="card" style="background:#FFB3A7"><div class=e>👧🏾</div><div class="lab">Sophia</div><div class=sm>Student F</div></div></div></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>👋 <b>Hello</b> · <b>My name is</b> · <b>What's your name?</b> · <b>Nice to meet you</b></p></div></section>
+<section class="slide "><h2>🔤 The Alphabet</h2><p class="sub">Click a letter to hear it, then repeat!</p><style>.abc{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;max-width:900px}.al{border-radius:16px;padding:8px 2px;text-align:center;font-family:Nunito;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #0002;user-select:none}.al b{display:block;font-size:clamp(20px,3vw,32px)}.al span{font-size:clamp(14px,2vw,20px);color:#555}.al:active{transform:translateY(2px)}@media(max-width:700px){.abc{grid-template-columns:repeat(5,1fr)}}</style><div class="abc"><div class="al" data-s="A" onclick="speakEn(this.dataset.s)" style="background:#F2A7C3"><b>A</b><span>a</span></div><div class="al" data-s="B" onclick="speakEn(this.dataset.s)" style="background:#9fdcf2"><b>B</b><span>b</span></div><div class="al" data-s="C" onclick="speakEn(this.dataset.s)" style="background:#A8E6CF"><b>C</b><span>c</span></div><div class="al" data-s="D" onclick="speakEn(this.dataset.s)" style="background:#C9A8E8"><b>D</b><span>d</span></div><div class="al" data-s="E" onclick="speakEn(this.dataset.s)" style="background:#FFD97D"><b>E</b><span>e</span></div><div class="al" data-s="F" onclick="speakEn(this.dataset.s)" style="background:#FFB3A7"><b>F</b><span>f</span></div><div class="al" data-s="G" onclick="speakEn(this.dataset.s)" style="background:#F2A7C3"><b>G</b><span>g</span></div><div class="al" data-s="H" onclick="speakEn(this.dataset.s)" style="background:#9fdcf2"><b>H</b><span>h</span></div><div class="al" data-s="I" onclick="speakEn(this.dataset.s)" style="background:#A8E6CF"><b>I</b><span>i</span></div><div class="al" data-s="J" onclick="speakEn(this.dataset.s)" style="background:#C9A8E8"><b>J</b><span>j</span></div><div class="al" data-s="K" onclick="speakEn(this.dataset.s)" style="background:#FFD97D"><b>K</b><span>k</span></div><div class="al" data-s="L" onclick="speakEn(this.dataset.s)" style="background:#FFB3A7"><b>L</b><span>l</span></div><div class="al" data-s="M" onclick="speakEn(this.dataset.s)" style="background:#F2A7C3"><b>M</b><span>m</span></div><div class="al" data-s="N" onclick="speakEn(this.dataset.s)" style="background:#9fdcf2"><b>N</b><span>n</span></div><div class="al" data-s="O" onclick="speakEn(this.dataset.s)" style="background:#A8E6CF"><b>O</b><span>o</span></div><div class="al" data-s="P" onclick="speakEn(this.dataset.s)" style="background:#C9A8E8"><b>P</b><span>p</span></div><div class="al" data-s="Q" onclick="speakEn(this.dataset.s)" style="background:#FFD97D"><b>Q</b><span>q</span></div><div class="al" data-s="R" onclick="speakEn(this.dataset.s)" style="background:#FFB3A7"><b>R</b><span>r</span></div><div class="al" data-s="S" onclick="speakEn(this.dataset.s)" style="background:#F2A7C3"><b>S</b><span>s</span></div><div class="al" data-s="T" onclick="speakEn(this.dataset.s)" style="background:#9fdcf2"><b>T</b><span>t</span></div><div class="al" data-s="U" onclick="speakEn(this.dataset.s)" style="background:#A8E6CF"><b>U</b><span>u</span></div><div class="al" data-s="V" onclick="speakEn(this.dataset.s)" style="background:#C9A8E8"><b>V</b><span>v</span></div><div class="al" data-s="W" onclick="speakEn(this.dataset.s)" style="background:#FFD97D"><b>W</b><span>w</span></div><div class="al" data-s="X" onclick="speakEn(this.dataset.s)" style="background:#FFB3A7"><b>X</b><span>x</span></div><div class="al" data-s="Y" onclick="speakEn(this.dataset.s)" style="background:#F2A7C3"><b>Y</b><span>y</span></div><div class="al" data-s="Z" onclick="speakEn(this.dataset.s)" style="background:#9fdcf2"><b>Z</b><span>z</span></div></div></section>
+<section class="slide "><h2>🎵 The Alphabet Song</h2><p class="sub">Sing along!</p><iframe class="vid" src="https://www.youtube-nocookie.com/embed/kDdg2M1_EuE" allowfullscreen allow="encrypted-media; picture-in-picture"></iframe><p class="sub" style="margin-top:8px"><a href="https://www.youtube.com/watch?v=kDdg2M1_EuE" target="_blank" rel="noopener">▶ Open on YouTube (new tab)</a></p></section>
+<section class="slide "><h2>🔠 How do you spell your name?</h2><p class="sub">COMO SE SOLETRA SEU NOME?</p><div class="row"><div class="card" style="background:#F2A7C3"><div class="lab">First name</div><div class="val">primeiro nome</div></div><div class="card" style="background:#9fdcf2"><div class="lab">Middle name</div><div class="val">nome do meio</div></div><div class="card" style="background:#A8E6CF"><div class="lab">Last name</div><div class="val">sobrenome</div></div><div class="card" style="background:#FFD97D"><div class="lab">Full name</div><div class="val">nome completo</div></div></div><div class="linkcard" style="margin-top:12px"><div class="e">🧱 A B C</div><p>🎯 Example:<br><b>"How do you spell your name?" → L - U - A - N - A</b></p></div></section>
+<section class="slide "><h2>🎨 Get ready: Name Badge!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Type your <b>name</b> in the box at the top.</div></div><div class="st"><span class="n">2</span><div>Tap the <b>letter blocks</b> 🧱 to spell your name. Each tap says the letter!</div></div><div class="st"><span class="n">3</span><div>Pick a <b>color</b> and a <b>sticker</b> for your badge.</div></div><div class="st"><span class="n">4</span><div>Say: <i>"Hello! My name is...."</i> and spell it out loud!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🎨 Name Badge!</span><small>Spell your name with letter blocks</small></div><iframe title="Name Badge!" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--dark:#3A3A3A}*{box-sizing:border-box}
+html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{padding:8px 14px 16px;max-width:980px;margin:0 auto;text-align:center}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}.names input{width:100px;border:2px solid #C9A8E8;border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.turn{font-family:Nunito;font-weight:900;color:#e0719c;font-size:20px;min-height:26px}
+.hint{font-weight:800;color:#666;margin:2px 0 8px}
+.badge{margin:6px auto;max-width:520px;border-radius:20px;overflow:hidden;box-shadow:0 6px 0 #0003;background:#fff}
+.bt{background:#e0443f;color:#fff;font-family:Nunito;font-weight:900;padding:6px;letter-spacing:2px;font-size:20px}
+.bm{padding:4px;font-family:Nunito;font-weight:900;font-size:13px;color:#666}
+.bn{min-height:70px;display:flex;justify-content:center;align-items:center;gap:4px;flex-wrap:wrap;padding:6px 10px 12px}
+.bn b{background:var(--c,#9fdcf2);border-radius:10px;padding:2px 10px;font-family:Nunito;font-size:36px;box-shadow:0 3px 0 #0002;animation:pop .25s}
+@keyframes pop{0%{transform:scale(.3)}100%{transform:scale(1)}}
+.sticker{font-size:34px;position:absolute;right:10px;top:6px}
+.bw{position:relative}
+.cols{display:flex;gap:6px;justify-content:center;margin:6px 0}.cols i{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid #fff;box-shadow:0 2px 0 #0003}
+.kb{display:grid;grid-template-columns:repeat(13,1fr);gap:5px;max-width:760px;margin:6px auto}
+.k{border:none;border-radius:10px;padding:8px 0;cursor:pointer;font-family:Nunito;font-weight:900;font-size:clamp(15px,2vw,20px);background:#fff;box-shadow:0 3px 0 #0002;color:var(--dark)}
+.k:active{transform:translateY(2px)}
+.st{display:flex;gap:6px;justify-content:center;margin:4px 0}.st span{font-size:26px;cursor:pointer;background:#fff;border-radius:10px;padding:2px 6px;box-shadow:0 2px 0 #0002}
+.btn{margin:6px 4px 0;border:none;border-radius:16px;padding:8px 16px;font-family:Nunito;font-weight:900;font-size:15px;cursor:pointer;background:#FFD97D;box-shadow:0 4px 0 #0002}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input placeholder=&quot;Student 1&quot;&gt;&lt;input placeholder=&quot;Student 2&quot;&gt;&lt;input placeholder=&quot;Student 3&quot;&gt;&lt;input placeholder=&quot;Student 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;turn&quot; id=&quot;turn&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hint&quot;&gt;Spell YOUR name with the letter blocks! Tap each letter 🧱 and say it out loud.&lt;/div&gt;
+&lt;div class=&quot;badge&quot;&gt;&lt;div class=&quot;bt&quot;&gt;HELLO!&lt;/div&gt;&lt;div class=&quot;bm&quot;&gt;MY NAME IS...&lt;/div&gt;&lt;div class=&quot;bw&quot;&gt;&lt;div class=&quot;bn&quot; id=&quot;bn&quot;&gt;&lt;/div&gt;&lt;div class=&quot;sticker&quot; id=&quot;sk&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;cols&quot; id=&quot;cols&quot;&gt;&lt;/div&gt;&lt;div class=&quot;st&quot; id=&quot;st&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;kb&quot; id=&quot;kb&quot;&gt;&lt;/div&gt;
+&lt;button class=&quot;btn&quot; id=&quot;del&quot; style=&quot;background:#ddd&quot;&gt;⌫ Back&lt;/button&gt;&lt;button class=&quot;btn&quot; id=&quot;clr&quot; style=&quot;background:#ddd&quot;&gt;🗑️ Clear&lt;/button&gt;&lt;button class=&quot;btn&quot; id=&quot;hear&quot; style=&quot;background:#A8E6CF&quot;&gt;🔊 Hear it&lt;/button&gt;&lt;button class=&quot;btn&quot; id=&quot;next&quot; style=&quot;background:#C9A8E8&quot;&gt;👉 Next student&lt;/button&gt;
+&lt;/div&gt;&lt;script&gt;
+var nameL=[],color=&#x27;#9fdcf2&#x27;,turn=0;
+var CO=[&#x27;#9fdcf2&#x27;,&#x27;#F2A7C3&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#FFD97D&#x27;,&#x27;#C9A8E8&#x27;,&#x27;#FFB3A7&#x27;],ST=[&#x27;⭐&#x27;,&#x27;🌈&#x27;,&#x27;🦄&#x27;,&#x27;⚽&#x27;,&#x27;🎨&#x27;,&#x27;🚀&#x27;,&#x27;🐶&#x27;,&#x27;🍕&#x27;];
+function $(i){return document.getElementById(i);}
+function nm(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
+function who(){var N=nm();$(&#x27;turn&#x27;).textContent=N.length?&#x27;👉 &#x27;+N[turn%N.length]+&#x27; is up! 🎤&#x27;:&#x27;&#x27;;}
+var _enV=null;function _pickV(){try{var vs=speechSynthesis.getVoices();if(!vs||!vs.length)return null;return vs.filter(function(v){return v.lang===&#x27;en-US&#x27;;})[0]||vs.filter(function(v){return /^en-/i.test(v.lang);})[0]||null;}catch(e){return null;}}if(&#x27;speechSynthesis&#x27; in window){_enV=_pickV();speechSynthesis.onvoiceschanged=function(){_enV=_pickV()||_enV;};}var _sT=null;function say(t){try{speechSynthesis.cancel();clearTimeout(_sT);_sT=setTimeout(function(){var u=new SpeechSynthesisUtterance(t);u.lang=&#x27;en-US&#x27;;u.rate=.8;u.pitch=1;u.volume=1;if(_enV)u.voice=_enV;speechSynthesis.speak(u);},60);}catch(e){}}
+function draw(){var b=$(&#x27;bn&#x27;);b.innerHTML=&#x27;&#x27;;b.style.setProperty(&#x27;--c&#x27;,color);nameL.forEach(function(c){var x=document.createElement(&#x27;b&#x27;);x.textContent=c;b.appendChild(x);});if(!nameL.length)b.innerHTML=&#x27;&lt;span style=&quot;color:#ccc;font-family:Nunito;font-weight:900;font-size:28px&quot;&gt;_ _ _ _&lt;/span&gt;&#x27;;}
+&#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;.split(&#x27;&#x27;).forEach(function(c){var k=document.createElement(&#x27;button&#x27;);k.className=&#x27;k&#x27;;k.textContent=c;k.onclick=function(){if(nameL.length&lt;12){nameL.push(c);say(c);draw();}};$(&#x27;kb&#x27;).appendChild(k);});
+CO.forEach(function(c){var i=document.createElement(&#x27;i&#x27;);i.style.background=c;i.onclick=function(){color=c;draw();};$(&#x27;cols&#x27;).appendChild(i);});
+ST.forEach(function(s){var x=document.createElement(&#x27;span&#x27;);x.textContent=s;x.onclick=function(){$(&#x27;sk&#x27;).textContent=s;};$(&#x27;st&#x27;).appendChild(x);});
+$(&#x27;del&#x27;).onclick=function(){nameL.pop();draw();};$(&#x27;clr&#x27;).onclick=function(){nameL=[];draw();};
+$(&#x27;hear&#x27;).onclick=function(){var i=0,t=setInterval(function(){if(i&gt;=nameL.length){clearInterval(t);return;}say(nameL[i]);i++;},900);};
+$(&#x27;next&#x27;).onclick=function(){turn++;nameL=[];$(&#x27;sk&#x27;).textContent=&#x27;&#x27;;draw();who();};
+$(&#x27;names&#x27;).addEventListener(&#x27;input&#x27;,who);draw();who();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Now it's your turn! 🙌</h2><p class="sub">Introduce yourself and spell your name!</p><div class="linkcard"><div class="e">🎨</div><div class="big2">"Hello! My name is ___. I spell it..."</div><p>Your homework for this lesson is waiting on the platform:<br>practice vocabulary, the alphabet, spelling and the quiz!</p><p>See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr||!fr.hasAttribute('data-srcdoc')) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+[].forEach.call(document.querySelectorAll('.gaps .rv'),function(p){var ab=p.querySelector('.ab');(ab||p).addEventListener('click',function(){p.classList.toggle('shown'); if(ab) ab.textContent=p.classList.contains('shown')?'🙈 Hide':'👁 Answer';});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Lesson 1 · Hello! My Name Is...</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Greetings</a> · <a href=\"#s3\">Name</a> · <a href=\"#s4\">Alphabet</a> · <a href=\"#s5\">ABC Song</a> · <a href=\"#s6\">Spelling</a> · <a href=\"#s7\">Name Badge</a> · <a href=\"#s8\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li>Primeira aula do programa: <b>greetings</b>, <b>apresentar-se</b> (My name is...), <b>alfabeto</b> e <b>soletrar o nome</b>.</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-4</td><td>1</td><td>Abertura: apresente-se em inglês</td></tr><tr><td>4-12</td><td>2</td><td>Greetings</td></tr><tr><td>12-19</td><td>3-4</td><td>What is your name? + Meet your classmates</td></tr><tr><td>19-27</td><td>5</td><td>Drills</td></tr><tr><td>27-37</td><td>6</td><td>The Alphabet</td></tr><tr><td>37-41</td><td>7</td><td>ABC Song</td></tr><tr><td>41-49</td><td>8</td><td>How do you spell your name?</td></tr><tr><td>49-57</td><td>9-10</td><td>Create your Name Badge (Letter Blocks)</td></tr><tr><td>57-60</td><td>11</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes do jogo (Name Badge) há um slide \"Get ready\". O slide \"Speaking Time\" não mostra frases: os drills ficam só neste guia. No alfabeto, clique em cada letra para ouvir a pronúncia (o áudio usa a voz do navegador).</div>\n<h2 id=\"s1\">⏱️ 0-4 min | Abertura (slide 1)</h2>\n<p>Comece a aula <b>se apresentando em inglês</b> (\"Hello! My name is...\"), com a capa na tela. Mostre que, a partir de hoje, a aula é em inglês e que ninguém precisa ter medo de errar.</p>\n<h2 id=\"s2\">⏱️ 4-12 min | Greetings (slide 2)</h2>\n<p>Ensine os cumprimentos: Good morning, Good afternoon, Good evening (chegada), Good night (saída), Hi / Hi there, Hello, What's up?, Nice to meet you!, Nice to meet you too. Atenção para o <b>Good evening</b> (usado ao chegar) e o <b>Good night</b> (usado ao sair), que em português são os dois \"boa noite\". A tradução está em itálico: use só se travarem. Dica do slide: pratique cumprimentar cada colega no início da aula!</p>\n<h2 id=\"s3\">⏱️ 12-27 min | What is your name? (slides 3-5)</h2>\n<p>Mostre as quatro formas de dizer o nome: My name is Luana / My name's Luana / I am Luana / I'm Luana. Depois, no slide \"Meet your new classmates\", cada aluno escolhe um personagem (Charlie, Mia, Joseph, Ruby, Elliot, Sophia) e pratica: \"Hi! My name is ___. What's your name?\".</p>\n<p>Mostre então o \"Speaking Time\" (sem frases) e conduza os drills do <b>português para o inglês</b>: <b>8 frases, 2 por aluno</b>, cada uma com 2 substituições. Respostas em letra pequena.</p>\n<ol><li>Olá, meu nome é Luana. / oi / e aí<br><small>Hello, my name is Luana. Hi, my name is Luana. What's up? My name is Luana.</small></li><li>Bom dia, eu sou o Pedro. / boa tarde / boa noite (chegando)<br><small>Good morning, I'm Pedro. Good afternoon, I'm Pedro. Good evening, I'm Pedro.</small></li><li>Qual é o seu nome? / meu nome é Mia / eu sou o Joseph<br><small>What's your name? My name is Mia. I'm Joseph.</small></li><li>Prazer em conhecê-lo! / prazer também / olá, prazer!<br><small>Nice to meet you! Nice to meet you too! Hello, nice to meet you!</small></li><li>Meu nome é Elliot. / eu sou o Elliot / meu nome é Charlie<br><small>My name is Elliot. I'm Elliot. My name's Charlie.</small></li><li>Oi, qual é o seu nome? / olá / e aí<br><small>Hi, what's your name? Hello, what's your name? What's up? What's your name?</small></li><li>Boa noite! (indo dormir) / bom dia / boa tarde<br><small>Good night! Good morning! Good afternoon!</small></li><li>Oi, prazer em conhecê-lo! / olá / e aí<br><small>Hi, nice to meet you! Hello, nice to meet you! What's up? Nice to meet you!</small></li></ol>\n<h2 id=\"s4\">⏱️ 27-41 min | The Alphabet (slides 6-7)</h2>\n<p>Apresente o alfabeto <b>letra por letra</b>, usando os cartões de áudio: clique na letra para que cada criança <b>ouça a pronúncia antes de repetir</b> em voz alta. Depois abra o slide do vídeo e cante o <b>ABC Song</b> como aquecimento: ajuda a fixar. Alterne fala, escuta e repetição a cada 5-7 minutos para não prender a atenção em uma atividade só.</p>\n<h2 id=\"s5\">⏱️ 41-49 min | How do you spell your name? (slide 8)</h2>\n<p>Apresente first name, middle name, last name e full name. Pratique com o exemplo do slide (\"How do you spell your name? → L-U-A-N-A\") antes de pedir que cada aluno soletre o próprio nome. <b>Nomes de colegas costumam ser mais fáceis de soletrar</b> que o próprio nome: comece por eles se perceber timidez.</p>\n<h2 id=\"s6\">⏱️ 49-57 min | Create your Name Badge (slides 9-10)</h2>\n<p>Depois do \"Get ready\", abra o <b>Name Badge</b>: digite os nomes; cada aluno monta o próprio crachá \"HELLO! MY NAME IS...\" tocando nas letras (cada toque fala a letra), escolhe cor e adesivo, e então se apresenta e soletra o nome em voz alta. \"Next student\" passa a vez. É a produção livre da aula.</p>\n<h2 id=\"s7\">⏱️ 57-60 min | Encerramento (slide 11)</h2>\n<p>Reforce greetings e apresentação: cada aluno diz \"Hello! My name is...\". Avise que o homework (vocabulário, alfabeto, soletração e o quiz, com badge ao completar a missão) já está na plataforma. \"See you next class!\"</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> evite ficar muito tempo em uma única atividade; alterne entre fala, escuta e repetição a cada 5-7 minutos.</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 1</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>
