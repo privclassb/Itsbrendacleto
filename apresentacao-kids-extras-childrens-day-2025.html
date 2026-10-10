@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aula Especial · Dia das Crianças</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">🎉 KIDS EDITION · DIA DAS CRIANÇAS</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Guia da professora</button><button id="fsBtn">⛶ Tela cheia</button></div></div>
+<div class="stage" id="stage">
+<section class="slide" data-id="cover"><div class="cover"><div class="emo">🎈 🎁 🎉 🍬 ⭐</div><div class="kick">KIDS ENGLISH · GAME DAY</div><h1>Happy<br>Children's Day!</h1><div class="pill">🎮 Today: 5 games · 2 teams · 0 homework!</div></div></section>
+<section class="slide" data-id="rules"><h2>📋 Game Rules</h2><p class="sub">Everybody plays. Everybody speaks English!</p><div class="cards4"><div class="c" style="background:#A8E6CF"><div class="e">👥</div><b>Two teams</b><span>Team A vs Team B</span></div><div class="c" style="background:#FFD97D"><div class="e">🗣️</div><b>Speak English</b><span>Say the answer out loud</span></div><div class="c" style="background:#C9A8E8"><div class="e">⭐</div><b>Earn points</b><span>Right answer = points</span></div><div class="c" style="background:#FFB3A7"><div class="e">🤝</div><b>Be kind</b><span>Help your team. Cheer for everybody!</span></div></div></section>
+<section class="slide" data-id="teams"><h2>👥 Choose Your Team Name!</h2><p class="sub">Pick a name in English. Type it here: it goes to all the games!</p><div class="box"><div class="ideas">🦄 Super Unicorns &nbsp; 🦁 Brave Lions &nbsp; 🚀 Space Stars &nbsp; 🐬 Happy Dolphins<br>🍕 Pizza Power &nbsp; ⚡ Lightning Kids &nbsp; 🐼 Cool Pandas &nbsp; 🌈 Rainbow Team</div><div class="tn"><label>Team A<input id="tnA" type="text" value="Team A"></label><label>Team B<input id="tnB" type="text" value="Team B"></label></div></div></section>
+<section class="slide" data-id="mystery_tiles_prep"><h2>🔍 Get ready: Mystery Tiles!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>A picture is hiding behind 9 tiles.</div></div><div class="st"><span class="n">2</span><div>Say a number to open a tile: <b>"Number five, please!"</b></div></div><div class="st"><span class="n">3</span><div>Guess what it is. Say it in English!</div></div><div class="st"><span class="n">4</span><div>Fewer tiles open = more points: <b>1-3 tiles = 3 ⭐ · 4-6 = 2 ⭐ · 7-9 = 1 ⭐</b></div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game" data-game="mystery_tiles"><div class="gh"><span>🔍 Game 1: Mystery Tiles</span><small>Say a number to open a tile. Fewer tiles = more points!</small></div><iframe title="mystery_tiles" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Mystery Tiles&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{ --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D; --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    background:linear-gradient(#ffffffee,#ffffffee),repeating-linear-gradient(0deg,#eee 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#eee 0 1px,transparent 1px 36px);
+    background-color:#fff; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+  .wrap{ max-width:760px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{ border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:14px; text-align:center; width:100%; color:var(--dark); }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:12px; }
+  .clue-card{ background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center; margin-bottom:16px; font-weight:800; font-size:18px; }
+  .clue-card .sm{ display:block; font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-top:12px; }
+  .feedback.ok{ color:#2a9d6f; } .feedback.no{ color:#e0654a; }
+  .opt-btn{ border:none; border-radius:16px; padding:16px 14px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); } .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+  .end-screen{ display:none; text-align:center; } .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{ display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--coral),var(--pink)); }
+  .stage{ position:relative; width:min(86vw,340px); height:min(86vw,340px); margin:0 auto 14px; background:#fff; border-radius:22px; box-shadow:0 6px 0 rgba(0,0,0,.08); overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.stage .big{ position:absolute; font-size:min(30vw,110px); line-height:1; text-align:center; white-space:nowrap; transform:translate(-50%,-50%); }
+.tiles{ position:absolute; inset:0; display:grid; grid-template-columns:repeat(3,1fr); grid-template-rows:repeat(3,1fr); }
+.tl{ border:2px solid #fff; cursor:pointer; font-size:40px; font-weight:900; font-family:&#x27;Nunito&#x27;,sans-serif; color:#fff; transition:opacity .35s; text-shadow:0 2px 0 rgba(0,0,0,.15); }
+.tl.off{ opacity:0; pointer-events:none; }
+.pts{ text-align:center; font-weight:900; font-size:18px; margin-bottom:10px; }
+.row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.row .opt-btn{ padding:14px 22px; } .opt-btn.yes{ background:var(--mint); } .opt-btn.no{ background:var(--coral); }
+.answer{ text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin:10px 0; min-height:34px; }
+
+header{display:none} html,body{align-items:flex-start}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+.clue-card{padding:10px 16px;margin-bottom:10px}
+.stage{width:min(86vw,340px,40vh)!important;height:min(86vw,340px,40vh)!important}
+.grid3{max-width:min(560px,66vh)!important} .mgrid{max-width:min(480px,58vh)!important}
+.pin svg{width:100px!important;height:100px!important} .slot{height:38px;line-height:38px;font-size:24px}
+.timer{font-size:48px!important} .cat{font-size:48px!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;h1&gt;🔍 Mystery Tiles&lt;/h1&gt;&lt;div class=&quot;sub&quot;&gt;Open the tiles and guess the word. Fewer tiles = more points!&lt;/div&gt;&lt;/header&gt;
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;gameArea&quot;&gt;&lt;div class=&quot;clue-card&quot;&gt;🔍 What is hiding? Say a number to open a tile!&lt;/div&gt;&lt;div class=&quot;stage&quot;&gt;&lt;div class=&quot;big&quot; id=&quot;big&quot;&gt;&lt;/div&gt;&lt;div class=&quot;tiles&quot; id=&quot;tiles&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;pts&quot; id=&quot;pts&quot;&gt;&lt;/div&gt;&lt;div class=&quot;answer&quot; id=&quot;answer&quot;&gt;&lt;/div&gt;&lt;div class=&quot;row&quot;&gt;&lt;button class=&quot;opt-btn yes&quot; id=&quot;gotBtn&quot;&gt;✅ They got it!&lt;/button&gt;&lt;button class=&quot;opt-btn no&quot; id=&quot;noBtn&quot;&gt;❌ Nobody knew&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;&lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;&lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const ROUNDS=[[&quot;😢&quot;, &quot;sad&quot;], [&quot;😠&quot;, &quot;angry&quot;], [&quot;🥱&quot;, &quot;tired&quot;], [&quot;👵&quot;, &quot;grandmother&quot;], [&quot;🚌&quot;, &quot;bus&quot;], [&quot;⏰&quot;, &quot;alarm clock&quot;], [&quot;🎧&quot;, &quot;listen to music&quot;], [&quot;🐕🚶&quot;, &quot;walk the dog&quot;], [&quot;📺&quot;, &quot;watch TV&quot;], [&quot;🛏️&quot;, &quot;make the bed&quot;], [&quot;📖&quot;, &quot;read a book&quot;], [&quot;🧹&quot;, &quot;clean the room&quot;]]; const TURN_ICON=&quot;🔍&quot;;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i&gt;0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+var currentTeam=&#x27;a&#x27;, scoreA=0, scoreB=0, locked=false;
+function teamName(t){ const el=document.getElementById(t===&#x27;a&#x27;?&#x27;teamNameA&#x27;:&#x27;teamNameB&#x27;); return (el.value||(t===&#x27;a&#x27;?&#x27;Team A&#x27;:&#x27;Team B&#x27;)).trim(); }
+function updateTurnBanner(){ document.getElementById(&#x27;turnBanner&#x27;).textContent = TURN_ICON+&#x27; &#x27;+teamName(currentTeam)+&quot;&#x27;s turn!&quot;; document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;a&#x27;); document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;b&#x27;); }
+function updateScores(){ document.getElementById(&#x27;scoreA&#x27;).textContent=scoreA; document.getElementById(&#x27;scoreB&#x27;).textContent=scoreB; }
+function addPoints(n){ if(currentTeam===&#x27;a&#x27;) scoreA=Math.max(0,scoreA+n); else scoreB=Math.max(0,scoreB+n); updateScores(); }
+function endGame(){ document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;none&#x27;; document.getElementById(&#x27;endScreen&#x27;).classList.add(&#x27;show&#x27;); let t; if(scoreA===scoreB){ t=&quot;🤝 It&#x27;s a tie! &quot;+scoreA+&#x27; - &#x27;+scoreB; } else { const w=scoreA&gt;scoreB?teamName(&#x27;a&#x27;):teamName(&#x27;b&#x27;); t=&#x27;🏆 &#x27;+w+&#x27; wins! &#x27;+scoreA+&#x27; - &#x27;+scoreB; } document.getElementById(&#x27;winnerText&#x27;).textContent=t; party(); }
+function party(){ const c=document.createElement(&#x27;div&#x27;); c.style.cssText=&#x27;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50&#x27;; document.body.appendChild(c); const em=[&#x27;🎉&#x27;,&#x27;🎈&#x27;,&#x27;⭐&#x27;,&#x27;🍬&#x27;,&#x27;🎊&#x27;,&#x27;🎁&#x27;]; for(let i=0;i&lt;40;i++){ const s=document.createElement(&#x27;span&#x27;); s.textContent=em[i%em.length]; s.style.cssText=&#x27;position:absolute;top:-40px;font-size:&#x27;+(20+Math.random()*20)+&#x27;px;left:&#x27;+Math.random()*100+&#x27;%;transition:transform &#x27;+(2+Math.random()*2)+&#x27;s linear, opacity 4s;&#x27;; c.appendChild(s); requestAnimationFrame(()=&gt;{ s.style.transform=&#x27;translateY(&#x27;+(window.innerHeight+80)+&#x27;px) rotate(&#x27;+(Math.random()*360)+&#x27;deg)&#x27;; s.style.opacity=&#x27;.2&#x27;; }); } setTimeout(()=&gt;c.remove(),4500); }
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;startGame());
+
+var deck=[], currentItem=null, roundNum=0;
+const TOTAL_ROUNDS = ROUNDS.length;
+function startGame(){ deck=shuffle(ROUNDS); scoreA=0; scoreB=0; roundNum=0; currentTeam=&#x27;a&#x27;; updateScores(); document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;block&#x27;; nextRound(); }
+function nextRound(){ currentItem=deck.length?deck.pop():null; if(!currentItem){ endGame(); return; } roundNum++; locked=false; document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Round &#x27;+roundNum+&#x27; of &#x27;+TOTAL_ROUNDS; renderRound(currentItem); updateTurnBanner(); }
+function finishRound(correct, delay, pts){ locked=true; if(correct) addPoints(pts==null?1:pts); currentTeam = currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; setTimeout(nextRound, delay||1400); }
+
+const COLS=[&#x27;#F2A7C3&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#C9A8E8&#x27;,&#x27;#FFD97D&#x27;,&#x27;#FFB3A7&#x27;,&#x27;#5BC4E8&#x27;,&#x27;#F2A7C3&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#C9A8E8&#x27;];
+var revealed=0;
+function ptsNow(){ return revealed&lt;=3?3:(revealed&lt;=6?2:1); }
+function showPts(){ document.getElementById(&#x27;pts&#x27;).textContent=&#x27;⭐ Points now: &#x27;+ptsNow()+&#x27;   (tiles open: &#x27;+revealed+&#x27;)&#x27;; }
+function renderRound(it){ revealed=0; const bg=document.getElementById(&#x27;big&#x27;); bg.textContent=it[0]; const P=[28,50,72]; bg.style.left=P[Math.floor(Math.random()*3)]+&#x27;%&#x27;; bg.style.top=P[Math.floor(Math.random()*3)]+&#x27;%&#x27;; bg.style.fontSize=(Array.from(it[0]).filter(c=&gt;c!==&#x27;️&#x27;).length&gt;1)?&#x27;min(18vw,66px)&#x27;:&#x27;&#x27;; document.getElementById(&#x27;answer&#x27;).textContent=&#x27;&#x27;; document.getElementById(&#x27;feedback&#x27;).textContent=&#x27;&#x27;;
+  const t=document.getElementById(&#x27;tiles&#x27;); t.innerHTML=&#x27;&#x27;; COLS.forEach((c,i)=&gt;{ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;tl&#x27;; b.style.background=c; b.textContent=String(i+1); b.addEventListener(&#x27;click&#x27;,()=&gt;{ if(locked||b.classList.contains(&#x27;off&#x27;)) return; b.classList.add(&#x27;off&#x27;); revealed++; showPts(); }); t.appendChild(b); });
+  document.getElementById(&#x27;gotBtn&#x27;).disabled=false; document.getElementById(&#x27;noBtn&#x27;).disabled=false; showPts(); }
+function reveal(){ document.querySelectorAll(&#x27;.tl&#x27;).forEach(b=&gt;b.classList.add(&#x27;off&#x27;)); document.getElementById(&#x27;answer&#x27;).textContent=currentItem[1]; document.getElementById(&#x27;gotBtn&#x27;).disabled=true; document.getElementById(&#x27;noBtn&#x27;).disabled=true; }
+document.getElementById(&#x27;gotBtn&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{ if(locked) return; const p=ptsNow(); reveal(); const fb=document.getElementById(&#x27;feedback&#x27;); fb.textContent=&#x27;✅ +&#x27;+p+&#x27; points!&#x27;; fb.className=&#x27;feedback ok&#x27;; finishRound(true,2200,p); });
+document.getElementById(&#x27;noBtn&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{ if(locked) return; reveal(); const fb=document.getElementById(&#x27;feedback&#x27;); fb.textContent=&#x27;Next time! 💪&#x27;; fb.className=&#x27;feedback no&#x27;; finishRound(false,2200); });
+startGame();
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide" data-id="category_blitz_prep"><h2>💣 Get ready: Category Blitz!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>You see a <b>category</b> (animals, foods, sports...).</div></div><div class="st"><span class="n">2</span><div>You have <b>30 seconds</b>!</div></div><div class="st"><span class="n">3</span><div>Say as many <b>English words</b> as you can. Example: Animals → dog, cat, lion!</div></div><div class="st"><span class="n">4</span><div>Each word = <b>1 point</b>. No repeated words. No Portuguese! 🙅</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game" data-game="category_blitz"><div class="gh"><span>💣 Game 2: Category Blitz</span><small>30 seconds. Say as many words as you can!</small></div><iframe title="category_blitz" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Category Blitz&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{ --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D; --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    background:linear-gradient(#ffffffee,#ffffffee),repeating-linear-gradient(0deg,#eee 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#eee 0 1px,transparent 1px 36px);
+    background-color:#fff; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+  .wrap{ max-width:760px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{ border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:14px; text-align:center; width:100%; color:var(--dark); }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:12px; }
+  .clue-card{ background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center; margin-bottom:16px; font-weight:800; font-size:18px; }
+  .clue-card .sm{ display:block; font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-top:12px; }
+  .feedback.ok{ color:#2a9d6f; } .feedback.no{ color:#e0654a; }
+  .opt-btn{ border:none; border-radius:16px; padding:16px 14px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); } .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+  .end-screen{ display:none; text-align:center; } .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{ display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--coral),var(--pink)); }
+  .cat{ font-size:64px; text-align:center; } .catname{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; text-align:center; margin:4px 0 6px; }
+.ideas{ text-align:center; font-size:13px; color:#888; margin-bottom:10px; min-height:18px; }
+.timer{ text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:64px; color:var(--blue); line-height:1; } .timer.low{ color:#e0654a; }
+.count{ text-align:center; font-weight:900; font-size:20px; margin:8px 0 14px; }
+.row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; } .row .opt-btn{ padding:16px 26px; font-size:18px; } .opt-btn.plus{ background:var(--mint); font-size:26px !important; padding:18px 44px !important; } .opt-btn.start{ background:var(--blue); color:#fff; }
+
+header{display:none} html,body{align-items:flex-start}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+.clue-card{padding:10px 16px;margin-bottom:10px}
+.stage{width:min(86vw,340px,40vh)!important;height:min(86vw,340px,40vh)!important}
+.grid3{max-width:min(560px,66vh)!important} .mgrid{max-width:min(480px,58vh)!important}
+.pin svg{width:100px!important;height:100px!important} .slot{height:38px;line-height:38px;font-size:24px}
+.timer{font-size:48px!important} .cat{font-size:48px!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;h1&gt;💣 Category Blitz&lt;/h1&gt;&lt;div class=&quot;sub&quot;&gt;30 seconds! Say as many words as you can!&lt;/div&gt;&lt;/header&gt;
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;gameArea&quot;&gt;&lt;div class=&quot;cat&quot; id=&quot;cat&quot;&gt;&lt;/div&gt;&lt;div class=&quot;catname&quot; id=&quot;catname&quot;&gt;&lt;/div&gt;&lt;div class=&quot;ideas&quot; id=&quot;ideas&quot;&gt;&lt;/div&gt;&lt;div class=&quot;timer&quot; id=&quot;timer&quot;&gt;30&lt;/div&gt;&lt;div class=&quot;count&quot; id=&quot;count&quot;&gt;&lt;/div&gt;&lt;div class=&quot;row&quot;&gt;&lt;button class=&quot;opt-btn start&quot; id=&quot;startBtn&quot;&gt;▶ Start the timer!&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;row&quot; style=&quot;margin-top:12px&quot;&gt;&lt;button class=&quot;opt-btn plus&quot; id=&quot;plusBtn&quot;&gt;+1&lt;/button&gt;&lt;button class=&quot;opt-btn&quot; id=&quot;minusBtn&quot;&gt;−1 (oops)&lt;/button&gt;&lt;/div&gt;&lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;&lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;&lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const ROUNDS=[[&quot;🍕&quot;, &quot;Foods &amp; drinks&quot;, &quot;pizza, rice, milk, apple&quot;], [&quot;👨‍👩‍👧&quot;, &quot;Family members&quot;, &quot;mother, brother, uncle&quot;], [&quot;⚽&quot;, &quot;Sports&quot;, &quot;soccer, swimming, tennis&quot;], [&quot;🌎&quot;, &quot;Countries&quot;, &quot;Brazil, Japan, Italy&quot;], [&quot;🎒&quot;, &quot;School things&quot;, &quot;pencil, book, ruler&quot;], [&quot;😊&quot;, &quot;Feelings&quot;, &quot;happy, sad, angry&quot;], [&quot;⏰&quot;, &quot;Daily routine&quot;, &quot;wake up, brush my teeth&quot;], [&quot;📊&quot;, &quot;Adverbs of frequency&quot;, &quot;always, never, often&quot;], [&quot;🔢&quot;, &quot;Numbers (any!)&quot;, &quot;say numbers: 7, 12, 30…&quot;], [&quot;🐶&quot;, &quot;Animals&quot;, &quot;dog, cat, lion&quot;], [&quot;🎨&quot;, &quot;Colors&quot;, &quot;red, blue, green&quot;], [&quot;🛏️&quot;, &quot;Things in your bedroom&quot;, &quot;bed, lamp, desk&quot;]].map(c=&gt;({e:c[0],n:c[1],i:c[2]})); const TURN_ICON=&quot;💣&quot;;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i&gt;0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+var currentTeam=&#x27;a&#x27;, scoreA=0, scoreB=0, locked=false;
+function teamName(t){ const el=document.getElementById(t===&#x27;a&#x27;?&#x27;teamNameA&#x27;:&#x27;teamNameB&#x27;); return (el.value||(t===&#x27;a&#x27;?&#x27;Team A&#x27;:&#x27;Team B&#x27;)).trim(); }
+function updateTurnBanner(){ document.getElementById(&#x27;turnBanner&#x27;).textContent = TURN_ICON+&#x27; &#x27;+teamName(currentTeam)+&quot;&#x27;s turn!&quot;; document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;a&#x27;); document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;b&#x27;); }
+function updateScores(){ document.getElementById(&#x27;scoreA&#x27;).textContent=scoreA; document.getElementById(&#x27;scoreB&#x27;).textContent=scoreB; }
+function addPoints(n){ if(currentTeam===&#x27;a&#x27;) scoreA=Math.max(0,scoreA+n); else scoreB=Math.max(0,scoreB+n); updateScores(); }
+function endGame(){ document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;none&#x27;; document.getElementById(&#x27;endScreen&#x27;).classList.add(&#x27;show&#x27;); let t; if(scoreA===scoreB){ t=&quot;🤝 It&#x27;s a tie! &quot;+scoreA+&#x27; - &#x27;+scoreB; } else { const w=scoreA&gt;scoreB?teamName(&#x27;a&#x27;):teamName(&#x27;b&#x27;); t=&#x27;🏆 &#x27;+w+&#x27; wins! &#x27;+scoreA+&#x27; - &#x27;+scoreB; } document.getElementById(&#x27;winnerText&#x27;).textContent=t; party(); }
+function party(){ const c=document.createElement(&#x27;div&#x27;); c.style.cssText=&#x27;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50&#x27;; document.body.appendChild(c); const em=[&#x27;🎉&#x27;,&#x27;🎈&#x27;,&#x27;⭐&#x27;,&#x27;🍬&#x27;,&#x27;🎊&#x27;,&#x27;🎁&#x27;]; for(let i=0;i&lt;40;i++){ const s=document.createElement(&#x27;span&#x27;); s.textContent=em[i%em.length]; s.style.cssText=&#x27;position:absolute;top:-40px;font-size:&#x27;+(20+Math.random()*20)+&#x27;px;left:&#x27;+Math.random()*100+&#x27;%;transition:transform &#x27;+(2+Math.random()*2)+&#x27;s linear, opacity 4s;&#x27;; c.appendChild(s); requestAnimationFrame(()=&gt;{ s.style.transform=&#x27;translateY(&#x27;+(window.innerHeight+80)+&#x27;px) rotate(&#x27;+(Math.random()*360)+&#x27;deg)&#x27;; s.style.opacity=&#x27;.2&#x27;; }); } setTimeout(()=&gt;c.remove(),4500); }
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;startGame());
+
+var deck=[], currentItem=null, roundNum=0;
+const TOTAL_ROUNDS = ROUNDS.length;
+function startGame(){ deck=shuffle(ROUNDS); scoreA=0; scoreB=0; roundNum=0; currentTeam=&#x27;a&#x27;; updateScores(); document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;block&#x27;; nextRound(); }
+function nextRound(){ currentItem=deck.length?deck.pop():null; if(!currentItem){ endGame(); return; } roundNum++; locked=false; document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Round &#x27;+roundNum+&#x27; of &#x27;+TOTAL_ROUNDS; renderRound(currentItem); updateTurnBanner(); }
+function finishRound(correct, delay, pts){ locked=true; if(correct) addPoints(pts==null?1:pts); currentTeam = currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; setTimeout(nextRound, delay||1400); }
+
+var tmr=null, left=30, cnt=0, running=false;
+function beep(){ try{ const a=new (window.AudioContext||window.webkitAudioContext)(); const o=a.createOscillator(); o.frequency.value=660; o.connect(a.destination); o.start(); setTimeout(()=&gt;{o.stop();a.close();},350);}catch(e){} }
+function showTimer(){ const t=document.getElementById(&#x27;timer&#x27;); t.textContent=left; t.classList.toggle(&#x27;low&#x27;,left&lt;=5); }
+function showCount(){ document.getElementById(&#x27;count&#x27;).textContent=&#x27;Words: &#x27;+cnt; }
+function renderRound(it){ clearInterval(tmr); running=false; left=30; cnt=0; document.getElementById(&#x27;cat&#x27;).textContent=it.e; document.getElementById(&#x27;catname&#x27;).textContent=it.n; document.getElementById(&#x27;ideas&#x27;).textContent=&#x27;Teacher ideas: &#x27;+it.i; document.getElementById(&#x27;feedback&#x27;).textContent=&#x27;&#x27;; document.getElementById(&#x27;startBtn&#x27;).disabled=false; showTimer(); showCount(); }
+document.getElementById(&#x27;startBtn&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{ if(running||locked) return; running=true; document.getElementById(&#x27;startBtn&#x27;).disabled=true; tmr=setInterval(()=&gt;{ left--; showTimer(); if(left&lt;=0){ clearInterval(tmr); running=false; beep(); const fb=document.getElementById(&#x27;feedback&#x27;); fb.textContent=&quot;⏰ Time&#x27;s up! &quot;+cnt+&#x27; word&#x27;+(cnt===1?&#x27;&#x27;:&#x27;s&#x27;)+&#x27; = +&#x27;+cnt; fb.className=&#x27;feedback ok&#x27;; finishRound(cnt&gt;0,2600,cnt); } },1000); });
+document.getElementById(&#x27;plusBtn&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{ if(!running) return; cnt++; showCount(); });
+document.getElementById(&#x27;minusBtn&#x27;).addEventListener(&#x27;click&#x27;,()=&gt;{ if(!running||cnt&lt;=0) return; cnt--; showCount(); });
+startGame();
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide" data-id="surprise_boxes_prep"><h2>🎁 Get ready: Surprise Boxes!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Pick a <b>number from 1 to 20</b> to open a box.</div></div><div class="st"><span class="n">2</span><div>🎁 Question: +1 · ⭐ Star: +2 · 💥 Risky: +1 or −1</div></div><div class="st"><span class="n">3</span><div>🎉 Lucky: free point · 🦹 Steal: take a point · 🔄 Swap: change scores</div></div><div class="st"><span class="n">4</span><div>🕺 <b>Challenge:</b> mime, dance, jump... and win +2!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game" data-game="surprise_boxes"><div class="gh"><span>🎁 Game 3: Surprise Boxes</span><small>Pick a box. Answer, move, steal... anything can happen!</small></div><iframe title="surprise_boxes" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Surprise Boxes&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{ --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D; --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    background:linear-gradient(#ffffffee,#ffffffee),repeating-linear-gradient(0deg,#eee 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#eee 0 1px,transparent 1px 36px);
+    background-color:#fff; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+  .wrap{ max-width:760px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{ border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:14px; text-align:center; width:100%; color:var(--dark); }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:12px; }
+  .clue-card{ background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center; margin-bottom:16px; font-weight:800; font-size:18px; }
+  .clue-card .sm{ display:block; font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-top:12px; }
+  .feedback.ok{ color:#2a9d6f; } .feedback.no{ color:#e0654a; }
+  .opt-btn{ border:none; border-radius:16px; padding:16px 14px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); } .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+  .end-screen{ display:none; text-align:center; } .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{ display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--coral),var(--pink)); }
+  .grid3{ display:grid; grid-template-columns:repeat(5,1fr); gap:8px; max-width:560px; margin:0 auto 10px; }
+.box{ border:none; border-radius:14px; aspect-ratio:1/1; font-size:26px; cursor:pointer; box-shadow:0 4px 0 rgba(0,0,0,.1); }
+.box:active{ transform:translateY(3px); box-shadow:none; } .box.gone{ visibility:hidden; }
+.qwrap{ display:none; max-width:560px; margin:0 auto; } .qwrap.show{ display:block; }
+.kind{ text-align:center; font-weight:900; font-size:18px; margin-bottom:8px; }
+.opts1{ display:flex; flex-direction:column; gap:12px; }
+.bigem{ text-align:center; font-size:72px; line-height:1.1; }
+.row3{ display:flex; flex-direction:column; gap:10px; margin-top:6px; } .opt-btn.yes{ background:var(--mint); } .opt-btn.skip{ background:#eee; }
+
+header{display:none} html,body{align-items:flex-start}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+.clue-card{padding:10px 16px;margin-bottom:10px}
+.stage{width:min(86vw,340px,40vh)!important;height:min(86vw,340px,40vh)!important}
+.grid3{max-width:min(560px,66vh)!important} .mgrid{max-width:min(480px,58vh)!important}
+.pin svg{width:100px!important;height:100px!important} .slot{height:38px;line-height:38px;font-size:24px}
+.timer{font-size:48px!important} .cat{font-size:48px!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;h1&gt;🎁 Surprise Boxes&lt;/h1&gt;&lt;div class=&quot;sub&quot;&gt;Pick a box. Answer, move, steal... anything can happen!&lt;/div&gt;&lt;/header&gt;
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;gameArea&quot;&gt;&lt;div class=&quot;clue-card&quot; id=&quot;hint&quot;&gt;🎁 Pick a box!&lt;/div&gt;&lt;div class=&quot;grid3&quot; id=&quot;grid&quot;&gt;&lt;/div&gt;&lt;div class=&quot;qwrap&quot; id=&quot;qwrap&quot;&gt;&lt;div class=&quot;kind&quot; id=&quot;kind&quot;&gt;&lt;/div&gt;&lt;div class=&quot;bigem&quot; id=&quot;bigem&quot;&gt;&lt;/div&gt;&lt;div class=&quot;clue-card&quot; id=&quot;q&quot;&gt;&lt;/div&gt;&lt;div class=&quot;opts1&quot; id=&quot;opts&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;&lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;&lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const ROUNDS=[&quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;normal&quot;, &quot;star&quot;, &quot;star&quot;, &quot;bomb&quot;, &quot;bomb&quot;, &quot;free&quot;, &quot;steal&quot;, &quot;swap&quot;, &quot;chal&quot;, &quot;chal&quot;, &quot;chal&quot;, &quot;chal&quot;].map((k,i)=&gt;({k:k})); const QS=[[&quot;___ you from Brazil?&quot;, [&quot;Are&quot;, &quot;Is&quot;, &quot;Do&quot;], &quot;Are&quot;], [&quot;She ___ 10 years old.&quot;, [&quot;is&quot;, &quot;are&quot;, &quot;am&quot;], &quot;is&quot;], [&quot;How do you say \&quot;segunda-feira\&quot;?&quot;, [&quot;Monday&quot;, &quot;Sunday&quot;, &quot;Tuesday&quot;], &quot;Monday&quot;], [&quot;I ___ breakfast at 7 a.m.&quot;, [&quot;have&quot;, &quot;has&quot;, &quot;am&quot;], &quot;have&quot;], [&quot;He ___ to school by bus.&quot;, [&quot;goes&quot;, &quot;go&quot;, &quot;going&quot;], &quot;goes&quot;], [&quot;What is 15 + 5?&quot;, [&quot;twenty&quot;, &quot;fifteen&quot;, &quot;twelve&quot;], &quot;twenty&quot;], [&quot;My mother&#x27;s mother is my...&quot;, [&quot;grandmother&quot;, &quot;aunt&quot;, &quot;sister&quot;], &quot;grandmother&quot;], [&quot;I ___ like broccoli.&quot;, [&quot;don&#x27;t&quot;, &quot;doesn&#x27;t&quot;, &quot;not&quot;], &quot;don&#x27;t&quot;], [&quot;She is crying. She is...&quot;, [&quot;sad&quot;, &quot;hungry&quot;, &quot;excited&quot;], &quot;sad&quot;], [&quot;She ___ goes to bed late. (0%)&quot;, [&quot;never&quot;, &quot;always&quot;, &quot;usually&quot;], &quot;never&quot;], [&quot;___ does he wake up? At 6 o&#x27;clock.&quot;, [&quot;What time&quot;, &quot;Who&quot;, &quot;Where&quot;], &quot;What time&quot;], [&quot;What do you use to write?&quot;, [&quot;a pencil&quot;, &quot;a backpack&quot;, &quot;a ruler&quot;], &quot;a pencil&quot;], [&quot;Does she like pizza?&quot;, [&quot;Yes, she does.&quot;, &quot;Yes, she do.&quot;, &quot;Yes, she is.&quot;], &quot;Yes, she does.&quot;], [&quot;We ___ soccer on Saturdays.&quot;, [&quot;play&quot;, &quot;plays&quot;, &quot;playing&quot;], &quot;play&quot;], [&quot;Which one is a sport?&quot;, [&quot;swimming&quot;, &quot;breakfast&quot;, &quot;brother&quot;], &quot;swimming&quot;], [&quot;Which sentence is correct?&quot;, [&quot;I usually walk the dog.&quot;, &quot;I walk usually the dog.&quot;, &quot;Usually walk I the dog.&quot;], &quot;I usually walk the dog.&quot;], [&quot;What is 30 - 10?&quot;, [&quot;twenty&quot;, &quot;thirteen&quot;, &quot;forty&quot;], &quot;twenty&quot;], [&quot;Which day comes after Friday?&quot;, [&quot;Saturday&quot;, &quot;Thursday&quot;, &quot;Monday&quot;], &quot;Saturday&quot;]]; const CHAL=[[&quot;🦁&quot;, &quot;Mime an animal! The other team guesses in English.&quot;, 1], [&quot;💃&quot;, &quot;Crazy dance for 5 seconds! Everybody dances!&quot;, 0], [&quot;⏰&quot;, &quot;Act out a daily routine (wake up, brush teeth...). The other team guesses in English!&quot;, 1], [&quot;🤪&quot;, &quot;Make a funny face and say: \&quot;I&#x27;m happy!\&quot;&quot;, 0], [&quot;🏃&quot;, &quot;Jump 10 times and count in English!&quot;, 0], [&quot;🤖&quot;, &quot;Walk like a robot and say: \&quot;I walk the dog.\&quot;&quot;, 0], [&quot;🎤&quot;, &quot;Sing \&quot;Happy Birthday\&quot; in English to the teacher!&quot;, 0], [&quot;🧘&quot;, &quot;Freeze like a statue for 5 seconds. Don&#x27;t laugh!&quot;, 0], [&quot;⚽&quot;, &quot;Mime a sport! The other team guesses in English.&quot;, 1], [&quot;😴&quot;, &quot;Act out a feeling (sad, tired, angry...). The other team guesses!&quot;, 1]]; const TURN_ICON=&quot;🎁&quot;;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i&gt;0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+var currentTeam=&#x27;a&#x27;, scoreA=0, scoreB=0, locked=false;
+function teamName(t){ const el=document.getElementById(t===&#x27;a&#x27;?&#x27;teamNameA&#x27;:&#x27;teamNameB&#x27;); return (el.value||(t===&#x27;a&#x27;?&#x27;Team A&#x27;:&#x27;Team B&#x27;)).trim(); }
+function updateTurnBanner(){ document.getElementById(&#x27;turnBanner&#x27;).textContent = TURN_ICON+&#x27; &#x27;+teamName(currentTeam)+&quot;&#x27;s turn!&quot;; document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;a&#x27;); document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;b&#x27;); }
+function updateScores(){ document.getElementById(&#x27;scoreA&#x27;).textContent=scoreA; document.getElementById(&#x27;scoreB&#x27;).textContent=scoreB; }
+function addPoints(n){ if(currentTeam===&#x27;a&#x27;) scoreA=Math.max(0,scoreA+n); else scoreB=Math.max(0,scoreB+n); updateScores(); }
+function endGame(){ document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;none&#x27;; document.getElementById(&#x27;endScreen&#x27;).classList.add(&#x27;show&#x27;); let t; if(scoreA===scoreB){ t=&quot;🤝 It&#x27;s a tie! &quot;+scoreA+&#x27; - &#x27;+scoreB; } else { const w=scoreA&gt;scoreB?teamName(&#x27;a&#x27;):teamName(&#x27;b&#x27;); t=&#x27;🏆 &#x27;+w+&#x27; wins! &#x27;+scoreA+&#x27; - &#x27;+scoreB; } document.getElementById(&#x27;winnerText&#x27;).textContent=t; party(); }
+function party(){ const c=document.createElement(&#x27;div&#x27;); c.style.cssText=&#x27;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50&#x27;; document.body.appendChild(c); const em=[&#x27;🎉&#x27;,&#x27;🎈&#x27;,&#x27;⭐&#x27;,&#x27;🍬&#x27;,&#x27;🎊&#x27;,&#x27;🎁&#x27;]; for(let i=0;i&lt;40;i++){ const s=document.createElement(&#x27;span&#x27;); s.textContent=em[i%em.length]; s.style.cssText=&#x27;position:absolute;top:-40px;font-size:&#x27;+(20+Math.random()*20)+&#x27;px;left:&#x27;+Math.random()*100+&#x27;%;transition:transform &#x27;+(2+Math.random()*2)+&#x27;s linear, opacity 4s;&#x27;; c.appendChild(s); requestAnimationFrame(()=&gt;{ s.style.transform=&#x27;translateY(&#x27;+(window.innerHeight+80)+&#x27;px) rotate(&#x27;+(Math.random()*360)+&#x27;deg)&#x27;; s.style.opacity=&#x27;.2&#x27;; }); } setTimeout(()=&gt;c.remove(),4500); }
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;startGame());
+
+var deck=[], currentItem=null, roundNum=0;
+const TOTAL_ROUNDS = ROUNDS.length;
+function startGame(){ deck=shuffle(ROUNDS); scoreA=0; scoreB=0; roundNum=0; currentTeam=&#x27;a&#x27;; updateScores(); document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;block&#x27;; nextRound(); }
+function nextRound(){ currentItem=deck.length?deck.pop():null; if(!currentItem){ endGame(); return; } roundNum++; locked=false; document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Round &#x27;+roundNum+&#x27; of &#x27;+TOTAL_ROUNDS; renderRound(currentItem); updateTurnBanner(); }
+function finishRound(correct, delay, pts){ locked=true; if(correct) addPoints(pts==null?1:pts); currentTeam = currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; setTimeout(nextRound, delay||1400); }
+
+const COLS=[&#x27;#F2A7C3&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#C9A8E8&#x27;,&#x27;#FFD97D&#x27;,&#x27;#FFB3A7&#x27;,&#x27;#5BC4E8&#x27;];
+var qdeck=[], cdeck=[], opened={}, picking=false;
+const KIND={normal:{t:&#x27;🎁 Normal box: +1&#x27;,p:1},star:{t:&#x27;⭐ STAR box: DOUBLE points! +2&#x27;,p:2},bomb:{t:&#x27;💥 Risky box: +1 if right, −1 if wrong!&#x27;,p:1},free:{t:&#x27;🎉 Lucky box: FREE point!&#x27;,p:1},steal:{t:&#x27;🦹 STEAL box!&#x27;},swap:{t:&#x27;🔄 SWAP box!&#x27;},chal:{t:&#x27;🕺 CHALLENGE box!&#x27;}};
+function other(){ return currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; }
+function getScore(t){ return t===&#x27;a&#x27;?scoreA:scoreB; }
+function setScore(t,v){ if(t===&#x27;a&#x27;) scoreA=Math.max(0,v); else scoreB=Math.max(0,v); updateScores(); }
+function endTurn(ms){ locked=true; currentTeam=other(); setTimeout(nextRound,ms||2200); }
+function renderRound(it){ picking=true; document.getElementById(&#x27;qwrap&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;hint&#x27;).textContent=&#x27;🎁 &#x27;+teamName(currentTeam)+&#x27;, pick a box! (say a number)&#x27;; document.getElementById(&#x27;feedback&#x27;).textContent=&#x27;&#x27;;
+  const g=document.getElementById(&#x27;grid&#x27;); g.style.display=&#x27;grid&#x27;; g.innerHTML=&#x27;&#x27;; for(let i=0;i&lt;20;i++){ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;box&#x27;+(opened[i]?&#x27; gone&#x27;:&#x27;&#x27;); b.style.background=COLS[i%6]; b.textContent=opened[i]?&#x27;&#x27;:String(i+1); b.style.fontFamily=&quot;&#x27;Nunito&#x27;,sans-serif&quot;; b.style.fontWeight=&#x27;900&#x27;; b.style.color=&#x27;#fff&#x27;; b.addEventListener(&#x27;click&#x27;,()=&gt;openBox(i)); g.appendChild(b); } }
+function openBox(i){ if(!picking||opened[i]) return; picking=false; opened[i]=true; document.getElementById(&#x27;grid&#x27;).style.display=&#x27;none&#x27;; const k=currentItem.k; const fb=document.getElementById(&#x27;feedback&#x27;); const T=teamName(currentTeam), O=teamName(other());
+  document.getElementById(&#x27;hint&#x27;).textContent=&#x27;📦 Box &#x27;+(i+1)+&#x27;!&#x27;; document.getElementById(&#x27;bigem&#x27;).textContent=&#x27;&#x27;;
+  if(k===&#x27;free&#x27;){ document.getElementById(&#x27;kind&#x27;).textContent=&#x27;&#x27;; document.getElementById(&#x27;qwrap&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;bigem&#x27;).textContent=&#x27;&#x27;; fb.textContent=&#x27;🎉 LUCKY BOX! Free point for &#x27;+T+&#x27;!&#x27;; fb.className=&#x27;feedback ok&#x27;; addPoints(1); endTurn(2400); return; }
+  if(k===&#x27;steal&#x27;){ document.getElementById(&#x27;qwrap&#x27;).classList.remove(&#x27;show&#x27;); const o=other(); if(getScore(o)&gt;0){ setScore(o,getScore(o)-1); addPoints(1); fb.textContent=&#x27;🦹 &#x27;+T+&#x27; steals 1 point from &#x27;+O+&#x27;!&#x27;; } else { addPoints(1); fb.textContent=&#x27;🦹 Steal box! &#x27;+O+&#x27; has no points, so &#x27;+T+&#x27; gets +1.&#x27;; } fb.className=&#x27;feedback ok&#x27;; endTurn(2800); return; }
+  if(k===&#x27;swap&#x27;){ document.getElementById(&#x27;qwrap&#x27;).classList.remove(&#x27;show&#x27;); const a=scoreA; scoreA=scoreB; scoreB=a; updateScores(); fb.textContent=&#x27;🔄 SWAP! The teams change scores!&#x27;; fb.className=&#x27;feedback ok&#x27;; endTurn(2800); return; }
+  document.getElementById(&#x27;qwrap&#x27;).classList.add(&#x27;show&#x27;);
+  if(k===&#x27;chal&#x27;){ if(!cdeck.length) cdeck=shuffle(CHAL); const c=cdeck.pop(); currentItem.c=c; document.getElementById(&#x27;kind&#x27;).textContent=KIND.chal.t+&#x27; (+2 points)&#x27;; document.getElementById(&#x27;bigem&#x27;).textContent=c[0]; document.getElementById(&#x27;q&#x27;).textContent=c[1];
+    const o=document.getElementById(&#x27;opts&#x27;); o.innerHTML=&#x27;&#x27;; const mk=(txt,cls,fn)=&gt;{ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;opt-btn &#x27;+cls; b.textContent=txt; b.addEventListener(&#x27;click&#x27;,()=&gt;{ if(locked) return; document.querySelectorAll(&#x27;#opts .opt-btn&#x27;).forEach(x=&gt;x.disabled=true); fn(); }); o.appendChild(b); };
+    mk(&#x27;✅ Done! +2&#x27;,&#x27;yes&#x27;,()=&gt;{ addPoints(2); fb.textContent=&#x27;🎉 Great show, &#x27;+T+&#x27;! +2&#x27;; fb.className=&#x27;feedback ok&#x27;; endTurn(2200); });
+    if(c[2]) mk(&#x27;🎯 Done + the other team guessed it! (+2 and +1)&#x27;,&#x27;yes&#x27;,()=&gt;{ addPoints(2); const o2=other(); setScore(o2,getScore(o2)+1); fb.textContent=&#x27;🎉 Great show! +2 for &#x27;+T+&#x27; and +1 for &#x27;+O+&#x27;!&#x27;; fb.className=&#x27;feedback ok&#x27;; endTurn(2400); });
+    mk(&#x27;⏭ Skip (0 points)&#x27;,&#x27;skip&#x27;,()=&gt;{ fb.textContent=&#x27;No problem! Next time!&#x27;; fb.className=&#x27;feedback no&#x27;; endTurn(1800); });
+    return; }
+  if(!qdeck.length) qdeck=shuffle(QS); const q=qdeck.pop(); currentItem.q=q; document.getElementById(&#x27;kind&#x27;).textContent=KIND[k].t; document.getElementById(&#x27;q&#x27;).textContent=q[0];
+  const o=document.getElementById(&#x27;opts&#x27;); o.innerHTML=&#x27;&#x27;; shuffle(q[1]).forEach(opt=&gt;{ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;opt-btn&#x27;; b.textContent=opt; b.addEventListener(&#x27;click&#x27;,()=&gt;pick(opt,b)); o.appendChild(b); }); }
+function pick(opt,btn){ if(locked) return; const k=currentItem.k, q=currentItem.q; const ok=opt===q[2]; document.querySelectorAll(&#x27;#opts .opt-btn&#x27;).forEach(b=&gt;{ b.disabled=true; if(b.textContent===q[2]) b.classList.add(&#x27;correct&#x27;); }); if(!ok) btn.classList.add(&#x27;incorrect&#x27;);
+  const fb=document.getElementById(&#x27;feedback&#x27;); let pts=0; if(ok) pts=KIND[k].p; else if(k===&#x27;bomb&#x27;) pts=-1;
+  fb.textContent= ok?(&#x27;✅ Yes! +&#x27;+pts):(k===&#x27;bomb&#x27;?&#x27;💥 Oops! −1 · The answer is: &#x27;+q[2]:&#x27;❌ The answer is: &#x27;+q[2]); fb.className=&#x27;feedback &#x27;+(ok?&#x27;ok&#x27;:&#x27;no&#x27;); if(pts!==0) addPoints(pts); endTurn(2200); }
+const _start=startGame; startGame=function(){ opened={}; qdeck=shuffle(QS); cdeck=shuffle(CHAL); _start(); };
+startGame();
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide" data-id="memory_match_prep"><h2>🧠 Get ready: Memory Match!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>First, look at all the cards for <b>5 seconds</b>. Remember them! 👀</div></div><div class="st"><span class="n">2</span><div>Then the cards turn over. Say <b>two numbers</b>: "Number 3 and number 9!"</div></div><div class="st"><span class="n">3</span><div>Find a pair: <b>picture + word</b> (🍎 = apple).</div></div><div class="st"><span class="n">4</span><div>Pair = <b>1 point</b>. Say the word and a sentence: "I like pizza!"</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game" data-game="memory_match"><div class="gh"><span>🧠 Game 4: Memory Match</span><small>Find the pairs: picture + word!</small></div><iframe title="memory_match" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Memory Match&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{ --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D; --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    background:linear-gradient(#ffffffee,#ffffffee),repeating-linear-gradient(0deg,#eee 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#eee 0 1px,transparent 1px 36px);
+    background-color:#fff; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+  .wrap{ max-width:760px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{ border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:14px; text-align:center; width:100%; color:var(--dark); }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:12px; }
+  .clue-card{ background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center; margin-bottom:16px; font-weight:800; font-size:18px; }
+  .clue-card .sm{ display:block; font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-top:12px; }
+  .feedback.ok{ color:#2a9d6f; } .feedback.no{ color:#e0654a; }
+  .opt-btn{ border:none; border-radius:16px; padding:16px 14px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); } .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+  .end-screen{ display:none; text-align:center; } .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{ display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--coral),var(--pink)); }
+  .mgrid{ display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:480px; margin:0 auto; }
+.mc{ position:relative; aspect-ratio:1/1; border:none; border-radius:16px; cursor:pointer; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; background:var(--lavender); color:#fff; font-size:26px; box-shadow:0 5px 0 rgba(0,0,0,.1); padding:0; }
+.mc .face{ font-size:36px; color:var(--dark); } .mc .face.w{ font-size:16px; }
+.mc.up{ background:#fff; } .mc.done{ background:var(--mint); cursor:default; opacity:.85; }
+
+header{display:none} html,body{align-items:flex-start}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+.clue-card{padding:10px 16px;margin-bottom:10px}
+.stage{width:min(86vw,340px,40vh)!important;height:min(86vw,340px,40vh)!important}
+.grid3{max-width:min(560px,66vh)!important} .mgrid{max-width:min(480px,58vh)!important}
+.pin svg{width:100px!important;height:100px!important} .slot{height:38px;line-height:38px;font-size:24px}
+.timer{font-size:48px!important} .cat{font-size:48px!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;h1&gt;🧠 Memory Match&lt;/h1&gt;&lt;div class=&quot;sub&quot;&gt;Find the pairs: picture + word!&lt;/div&gt;&lt;/header&gt;
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;gameArea&quot;&gt;&lt;div class=&quot;clue-card&quot; id=&quot;hint&quot;&gt;🧠 Say two numbers. Find a pair: picture + word!&lt;/div&gt;&lt;div class=&quot;mgrid&quot; id=&quot;mgrid&quot;&gt;&lt;/div&gt;&lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;&lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;&lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const PAIRS=[[&quot;🍎&quot;, &quot;apple&quot;], [&quot;🍕&quot;, &quot;pizza&quot;], [&quot;⚽&quot;, &quot;soccer&quot;], [&quot;🏀&quot;, &quot;basketball&quot;], [&quot;🎒&quot;, &quot;backpack&quot;], [&quot;✏️&quot;, &quot;pencil&quot;], [&quot;🐶&quot;, &quot;dog&quot;], [&quot;🍌&quot;, &quot;banana&quot;]]; const ROUNDS=PAIRS; const TURN_ICON=&quot;🧠&quot;;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i&gt;0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+var currentTeam=&#x27;a&#x27;, scoreA=0, scoreB=0, locked=false;
+function teamName(t){ const el=document.getElementById(t===&#x27;a&#x27;?&#x27;teamNameA&#x27;:&#x27;teamNameB&#x27;); return (el.value||(t===&#x27;a&#x27;?&#x27;Team A&#x27;:&#x27;Team B&#x27;)).trim(); }
+function updateTurnBanner(){ document.getElementById(&#x27;turnBanner&#x27;).textContent = TURN_ICON+&#x27; &#x27;+teamName(currentTeam)+&quot;&#x27;s turn!&quot;; document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;a&#x27;); document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;b&#x27;); }
+function updateScores(){ document.getElementById(&#x27;scoreA&#x27;).textContent=scoreA; document.getElementById(&#x27;scoreB&#x27;).textContent=scoreB; }
+function addPoints(n){ if(currentTeam===&#x27;a&#x27;) scoreA=Math.max(0,scoreA+n); else scoreB=Math.max(0,scoreB+n); updateScores(); }
+function endGame(){ document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;none&#x27;; document.getElementById(&#x27;endScreen&#x27;).classList.add(&#x27;show&#x27;); let t; if(scoreA===scoreB){ t=&quot;🤝 It&#x27;s a tie! &quot;+scoreA+&#x27; - &#x27;+scoreB; } else { const w=scoreA&gt;scoreB?teamName(&#x27;a&#x27;):teamName(&#x27;b&#x27;); t=&#x27;🏆 &#x27;+w+&#x27; wins! &#x27;+scoreA+&#x27; - &#x27;+scoreB; } document.getElementById(&#x27;winnerText&#x27;).textContent=t; party(); }
+function party(){ const c=document.createElement(&#x27;div&#x27;); c.style.cssText=&#x27;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50&#x27;; document.body.appendChild(c); const em=[&#x27;🎉&#x27;,&#x27;🎈&#x27;,&#x27;⭐&#x27;,&#x27;🍬&#x27;,&#x27;🎊&#x27;,&#x27;🎁&#x27;]; for(let i=0;i&lt;40;i++){ const s=document.createElement(&#x27;span&#x27;); s.textContent=em[i%em.length]; s.style.cssText=&#x27;position:absolute;top:-40px;font-size:&#x27;+(20+Math.random()*20)+&#x27;px;left:&#x27;+Math.random()*100+&#x27;%;transition:transform &#x27;+(2+Math.random()*2)+&#x27;s linear, opacity 4s;&#x27;; c.appendChild(s); requestAnimationFrame(()=&gt;{ s.style.transform=&#x27;translateY(&#x27;+(window.innerHeight+80)+&#x27;px) rotate(&#x27;+(Math.random()*360)+&#x27;deg)&#x27;; s.style.opacity=&#x27;.2&#x27;; }); } setTimeout(()=&gt;c.remove(),4500); }
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;startGame());
+
+var cards=[], first=null, found=0;
+function startGame(){ scoreA=0; scoreB=0; currentTeam=&#x27;a&#x27;; found=0; first=null; locked=false; updateScores(); document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;block&#x27;; document.getElementById(&#x27;feedback&#x27;).textContent=&#x27;&#x27;;
+  cards=[]; PAIRS.forEach((p,i)=&gt;{ cards.push({id:i,t:&#x27;e&#x27;,v:p[0]}); cards.push({id:i,t:&#x27;w&#x27;,v:p[1]}); }); cards=shuffle(cards);
+  const g=document.getElementById(&#x27;mgrid&#x27;); g.innerHTML=&#x27;&#x27;; cards.forEach((c,i)=&gt;{ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;mc&#x27;; b.textContent=String(i+1); b.addEventListener(&#x27;click&#x27;,()=&gt;flip(i)); c.el=b; g.appendChild(b); });
+  document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Pairs found: 0 of &#x27;+PAIRS.length; updateTurnBanner();
+  locked=true; cards.forEach(show); let n=5; const h=document.getElementById(&#x27;hint&#x27;); h.textContent=&#x27;👀 Memorize the cards! &#x27;+n+&#x27;...&#x27;; clearInterval(window._pv); window._pv=setInterval(()=&gt;{ n--; if(n&gt;0){ h.textContent=&#x27;👀 Memorize the cards! &#x27;+n+&#x27;...&#x27;; } else { clearInterval(window._pv); cards.forEach((c,i)=&gt;hide(c,i)); h.textContent=&#x27;🧠 Say two numbers. Find a pair: picture + word!&#x27;; locked=false; } },1000); }
+function show(c){ c.el.classList.add(&#x27;up&#x27;); c.el.innerHTML=&#x27;&lt;span class=&quot;face &#x27;+(c.t===&#x27;w&#x27;?&#x27;w&#x27;:&#x27;&#x27;)+&#x27;&quot;&gt;&#x27;+c.v+&#x27;&lt;/span&gt;&#x27;; }
+function hide(c,i){ c.el.classList.remove(&#x27;up&#x27;); c.el.textContent=String(i+1); }
+function flip(i){ const c=cards[i]; if(locked||c.done||first===i) return; show(c); if(first===null){ first=i; return; }
+  locked=true; const a=cards[first], ai=first; first=null; const fb=document.getElementById(&#x27;feedback&#x27;);
+  if(a.id===c.id){ a.done=c.done=true; setTimeout(()=&gt;{ a.el.classList.add(&#x27;done&#x27;); c.el.classList.add(&#x27;done&#x27;); },500); found++; addPoints(1); fb.textContent=&#x27;✅ A match! &#x27;+PAIRS[c.id][0]+&#x27; = &#x27;+PAIRS[c.id][1]; fb.className=&#x27;feedback ok&#x27;; document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Pairs found: &#x27;+found+&#x27; of &#x27;+PAIRS.length; }
+  else { fb.textContent=&#x27;❌ Not a match. Remember the cards!&#x27;; fb.className=&#x27;feedback no&#x27;; }
+  setTimeout(()=&gt;{ if(!a.done){ hide(a,ai); hide(c,i); } fb.textContent=&#x27;&#x27;; if(found===PAIRS.length){ endGame(); return; } currentTeam=currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; updateTurnBanner(); locked=false; }, a.id===c.id?1600:2000); }
+startGame();
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide" data-id="save_the_pinata_prep"><h2>🪅 Get ready: Save the Piñata!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>You see a <b>hint</b> and empty spaces: _ _ _ _ _</div></div><div class="st"><span class="n">2</span><div>Say a <b>letter in English</b>: A = "ay", B = "bee", C = "see"...</div></div><div class="st"><span class="n">3</span><div>Right letter: it appears! ✅ Wrong letter: the piñata gets hit! 💥</div></div><div class="st"><span class="n">4</span><div><b>6 hits</b> = the piñata breaks. Complete the word = <b>1 point</b> 🍬</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game" data-game="save_the_pinata"><div class="gh"><span>🪅 Game 5: Save the Piñata</span><small>Guess the letters. 6 mistakes and the piñata breaks!</small></div><iframe title="save_the_pinata" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Save the Piñata&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{ --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D; --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    background:linear-gradient(#ffffffee,#ffffffee),repeating-linear-gradient(0deg,#eee 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#eee 0 1px,transparent 1px 36px);
+    background-color:#fff; color:var(--dark); display:flex; align-items:center; justify-content:center; }
+  .wrap{ max-width:760px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{ border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:14px; text-align:center; width:100%; color:var(--dark); }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:12px; }
+  .clue-card{ background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center; margin-bottom:16px; font-weight:800; font-size:18px; }
+  .clue-card .sm{ display:block; font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-top:12px; }
+  .feedback.ok{ color:#2a9d6f; } .feedback.no{ color:#e0654a; }
+  .opt-btn{ border:none; border-radius:16px; padding:16px 14px; font-weight:900; font-size:16px; cursor:pointer; background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); } .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+  .end-screen{ display:none; text-align:center; } .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{ display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff; background:linear-gradient(135deg,var(--coral),var(--pink)); }
+  .pin{ text-align:center; margin:4px 0 6px; } .pin svg{ width:150px; height:150px; } .pin.hit svg{ animation:swing .5s; } @keyframes swing{ 0%,100%{transform:rotate(0)} 25%{transform:rotate(-14deg)} 75%{transform:rotate(14deg)} }
+.hits{ text-align:center; font-size:22px; margin-bottom:6px; letter-spacing:2px; }
+.word{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin:8px 0 14px; }
+.slot{ width:34px; height:44px; border-bottom:4px solid var(--dark); font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:28px; text-align:center; line-height:44px; }
+.kb{ display:flex; flex-wrap:wrap; gap:6px; justify-content:center; max-width:560px; margin:0 auto; }
+.key{ width:42px; height:46px; border:none; border-radius:10px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:18px; cursor:pointer; background:#fff; box-shadow:0 4px 0 rgba(0,0,0,.1); color:var(--dark); }
+.key.good{ background:var(--mint); } .key.bad{ background:var(--coral); opacity:.6; } .key:disabled{ cursor:default; }
+.candy{ text-align:center; font-size:34px; min-height:42px; }
+
+header{display:none} html,body{align-items:flex-start}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+.clue-card{padding:10px 16px;margin-bottom:10px}
+.stage{width:min(86vw,340px,40vh)!important;height:min(86vw,340px,40vh)!important}
+.grid3{max-width:min(560px,66vh)!important} .mgrid{max-width:min(480px,58vh)!important}
+.pin svg{width:100px!important;height:100px!important} .slot{height:38px;line-height:38px;font-size:24px}
+.timer{font-size:48px!important} .cat{font-size:48px!important}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;&lt;h1&gt;🪅 Save the Piñata&lt;/h1&gt;&lt;div class=&quot;sub&quot;&gt;Guess the letters. 6 wrong = the piñata breaks!&lt;/div&gt;&lt;/header&gt;
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;&lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;&lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+  &lt;div id=&quot;gameArea&quot;&gt;&lt;div class=&quot;clue-card&quot; id=&quot;clue&quot;&gt;&lt;/div&gt;&lt;div class=&quot;pin&quot; id=&quot;pin&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hits&quot; id=&quot;hits&quot;&gt;&lt;/div&gt;&lt;div class=&quot;word&quot; id=&quot;word&quot;&gt;&lt;/div&gt;&lt;div class=&quot;candy&quot; id=&quot;candy&quot;&gt;&lt;/div&gt;&lt;div class=&quot;kb&quot; id=&quot;kb&quot;&gt;&lt;/div&gt;&lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;&lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;&lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+const ROUNDS=[[&quot;BREAKFAST&quot;, &quot;a meal in the morning&quot;], [&quot;SCHOOL&quot;, &quot;where you study&quot;], [&quot;FAMILY&quot;, &quot;mother, father, brother…&quot;], [&quot;SATURDAY&quot;, &quot;a day of the week&quot;], [&quot;SOMETIMES&quot;, &quot;an adverb of frequency&quot;], [&quot;HOMEWORK&quot;, &quot;you do it at home for school&quot;], [&quot;SISTER&quot;, &quot;a girl in your family&quot;], [&quot;TEACHER&quot;, &quot;she/he works at school&quot;], [&quot;ALWAYS&quot;, &quot;100% of the time&quot;], [&quot;BASKETBALL&quot;, &quot;a sport with a hoop&quot;]].map(w=&gt;({w:w[0],h:w[1]})); const TURN_ICON=&quot;🪅&quot;;
+
+function shuffle(arr){ const a=arr.slice(); for(let i=a.length-1;i&gt;0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+var currentTeam=&#x27;a&#x27;, scoreA=0, scoreB=0, locked=false;
+function teamName(t){ const el=document.getElementById(t===&#x27;a&#x27;?&#x27;teamNameA&#x27;:&#x27;teamNameB&#x27;); return (el.value||(t===&#x27;a&#x27;?&#x27;Team A&#x27;:&#x27;Team B&#x27;)).trim(); }
+function updateTurnBanner(){ document.getElementById(&#x27;turnBanner&#x27;).textContent = TURN_ICON+&#x27; &#x27;+teamName(currentTeam)+&quot;&#x27;s turn!&quot;; document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;a&#x27;); document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;,currentTeam===&#x27;b&#x27;); }
+function updateScores(){ document.getElementById(&#x27;scoreA&#x27;).textContent=scoreA; document.getElementById(&#x27;scoreB&#x27;).textContent=scoreB; }
+function addPoints(n){ if(currentTeam===&#x27;a&#x27;) scoreA=Math.max(0,scoreA+n); else scoreB=Math.max(0,scoreB+n); updateScores(); }
+function endGame(){ document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;none&#x27;; document.getElementById(&#x27;endScreen&#x27;).classList.add(&#x27;show&#x27;); let t; if(scoreA===scoreB){ t=&quot;🤝 It&#x27;s a tie! &quot;+scoreA+&#x27; - &#x27;+scoreB; } else { const w=scoreA&gt;scoreB?teamName(&#x27;a&#x27;):teamName(&#x27;b&#x27;); t=&#x27;🏆 &#x27;+w+&#x27; wins! &#x27;+scoreA+&#x27; - &#x27;+scoreB; } document.getElementById(&#x27;winnerText&#x27;).textContent=t; party(); }
+function party(){ const c=document.createElement(&#x27;div&#x27;); c.style.cssText=&#x27;position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:50&#x27;; document.body.appendChild(c); const em=[&#x27;🎉&#x27;,&#x27;🎈&#x27;,&#x27;⭐&#x27;,&#x27;🍬&#x27;,&#x27;🎊&#x27;,&#x27;🎁&#x27;]; for(let i=0;i&lt;40;i++){ const s=document.createElement(&#x27;span&#x27;); s.textContent=em[i%em.length]; s.style.cssText=&#x27;position:absolute;top:-40px;font-size:&#x27;+(20+Math.random()*20)+&#x27;px;left:&#x27;+Math.random()*100+&#x27;%;transition:transform &#x27;+(2+Math.random()*2)+&#x27;s linear, opacity 4s;&#x27;; c.appendChild(s); requestAnimationFrame(()=&gt;{ s.style.transform=&#x27;translateY(&#x27;+(window.innerHeight+80)+&#x27;px) rotate(&#x27;+(Math.random()*360)+&#x27;deg)&#x27;; s.style.opacity=&#x27;.2&#x27;; }); } setTimeout(()=&gt;c.remove(),4500); }
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;startGame());
+
+var deck=[], currentItem=null, roundNum=0;
+const TOTAL_ROUNDS = ROUNDS.length;
+function startGame(){ deck=shuffle(ROUNDS); scoreA=0; scoreB=0; roundNum=0; currentTeam=&#x27;a&#x27;; updateScores(); document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;); document.getElementById(&#x27;gameArea&#x27;).style.display=&#x27;block&#x27;; nextRound(); }
+function nextRound(){ currentItem=deck.length?deck.pop():null; if(!currentItem){ endGame(); return; } roundNum++; locked=false; document.getElementById(&#x27;roundBadge&#x27;).textContent=&#x27;Round &#x27;+roundNum+&#x27; of &#x27;+TOTAL_ROUNDS; renderRound(currentItem); updateTurnBanner(); }
+function finishRound(correct, delay, pts){ locked=true; if(correct) addPoints(pts==null?1:pts); currentTeam = currentTeam===&#x27;a&#x27;?&#x27;b&#x27;:&#x27;a&#x27;; setTimeout(nextRound, delay||1400); }
+
+const MAXH=6; var guessed={}, hits=0, shown=null;
+function svg(h){ const c=[&#x27;#F2A7C3&#x27;,&#x27;#FFD97D&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#C9A8E8&#x27;,&#x27;#FFB3A7&#x27;,&#x27;#5BC4E8&#x27;];
+  let s=&#x27;&lt;svg viewBox=&quot;0 0 100 100&quot;&gt;&lt;line x1=&quot;50&quot; y1=&quot;0&quot; x2=&quot;50&quot; y2=&quot;14&quot; stroke=&quot;#7A4A2B&quot; stroke-width=&quot;3&quot;/&gt;&lt;polygon points=&quot;50,12 61,36 88,38 67,55 74,82 50,68 26,82 33,55 12,38 39,36&quot; fill=&quot;&#x27;+c[h%6]+&#x27;&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;2.5&quot; stroke-linejoin=&quot;round&quot;/&gt;&lt;circle cx=&quot;42&quot; cy=&quot;48&quot; r=&quot;3&quot; fill=&quot;#3A3A3A&quot;/&gt;&lt;circle cx=&quot;58&quot; cy=&quot;48&quot; r=&quot;3&quot; fill=&quot;#3A3A3A&quot;/&gt;&lt;path d=&quot;M42 58 Q50 66 58 58&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;3&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&#x27;;
+  if(h&gt;=2) s+=&#x27;&lt;path d=&quot;M30 40 L38 50 L32 58&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;2&quot; fill=&quot;none&quot;/&gt;&#x27;; if(h&gt;=4) s+=&#x27;&lt;path d=&quot;M70 42 L62 52 L68 62&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;2&quot; fill=&quot;none&quot;/&gt;&#x27;; if(h&gt;=5) s+=&#x27;&lt;path d=&quot;M50 70 L46 80 L54 88&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;2&quot; fill=&quot;none&quot;/&gt;&#x27;;
+  return s+&#x27;&lt;/svg&gt;&#x27;; }
+function draw(){ const w=currentItem.w; const el=document.getElementById(&#x27;word&#x27;); el.innerHTML=&#x27;&#x27;; w.split(&#x27;&#x27;).forEach(ch=&gt;{ const d=document.createElement(&#x27;div&#x27;); d.className=&#x27;slot&#x27;; d.textContent=(guessed[ch]||shown===&#x27;all&#x27;)?ch:&#x27;&#x27;; el.appendChild(d); });
+  document.getElementById(&#x27;pin&#x27;).innerHTML=svg(hits); let h=&#x27;&#x27;; for(let i=0;i&lt;MAXH;i++) h+=(i&lt;hits?&#x27;💥&#x27;:&#x27;⚪&#x27;); document.getElementById(&#x27;hits&#x27;).textContent=h; }
+function renderRound(it){ guessed={}; hits=0; shown=null; document.getElementById(&#x27;clue&#x27;).innerHTML=&#x27;Hint: &#x27;+it.h+&#x27;&lt;span class=&quot;sm&quot;&gt;&#x27;+it.w.length+&#x27; letters&lt;/span&gt;&#x27;; document.getElementById(&#x27;feedback&#x27;).textContent=&#x27;&#x27;; document.getElementById(&#x27;candy&#x27;).textContent=&#x27;&#x27;;
+  const kb=document.getElementById(&#x27;kb&#x27;); kb.innerHTML=&#x27;&#x27;; &#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;.split(&#x27;&#x27;).forEach(ch=&gt;{ const b=document.createElement(&#x27;button&#x27;); b.className=&#x27;key&#x27;; b.textContent=ch; b.addEventListener(&#x27;click&#x27;,()=&gt;guess(ch,b)); kb.appendChild(b); }); draw(); }
+function guess(ch,b){ if(locked||guessed[ch]) return; const w=currentItem.w; const fb=document.getElementById(&#x27;feedback&#x27;); b.disabled=true;
+  if(w.indexOf(ch)&gt;=0){ guessed[ch]=true; b.classList.add(&#x27;good&#x27;); draw(); if(w.split(&#x27;&#x27;).every(c=&gt;guessed[c])){ fb.textContent=&#x27;🎉 You saved the word: &#x27;+w+&#x27;! +1&#x27;; fb.className=&#x27;feedback ok&#x27;; document.getElementById(&#x27;candy&#x27;).textContent=&#x27;🍬🍭🍫&#x27;; finishRound(true,2800,1); } }
+  else { guessed[ch]=false; b.classList.add(&#x27;bad&#x27;); hits++; const p=document.getElementById(&#x27;pin&#x27;); p.classList.remove(&#x27;hit&#x27;); void p.offsetWidth; p.classList.add(&#x27;hit&#x27;); draw(); if(hits&gt;=MAXH){ shown=&#x27;all&#x27;; draw(); document.getElementById(&#x27;candy&#x27;).textContent=&#x27;🍬🍭🍫🍬🍭&#x27;; fb.textContent=&#x27;💥 The piñata broke! The word was: &#x27;+w+&#x27; (candy for everyone!)&#x27;; fb.className=&#x27;feedback no&#x27;; finishRound(false,3200); } } }
+startGame();
+
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide" data-id="champ"><h2>🏆 Champions!</h2><p class="sub">Everybody is a winner today!</p><div class="box center"><div class="big">🏆 🥇 🎉</div><p class="lg">Count the stars!</p><p class="lg" style="color:#FF8F7C">Happy Children's Day, superstars!</p></div></section>
+<section class="slide" data-id="close"><h2>💬 Before You Go...</h2><p class="sub">Answer in English!</p><div class="box lg2"><p>1. What's your favorite game?<br>&nbsp;&nbsp;&nbsp;→ My favorite game is ______.</p><p>2. How do you feel today?<br>&nbsp;&nbsp;&nbsp;→ I'm ______.</p><p>3. See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+var nw=null; var GUIDE="<h1>🎉 Teacher's Guide — Aula Especial: Dia das Crianças</h1>\n<p class=\"meta\">Kids English · Game Day · 60 min · Professora: Nathalia · Aula só de jogos: revisão de tudo que já foi ensinado, <b>sem conteúdo novo e sem homework</b>.</p>\n<div class=\"toc\"><b>Ir para:</b> <a href=\"#antes\">Antes da aula</a> · <a href=\"#roteiro\">Roteiro (60 min)</a> · <a href=\"#g1\">Game 1</a> · <a href=\"#g2\">Game 2</a> · <a href=\"#g3\">Game 3</a> · <a href=\"#g4\">Game 4</a> · <a href=\"#g5\">Game 5</a> · <a href=\"#fim\">Final</a> · <a href=\"#dicas\">Dicas</a></div>\n\n<h2 id=\"antes\">✅ Antes da aula</h2>\n<ul>\n<li><b>Compartilhe só a ABA ou a JANELA da aula</b> (Meet/Zoom: \"Aba\" ou \"Janela\"), nunca a tela inteira. Assim a janela deste guia não aparece para os alunos.</li>\n<li>Este guia abre em uma janela separada. Se o navegador bloquear, permita pop-ups para o site e clique em <b>📝 Guia da professora</b> de novo. <b>O guia é independente:</b> rolar ou navegar aqui não muda o slide dos alunos.</li>\n<li>Use <b>⛶ Tela cheia</b> na aula e as setas do teclado (← →) para trocar de slide. Pode ir direto ao slide pelo endereço (ex.: <code>#s9</code> = Surprise Boxes).</li>\n<li><b>Slide 3:</b> digite os nomes dos times <b>antes</b> de abrir o primeiro jogo. Os nomes entram sozinhos nos 5 jogos.</li>\n<li>Os alunos <b>não mexem</b> nos jogos: eles falam, você clica. Os times se alternam a cada rodada e o placar aparece na tela.</li>\n<li>Se a página recarregar, ela volta ao mesmo slide, mas o placar do jogo reinicia.</li>\n<li>Opcional: balas, adesivos ou \"estrelinhas\" desenhadas para a premiação final.</li>\n</ul>\n\n<h2 id=\"roteiro\">⏱️ Roteiro (60 min)</h2>\n<table>\n<tr><th>Tempo</th><th>Slides</th><th>O que acontece</th></tr>\n<tr><td>0–4</td><td>1</td><td>Welcome</td></tr>\n<tr><td>4–9</td><td>2–3</td><td>Regras + nomes dos times</td></tr>\n<tr><td>9–17</td><td>4–5</td><td>🔍 Mystery Tiles (1 min de explicação + ~7 min de jogo)</td></tr>\n<tr><td>17–26</td><td>6–7</td><td>💣 Category Blitz</td></tr>\n<tr><td>26–36</td><td>8–9</td><td>🎁 Surprise Boxes</td></tr>\n<tr><td>36–45</td><td>10–11</td><td>🧠 Memory Match</td></tr>\n<tr><td>45–55</td><td>12–13</td><td>🪅 Save the Piñata (final emocionante)</td></tr>\n<tr><td>55–60</td><td>14–15</td><td>Champions + Before you go</td></tr>\n</table>\n<p class=\"tip\">⏳ <b>Se o tempo apertar:</b> não precisa terminar todas as rodadas de um jogo. O placar está sempre visível nos cartões dos times, então é só encerrar, comemorar quem está na frente (\"Great game!\") e passar ao próximo. Os jogos têm 12, 12, 20, 8 pares e 10 rodadas.</p>\n\n<h2>Slide 1 · Welcome (0–4 min)</h2>\n<ul>\n<li>\"Hello, everybody! <b>Happy Children's Day!</b> 🎉\" (animada, com palmas)</li>\n<li>\"How are you today?\" → \"I'm happy / I'm great / I'm tired.\"</li>\n<li>\"Today we have <b>no homework</b>! Today is <b>Game Day</b>!\"</li>\n</ul>\n\n<h2>Slides 2–3 · Rules + Team names (4–9 min)</h2>\n<ul>\n<li>Slide 2: leia cada card com gestos. \"Two teams. <b>Speak English!</b> Right answer, points. Be kind!\" Peça que repitam \"Speak English!\".</li>\n<li>Slide 3: \"Choose your team name!\" Cada time escolhe um nome em inglês. Pergunte: \"What's your team name?\" → \"Our team name is <b>Super Unicorns</b>.\" Digite os nomes nos campos.</li>\n<li>Com 3 alunos: 2 contra 1 (você ajuda o time menor) ou cada aluno é seu próprio time e vocês trocam de time a cada jogo.</li>\n<li>Os slides \"Get ready\" (4, 6, 8, 10, 12) são lidos <b>junto com as crianças</b>, em inglês simples, com gestos. Termine sempre com \"Ready? Let's play!\" e clique no botão verde.</li>\n</ul>\n\n<h2 id=\"g1\">🔍 Game 1 · Mystery Tiles (slides 4–5)</h2>\n<p><b>Objetivo:</b> vocabulário de rotina, sentimentos e família. 12 rodadas, uma figura por rodada, em ordem aleatória.</p>\n<p><b>Como conduzir:</b></p>\n<ol>\n<li>Slide 4: leia os 4 passos. Faça um teste: \"Say: <b>Number five, please!</b>\"</li>\n<li>Slide 5: a figura está escondida atrás de 9 quadrados <b>numerados</b>. Ela aparece em um ponto diferente a cada rodada (não é sempre no meio).</li>\n<li>A criança do time da vez pede um número em inglês: \"Number three, please!\" Você clica no quadrado. Ele some e mostra um pedaço da figura.</li>\n<li>Pergunte: \"What is it?\" Quando acertarem, clique <b>✅ They got it!</b>. Se ninguém souber, clique <b>❌ Nobody knew</b> (a resposta aparece na tela).</li>\n<li>O jogo passa sozinho para o outro time.</li>\n</ol>\n<p><b>Pontos (você vê \"Points now\" na tela):</b> 1–3 quadrados abertos = <b>3 pts</b> · 4–6 = <b>2 pts</b> · 7–9 = <b>1 pt</b> · ninguém sabe = 0. Os pontos entram sozinhos quando você clica ✅.</p>\n<table>\n<tr><th>Emoji</th><th>Resposta esperada</th><th>Também aceite</th></tr>\n<tr><td>😢</td><td><b>sad</b></td><td>\"I'm sad\", \"crying\"</td></tr>\n<tr><td>😠</td><td><b>angry</b></td><td>\"I'm angry\", \"mad\"</td></tr>\n<tr><td>🥱</td><td><b>tired</b></td><td>\"I'm tired\", \"sleepy\"</td></tr>\n<tr><td>👵</td><td><b>grandmother</b></td><td>\"grandma\"</td></tr>\n<tr><td>🚌</td><td><b>bus</b></td><td>\"I go to school by bus\"</td></tr>\n<tr><td>⏰</td><td><b>alarm clock</b></td><td>\"clock\", \"wake up\"</td></tr>\n<tr><td>🎧</td><td><b>listen to music</b></td><td>\"I listen to music\"</td></tr>\n<tr><td>🐕🚶</td><td><b>walk the dog</b></td><td>\"I walk the dog\"</td></tr>\n<tr><td>📺</td><td><b>watch TV</b></td><td>\"I watch TV\", \"television\"</td></tr>\n<tr><td>🛏️</td><td><b>make the bed</b></td><td>\"I make my bed\"</td></tr>\n<tr><td>📖</td><td><b>read a book</b></td><td>\"I read a book\", \"book\"</td></tr>\n<tr><td>🧹</td><td><b>clean the room</b></td><td>\"I clean my room\", \"clean\"</td></tr>\n</table>\n<p class=\"tip\">💡 Aceite palavra solta ou frase; elogie frases completas: \"Great! Can you say a full sentence? <b>I read a book.</b>\" Nas rotinas, o ideal é verbo + complemento: se disserem só \"dog\", dê a dica \"What do you do with the dog? <b>Walk</b> the dog!\" Nos sentimentos, dica: \"How does he/she feel?\" Se travarem, diga a categoria: \"It's a feeling\" / \"a family member\" / \"a daily routine\".</p>\n\n<h2 id=\"g2\">💣 Game 2 · Category Blitz (slides 6–7)</h2>\n<p><b>Objetivo:</b> puxar vocabulário da memória de forma ativa. 12 categorias, uma por rodada, alternando os times.</p>\n<p><b>O que você clica, passo a passo:</b></p>\n<ol>\n<li>Slide 6: leia os 4 passos. Dê o exemplo: \"Animals → dog, cat, lion!\"</li>\n<li>Slide 7: mostre a categoria e leia: \"Team A, your category is <b>foods and drinks</b>! Are you ready?\"</li>\n<li>Clique <b>▶ Start the timer!</b>. O cronômetro desce de 30 até 0 (só funciona 1 vez por rodada).</li>\n<li>A cada palavra correta, clique <b>+1</b>. O contador \"Words: X\" sobe na hora.</li>\n<li>Palavra errada, repetida ou em português: clique <b>−1 (oops)</b> para corrigir (nunca fica abaixo de 0).</li>\n<li>Nos últimos 5 segundos o número fica vermelho. No zero toca um beep e aparece \"⏰ Time's up! X words = +X\".</li>\n<li><b>Os pontos entram sozinhos</b> no placar e o jogo passa para o outro time depois de ~2 segundos. Você não precisa clicar mais nada.</li>\n</ol>\n<p><b>Pontos:</b> cada palavra correta = <b>1 ponto</b>. Uma rodada normal vale de 4 a 10 pontos.</p>\n<p><b>O que conta:</b> qualquer palavra em inglês da categoria que eles já tenham visto. Todos do time podem falar ao mesmo tempo. Frases completas (ex.: \"I like pizza\") contam como uma palavra: elogie! A lista \"Teacher ideas\" na tela é só para você; aceite qualquer palavra correta fora da lista.</p>\n<table>\n<tr><th></th><th>Categoria</th><th>Exemplos para você</th></tr>\n<tr><td>🍕</td><td>Foods &amp; drinks</td><td>pizza, rice, milk, apple</td></tr>\n<tr><td>👨‍👩‍👧</td><td>Family members</td><td>mother, brother, uncle</td></tr>\n<tr><td>⚽</td><td>Sports</td><td>soccer, swimming, tennis</td></tr>\n<tr><td>🌎</td><td>Countries</td><td>Brazil, Japan, Italy</td></tr>\n<tr><td>🎒</td><td>School things</td><td>pencil, book, ruler</td></tr>\n<tr><td>😊</td><td>Feelings</td><td>happy, sad, angry</td></tr>\n<tr><td>⏰</td><td>Daily routine</td><td>wake up, brush my teeth</td></tr>\n<tr><td>📊</td><td>Adverbs of frequency</td><td>always, never, often</td></tr>\n<tr><td>🔢</td><td>Numbers (any!)</td><td>7, 12, 30…</td></tr>\n<tr><td>🐶</td><td>Animals</td><td>dog, cat, lion</td></tr>\n<tr><td>🎨</td><td>Colors</td><td>red, blue, green</td></tr>\n<tr><td>🛏️</td><td>Things in your bedroom</td><td>bed, lamp, desk</td></tr>\n</table>\n<p class=\"tip\">💡 Se um aluno trava, dê uma dica sem parar o tempo (\"Think of fruits!\"). Ao final, comente o número em inglês: \"Wow, <b>seven</b> words! Great job!\" (reforça os números).</p>\n\n<h2 id=\"g3\">🎁 Game 3 · Surprise Boxes (slides 8–9)</h2>\n<p><b>Objetivo:</b> revisão de gramática e vocabulário, com surpresas e <b>movimento</b>. 20 caixas numeradas, uma por rodada (10 turnos para cada time).</p>\n<p><b>Como conduzir:</b></p>\n<ol>\n<li>Slide 8: leia os passos. Faça suspense: \"What's inside?\"</li>\n<li>Slide 9: o time da vez diz um número de 1 a 20 (\"Box number twelve!\"). Você clica na caixa. Ela some do tabuleiro.</li>\n<li><b>Caixa de pergunta:</b> leia a pergunta em voz alta com as 3 opções. O time responde e você clica na resposta dita. A certa fica verde; se errarem, a certa aparece e você pede: \"Repeat: <i>He goes to school by bus.</i>\"</li>\n<li><b>Caixa de poder:</b> o efeito é automático.</li>\n<li><b>Desafio:</b> leia em inglês, o time faz (todos podem fazer junto, na frente da câmera!) e você clica em <b>✅ Done! +2</b>. Nas mímicas, se o outro time adivinhar em inglês, clique no botão do meio (\"the other team guessed it\": +2 e +1).</li>\n</ol>\n<table>\n<tr><th>Caixa</th><th>Qtde</th><th>Efeito</th></tr>\n<tr><td>🎁 Normal</td><td>9</td><td>Pergunta. Acertou: <b>+1</b></td></tr>\n<tr><td>⭐ Estrela</td><td>2</td><td>Pergunta. Acertou: <b>+2</b></td></tr>\n<tr><td>💥 Arriscada</td><td>2</td><td>Pergunta. Acertou <b>+1</b>, errou <b>−1</b> (nunca fica abaixo de 0)</td></tr>\n<tr><td>🎉 Sortuda</td><td>1</td><td>Ponto grátis: <b>+1</b></td></tr>\n<tr><td>🦹 Ladra</td><td>1</td><td>O time <b>rouba 1 ponto</b> do outro (se o outro tem 0, ganha +1 normal)</td></tr>\n<tr><td>🔄 Troca</td><td>1</td><td>Os dois times <b>trocam de placar</b></td></tr>\n<tr><td>🕺 Desafio</td><td>4</td><td>Movimento: feito = <b>+2</b> · Skip = 0</td></tr>\n</table>\n<p><b>Os desafios possíveis (4 sorteados entre estes 10):</b></p>\n<ul>\n<li>🦁 Mime an animal! The other team guesses in English. <i>(mímica)</i></li>\n<li>💃 Crazy dance for 5 seconds! Everybody dances!</li>\n<li>⏰ Act out a daily routine (wake up, brush teeth...). The other team guesses! <i>(mímica)</i></li>\n<li>🤪 Make a funny face and say: \"I'm happy!\"</li>\n<li>🏃 Jump 10 times and count in English!</li>\n<li>🤖 Walk like a robot and say: \"I walk the dog.\"</li>\n<li>🎤 Sing \"Happy Birthday\" in English to the teacher!</li>\n<li>🧘 Freeze like a statue for 5 seconds. Don't laugh!</li>\n<li>⚽ Mime a sport! The other team guesses in English. <i>(mímica)</i></li>\n<li>😴 Act out a feeling (sad, tired, angry...). The other team guesses! <i>(mímica)</i></li>\n</ul>\n<p><b>Banco de perguntas (resposta certa em negrito):</b></p>\n<ol class=\"small\">\n<li>___ you from Brazil? → <b>Are</b></li>\n<li>She ___ 10 years old. → <b>is</b></li>\n<li>How do you say \"segunda-feira\"? → <b>Monday</b></li>\n<li>I ___ breakfast at 7 a.m. → <b>have</b></li>\n<li>He ___ to school by bus. → <b>goes</b></li>\n<li>What is 15 + 5? → <b>twenty</b></li>\n<li>My mother's mother is my... → <b>grandmother</b></li>\n<li>I ___ like broccoli. → <b>don't</b></li>\n<li>She is crying. She is... → <b>sad</b></li>\n<li>She ___ goes to bed late. (0%) → <b>never</b></li>\n<li>___ does he wake up? At 6 o'clock. → <b>What time</b></li>\n<li>What do you use to write? → <b>a pencil</b></li>\n<li>Does she like pizza? → <b>Yes, she does.</b></li>\n<li>We ___ soccer on Saturdays. → <b>play</b></li>\n<li>Which one is a sport? → <b>swimming</b></li>\n<li>Which sentence is correct? → <b>I usually walk the dog.</b></li>\n<li>What is 30 − 10? → <b>twenty</b></li>\n<li>Which day comes after Friday? → <b>Saturday</b></li>\n</ol>\n<p class=\"tip\">💡 Faça suspense antes de clicar. Crianças online adoram se ver na tela: incentive o movimento. Se a criança estiver tímida no desafio, faça junto com ela.</p>\n\n<h2 id=\"g4\">🧠 Game 4 · Memory Match (slides 10–11)</h2>\n<p><b>Objetivo:</b> associar figura + palavra. Jogo mais calmo, que dá um respiro. 8 pares (16 cartas numeradas).</p>\n<ol>\n<li>Slide 10: leia os passos. Diga: \"Look carefully!\"</li>\n<li>Slide 11: <b>todas as cartas aparecem por 5 segundos</b> (\"👀 Memorize the cards! 5…\"). Conte junto com eles em inglês: \"five, four, three, two, one!\". Depois elas viram.</li>\n<li>O aluno da vez diz dois números (\"Number three and number nine.\"). Você clica nas duas cartas.</li>\n<li><b>Par certo:</b> as cartas ficam verdes e o time ganha <b>+1</b>. Peça: \"What is it? Say the word and a sentence.\" → \"Pizza! I like pizza.\"</li>\n<li><b>Não é par:</b> as cartas viram de volta depois de 2 segundos. Diga: \"Oh no! Remember the cards!\" e peça aos outros para observarem.</li>\n<li>O turno passa para o outro time <b>sempre</b> (acertando ou não). O jogo acaba quando os 8 pares forem achados. Empate (4–4) é possível.</li>\n</ol>\n<p><b>Os 8 pares:</b> 🍎 apple · 🍕 pizza · ⚽ soccer · 🏀 basketball · 🎒 backpack · ✏️ pencil · 🐶 dog · 🍌 banana</p>\n\n<h2 id=\"g5\">🪅 Game 5 · Save the Piñata (slides 12–13)</h2>\n<p><b>Objetivo:</b> soletrar em inglês e revisar vocabulário. 10 palavras, uma por rodada. É o jogo final: aumente a energia!</p>\n<ol>\n<li>Slide 12: antes, revise rapidamente o alfabeto em inglês com eles (tabela abaixo).</li>\n<li>Slide 13: aparece uma <b>dica</b> e os espaços vazios (ex.: \"Hint: a day of the week · 8 letters\").</li>\n<li>O time da vez diz <b>uma letra em inglês</b> (\"A\" = \"ay\"). Você clica na letra do teclado da tela.</li>\n<li><b>Letra certa:</b> ela aparece na palavra (botão verde). <b>Letra errada:</b> a piñata leva uma batida 💥 (botão vermelho).</li>\n<li><b>6 batidas = a piñata quebra:</b> a palavra é revelada, ninguém pontua (balas para todos!).</li>\n<li>Palavra completa = <b>+1 ponto</b> para o time da rodada. O turno passa para o outro time na rodada seguinte.</li>\n</ol>\n<table>\n<tr><th>Palavra</th><th>Dica na tela</th></tr>\n<tr><td>BREAKFAST</td><td>a meal in the morning</td></tr>\n<tr><td>SCHOOL</td><td>where you study</td></tr>\n<tr><td>FAMILY</td><td>mother, father, brother…</td></tr>\n<tr><td>SATURDAY</td><td>a day of the week</td></tr>\n<tr><td>SOMETIMES</td><td>an adverb of frequency</td></tr>\n<tr><td>HOMEWORK</td><td>you do it at home for school</td></tr>\n<tr><td>SISTER</td><td>a girl in your family</td></tr>\n<tr><td>TEACHER</td><td>she/he works at school</td></tr>\n<tr><td>ALWAYS</td><td>100% of the time</td></tr>\n<tr><td>BASKETBALL</td><td>a sport with a hoop</td></tr>\n</table>\n<p><b>Alfabeto (como dizer cada letra):</b> A \"ay\" · B \"bee\" · C \"see\" · D \"dee\" · E \"ee\" · F \"eff\" · G \"jee\" · H \"aitch\" · I \"eye\" · J \"jay\" · K \"kay\" · L \"el\" · M \"em\" · N \"en\" · O \"oh\" · P \"pee\" · Q \"kyoo\" · R \"ar\" · S \"ess\" · T \"tee\" · U \"you\" · V \"vee\" · W \"double-you\" · X \"ex\" · Y \"why\" · Z \"zee\"</p>\n<p class=\"tip\">💡 Peça sempre: \"Say the letter in English!\" Se o time estiver preso, dê pistas: \"It's a day of the week.\" / \"It starts with S.\" Comemore a piñata quebrada: \"Oh no! 🍬 Candy for everybody!\"</p>\n\n<h2 id=\"fim\">🏆 Slides 14–15 · Champions + Before you go (55–60 min)</h2>\n<ul>\n<li>Slide 14: conte as estrelas (1 por jogo vencido) olhando o placar final de cada jogo. Aplauda <b>os dois times</b>: \"Everybody is a winner!\" \"Happy Children's Day, superstars!\" 🏆 (distribua balas/adesivos se tiver)</li>\n<li>Slide 15: cada aluno responde:\n <br>• \"What's your favorite game?\" → \"My favorite game is <b>Memory Match</b>.\"\n <br>• \"How do you feel today?\" → \"I'm <b>happy</b>!\"</li>\n<li>Despedida: \"Bye! See you next class!\" 👋</li>\n</ul>\n\n<h2 id=\"dicas\">💡 Dicas gerais</h2>\n<ul>\n<li><b>Empate</b> é possível em todos os jogos (o jogo avisa). Comemorem juntos: \"It's a tie! Great teams!\"</li>\n<li><b>Erros:</b> sempre repita a forma correta, sem broncas, e peça para o aluno repetir.</li>\n<li><b>Energia:</b> se estiverem muito agitados, faça o Memory Match antes do Blitz (é só abrir o slide direto, os jogos são independentes).</li>\n<li><b>Speak English:</b> mantenha a regra o tempo todo. Frases completas merecem elogio extra.</li>\n<li><b>Fim de cada jogo:</b> aparece a tela de vencedor (ou empate) com confete. Use o botão <b>Play Again</b> só se sobrar tempo.</li>\n<li><b>Problemas:</b> se um jogo travar, atualize a página (volta ao mesmo slide, mas o placar daquele jogo recomeça).</li>\n</ul>\n";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert('O navegador bloqueou a janela. Permita pop-ups para este site e clique em Guia de novo.'); return; }
+  try{ nw.document.write('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Dia das Crianças</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>');
+  nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>
