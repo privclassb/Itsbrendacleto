@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 12 · More About My Day!</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 12</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">KIDS ENGLISH · WEEK BLOCK</div><h1>More About<br>My Day!</h1><div class="pill">⏰ New routine words + always/usually/sometimes/never</div></div></section>
+<section class="slide "><h2>🔁 Get ready: Week & Routine Review!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>A question about <b>days and routines</b> appears.</div></div><div class="st"><span class="n">2</span><div>Talk with your team and choose an answer.</div></div><div class="st"><span class="n">3</span><div>Say your answer in English!</div></div><div class="st"><span class="n">4</span><div>Right answer = <b>1 point</b> ⭐ Teams take turns!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🔁 Warm-up: Week & Routine Review</span><small>Let&#x27;s remember Days of the Week + our daily routine!</small></div><iframe title="Warm-up: Week &amp; Routine Review" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Week &amp; Routine Warm-Up&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D;
+    --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff; color:var(--dark);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{
+    border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900;
+    font-size:14px; text-align:center; width:100%; color:var(--dark);
+  }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; color:var(--dark); }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:10px; }
+
+  .clue-card{
+    background:var(--yellow); border-radius:18px; padding:18px 22px; text-align:center;
+    margin-bottom:20px; font-weight:800; font-size:19px;
+  }
+
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:14px; max-width:620px; margin:0 auto; }
+  @media(max-width:520px){ .options{ grid-template-columns:1fr; } }
+  .opt-btn{
+    border:none; border-radius:16px; padding:18px 14px; font-weight:900; font-size:17px; cursor:pointer;
+    background:#fff; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); transition:filter .2s;
+  }
+  .opt-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .opt-btn.correct{ background:var(--mint); }
+  .opt-btn.incorrect{ background:var(--coral); opacity:.75; }
+
+  .end-screen{ display:none; text-align:center; }
+  .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{
+    display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+  }
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;🔁 Week &amp; Routine Warm-Up&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Quick review: Days of the Week + Daily Routine!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+
+  &lt;div id=&quot;gameArea&quot;&gt;
+    &lt;div class=&quot;clue-card&quot; id=&quot;clueCard&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;options&quot; id=&quot;options&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;
+    &lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const rounds = [
+  {q:&quot;What day comes after Monday?&quot;, opts:[&quot;Tuesday&quot;,&quot;Sunday&quot;,&quot;Friday&quot;], answer:&quot;Tuesday&quot;},
+  {q:&quot;What day comes before Friday?&quot;, opts:[&quot;Thursday&quot;,&quot;Saturday&quot;,&quot;Monday&quot;], answer:&quot;Thursday&quot;},
+  {q:&quot;I have English class ___ Tuesdays.&quot;, opts:[&quot;on&quot;,&quot;in&quot;,&quot;at&quot;], answer:&quot;on&quot;},
+  {q:&quot;What do you do first in the morning?&quot;, opts:[&quot;wake up&quot;,&quot;go to bed&quot;,&quot;have dinner&quot;], answer:&quot;wake up&quot;},
+  {q:&quot;Which is NOT a weekend day?&quot;, opts:[&quot;Saturday&quot;,&quot;Sunday&quot;,&quot;Wednesday&quot;], answer:&quot;Wednesday&quot;},
+  {q:&quot;After you wake up, what do you usually do?&quot;, opts:[&quot;get up&quot;,&quot;take a bath&quot;,&quot;go to school&quot;], answer:&quot;get up&quot;},
+  {q:&quot;What day is between Tuesday and Thursday?&quot;, opts:[&quot;Wednesday&quot;,&quot;Monday&quot;,&quot;Friday&quot;], answer:&quot;Wednesday&quot;},
+  {q:&quot;Before you go to school, you ___.&quot;, opts:[&quot;get dressed&quot;,&quot;go to bed&quot;,&quot;have dinner&quot;], answer:&quot;get dressed&quot;},
+  {q:&quot;We don&#x27;t have school ___ Saturday.&quot;, opts:[&quot;on&quot;,&quot;in&quot;,&quot;at&quot;], answer:&quot;on&quot;},
+  {q:&quot;What do you do before bed?&quot;, opts:[&quot;take a bath&quot;,&quot;have breakfast&quot;,&quot;go to school&quot;], answer:&quot;take a bath&quot;},
+  {q:&quot;How many days are in a week?&quot;, opts:[&quot;5&quot;,&quot;7&quot;,&quot;10&quot;], answer:&quot;7&quot;},
+  {q:&quot;What&#x27;s the first day of the school week?&quot;, opts:[&quot;Monday&quot;,&quot;Sunday&quot;,&quot;Saturday&quot;], answer:&quot;Monday&quot;},
+  {q:&quot;After lunch, I usually...&quot;, opts:[&quot;do my homework&quot;,&quot;wake up&quot;,&quot;take a shower&quot;], answer:&quot;do my homework&quot;},
+  {q:&quot;What day comes after Saturday?&quot;, opts:[&quot;Sunday&quot;,&quot;Friday&quot;,&quot;Monday&quot;], answer:&quot;Sunday&quot;},
+  {q:&quot;I always brush my teeth ___ the morning.&quot;, opts:[&quot;in&quot;,&quot;on&quot;,&quot;at&quot;], answer:&quot;in&quot;},
+  {q:&quot;What do you do at night, before sleeping?&quot;, opts:[&quot;go to bed&quot;,&quot;have breakfast&quot;,&quot;go to school&quot;], answer:&quot;go to bed&quot;}
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let deck = [];
+let currentItem = null;
+let currentTeam = &#x27;a&#x27;;
+let scoreA = 0, scoreB = 0;
+let roundNum = 0;
+const TOTAL_ROUNDS = rounds.length;
+
+function teamName(team){
+  const el = document.getElementById(team === &#x27;a&#x27; ? &#x27;teamNameA&#x27; : &#x27;teamNameB&#x27;);
+  return (el.value || (team === &#x27;a&#x27; ? &#x27;Team A&#x27; : &#x27;Team B&#x27;)).trim();
+}
+
+function updateTurnBanner(){
+  document.getElementById(&#x27;turnBanner&#x27;).textContent = `🙋 ${teamName(currentTeam)}&#x27;s turn!`;
+  document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;a&#x27;);
+  document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;b&#x27;);
+}
+
+function updateScores(){
+  document.getElementById(&#x27;scoreA&#x27;).textContent = scoreA;
+  document.getElementById(&#x27;scoreB&#x27;).textContent = scoreB;
+}
+
+function buildDeck(){
+  return shuffle(rounds);
+}
+
+function drawCard(){
+  return deck.length ? deck.pop() : null;
+}
+
+function startGame(){
+  deck = buildDeck();
+  scoreA = 0; scoreB = 0; roundNum = 0; currentTeam = &#x27;a&#x27;;
+  updateScores();
+  document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;);
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;block&#x27;;
+  nextRound();
+}
+
+function nextRound(){
+  currentItem = drawCard();
+  if(!currentItem){
+    endGame();
+    return;
+  }
+  roundNum++;
+  document.getElementById(&#x27;roundBadge&#x27;).textContent = `Round ${roundNum} of ${TOTAL_ROUNDS}`;
+  document.getElementById(&#x27;clueCard&#x27;).textContent = currentItem.q;
+  const optsEl = document.getElementById(&#x27;options&#x27;);
+  optsEl.innerHTML = &#x27;&#x27;;
+  shuffle(currentItem.opts).forEach(opt=&gt;{
+    const btn = document.createElement(&#x27;button&#x27;);
+    btn.className = &#x27;opt-btn&#x27;;
+    btn.textContent = opt;
+    btn.addEventListener(&#x27;click&#x27;, ()=&gt; pick(opt, btn));
+    optsEl.appendChild(btn);
+  });
+  updateTurnBanner();
+}
+
+function pick(opt, btnEl){
+  const allBtns = document.querySelectorAll(&#x27;.opt-btn&#x27;);
+  allBtns.forEach(b=&gt; b.disabled = true);
+  const correct = opt === currentItem.answer;
+  if(correct){
+    btnEl.classList.add(&#x27;correct&#x27;);
+    if(currentTeam === &#x27;a&#x27;) scoreA++; else scoreB++;
+    updateScores();
+  } else {
+    btnEl.classList.add(&#x27;incorrect&#x27;);
+    allBtns.forEach(b=&gt;{ if(b.textContent === currentItem.answer) b.classList.add(&#x27;correct&#x27;); });
+  }
+  currentTeam = currentTeam === &#x27;a&#x27; ? &#x27;b&#x27; : &#x27;a&#x27;;
+  setTimeout(nextRound, 1300);
+}
+
+function endGame(){
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;none&#x27;;
+  const endScreen = document.getElementById(&#x27;endScreen&#x27;);
+  endScreen.classList.add(&#x27;show&#x27;);
+  let text;
+  if(scoreA === scoreB){
+    text = `🤝 It&#x27;s a tie! ${scoreA} - ${scoreB}`;
+  } else {
+    const winner = scoreA &gt; scoreB ? teamName(&#x27;a&#x27;) : teamName(&#x27;b&#x27;);
+    text = `🏆 ${winner} wins! ${scoreA} - ${scoreB}`;
+  }
+  document.getElementById(&#x27;winnerText&#x27;).textContent = text;
+}
+
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, startGame);
+
+startGame();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🆕 New Routine Words</h2><p class="sub">More things we do every day!</p><div class="row" style="padding-top:8px"><div class="card" style="background:#FFD97D;min-width:220px;flex:1 1 30%"><div class="e">🛏️</div><div class="val">make my bed</div><div class="sm" style="font-style:italic">arrumar a cama</div></div><div class="card" style="background:#A8E6CF;min-width:220px;flex:1 1 30%"><div class="e">🐕</div><div class="val">walk the dog</div><div class="sm" style="font-style:italic">passear com o cachorro</div></div><div class="card" style="background:#C9A8E8;min-width:220px;flex:1 1 30%"><div class="e">📺</div><div class="val">watch TV</div><div class="sm" style="font-style:italic">assistir TV</div></div><div class="card" style="background:#FFB3A7;min-width:220px;flex:1 1 30%"><div class="e">📖</div><div class="val">read a book</div><div class="sm" style="font-style:italic">ler um livro</div></div><div class="card" style="background:#9fdcf2;min-width:220px;flex:1 1 30%"><div class="e">🧹</div><div class="val">clean my room</div><div class="sm" style="font-style:italic">limpar o quarto</div></div><div class="card" style="background:#F2A7C3;min-width:220px;flex:1 1 30%"><div class="e">🎵</div><div class="val">listen to music</div><div class="sm" style="font-style:italic">ouvir música</div></div></div></section>
+<section class="slide "><div class="newtag">NEW! ✨</div><br><h2>📊 Adverbs of Frequency</h2><p class="sub">They go BEFORE the main verb!</p><div class="row" style="padding-top:8px"><div class="card" style="background:#A8E6CF"><div class="lab">100%</div><div class="val">Always</div><div class=sm>I always brush my teeth before bed.</div></div><div class="card" style="background:#9fdcf2"><div class="lab">~75%</div><div class="val">Usually</div><div class=sm>She usually walks the dog after school.</div></div><div class="card" style="background:#C9A8E8"><div class="lab">~25%</div><div class="val">Sometimes</div><div class=sm>We sometimes watch TV at night.</div></div><div class="card" style="background:#FFB3A7"><div class="lab">0%</div><div class="val">Never</div><div class=sm>He never cleans his room on Sundays.</div></div></div></section>
+<section class="slide "><h2>🎯 Get ready: Frequency Target!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>You see a <b>sentence</b> with a missing frequency word.</div></div><div class="st"><span class="n">2</span><div>Think: <b>always, usually, sometimes</b> or <b>never</b>?</div></div><div class="st"><span class="n">3</span><div>Say your answer: <b>"Always!"</b></div></div><div class="st"><span class="n">4</span><div>Hit the right ring = <b>1 point</b> ⭐</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🎯 Practice Time: Frequency Target</span><small>Always, usually, sometimes or never?</small></div><iframe title="Practice Time: Frequency Target" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Frequency Target&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D;
+    --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff; color:var(--dark);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{
+    border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900;
+    font-size:14px; text-align:center; width:100%; color:var(--dark);
+  }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; color:var(--dark); }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:10px; }
+
+  .clue-card{
+    background:var(--yellow); border-radius:18px; padding:16px 20px; text-align:center;
+    margin-bottom:18px; font-weight:800; font-size:17px;
+  }
+  .clue-pt{ font-size:13px; font-weight:700; color:#7a5f10; margin-top:4px; }
+
+  .target-wrap{ display:flex; justify-content:center; margin-bottom:16px; }
+  .target{
+    position:relative; width:320px; height:320px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .ring{
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); border-radius:50%;
+    cursor:pointer; color:#fff; font-weight:900; text-align:center;
+    transition:filter .3s;
+  }
+  .ring-label{
+    position:absolute; top:50%; left:50%; font-size:12px; white-space:nowrap; pointer-events:none;
+    z-index:5;
+  }
+  .ring:active{ filter:brightness(.95); }
+  .ring.flash-correct{ filter:brightness(1.4); }
+  .ring.flash-incorrect{ filter:grayscale(.6); }
+  .ring-never{ width:320px; height:320px; background:var(--coral); z-index:1; }
+  .ring-sometimes{ width:235px; height:235px; background:var(--lavender); z-index:2; }
+  .ring-usually{ width:150px; height:150px; background:var(--blue); z-index:3; }
+  .ring-always{ width:70px; height:70px; background:var(--mint); z-index:4; }
+  .label-never{ transform:translate(-50%,-50%) translateY(-138px); }
+  .label-sometimes{ transform:translate(-50%,-50%) translateY(-96px); }
+  .label-usually{ transform:translate(-50%,-50%) translateY(-55px); }
+  .label-always{ transform:translate(-50%,-50%); }
+
+  .dart{ position:absolute; font-size:30px; pointer-events:none; z-index:10; transform:translate(-50%,-50%); }
+
+  .end-screen{ display:none; text-align:center; }
+  .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{
+    display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+  }
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;🎯 Frequency Target&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Always · Usually · Sometimes · Never — throw your dart at the right ring!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+
+  &lt;div id=&quot;gameArea&quot;&gt;
+    &lt;div class=&quot;clue-card&quot; id=&quot;clueCard&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;target-wrap&quot;&gt;
+      &lt;div class=&quot;target&quot; id=&quot;target&quot;&gt;
+        &lt;div class=&quot;ring ring-never&quot; data-ring=&quot;Never&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;ring ring-sometimes&quot; data-ring=&quot;Sometimes&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;ring ring-usually&quot; data-ring=&quot;Usually&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;ring ring-always&quot; data-ring=&quot;Always&quot;&gt;&lt;/div&gt;
+        &lt;div class=&quot;ring-label label-never&quot;&gt;NEVER&lt;/div&gt;
+        &lt;div class=&quot;ring-label label-sometimes&quot;&gt;SOMETIMES&lt;/div&gt;
+        &lt;div class=&quot;ring-label label-usually&quot;&gt;USUALLY&lt;/div&gt;
+        &lt;div class=&quot;ring-label label-always&quot;&gt;ALWAYS&lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;
+    &lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const rounds = [
+  {stub:&quot;I ___ make my bed in the morning.&quot;, pt:&quot;(sempre)&quot;, answer:&quot;Always&quot;},
+  {stub:&quot;She ___ watches TV at night.&quot;, pt:&quot;(às vezes)&quot;, answer:&quot;Sometimes&quot;},
+  {stub:&quot;We ___ walk the dog after school.&quot;, pt:&quot;(geralmente)&quot;, answer:&quot;Usually&quot;},
+  {stub:&quot;He ___ cleans his room on Saturdays.&quot;, pt:&quot;(nunca)&quot;, answer:&quot;Never&quot;},
+  {stub:&quot;I ___ have breakfast at 7.&quot;, pt:&quot;(sempre)&quot;, answer:&quot;Always&quot;},
+  {stub:&quot;I ___ read a book before bed.&quot;, pt:&quot;(geralmente)&quot;, answer:&quot;Usually&quot;},
+  {stub:&quot;She ___ listens to music in the morning.&quot;, pt:&quot;(às vezes)&quot;, answer:&quot;Sometimes&quot;},
+  {stub:&quot;He ___ does his homework on Fridays.&quot;, pt:&quot;(nunca)&quot;, answer:&quot;Never&quot;},
+  {stub:&quot;They ___ go to school by bus.&quot;, pt:&quot;(sempre)&quot;, answer:&quot;Always&quot;},
+  {stub:&quot;We ___ play sports after school.&quot;, pt:&quot;(geralmente)&quot;, answer:&quot;Usually&quot;},
+  {stub:&quot;I ___ watch TV during homework time.&quot;, pt:&quot;(às vezes)&quot;, answer:&quot;Sometimes&quot;},
+  {stub:&quot;She ___ takes a bath at night.&quot;, pt:&quot;(nunca)&quot;, answer:&quot;Never&quot;},
+  {stub:&quot;He ___ brushes his teeth before bed.&quot;, pt:&quot;(sempre)&quot;, answer:&quot;Always&quot;},
+  {stub:&quot;I ___ clean my room on Sundays.&quot;, pt:&quot;(geralmente)&quot;, answer:&quot;Usually&quot;},
+  {stub:&quot;We ___ listen to music on Saturdays.&quot;, pt:&quot;(às vezes)&quot;, answer:&quot;Sometimes&quot;},
+  {stub:&quot;They ___ make their beds.&quot;, pt:&quot;(nunca)&quot;, answer:&quot;Never&quot;}
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let deck = [];
+let currentItem = null;
+let currentTeam = &#x27;a&#x27;;
+let scoreA = 0, scoreB = 0;
+let roundNum = 0;
+const TOTAL_ROUNDS = rounds.length;
+
+function teamName(team){
+  const el = document.getElementById(team === &#x27;a&#x27; ? &#x27;teamNameA&#x27; : &#x27;teamNameB&#x27;);
+  return (el.value || (team === &#x27;a&#x27; ? &#x27;Team A&#x27; : &#x27;Team B&#x27;)).trim();
+}
+
+function updateTurnBanner(){
+  document.getElementById(&#x27;turnBanner&#x27;).textContent = `🎯 ${teamName(currentTeam)}&#x27;s turn!`;
+  document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;a&#x27;);
+  document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;b&#x27;);
+}
+
+function updateScores(){
+  document.getElementById(&#x27;scoreA&#x27;).textContent = scoreA;
+  document.getElementById(&#x27;scoreB&#x27;).textContent = scoreB;
+}
+
+function buildDeck(){
+  return shuffle(rounds);
+}
+
+function drawCard(){
+  return deck.length ? deck.pop() : null;
+}
+
+function startGame(){
+  deck = buildDeck();
+  scoreA = 0; scoreB = 0; roundNum = 0; currentTeam = &#x27;a&#x27;;
+  updateScores();
+  document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;);
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;block&#x27;;
+  nextRound();
+}
+
+function nextRound(){
+  currentItem = drawCard();
+  if(!currentItem){
+    endGame();
+    return;
+  }
+  roundNum++;
+  document.getElementById(&#x27;roundBadge&#x27;).textContent = `Round ${roundNum} of ${TOTAL_ROUNDS}`;
+  document.getElementById(&#x27;clueCard&#x27;).innerHTML = `${currentItem.stub}&lt;div class=&quot;clue-pt&quot;&gt;${currentItem.pt}&lt;/div&gt;`;
+  document.querySelectorAll(&#x27;.ring&#x27;).forEach(r=&gt;{
+    r.classList.remove(&#x27;flash-correct&#x27;,&#x27;flash-incorrect&#x27;);
+  });
+  updateTurnBanner();
+}
+
+function throwDart(x, y, emoji){
+  const dart = document.createElement(&#x27;div&#x27;);
+  dart.className = &#x27;dart&#x27;;
+  dart.textContent = emoji;
+  dart.style.left = x + &#x27;px&#x27;;
+  dart.style.top = y + &#x27;px&#x27;;
+  document.getElementById(&#x27;target&#x27;).appendChild(dart);
+  setTimeout(()=&gt; dart.remove(), 1000);
+}
+
+document.querySelectorAll(&#x27;.ring&#x27;).forEach(ring=&gt;{
+  ring.addEventListener(&#x27;click&#x27;, (e)=&gt;{
+    if(!currentItem) return;
+    const rect = ring.getBoundingClientRect();
+    const targetRect = document.getElementById(&#x27;target&#x27;).getBoundingClientRect();
+    const x = e.clientX - targetRect.left;
+    const y = e.clientY - targetRect.top;
+    const chosen = ring.dataset.ring;
+    const correct = chosen === currentItem.answer;
+    throwDart(x, y, correct ? &#x27;🎯&#x27; : &#x27;💥&#x27;);
+    if(correct){
+      ring.classList.add(&#x27;flash-correct&#x27;);
+      if(currentTeam === &#x27;a&#x27;) scoreA++; else scoreB++;
+      updateScores();
+    } else {
+      ring.classList.add(&#x27;flash-incorrect&#x27;);
+      document.querySelectorAll(&#x27;.ring&#x27;).forEach(r=&gt;{
+        if(r.dataset.ring === currentItem.answer) r.classList.add(&#x27;flash-correct&#x27;);
+      });
+    }
+    currentTeam = currentTeam === &#x27;a&#x27; ? &#x27;b&#x27; : &#x27;a&#x27;;
+    setTimeout(nextRound, 1100);
+  });
+});
+
+function endGame(){
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;none&#x27;;
+  const endScreen = document.getElementById(&#x27;endScreen&#x27;);
+  endScreen.classList.add(&#x27;show&#x27;);
+  let text;
+  if(scoreA === scoreB){
+    text = `🤝 It&#x27;s a tie! ${scoreA} - ${scoreB}`;
+  } else {
+    const winner = scoreA &gt; scoreB ? teamName(&#x27;a&#x27;) : teamName(&#x27;b&#x27;);
+    text = `🏆 ${winner} wins! ${scoreA} - ${scoreB}`;
+  }
+  document.getElementById(&#x27;winnerText&#x27;).textContent = text;
+}
+
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, startGame);
+
+startGame();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🧩 Putting It Together</h2><p class="sub">Subject + Frequency + Routine = a sentence about your habits!</p><div class="row"><div class="card" style="background:#F2A7C3"><div class="lab">Subject</div><div class="val">She</div></div><div class="card" style="background:#FFD97D"><div class="lab">Frequency</div><div class="val">usually</div></div><div class="card" style="background:#A8E6CF"><div class="lab">Routine</div><div class="val">reads a book</div></div><div class="card" style="background:#9fdcf2"><div class="lab">When</div><div class="val">before bed</div></div></div><div class="big3" style="margin-top:22px">👉 "She usually reads a book before bed."</div></section>
+<section class="slide "><h2>🏭 Get ready: Sentence Factory!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>You see a <b>hint</b> in Portuguese and a sentence type: ✅ ❌ ❓</div></div><div class="st"><span class="n">2</span><div>Tell your teacher the sentence <b>in English</b>.</div></div><div class="st"><span class="n">3</span><div>The teacher spins the wheels: <b>Type · Subject · Frequency · Action</b></div></div><div class="st"><span class="n">4</span><div>Build it right = <b>1 point</b> ⭐</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🏭 Practice Time: Sentence Factory</span><small>Build affirmative, negative and question sentences!</small></div><iframe title="Practice Time: Sentence Factory" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Sentence Factory&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3; --mint:#A8E6CF; --lavender:#C9A8E8; --yellow:#FFD97D;
+    --coral:#FFB3A7; --blue:#5BC4E8; --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh; font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff; color:var(--dark);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .wrap{ max-width:720px; margin:0 auto; padding:18px 16px 40px; width:100%; }
+  header{ text-align:center; margin-bottom:10px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+
+  .teams{ display:flex; gap:12px; justify-content:center; margin:14px 0; flex-wrap:wrap; }
+  .team-card{ background:#fff; border-radius:16px; padding:10px 16px; box-shadow:0 4px 0 rgba(0,0,0,.06); text-align:center; min-width:140px; }
+  .team-card.active{ outline:3px solid var(--blue); }
+  .team-card input{
+    border:none; background:transparent; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900;
+    font-size:14px; text-align:center; width:100%; color:var(--dark);
+  }
+  .team-card .score{ font-size:26px; font-weight:900; color:var(--blue); }
+  .team-card.team-b .score{ color:var(--coral); }
+
+  .turn-banner{ text-align:center; font-weight:900; font-size:15px; margin-bottom:10px; color:var(--dark); }
+  .round-badge{ text-align:center; font-size:13px; color:#888; font-weight:800; margin-bottom:14px; }
+
+  .clue-card{
+    background:var(--yellow); border-radius:16px; padding:14px 18px; text-align:center; margin-bottom:18px;
+  }
+  .clue-card .type-icon{ font-size:22px; margin-right:6px; vertical-align:middle; }
+  .clue-card .pt-text{ font-weight:800; font-size:17px; }
+
+  .reels{ display:flex; flex-direction:column; gap:12px; margin-bottom:18px; }
+  .reel{
+    display:flex; align-items:center; gap:10px; background:#FFF9EE; border-radius:16px; padding:10px 12px;
+  }
+  .reel .reel-label{ width:78px; flex-shrink:0; font-weight:800; font-size:11.5px; color:#999; text-transform:uppercase; letter-spacing:.5px; }
+  .reel .reel-arrow{
+    border:none; background:#fff; width:42px; height:42px; border-radius:50%; font-size:18px; font-weight:900;
+    cursor:pointer; box-shadow:0 3px 0 rgba(0,0,0,.07); flex-shrink:0; color:var(--dark);
+  }
+  .reel .reel-arrow:active{ transform:translateY(2px); box-shadow:none; }
+  .reel .reel-value{
+    flex:1; text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:17px;
+    background:#fff; border-radius:12px; padding:10px 6px; min-width:0;
+  }
+
+  .preview{
+    background:#1f2430; color:#fff; border-radius:18px; padding:20px 18px; text-align:center;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:19px; margin-bottom:16px; min-height:34px;
+    line-height:1.4;
+  }
+
+  .build-row{ display:flex; justify-content:center; margin-bottom:10px; }
+  .build-btn{
+    border:none; border-radius:16px; padding:14px 30px; font-weight:900; font-size:15px; cursor:pointer;
+    background:var(--blue); color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.1);
+  }
+  .build-btn:active{ transform:translateY(3px); box-shadow:none; }
+  .feedback{ text-align:center; font-weight:800; font-size:14.5px; min-height:22px; margin-bottom:6px; }
+  .feedback.ok{ color:#2a9d6f; }
+  .feedback.no{ color:#e0654a; }
+
+  .end-screen{ display:none; text-align:center; }
+  .end-screen.show{ display:block; }
+  .end-screen .winner{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:26px; margin-bottom:8px; }
+  .play-again{
+    display:block; margin:16px auto 0; border:none; border-radius:16px; padding:14px 30px;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:16px; cursor:pointer; color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+  }
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;🏭 Sentence Factory&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Turn the dials to build the sentence that matches the clue!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;teams&quot;&gt;
+    &lt;div class=&quot;team-card team-a&quot; id=&quot;teamCardA&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameA&quot; value=&quot;Team A&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;team-card team-b&quot; id=&quot;teamCardB&quot;&gt;
+      &lt;input type=&quot;text&quot; id=&quot;teamNameB&quot; value=&quot;Team B&quot;&gt;
+      &lt;div class=&quot;score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;turn-banner&quot; id=&quot;turnBanner&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;&lt;/div&gt;
+
+  &lt;div id=&quot;gameArea&quot;&gt;
+    &lt;div class=&quot;clue-card&quot;&gt;
+      &lt;span class=&quot;type-icon&quot; id=&quot;clueTypeIcon&quot;&gt;✅&lt;/span&gt;
+      &lt;span class=&quot;pt-text&quot; id=&quot;cluePt&quot;&gt;&lt;/span&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;reels&quot;&gt;
+      &lt;div class=&quot;reel&quot;&gt;
+        &lt;div class=&quot;reel-label&quot;&gt;Type&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;type&quot; data-dir=&quot;-1&quot;&gt;◀&lt;/button&gt;
+        &lt;div class=&quot;reel-value&quot; id=&quot;valType&quot;&gt;&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;type&quot; data-dir=&quot;1&quot;&gt;▶&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;reel&quot;&gt;
+        &lt;div class=&quot;reel-label&quot;&gt;Subject&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;subject&quot; data-dir=&quot;-1&quot;&gt;◀&lt;/button&gt;
+        &lt;div class=&quot;reel-value&quot; id=&quot;valSubject&quot;&gt;&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;subject&quot; data-dir=&quot;1&quot;&gt;▶&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;reel&quot;&gt;
+        &lt;div class=&quot;reel-label&quot;&gt;Frequency&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;freq&quot; data-dir=&quot;-1&quot;&gt;◀&lt;/button&gt;
+        &lt;div class=&quot;reel-value&quot; id=&quot;valFreq&quot;&gt;&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;freq&quot; data-dir=&quot;1&quot;&gt;▶&lt;/button&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;reel&quot;&gt;
+        &lt;div class=&quot;reel-label&quot;&gt;Action&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;verb&quot; data-dir=&quot;-1&quot;&gt;◀&lt;/button&gt;
+        &lt;div class=&quot;reel-value&quot; id=&quot;valVerb&quot;&gt;&lt;/div&gt;
+        &lt;button class=&quot;reel-arrow&quot; data-reel=&quot;verb&quot; data-dir=&quot;1&quot;&gt;▶&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;preview&quot; id=&quot;preview&quot;&gt;—&lt;/div&gt;
+    &lt;div class=&quot;build-row&quot;&gt;&lt;button class=&quot;build-btn&quot; id=&quot;buildBtn&quot;&gt;Build it! 🔨&lt;/button&gt;&lt;/div&gt;
+    &lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;
+    &lt;div class=&quot;winner&quot; id=&quot;winnerText&quot;&gt;&lt;/div&gt;
+    &lt;button class=&quot;play-again&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const factoryTypes = [
+  {key:&#x27;aff&#x27;, label:&#x27;Affirmative&#x27;, icon:&#x27;✅&#x27;},
+  {key:&#x27;neg&#x27;, label:&#x27;Negative&#x27;, icon:&#x27;❌&#x27;},
+  {key:&#x27;ques&#x27;, label:&#x27;Question&#x27;, icon:&#x27;❓&#x27;}
+];
+const factorySubjects = [&#x27;I&#x27;,&#x27;You&#x27;,&#x27;We&#x27;,&#x27;They&#x27;,&#x27;He&#x27;,&#x27;She&#x27;];
+const factoryFreqs = [&#x27;always&#x27;,&#x27;usually&#x27;,&#x27;sometimes&#x27;,&#x27;never&#x27;];
+const factoryVerbs = [
+  {base:&#x27;make the bed&#x27;, third:&#x27;makes the bed&#x27;},
+  {base:&#x27;walk the dog&#x27;, third:&#x27;walks the dog&#x27;},
+  {base:&#x27;watch TV&#x27;, third:&#x27;watches TV&#x27;},
+  {base:&#x27;read a book&#x27;, third:&#x27;reads a book&#x27;},
+  {base:&#x27;clean the room&#x27;, third:&#x27;cleans the room&#x27;},
+  {base:&#x27;listen to music&#x27;, third:&#x27;listens to music&#x27;},
+  {base:&#x27;go to school&#x27;, third:&#x27;goes to school&#x27;},
+  {base:&#x27;have breakfast&#x27;, third:&#x27;has breakfast&#x27;},
+  {base:&#x27;do homework&#x27;, third:&#x27;does homework&#x27;},
+  {base:&#x27;take a bath&#x27;, third:&#x27;takes a bath&#x27;},
+  {base:&#x27;go to bed&#x27;, third:&#x27;goes to bed&#x27;},
+  {base:&#x27;have dinner&#x27;, third:&#x27;has dinner&#x27;}
+];
+
+const rounds = [
+  {type:&#x27;aff&#x27;, subject:&#x27;I&#x27;, freq:&#x27;always&#x27;, verb:0, pt:&#x27;Eu sempre arrumo a cama.&#x27;},
+  {type:&#x27;aff&#x27;, subject:&#x27;She&#x27;, freq:&#x27;usually&#x27;, verb:3, pt:&#x27;Ela geralmente lê um livro.&#x27;},
+  {type:&#x27;aff&#x27;, subject:&#x27;They&#x27;, freq:&#x27;sometimes&#x27;, verb:2, pt:&#x27;Eles às vezes assistem TV.&#x27;},
+  {type:&#x27;aff&#x27;, subject:&#x27;We&#x27;, freq:&#x27;never&#x27;, verb:4, pt:&#x27;Nós nunca limpamos o quarto.&#x27;},
+  {type:&#x27;neg&#x27;, subject:&#x27;He&#x27;, freq:&#x27;usually&#x27;, verb:8, pt:&#x27;Ele geralmente não faz lição de casa.&#x27;},
+  {type:&#x27;neg&#x27;, subject:&#x27;You&#x27;, freq:&#x27;always&#x27;, verb:7, pt:&#x27;Você nem sempre toma café da manhã.&#x27;},
+  {type:&#x27;neg&#x27;, subject:&#x27;They&#x27;, freq:&#x27;usually&#x27;, verb:2, pt:&#x27;Eles geralmente não assistem TV.&#x27;},
+  {type:&#x27;neg&#x27;, subject:&#x27;She&#x27;, freq:&#x27;always&#x27;, verb:4, pt:&#x27;Ela nem sempre limpa o quarto.&#x27;},
+  {type:&#x27;ques&#x27;, subject:&#x27;You&#x27;, freq:&#x27;usually&#x27;, verb:1, pt:&#x27;Você geralmente passeia com o cachorro?&#x27;},
+  {type:&#x27;ques&#x27;, subject:&#x27;He&#x27;, freq:&#x27;always&#x27;, verb:0, pt:&#x27;Ele sempre arruma a cama?&#x27;},
+  {type:&#x27;ques&#x27;, subject:&#x27;They&#x27;, freq:&#x27;sometimes&#x27;, verb:11, pt:&#x27;Eles às vezes jantam?&#x27;},
+  {type:&#x27;ques&#x27;, subject:&#x27;She&#x27;, freq:&#x27;usually&#x27;, verb:5, pt:&#x27;Ela geralmente ouve música?&#x27;}
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function auxFor(subject){ return (subject === &#x27;He&#x27; || subject === &#x27;She&#x27;) ? &#x27;does&#x27; : &#x27;do&#x27;; }
+function negAuxFor(subject){ return (subject === &#x27;He&#x27; || subject === &#x27;She&#x27;) ? &quot;doesn&#x27;t&quot; : &quot;don&#x27;t&quot;; }
+function conjugate(subject, verbObj){ return (subject === &#x27;He&#x27; || subject === &#x27;She&#x27;) ? verbObj.third : verbObj.base; }
+function capitalize(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+
+function buildSentence(typeKey, subject, freq, verbObj){
+  if(typeKey === &#x27;aff&#x27;){
+    return capitalize(subject) + &#x27; &#x27; + freq + &#x27; &#x27; + conjugate(subject, verbObj) + &#x27;.&#x27;;
+  }
+  if(typeKey === &#x27;neg&#x27;){
+    return capitalize(subject) + &#x27; &#x27; + negAuxFor(subject) + &#x27; &#x27; + freq + &#x27; &#x27; + verbObj.base + &#x27;.&#x27;;
+  }
+  return capitalize(auxFor(subject)) + &#x27; &#x27; + subject.toLowerCase() + &#x27; &#x27; + freq + &#x27; &#x27; + verbObj.base + &#x27;?&#x27;;
+}
+
+let deck = [];
+let currentItem = null;
+let currentTeam = &#x27;a&#x27;;
+let scoreA = 0, scoreB = 0;
+let roundNum = 0;
+const TOTAL_ROUNDS = rounds.length;
+let dialState = { typeIdx:0, subjIdx:0, freqIdx:0, verbIdx:0 };
+
+function teamName(team){
+  const el = document.getElementById(team === &#x27;a&#x27; ? &#x27;teamNameA&#x27; : &#x27;teamNameB&#x27;);
+  return (el.value || (team === &#x27;a&#x27; ? &#x27;Team A&#x27; : &#x27;Team B&#x27;)).trim();
+}
+
+function updateTurnBanner(){
+  document.getElementById(&#x27;turnBanner&#x27;).textContent = `🏭 ${teamName(currentTeam)}&#x27;s turn!`;
+  document.getElementById(&#x27;teamCardA&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;a&#x27;);
+  document.getElementById(&#x27;teamCardB&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;b&#x27;);
+}
+
+function updateScores(){
+  document.getElementById(&#x27;scoreA&#x27;).textContent = scoreA;
+  document.getElementById(&#x27;scoreB&#x27;).textContent = scoreB;
+}
+
+function renderDials(){
+  document.getElementById(&#x27;valType&#x27;).textContent = factoryTypes[dialState.typeIdx].icon + &#x27; &#x27; + factoryTypes[dialState.typeIdx].label;
+  document.getElementById(&#x27;valSubject&#x27;).textContent = factorySubjects[dialState.subjIdx];
+  document.getElementById(&#x27;valFreq&#x27;).textContent = factoryFreqs[dialState.freqIdx];
+  document.getElementById(&#x27;valVerb&#x27;).textContent = factoryVerbs[dialState.verbIdx].base;
+  updatePreview();
+}
+
+function updatePreview(){
+  const typeKey = factoryTypes[dialState.typeIdx].key;
+  const subject = factorySubjects[dialState.subjIdx];
+  const freq = factoryFreqs[dialState.freqIdx];
+  const verbObj = factoryVerbs[dialState.verbIdx];
+  document.getElementById(&#x27;preview&#x27;).textContent = buildSentence(typeKey, subject, freq, verbObj);
+}
+
+document.querySelectorAll(&#x27;.reel-arrow&#x27;).forEach(btn=&gt;{
+  btn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+    const reel = btn.dataset.reel;
+    const dir = parseInt(btn.dataset.dir, 10);
+    if(reel === &#x27;type&#x27;) dialState.typeIdx = (dialState.typeIdx + dir + factoryTypes.length) % factoryTypes.length;
+    else if(reel === &#x27;subject&#x27;) dialState.subjIdx = (dialState.subjIdx + dir + factorySubjects.length) % factorySubjects.length;
+    else if(reel === &#x27;freq&#x27;) dialState.freqIdx = (dialState.freqIdx + dir + factoryFreqs.length) % factoryFreqs.length;
+    else if(reel === &#x27;verb&#x27;) dialState.verbIdx = (dialState.verbIdx + dir + factoryVerbs.length) % factoryVerbs.length;
+    renderDials();
+  });
+});
+
+function buildDeck(){ return shuffle(rounds); }
+function drawCard(){ return deck.length ? deck.pop() : null; }
+
+function startGame(){
+  deck = buildDeck();
+  scoreA = 0; scoreB = 0; roundNum = 0; currentTeam = &#x27;a&#x27;;
+  updateScores();
+  document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;);
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;block&#x27;;
+  nextRound();
+}
+
+function nextRound(){
+  currentItem = drawCard();
+  if(!currentItem){ endGame(); return; }
+  roundNum++;
+  document.getElementById(&#x27;roundBadge&#x27;).textContent = `Round ${roundNum} of ${TOTAL_ROUNDS}`;
+  const typeInfo = factoryTypes.find(t =&gt; t.key === currentItem.type);
+  document.getElementById(&#x27;clueTypeIcon&#x27;).textContent = typeInfo.icon;
+  document.getElementById(&#x27;cluePt&#x27;).textContent = currentItem.pt;
+  dialState = { typeIdx:0, subjIdx:0, freqIdx:0, verbIdx:0 };
+  renderDials();
+  document.getElementById(&#x27;feedback&#x27;).textContent = &#x27;&#x27;;
+  document.getElementById(&#x27;feedback&#x27;).className = &#x27;feedback&#x27;;
+  document.getElementById(&#x27;buildBtn&#x27;).disabled = false;
+  updateTurnBanner();
+}
+
+document.getElementById(&#x27;buildBtn&#x27;).addEventListener(&#x27;click&#x27;, function(){
+  const typeKey = factoryTypes[dialState.typeIdx].key;
+  const subject = factorySubjects[dialState.subjIdx];
+  const freq = factoryFreqs[dialState.freqIdx];
+  const verbObj = factoryVerbs[dialState.verbIdx];
+  const built = buildSentence(typeKey, subject, freq, verbObj);
+  const target = buildSentence(currentItem.type, currentItem.subject, currentItem.freq, factoryVerbs[currentItem.verb]);
+  const fb = document.getElementById(&#x27;feedback&#x27;);
+  const correct = built === target;
+  if(correct){
+    fb.textContent = &#x27;✅ Perfect! &quot;&#x27; + built + &#x27;&quot;&#x27;;
+    fb.className = &#x27;feedback ok&#x27;;
+    if(currentTeam === &#x27;a&#x27;) scoreA++; else scoreB++;
+    updateScores();
+  } else {
+    fb.textContent = &#x27;❌ Not quite! The target was: &quot;&#x27; + target + &#x27;&quot;&#x27;;
+    fb.className = &#x27;feedback no&#x27;;
+  }
+  this.disabled = true;
+  currentTeam = currentTeam === &#x27;a&#x27; ? &#x27;b&#x27; : &#x27;a&#x27;;
+  setTimeout(nextRound, 2000);
+});
+
+function endGame(){
+  document.getElementById(&#x27;gameArea&#x27;).style.display = &#x27;none&#x27;;
+  const endScreen = document.getElementById(&#x27;endScreen&#x27;);
+  endScreen.classList.add(&#x27;show&#x27;);
+  let text;
+  if(scoreA === scoreB){
+    text = `🤝 It&#x27;s a tie! ${scoreA} - ${scoreB}`;
+  } else {
+    const winner = scoreA &gt; scoreB ? teamName(&#x27;a&#x27;) : teamName(&#x27;b&#x27;);
+    text = `🏆 ${winner} wins! ${scoreA} - ${scoreB}`;
+  }
+  document.getElementById(&#x27;winnerText&#x27;).textContent = text;
+}
+
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, startGame);
+
+startGame();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>✅ Positive sentence &nbsp; ❌ Negative sentence</p><p>Use the frequency words: <b>always · usually · sometimes · never</b></p></div></section>
+<section class="slide "><h2>🎡 Get ready: My Real Routine!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Spin the wheel: a <b>routine topic</b> appears.</div></div><div class="st"><span class="n">2</span><div>Say a <b>true sentence</b> about YOU with a frequency word.</div></div><div class="st"><span class="n">3</span><div>Sometimes there is a ⭐ <b>bonus challenge</b>: do it for extra points!</div></div><div class="st"><span class="n">4</span><div>Listen to your friends. Then it's the next student's turn!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🎡 My Real Routine: Spin & Say!</span><small>Say a true sentence about you!</small></div><iframe title="My Real Routine: Spin &amp; Say!" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{display:flex;gap:24px;flex-wrap:wrap;justify-content:center;align-items:center;padding:10px 14px 24px}
+.wheelbox{position:relative;width:min(88vw,360px,62vh);aspect-ratio:1}
+.pointer{position:absolute;left:50%;top:-6px;transform:translateX(-50%);font-size:34px;z-index:3;filter:drop-shadow(0 2px 2px #0003)}
+.wheel{position:absolute;inset:8px;border-radius:50%;border:6px solid #fff;box-shadow:0 6px 18px #0003;transition:transform 4s cubic-bezier(.12,.7,.15,1);overflow:hidden}
+.wheel .lab{position:absolute;left:50%;top:50%;width:0;height:0;font-size:clamp(22px,5vw,32px)}
+.wheel .lab span{position:absolute;left:0;top:0;transform:translate(-50%,-50%)}
+.hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:#fff;box-shadow:0 2px 8px #0003;z-index:2}
+.side{flex:1;min-width:260px;max-width:460px;display:flex;flex-direction:column;gap:12px}
+.card{background:#fff;border-radius:22px;box-shadow:0 6px 18px #0002;padding:16px 18px;text-align:center}
+.card .e{font-size:54px}.card .t{font-family:Nunito;font-weight:900;font-size:clamp(20px,3vw,28px)}
+.q{margin-top:8px;font-weight:800;font-size:clamp(15px,2.2vw,20px)}.q b{color:var(--blue)}
+.who{font-family:Nunito;font-weight:900;color:#e0719c;margin-top:6px}
+.btn{border:none;border-radius:22px;padding:14px 26px;font-family:Nunito;font-weight:900;font-size:20px;cursor:pointer;background:var(--blue);color:#fff;box-shadow:0 5px 0 #0002}
+.btn:disabled{opacity:.5}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.names input{width:92px;border:2px solid var(--lav);border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.cnt{font-weight:900;color:#888;font-family:Nunito}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;wheelbox&quot;&gt;&lt;div class=&quot;pointer&quot;&gt;🔻&lt;/div&gt;&lt;div class=&quot;wheel&quot; id=&quot;wheel&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hub&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;side&quot;&gt;&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input value=&quot;&quot; placeholder=&quot;Student 1&quot;&gt;&lt;input value=&quot;&quot; placeholder=&quot;Student 2&quot;&gt;&lt;input value=&quot;&quot; placeholder=&quot;Student 3&quot;&gt;&lt;input value=&quot;&quot; placeholder=&quot;Student 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;card&quot; id=&quot;res&quot;&gt;&lt;div class=&quot;e&quot;&gt;🎡&lt;/div&gt;&lt;div class=&quot;t&quot;&gt;Spin the wheel!&lt;/div&gt;&lt;div class=&quot;q&quot;&gt;A topic will appear. Say a true sentence!&lt;/div&gt;&lt;/div&gt;
+&lt;button class=&quot;btn&quot; id=&quot;spin&quot;&gt;🎡 SPIN!&lt;/button&gt;&lt;div class=&quot;cnt&quot; id=&quot;cnt&quot;&gt;Sentences said: 0&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;script&gt;
+var T=[[&quot;🛏️&quot;,&quot;make my bed&quot;,&quot;&quot;,&quot;#FFD97D&quot;],[&quot;🐕&quot;,&quot;walk the dog&quot;,&quot;&quot;,&quot;#A8E6CF&quot;],[&quot;📺&quot;,&quot;watch TV&quot;,&quot;&quot;,&quot;#C9A8E8&quot;],[&quot;📖&quot;,&quot;read a book&quot;,&quot;&quot;,&quot;#FFB3A7&quot;],[&quot;🧹&quot;,&quot;clean my room&quot;,&quot;&quot;,&quot;#9fdcf2&quot;],[&quot;🎵&quot;,&quot;listen to music&quot;,&quot;&quot;,&quot;#F2A7C3&quot;],[&quot;🎲&quot;,&quot;your choice!&quot;,&quot;&quot;,&quot;#A8E6CF&quot;],[&quot;😴&quot;,&quot;your lazy day&quot;,&quot;&quot;,&quot;#FFD97D&quot;]];
+var BONUS=[&quot;&quot;,&quot;&quot;,&quot;⭐ Bonus: say it about a FRIEND (he / she)!&quot;,&quot;⭐ Bonus: say it in the NEGATIVE (don&#x27;t / doesn&#x27;t)!&quot;,&quot;⭐ Bonus: add WHEN (on Sundays, at night, in the morning...)!&quot;,&quot;&quot;,&quot;⭐ Bonus: say it about your FAMILY (my mom, my brother...)!&quot;];
+var n=T.length,seg=360/n,w=document.getElementById(&#x27;wheel&#x27;),rot=0,busy=false,count=0,turn=0;
+var stops=T.map(function(t,i){return t[3]+&#x27; &#x27;+(i*seg)+&#x27;deg &#x27;+((i+1)*seg)+&#x27;deg&#x27;;}).join(&#x27;,&#x27;);
+w.style.background=&#x27;conic-gradient(&#x27;+stops+&#x27;)&#x27;;
+T.forEach(function(t,i){var a=(i+.5)*seg-90,r=36;var l=document.createElement(&#x27;div&#x27;);l.className=&#x27;lab&#x27;;l.style.transform=&#x27;translate(&#x27;+(Math.cos(a*Math.PI/180)*r)+&#x27;cqw,0)&#x27;;l.innerHTML=&#x27;&lt;span&gt;&#x27;+t[0]+&#x27;&lt;/span&gt;&#x27;;w.appendChild(l);
+ var rad=a*Math.PI/180;l.style.left=(50+Math.cos(rad)*34)+&#x27;%&#x27;;l.style.top=(50+Math.sin(rad)*34)+&#x27;%&#x27;;l.style.transform=&#x27;none&#x27;;});
+function names(){var v=[].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);return v;}
+document.getElementById(&#x27;spin&#x27;).addEventListener(&#x27;click&#x27;,function(){
+ if(busy)return;busy=true;this.disabled=true;
+ var idx=Math.floor(Math.random()*n);var target=360-((idx+.5)*seg);rot+=360*5+((target-(rot%360))+360)%360;
+ w.style.transform=&#x27;rotate(&#x27;+rot+&#x27;deg)&#x27;;
+ setTimeout(function(){var t=T[idx];count++;document.getElementById(&#x27;cnt&#x27;).textContent=&#x27;Sentences said: &#x27;+count;
+  var nm=names(),who=&#x27;&#x27;;if(nm.length&gt;0){var a=nm[turn%nm.length];who=&#x27;&lt;div class=&quot;who&quot;&gt;👉 &#x27;+a+&#x27; is up! 🎤&lt;/div&gt;&#x27;;turn++;}
+  var bn=BONUS[Math.floor(Math.random()*BONUS.length)];document.getElementById(&#x27;res&#x27;).innerHTML=&#x27;&lt;div class=&quot;e&quot;&gt;&#x27;+t[0]+&#x27;&lt;/div&gt;&lt;div class=&quot;t&quot;&gt;&#x27;+t[1]+&#x27;&lt;/div&gt;&#x27;+(bn?&#x27;&lt;div class=&quot;q&quot; style=&quot;color:#e0719c&quot;&gt;&#x27;+bn+&#x27;&lt;/div&gt;&#x27;:&#x27;&#x27;)+who;
+  busy=false;document.getElementById(&#x27;spin&#x27;).disabled=false;document.getElementById(&#x27;spin&#x27;).textContent=&#x27;🎡 SPIN AGAIN!&#x27;;},4200);});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Now it's your turn! 🎉</h2><p class="sub">Practice your routine + always/usually/sometimes/never at home!</p><div class="linkcard"><div class="e">📝</div><p>Your homework for this lesson is waiting on the platform!</p><p>See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Lesson 12 · More About My Day!</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Warm-up</a> · <a href=\"#s3\">Routine words</a> · <a href=\"#s4\">Adverbs</a> · <a href=\"#s5\">Frequency Target</a> · <a href=\"#s7\">Putting It Together</a> · <a href=\"#s8\">Sentence Factory</a> · <a href=\"#s6\">Drills</a> · <a href=\"#s9\">My Real Routine</a> · <a href=\"#s10\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li><b>Revisão (warm-up):</b> dias da semana + rotina das Lessons 10 e 11. Nada de frequência ainda, porque é o conteúdo novo de hoje.</li><li><b>Novo:</b> 6 palavras de rotina (make my bed, walk the dog, watch TV, read a book, clean my room, listen to music) e os advérbios always, usually, sometimes e never.</li><li><b>Sequência:</b> vocabulário → advérbios (regra: antes do verbo) → Frequency Target para fixar → Putting It Together → Sentence Factory (reforço visual) → drills → produção livre na roleta.</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-5</td><td>1</td><td>Abertura</td></tr><tr><td>5-13</td><td>2-3</td><td>Warm-up: Week &amp; Routine Review</td></tr><tr><td>13-19</td><td>4</td><td>New Routine Words</td></tr><tr><td>19-24</td><td>5</td><td>Adverbs of Frequency</td></tr><tr><td>24-31</td><td>6-7</td><td>Frequency Target</td></tr><tr><td>31-35</td><td>8</td><td>Putting It Together</td></tr><tr><td>35-43</td><td>9-10</td><td>Sentence Factory</td></tr><tr><td>43-52</td><td>11</td><td>Drills: afirmativa e negativa</td></tr><tr><td>52-58</td><td>12-13</td><td>My Real Routine (roleta)</td></tr><tr><td>58-60</td><td>14</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes de cada jogo há um slide \"Get ready\" para as crianças entenderem as regras. Leia com elas e depois clique em \"Ready? Let's play!\". Nos jogos, os alunos digitam o nome do time e <b>você</b> controla os cliques; eles falam em inglês.</div>\n<h2 id=\"s1\">⏱️ 0-5 min | Abertura (slide 1)</h2>\n<p>Cumprimente os alunos normalmente em inglês. Pergunte rapidamente, revisando a lição anterior: \"What day is it today?\" e \"Can you tell me 2 things you do every morning?\" Deixe 2-3 alunos responderem oralmente antes de seguir. Não corrija demais aqui, é só aquecimento.</p>\n<h2 id=\"s2\">⏱️ 5-13 min | Warm-up: Week &amp; Routine Review (slides 2-3)</h2>\n<p>Depois do \"Get ready\", abra o jogo e divida a turma em 2 times. Este jogo é só revisão: dias da semana + rotina da Lição 10/11, nada de frequência ainda.</p>\n<ol><li>Leia a pergunta em voz alta para o time da vez.</li><li>Deixe o aluno responder oralmente.</li><li>Clique na opção que corresponde à resposta dele (certa ou errada).</li><li>Comemore acertos com \"Yes! Great job!\" e corrija erros com suavidade: \"Close! The answer is... (Tuesday).\"</li></ol>\n<h2 id=\"s3\">⏱️ 13-19 min | New Routine Words (slide 4)</h2>\n<p>Apresente as 6 palavras novas uma por vez. Para cada uma: mostre o slide e leia em voz alta (\"Make my bed!\"), peça repetição coral (\"Everybody, say it with me: make my bed!\") e pergunte pessoalmente a pelo menos 1 aluno: \"Do you make your bed every day?\" (resposta livre, só sim/não por enquanto).</p>\n<p>Palavras: make my bed 🛏️ · walk the dog 🐕 · watch TV 📺 · read a book 📖 · clean my room 🧹 · listen to music 🎵</p>\n<h2 id=\"s4\">⏱️ 19-24 min | Vocabulário e regra: Adverbs of Frequency (slide 5)</h2>\n<p>Explique a régua visual do slide (100% → 0%) de forma bem simples: <b>Always</b> = toda vez, 100% das vezes · <b>Usually</b> = quase sempre · <b>Sometimes</b> = às vezes · <b>Never</b> = nunca, 0%.</p>\n<p>Regra de ouro para decorarem: <b>\"The frequency word comes BEFORE the verb!\"</b> Dê 2-3 exemplos orais puxando dos próprios alunos (\"Maria, do you always brush your teeth before bed?\"). Reforce a ordem repetindo as frases do slide em voz alta e pedindo para a turma repetir.</p>\n<h2 id=\"s5\">⏱️ 24-31 min | Fixação: Frequency Target (slides 6-7)</h2>\n<p>Com a gramática já apresentada, abra o jogo. Mesma dinâmica de times do warm-up, mas agora praticando always/usually/sometimes/never de verdade: leia a frase em voz alta (a dica em português é só apoio visual, não leia), pergunte \"Always, usually, sometimes, or never?\", clique no anel (ring) correspondente à resposta do aluno e comemore ou corrija (\"Close! The answer is... always.\").</p>\n<h2 id=\"s7\">⏱️ 31-35 min | Putting It Together (slide 8)</h2>\n<p>Mostre a montagem em blocos (Subject + Frequency + Routine + When). Monte a frase juntos, bloco por bloco: \"What's the subject? ... What's the frequency? ... What's the routine? ... When?\" Depois peça 2-3 combinações novas para os alunos montarem a frase completa, sempre pensando a ordem dos blocos.</p>\n<p>Se errarem o -s de he/she ou colocarem o advérbio depois do verbo, corrija na hora e peça para repetir a frase certa.</p>\n<h2 id=\"s8\">⏱️ 35-43 min | Prática: Sentence Factory (slides 9-10)</h2>\n<p>Com a estrutura de frase já internalizada, abra o jogo. Mesma dinâmica de times, mas agora praticando frases completas (afirmativa, negativa e interrogativa) combinando rotina + frequência.</p>\n<ol><li>Leia a dica em português em voz alta para o time da vez (o ícone ✅/❌/❓ mostra o tipo de frase esperado: afirmativa, negativa ou pergunta).</li><li>Peça para o aluno ditar a frase completa em inglês.</li><li>Gire os discos (Type → Subject → Frequency → Action) conforme ele fala, até a frase preta embaixo bater com o que ele disse.</li><li>Clique em \"Build it! 🔨\" para conferir.</li><li>Comemore acertos ou corrija mostrando a frase certa que aparece no feedback.</li></ol>\n<p>Aqui eles reforçam o conteúdo com apoio visual (o gabarito aparece no jogo). Depois vêm os drills, sem apoio visual, e por último a produção livre.</p>\n<h2 id=\"s6\">⏱️ 43-52 min | Prática de comunicação: drills (slide 11)</h2>\n<p>Mostre o slide \"Speaking Time\" (ele não tem nenhuma frase de drill) e conduza os drills oralmente, sempre do <b>português para o inglês</b>. Não leia estas frases a partir dos slides: elas não aparecem lá de propósito.</p>\n<h3>Drills orais (somente professora)</h3>\n<p>Você fala <b>uma frase em português</b> e depois <b>2 substituições</b>; o aluno responde em inglês trocando só o que mudou. São <b>2 frases por aluno</b>: uma <b>afirmativa</b> e uma <b>negativa</b> (4 alunos = 4 afirmativas + 4 negativas). Respostas em letra pequena.</p>\n<p><b>Afirmativas</b> (a substituição é o <b>advérbio</b>, para ver onde cada um se encaixa: sempre <b>antes do verbo</b>)</p>\n<ol><li>Eu sempre ouço música à noite / geralmente / às vezes<br><small>I always listen to music at night. I usually listen to music at night. I sometimes listen to music at night.</small></li><li>Ela geralmente lê um livro antes de dormir / nunca / sempre<br><small>She usually reads a book before bed. She never reads a book before bed. She always reads a book before bed.</small></li><li>Nós às vezes assistimos TV aos domingos / sempre / nunca<br><small>We sometimes watch TV on Sundays. We always watch TV on Sundays. We never watch TV on Sundays.</small></li><li>Ele nunca limpa o quarto aos domingos / às vezes / geralmente<br><small>He never cleans his room on Sundays. He sometimes cleans his room on Sundays. He usually cleans his room on Sundays.</small></li></ol>\n<p><b>Negativas</b> (<i>don't/doesn't + advérbio + verbo</i>). Só always e usually entram aqui: sometimes e never não combinam com don't. Em português, o \"always\" vira \"nem sempre\". Como há só dois advérbios possíveis, a substituição das negativas é o <b>sujeito</b> (eu / ela / eles), o que pratica don't x doesn't.</p>\n<ol><li>Ela nem sempre passeia com o cachorro de manhã / eu / eles<br><small>She doesn't always walk the dog in the morning. I don't always walk the dog in the morning. They don't always walk the dog in the morning.</small></li><li>Ele geralmente não arruma a cama / nós / eu<br><small>He doesn't usually make his bed. We don't usually make our bed. I don't usually make my bed.</small></li><li>Eles nem sempre assistem TV à noite / ela / eu<br><small>They don't always watch TV at night. She doesn't always watch TV at night. I don't always watch TV at night.</small></li><li>Eu geralmente não leio um livro antes de dormir / ele / eles<br><small>I don't usually read a book before bed. He doesn't usually read a book before bed. They don't usually read a book before bed.</small></li></ol>\n<h2 id=\"s9\">⏱️ 52-58 min | Produção: My Real Routine (slides 12-13)</h2>\n<p>Depois do \"Get ready\", abra a roleta. Digite os nomes dos 4 alunos nas caixinhas: a roleta indica de quem é a vez. Gire e aparece <b>só o tema</b> (make my bed, walk the dog, watch TV, read a book, clean my room, listen to music, 🎲 your choice! ou 😴 your lazy day), nunca a frase pronta, para a produção ser livre. O aluno fala uma <b>frase verdadeira sobre si mesmo</b> usando o advérbio que quiser. Às vezes aparece um ⭐ <b>bônus</b> (falar de um amigo com he/she, dizer na negativa, acrescentar um \"when\", ou falar da família): é um desafio extra que treina o -s e don't/doesn't de forma lúdica. Os outros escutam e podem reagir (\"Me too!\"). Incentive detalhes extras (\"that's my lazy day!\"). Corrija só erros de ordem (advérbio antes do verbo) e não interrompa a fluência. Se travarem, dê só o começo (\"I always...\").</p>\n<h2 id=\"s10\">⏱️ 58-60 min | Encerramento (slide 14)</h2>\n<p>Mostre o slide final e explique que o homework da aula já está na plataforma: \"Your homework today has 4 fun games: a chat with a new friend, Alex, a slider game, a secret decoder, and a dashboard about YOUR habits!\"</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> a palavra de frequência antes do verbo é a regra que mais gera erro; repita-a em todas as etapas. Os drills partem do português para que os alunos aprendam a montar frases sozinhos. Alterne fala, escuta e repetição a cada 5-7 minutos.</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 12</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review 1 · Review Time</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}.gaps .ans{display:block;min-height:1.4em;color:transparent;font-size:.9em}.gaps .rv{cursor:pointer;border-radius:12px;padding:2px 8px}.gaps .rv:hover{background:#f3fbff}.gaps .rv.shown b,.gaps .rv.shown .ans{color:var(--blue)}.ab{margin-left:10px;border:none;background:#FFD97D;border-radius:12px;padding:3px 10px;font-family:Nunito;font-weight:900;font-size:13px;cursor:pointer;vertical-align:middle;box-shadow:0 2px 0 #0002}.gaps .rv.hasab{cursor:default}.gaps .rv.hasab:hover{background:none}.tapnote{font-size:13px;color:#888;margin:0 0 6px;font-weight:700}.gaps.show .ans{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · REVIEW</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">REVIEW 1</div><h1>Review<br>Time!</h1><div class="pill">🎉🧠🏆 Games · talking · celebrating</div></div></section>
+<section class="slide "><h2>This is NOT a test! 😄</h2><p class="sub">Welcome</p><div class="linkcard"><div class="e">🎉</div><div class="big2">Today is a fun day to remember everything we've learned!</div><p>We're going to play games, talk a lot, and see how much English we know.</p><p>There's no grade — just games, talking, and celebrating how far you've come! 🌟</p></div></section>
+<section class="slide "><h2>🧠 Get ready: Memory Lane!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>A <b>card</b> shows a word or a picture from our lessons.</div></div><div class="st"><span class="n">2</span><div>Say the word <b>in English</b>!</div></div><div class="st"><span class="n">3</span><div>Tap the card to check the answer. ✅</div></div><div class="st"><span class="n">4</span><div>Tap <b>Next</b> for a new card.</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🧠 Memory Lane</span><small>A quick game to review vocabulary from all our lessons!</small></div><iframe title="Memory Lane" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Memory Lane · Review Game&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; height:100%;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .wrap{
+    width:100%;
+    height:100%;
+    max-width:900px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    max-width:640px;
+    margin-bottom:10px;
+  }
+  .counter{ font-weight:800; font-size:clamp(13px,2vw,16px); color:#888; }
+  .category-tag{
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(13px,2.2vw,17px);
+    color:#fff;
+    background:var(--blue);
+    padding:6px 16px;
+    border-radius:20px;
+  }
+  .card{
+    width:100%;
+    max-width:640px;
+    aspect-ratio:16/9;
+    border-radius:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    cursor:pointer;
+    transition:transform .15s;
+    box-shadow:0 8px 0 rgba(0,0,0,.08);
+  }
+  .card:active{ transform:scale(.98); }
+  .clue{
+    font-size:clamp(60px,14vw,120px);
+    text-align:center;
+    padding:10px;
+    line-height:1.1;
+  }
+  .answer{
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(28px,7vw,56px);
+    color:var(--dark);
+    text-align:center;
+    padding:20px;
+    display:none;
+  }
+  .card.revealed .clue{ display:none; }
+  .card.revealed .answer{ display:block; }
+  .tap-hint{
+    margin-top:6px;
+    font-size:clamp(12px,2vw,14px);
+    color:#999;
+    font-weight:700;
+  }
+  .controls{
+    display:flex;
+    gap:14px;
+    margin-top:18px;
+  }
+  .btn{
+    border:none;
+    border-radius:16px;
+    padding:14px 26px;
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(14px,2.4vw,18px);
+    cursor:pointer;
+    color:#fff;
+    background:var(--blue);
+  }
+  .btn.secondary{
+    background:#eee;
+    color:var(--dark);
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;div class=&quot;top-row&quot;&gt;
+    &lt;div class=&quot;category-tag&quot; id=&quot;categoryTag&quot;&gt;CATEGORY&lt;/div&gt;
+    &lt;div class=&quot;counter&quot; id=&quot;counter&quot;&gt;1 / 28&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;card&quot; id=&quot;card&quot;&gt;
+    &lt;div class=&quot;clue&quot; id=&quot;clue&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;answer&quot; id=&quot;answer&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;tap-hint&quot;&gt;👆 Tap the card to reveal the answer&lt;/div&gt;
+
+  &lt;div class=&quot;controls&quot;&gt;
+    &lt;button class=&quot;btn secondary&quot; id=&quot;shuffleBtn&quot;&gt;🔀 Shuffle&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;nextBtn&quot;&gt;Next ▶&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const CARD_COLORS = [&#x27;pink&#x27;,&#x27;mint&#x27;,&#x27;lavender&#x27;,&#x27;yellow&#x27;,&#x27;coral&#x27;,&#x27;blue&#x27;];
+
+const clues = [
+  // Greetings
+  { cat: &#x27;Greetings&#x27;, emoji: &#x27;👋&#x27;, answer: &#x27;Hello! / Hi!&#x27; },
+  { cat: &#x27;Greetings&#x27;, emoji: &#x27;🙋&#x27;, answer: &quot;What&#x27;s your name?&quot; },
+  { cat: &#x27;Greetings&#x27;, emoji: &#x27;🔤&#x27;, answer: &#x27;How do you spell it?&#x27; },
+  // Feelings
+  { cat: &#x27;Feelings&#x27;, emoji: &#x27;😊&#x27;, answer: &#x27;Happy&#x27; },
+  { cat: &#x27;Feelings&#x27;, emoji: &#x27;😢&#x27;, answer: &#x27;Sad&#x27; },
+  { cat: &#x27;Feelings&#x27;, emoji: &#x27;😴&#x27;, answer: &#x27;Tired&#x27; },
+  { cat: &#x27;Feelings&#x27;, emoji: &#x27;😱&#x27;, answer: &#x27;Scared&#x27; },
+  // Numbers
+  { cat: &#x27;Numbers&#x27;, emoji: &#x27;🔢 13&#x27;, answer: &#x27;Thirteen&#x27; },
+  { cat: &#x27;Numbers&#x27;, emoji: &#x27;🔢 30&#x27;, answer: &#x27;Thirty&#x27; },
+  { cat: &#x27;Numbers&#x27;, emoji: &#x27;🔢 18&#x27;, answer: &#x27;Eighteen&#x27; },
+  // Countries
+  { cat: &#x27;Countries&#x27;, emoji: &#x27;🇯🇵&#x27;, answer: &#x27;Japan / Japanese&#x27; },
+  { cat: &#x27;Countries&#x27;, emoji: &#x27;🇧🇷&#x27;, answer: &#x27;Brazil / Brazilian&#x27; },
+  { cat: &#x27;Countries&#x27;, emoji: &#x27;🇫🇷&#x27;, answer: &#x27;France / French&#x27; },
+  { cat: &#x27;Countries&#x27;, emoji: &#x27;🇺🇸&#x27;, answer: &#x27;The USA / American&#x27; },
+  // Food
+  { cat: &#x27;Food&#x27;, emoji: &#x27;🍕&#x27;, answer: &#x27;Pizza&#x27; },
+  { cat: &#x27;Food&#x27;, emoji: &#x27;🥪&#x27;, answer: &#x27;Sandwich&#x27; },
+  { cat: &#x27;Food&#x27;, emoji: &#x27;🧃&#x27;, answer: &#x27;Juice&#x27; },
+  { cat: &#x27;Food&#x27;, emoji: &#x27;🍞&#x27;, answer: &#x27;Bread&#x27; },
+  // School Subjects
+  { cat: &#x27;School&#x27;, emoji: &#x27;🔢📚&#x27;, answer: &#x27;Math&#x27; },
+  { cat: &#x27;School&#x27;, emoji: &#x27;🎨&#x27;, answer: &#x27;Art&#x27; },
+  { cat: &#x27;School&#x27;, emoji: &#x27;🔬&#x27;, answer: &#x27;Science&#x27; },
+  { cat: &#x27;School&#x27;, emoji: &#x27;🏛️&#x27;, answer: &#x27;History&#x27; },
+  // Sports
+  { cat: &#x27;Sports&#x27;, emoji: &#x27;⚽&#x27;, answer: &#x27;Soccer&#x27; },
+  { cat: &#x27;Sports&#x27;, emoji: &#x27;🎾&#x27;, answer: &#x27;Tennis&#x27; },
+  { cat: &#x27;Sports&#x27;, emoji: &#x27;🏀&#x27;, answer: &#x27;Basketball&#x27; },
+  { cat: &#x27;Sports&#x27;, emoji: &#x27;⚾&#x27;, answer: &#x27;Baseball&#x27; },
+  // Family
+  { cat: &#x27;Family&#x27;, emoji: &#x27;👵&#x27;, answer: &#x27;Grandma&#x27; },
+  { cat: &#x27;Family&#x27;, emoji: &#x27;👦&#x27;, answer: &#x27;Brother&#x27; },
+  { cat: &#x27;Family&#x27;, emoji: &#x27;🐶&#x27;, answer: &#x27;Dog&#x27; }
+];
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let order = shuffle(clues);
+let index = 0;
+
+const cardEl = document.getElementById(&#x27;card&#x27;);
+const clueEl = document.getElementById(&#x27;clue&#x27;);
+const answerEl = document.getElementById(&#x27;answer&#x27;);
+const categoryTag = document.getElementById(&#x27;categoryTag&#x27;);
+const counter = document.getElementById(&#x27;counter&#x27;);
+
+function render(){
+  const item = order[index];
+  cardEl.classList.remove(&#x27;revealed&#x27;);
+  cardEl.style.background = `var(--${CARD_COLORS[index % CARD_COLORS.length]})`;
+  clueEl.textContent = item.emoji;
+  answerEl.textContent = item.answer;
+  categoryTag.textContent = item.cat.toUpperCase();
+  counter.textContent = `${index+1} / ${order.length}`;
+}
+
+cardEl.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  cardEl.classList.toggle(&#x27;revealed&#x27;);
+});
+
+document.getElementById(&#x27;nextBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  index = (index + 1) % order.length;
+  if(index === 0) order = shuffle(clues);
+  render();
+});
+
+document.getElementById(&#x27;shuffleBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  order = shuffle(clues);
+  index = 0;
+  render();
+});
+
+render();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🌍 Get ready: Around the World Quiz Show!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Pick a <b>category</b> and a number of points: 10, 20 or 30.</div></div><div class="st"><span class="n">2</span><div>Read the question and <b>answer in English</b>.</div></div><div class="st"><span class="n">3</span><div>The teacher shows the answer. ✅</div></div><div class="st"><span class="n">4</span><div>Right answer = points for your team! 🏆</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🌍 Around the World Quiz Show</span><small>A quiz to review everything we&#x27;ve learned so far!</small></div><iframe title="Around the World Quiz Show" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Around the World Quiz Show&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+    --brown1:#7A4A2B;
+    --brown2:#5A331B;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100%;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+  }
+  .wrap{ max-width:1000px; margin:0 auto; padding:16px 16px 40px; }
+
+  header{
+    background:linear-gradient(135deg, var(--brown1), var(--brown2));
+    color:#fff; text-align:center; padding:18px 16px; border-radius:20px; margin-bottom:16px;
+  }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-size:clamp(18px,3vw,28px); font-weight:900; margin:0; }
+  header .sub{ font-size:clamp(12px,1.6vw,15px); opacity:.9; margin-top:4px; }
+
+  .scoreboard{
+    display:flex; gap:12px; margin-bottom:16px;
+  }
+  .team{
+    flex:1; border-radius:16px; padding:12px 16px; color:#fff; text-align:center;
+  }
+  .team.a{ background:var(--blue); }
+  .team.b{ background:var(--coral); }
+  .team-name{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(14px,2.2vw,18px); }
+  .team-score{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(28px,5vw,40px); margin:4px 0; }
+  .team-buttons{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
+  .team-buttons button{
+    border:none; border-radius:10px; padding:6px 10px; font-weight:800; font-size:13px;
+    cursor:pointer; background:rgba(255,255,255,.9); color:var(--dark);
+  }
+
+  .board{
+    display:grid;
+    grid-template-columns:repeat(5, 1fr);
+    gap:6px;
+  }
+  .cat-header{
+    background:var(--dark); color:#fff; border-radius:8px;
+    padding:8px 4px; text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:800; font-size:clamp(10px,1.6vw,14px); display:flex; align-items:center; justify-content:center;
+    min-height:52px;
+  }
+  .cell{
+    border:none; border-radius:8px; padding:16px 4px; cursor:pointer;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(16px,3vw,26px);
+    color:#fff; min-height:64px;
+  }
+  .cell.used{ background:#e0e0e0 !important; color:#bbb; cursor:default; }
+  .colors0{ background:var(--pink); }
+  .colors1{ background:var(--mint); }
+  .colors2{ background:var(--lavender); }
+  .colors3{ background:var(--yellow); color:var(--dark); }
+  .colors4{ background:var(--blue); }
+
+  .overlay{
+    display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
+    align-items:center; justify-content:center; z-index:50; padding:20px;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background:#fff; border-radius:24px; padding:30px 26px; max-width:560px; width:100%; text-align:center;
+  }
+  .modal .cat-tag{
+    display:inline-block; background:var(--dark); color:#fff; font-weight:800; font-size:13px;
+    padding:4px 14px; border-radius:20px; margin-bottom:14px;
+  }
+  .modal .points{ font-weight:900; font-family:&#x27;Nunito&#x27;,sans-serif; color:var(--blue); font-size:20px; margin-bottom:10px; }
+  .modal .question{ font-size:clamp(18px,3vw,24px); font-weight:800; margin-bottom:20px; line-height:1.4; }
+  .modal .answer{
+    display:none; background:var(--mint); border-radius:14px; padding:16px; font-weight:800; font-size:18px; margin-bottom:20px;
+  }
+  .modal .answer.show{ display:block; }
+  .modal-buttons{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .modal-buttons button{
+    border:none; border-radius:14px; padding:12px 20px; font-weight:900; font-size:15px; cursor:pointer;
+  }
+  .btn-reveal{ background:var(--yellow); }
+  .btn-close{ background:#eee; color:var(--dark); }
+
+  .reset-row{ text-align:center; margin-top:16px; }
+  .reset-row button{
+    border:none; border-radius:14px; padding:10px 20px; font-weight:800; font-size:14px; cursor:pointer;
+    background:#eee; color:var(--dark);
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;🌍🏆 Around the World Quiz Show&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Review 1 · Pick a category and a point value!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;scoreboard&quot;&gt;
+    &lt;div class=&quot;team a&quot;&gt;
+      &lt;div class=&quot;team-name&quot;&gt;🔵 Team A&lt;/div&gt;
+      &lt;div class=&quot;team-score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;
+      &lt;div class=&quot;team-buttons&quot;&gt;
+        &lt;button onclick=&quot;addScore(&#x27;A&#x27;,10)&quot;&gt;+10&lt;/button&gt;
+        &lt;button onclick=&quot;addScore(&#x27;A&#x27;,20)&quot;&gt;+20&lt;/button&gt;
+        &lt;button onclick=&quot;addScore(&#x27;A&#x27;,30)&quot;&gt;+30&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;team b&quot;&gt;
+      &lt;div class=&quot;team-name&quot;&gt;🔴 Team B&lt;/div&gt;
+      &lt;div class=&quot;team-score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;
+      &lt;div class=&quot;team-buttons&quot;&gt;
+        &lt;button onclick=&quot;addScore(&#x27;B&#x27;,10)&quot;&gt;+10&lt;/button&gt;
+        &lt;button onclick=&quot;addScore(&#x27;B&#x27;,20)&quot;&gt;+20&lt;/button&gt;
+        &lt;button onclick=&quot;addScore(&#x27;B&#x27;,30)&quot;&gt;+30&lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;board&quot; id=&quot;board&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;reset-row&quot;&gt;
+    &lt;button id=&quot;resetBtn&quot;&gt;🔄 Reset Game&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;overlay&quot; id=&quot;overlay&quot;&gt;
+  &lt;div class=&quot;modal&quot;&gt;
+    &lt;div class=&quot;cat-tag&quot; id=&quot;modalCat&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;points&quot; id=&quot;modalPoints&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;question&quot; id=&quot;modalQuestion&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;answer&quot; id=&quot;modalAnswer&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;modal-buttons&quot;&gt;
+      &lt;button class=&quot;btn-reveal&quot; id=&quot;revealBtn&quot;&gt;💡 Show Answer&lt;/button&gt;
+      &lt;button class=&quot;btn-close&quot; id=&quot;closeBtn&quot;&gt;Close ✓&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const categories = [
+  {
+    name: &#x27;Greetings &amp; Feelings&#x27;,
+    questions: [
+      { points: 10, q: &quot;How do you say &#x27;Bom dia&#x27; in English?&quot;, a: &#x27;Good morning!&#x27; },
+      { points: 20, q: &quot;Name 3 feelings in English.&quot;, a: &#x27;Any 3: happy, sad, tired, excited, angry, scared, sick, hungry, fine, good&#x27; },
+      { points: 30, q: &quot;Spell your name out loud in English, letter by letter!&quot;, a: &#x27;(Teacher checks pronunciation of each letter)&#x27; }
+    ]
+  },
+  {
+    name: &#x27;Countries &amp; Food&#x27;,
+    questions: [
+      { points: 10, q: &quot;What country does this flag belong to? 🇯🇵&quot;, a: &#x27;Japan (Japanese)&#x27; },
+      { points: 20, q: &quot;Complete: I ___ pizza for dinner. (eat)&quot;, a: &#x27;eat&#x27; },
+      { points: 30, q: &quot;Ask a classmate: what do you eat for breakfast?&quot;, a: &#x27;(Open question — check for a full sentence answer)&#x27; }
+    ]
+  },
+  {
+    name: &#x27;School &amp; Sports&#x27;,
+    questions: [
+      { points: 10, q: &quot;Name 3 school subjects in English.&quot;, a: &#x27;Any 3: Math, English, Science, History, Geography, Art, P.E., Music&#x27; },
+      { points: 20, q: &quot;Complete: He ___ Soccer every day. (play)&quot;, a: &#x27;plays&#x27; },
+      { points: 30, q: &quot;Make a NEGATIVE sentence about a sport.&quot;, a: &#x27;Example: He doesn\u2019t play Tennis.&#x27; }
+    ]
+  },
+  {
+    name: &#x27;Family&#x27;,
+    questions: [
+      { points: 10, q: &quot;What do you call your mother&#x27;s sister?&quot;, a: &#x27;Aunt&#x27; },
+      { points: 20, q: &quot;Complete: She ___ a dog. (have)&quot;, a: &#x27;has&#x27; },
+      { points: 30, q: &quot;Ask: Does he have a cat? Then answer it yourself!&quot;, a: &#x27;(Open — check for Yes, he does. / No, he doesn\u2019t.)&#x27; }
+    ]
+  },
+  {
+    name: &#x27;Grammar Mix&#x27;,
+    questions: [
+      { points: 10, q: &quot;Is this correct? \u201cShe like Art.\u201d&quot;, a: &#x27;No! It should be &quot;She likes Art.&quot;&#x27; },
+      { points: 20, q: &quot;Turn into a question: \u201cThey study English.\u201d&quot;, a: &#x27;Do they study English?&#x27; },
+      { points: 30, q: &quot;Turn into a negative: \u201cHe plays Tennis.\u201d&quot;, a: &quot;He doesn&#x27;t play Tennis.&quot; }
+    ]
+  }
+];
+
+let scores = { A: 0, B: 0 };
+let usedCells = new Set();
+
+function addScore(team, amount){
+  scores[team] += amount;
+  document.getElementById(&#x27;score&#x27; + team).textContent = scores[team];
+}
+
+function renderBoard(){
+  const board = document.getElementById(&#x27;board&#x27;);
+  board.innerHTML = &#x27;&#x27;;
+  categories.forEach(cat=&gt;{
+    const header = document.createElement(&#x27;div&#x27;);
+    header.className = &#x27;cat-header&#x27;;
+    header.textContent = cat.name;
+    board.appendChild(header);
+  });
+  for(let row=0; row&lt;3; row++){
+    categories.forEach((cat, catIndex)=&gt;{
+      const q = cat.questions[row];
+      const cellId = catIndex + &#x27;-&#x27; + row;
+      const btn = document.createElement(&#x27;button&#x27;);
+      btn.className = &#x27;cell colors&#x27; + catIndex + (usedCells.has(cellId) ? &#x27; used&#x27; : &#x27;&#x27;);
+      btn.textContent = usedCells.has(cellId) ? &#x27;✓&#x27; : q.points;
+      btn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+        if(usedCells.has(cellId)) return;
+        openModal(cat.name, q, cellId);
+      });
+      board.appendChild(btn);
+    });
+  }
+}
+
+function openModal(catName, q, cellId){
+  document.getElementById(&#x27;modalCat&#x27;).textContent = catName.toUpperCase();
+  document.getElementById(&#x27;modalPoints&#x27;).textContent = q.points + &#x27; points&#x27;;
+  document.getElementById(&#x27;modalQuestion&#x27;).textContent = q.q;
+  const answerEl = document.getElementById(&#x27;modalAnswer&#x27;);
+  answerEl.textContent = q.a;
+  answerEl.classList.remove(&#x27;show&#x27;);
+  document.getElementById(&#x27;overlay&#x27;).classList.add(&#x27;show&#x27;);
+  document.getElementById(&#x27;overlay&#x27;).dataset.cellId = cellId;
+}
+
+document.getElementById(&#x27;revealBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  document.getElementById(&#x27;modalAnswer&#x27;).classList.add(&#x27;show&#x27;);
+});
+document.getElementById(&#x27;closeBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  const cellId = document.getElementById(&#x27;overlay&#x27;).dataset.cellId;
+  usedCells.add(cellId);
+  document.getElementById(&#x27;overlay&#x27;).classList.remove(&#x27;show&#x27;);
+  renderBoard();
+});
+document.getElementById(&#x27;resetBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  usedCells = new Set();
+  scores = { A: 0, B: 0 };
+  document.getElementById(&#x27;scoreA&#x27;).textContent = 0;
+  document.getElementById(&#x27;scoreB&#x27;).textContent = 0;
+  renderBoard();
+});
+
+renderBoard();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Sentence Relay 🔁</h2><p class="sub">Teacher points to a card — say the sentence right away!</p><div class="row"><div class="card" style="background:#A8E6CF;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🍕</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to eat</div><div class="lab">Affirmative</div></div><div class="card" style="background:#FFB3A7;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🎨</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to like</div><div class="lab">Negative</div></div><div class="card" style="background:#C9A8E8;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">⚽</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to play</div><div class="lab">Question</div></div><div class="card" style="background:#A8E6CF;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🐶</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to have</div><div class="lab">Affirmative</div></div><div class="card" style="background:#FFB3A7;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">📚</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to study</div><div class="lab">Negative</div></div><div class="card" style="background:#C9A8E8;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🥤</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to drink</div><div class="lab">Question</div></div><div class="card" style="background:#A8E6CF;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🎵</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to like</div><div class="lab">Affirmative</div></div><div class="card" style="background:#C9A8E8;min-width:200px;flex:1 1 200px;min-height:140px"><div class="e">🏀</div><div class="val" style="font-size:clamp(16px,2vw,22px)">to play</div><div class="lab">Question</div></div></div></section>
+<section class="slide "><h2>Change into Negatives 🔄</h2><p class="sub">Say each sentence in the negative!</p><div class="linkcard" style="max-width:900px;text-align:left"><div class="gaps"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:4px 28px"><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">1 – She likes Art. <button class="ab">👁 Answer</button><br><span class="ans">She doesn't like Art.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">2 – He plays Soccer. <button class="ab">👁 Answer</button><br><span class="ans">He doesn't play Soccer.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">3 – They study English. <button class="ab">👁 Answer</button><br><span class="ans">They don't study English.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">4 – She has a dog. <button class="ab">👁 Answer</button><br><span class="ans">She doesn't have a dog.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">5 – He eats Pizza. <button class="ab">👁 Answer</button><br><span class="ans">He doesn't eat Pizza.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">6 – They play Basketball. <button class="ab">👁 Answer</button><br><span class="ans">They don't play Basketball.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">7 – She drinks Juice. <button class="ab">👁 Answer</button><br><span class="ans">She doesn't drink Juice.</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">8 – He studies Math. <button class="ab">👁 Answer</button><br><span class="ans">He doesn't study Math.</span></p></div></div></div></section>
+<section class="slide "><h2>Change into Interrogatives ❓</h2><p class="sub">Say each sentence as a question!</p><div class="linkcard" style="max-width:900px;text-align:left"><div class="gaps"><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:4px 28px"><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">1 – She likes Music. <button class="ab">👁 Answer</button><br><span class="ans">Does she like Music?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">2 – He plays Tennis. <button class="ab">👁 Answer</button><br><span class="ans">Does he play Tennis?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">3 – They have a cat. <button class="ab">👁 Answer</button><br><span class="ans">Do they have a cat?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">4 – She studies Science. <button class="ab">👁 Answer</button><br><span class="ans">Does she study Science?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">5 – He eats Bread. <button class="ab">👁 Answer</button><br><span class="ans">Does he eat Bread?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">6 – They drink Soda. <button class="ab">👁 Answer</button><br><span class="ans">Do they drink Soda?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">7 – She plays Volleyball. <button class="ab">👁 Answer</button><br><span class="ans">Does she play Volleyball?</span></p><p class="rv hasab" style="margin:6px 0;font-weight:800;font-size:clamp(16px,2.2vw,22px)">8 – He has a sister. <button class="ab">👁 Answer</button><br><span class="ans">Does he have a sister?</span></p></div></div></div></section>
+<section class="slide "><h2>🎤 Get ready: Interview Marathon!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Interview a classmate <b>all by yourself</b>!</div></div><div class="st"><span class="n">2</span><div>Ask about as many <b>topics</b> as you can: Name · Age · Country · Food · School · Sports · Family.</div></div><div class="st"><span class="n">3</span><div>Tap a topic when you ask about it. ✅</div></div><div class="st"><span class="n">4</span><div>Go as long as you can without stopping! ⏱️</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🎤 Interview Marathon</span><small>Cover AS MANY topics as you can!</small></div><iframe title="Interview Marathon" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--blue:#5BC4E8;--dark:#3A3A3A}*{box-sizing:border-box}
+html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{padding:8px 14px 20px;max-width:900px;margin:0 auto;text-align:center}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:6px}.names input{width:100px;border:2px solid #C9A8E8;border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.turn{font-family:Nunito;font-weight:900;color:#e0719c;font-size:20px;min-height:28px}
+.time{font-family:Nunito;font-weight:900;font-size:clamp(52px,10vw,92px);color:var(--blue);line-height:1.1}
+.run{display:flex;gap:10px;justify-content:center;margin:6px 0 14px}
+.btn{border:none;border-radius:20px;padding:12px 24px;font-family:Nunito;font-weight:900;font-size:18px;cursor:pointer;color:#fff;box-shadow:0 4px 0 #0002}
+.go{background:#5cc99b}.stop{background:#F2A7C3}.rs{background:#bbb}
+.topics{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+.t{border:none;border-radius:20px;padding:14px 8px;cursor:pointer;font-family:Nunito;font-weight:900;font-size:clamp(15px,2.2vw,20px);color:var(--dark);box-shadow:0 5px 0 #0002;transition:.2s}
+.t .e{display:block;font-size:34px}
+.t.on{background:#fff!important;outline:4px solid #FFD97D}.t.on:after{content:&quot; ✅&quot;}
+.hint{font-weight:800;color:#666;margin:4px 0 12px}.win{display:none;font-family:Nunito;font-weight:900;font-size:clamp(22px,4vw,32px);margin-top:12px;color:#e0719c}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input placeholder=&quot;Pair 1&quot;&gt;&lt;input placeholder=&quot;Pair 2&quot;&gt;&lt;input placeholder=&quot;Pair 3&quot;&gt;&lt;input placeholder=&quot;Pair 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;turn&quot; id=&quot;turn&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;time&quot; id=&quot;time&quot;&gt;0:00&lt;/div&gt;&lt;div class=&quot;run&quot;&gt;&lt;button class=&quot;btn go&quot; id=&quot;go&quot;&gt;▶ Start&lt;/button&gt;&lt;button class=&quot;btn stop&quot; id=&quot;stop&quot;&gt;⏸ Pause&lt;/button&gt;&lt;button class=&quot;btn rs&quot; id=&quot;rs&quot;&gt;↺ Reset&lt;/button&gt;&lt;/div&gt;
+&lt;div class=&quot;hint&quot;&gt;Interview a classmate! Tap a topic when you ask about it. How many can you cover without stopping? ⏱️&lt;/div&gt;
+&lt;div class=&quot;topics&quot; id=&quot;topics&quot;&gt;&lt;/div&gt;&lt;div class=&quot;win&quot; id=&quot;win&quot;&gt;🏆 All topics covered! You are interview stars!&lt;/div&gt;
+&lt;/div&gt;&lt;script&gt;
+var TP=[[&quot;📛&quot;,&quot;Name&quot;,&quot;#F2A7C3&quot;],[&quot;🎂&quot;,&quot;Age&quot;,&quot;#A8E6CF&quot;],[&quot;🌍&quot;,&quot;Country&quot;,&quot;#C9A8E8&quot;],[&quot;🍕&quot;,&quot;Food&quot;,&quot;#FFD97D&quot;],[&quot;🏫&quot;,&quot;School&quot;,&quot;#FFB3A7&quot;],[&quot;⚽&quot;,&quot;Sports&quot;,&quot;#9fdcf2&quot;],[&quot;👨‍👩‍👧&quot;,&quot;Family&quot;,&quot;#F2A7C3&quot;]];
+var sec=0,iv=null,done=0;
+function fmt(){return Math.floor(sec/60)+&#x27;:&#x27;+(sec%60&lt;10?&#x27;0&#x27;:&#x27;&#x27;)+sec%60;}
+function tick(){sec++;document.getElementById(&#x27;time&#x27;).textContent=fmt();}
+document.getElementById(&#x27;go&#x27;).addEventListener(&#x27;click&#x27;,function(){if(!iv)iv=setInterval(tick,1000);});
+document.getElementById(&#x27;stop&#x27;).addEventListener(&#x27;click&#x27;,function(){clearInterval(iv);iv=null;});
+document.getElementById(&#x27;rs&#x27;).addEventListener(&#x27;click&#x27;,function(){clearInterval(iv);iv=null;sec=0;document.getElementById(&#x27;time&#x27;).textContent=&#x27;0:00&#x27;;build();});
+function nm(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
+function build(){var b=document.getElementById(&#x27;topics&#x27;);b.innerHTML=&#x27;&#x27;;done=0;document.getElementById(&#x27;win&#x27;).style.display=&#x27;none&#x27;;
+ TP.forEach(function(t){var x=document.createElement(&#x27;button&#x27;);x.className=&#x27;t&#x27;;x.style.background=t[2];x.innerHTML=&#x27;&lt;span class=&quot;e&quot;&gt;&#x27;+t[0]+&#x27;&lt;/span&gt;&#x27;+t[1];
+  x.addEventListener(&#x27;click&#x27;,function(){if(x.classList.contains(&#x27;on&#x27;)){x.classList.remove(&#x27;on&#x27;);done--;}else{x.classList.add(&#x27;on&#x27;);done++;}
+   if(done===TP.length){document.getElementById(&#x27;win&#x27;).style.display=&#x27;block&#x27;;clearInterval(iv);iv=null;}else document.getElementById(&#x27;win&#x27;).style.display=&#x27;none&#x27;;});b.appendChild(x);});}
+document.getElementById(&#x27;names&#x27;).addEventListener(&#x27;input&#x27;,function(){var N=nm();document.getElementById(&#x27;turn&#x27;).textContent=N.length?&#x27;🎤 &#x27;+N.join(&#x27; · &#x27;):&#x27;&#x27;;});
+build();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🌟 Get ready: How do you feel?!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Tell your teacher how you feel about each <b>topic</b>.</div></div><div class="st"><span class="n">2</span><div>😄 = I'm confident</div></div><div class="st"><span class="n">3</span><div>😐 = So-so</div></div><div class="st"><span class="n">4</span><div>😟 = I need help</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🌟 Self-Assessment: How do you feel?</span><small>A fun way to see how confident you feel in every topic!</small></div><iframe title="Self-Assessment: How do you feel?" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Self-Assessment Tracker&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&amp;family=Nunito+Sans:wght@600;700;800&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100%;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      radial-gradient(circle at 10% 10%, rgba(242,167,195,.25) 0, transparent 40%),
+      radial-gradient(circle at 90% 15%, rgba(169,230,207,.3) 0, transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(201,168,232,.25) 0, transparent 40%),
+      #fffdf8;
+    color:var(--dark);
+  }
+  h1,h2,h3{ font-family:&#x27;Baloo 2&#x27;, sans-serif; margin:0; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:18px 16px 50px; }
+
+  header{
+    background:linear-gradient(135deg, var(--pink), var(--lavender));
+    color:#fff; text-align:center; padding:22px 16px; border-radius:28px; margin-bottom:18px;
+    box-shadow:0 6px 0 rgba(0,0,0,.08);
+    position:relative; overflow:hidden;
+  }
+  header h1{ font-size:clamp(22px,4vw,32px); font-weight:800; text-shadow:0 2px 0 rgba(0,0,0,.1); }
+  header .sub{ font-size:clamp(13px,1.8vw,16px); font-weight:700; opacity:.95; margin-top:6px; }
+  header .decor{ position:absolute; font-size:32px; opacity:.5; }
+  header .decor.d1{ top:6px; left:16px; }
+  header .decor.d2{ bottom:6px; right:20px; }
+
+  .how-box{
+    background:#fff; border:3px dashed var(--blue); border-radius:20px;
+    padding:16px 18px; font-size:15px; line-height:1.7; margin-bottom:18px; color:var(--dark);
+    font-weight:700;
+  }
+  .how-box b{ color:#2c8bb0; }
+
+  .palette{
+    display:flex; gap:14px; justify-content:center; margin-bottom:20px; flex-wrap:wrap;
+  }
+  .palette-item{
+    display:flex; flex-direction:column; align-items:center; gap:4px;
+    background:#fff; border-radius:20px; padding:12px 20px; box-shadow:0 4px 0 rgba(0,0,0,.08);
+    cursor:grab; user-select:none; touch-action:none; transition:transform .1s;
+  }
+  .palette-item:active{ cursor:grabbing; transform:scale(.95); }
+  .palette-item.selected{ outline:4px solid var(--blue); }
+  .palette-item .emoji{ font-size:44px; }
+  .palette-item .label{ font-weight:800; font-size:12px; color:#666; }
+
+  .table-wrap{ overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:18px; border-radius:20px; }
+  table{ border-collapse:separate; border-spacing:6px; width:100%; min-width:560px; }
+  th{
+    font-family:&#x27;Baloo 2&#x27;,sans-serif; font-weight:700; font-size:14px; color:#fff;
+    background:var(--blue); border-radius:14px; padding:10px 8px;
+  }
+  th.topic-header{ background:transparent; }
+  .student-header{ display:flex; align-items:center; justify-content:center; gap:6px; }
+  .remove-student{
+    background:rgba(255,255,255,.3); border:none; color:#fff; cursor:pointer; font-size:13px;
+    border-radius:50%; width:18px; height:18px; line-height:1;
+  }
+
+  .topic-cell{
+    text-align:left; font-weight:800; font-size:14px; color:var(--dark); white-space:nowrap;
+    background:#fff; border-radius:14px; padding:10px 14px;
+  }
+  .topic-emoji{ margin-right:6px; }
+
+  .drop-cell{
+    width:78px; height:64px; text-align:center; vertical-align:middle;
+    border-radius:16px; font-size:30px; cursor:pointer;
+    background:#f4f4f4; border:3px solid transparent; transition:all .15s;
+  }
+  .drop-cell.dragover{ border-color:var(--blue); background:#eaf7fc; transform:scale(1.05); }
+  .drop-cell.happy{ background:#e3f7ec; }
+  .drop-cell.neutral{ background:#fff3d6; }
+  .drop-cell.sad{ background:#fde3e0; }
+  .drop-cell.pop{ animation:pop .25s ease; }
+  @keyframes pop{ 0%{transform:scale(0.6);} 60%{transform:scale(1.15);} 100%{transform:scale(1);} }
+
+  .add-row{ display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap; }
+  .add-row input{
+    flex:1; min-width:160px; border:3px solid var(--lavender); border-radius:16px; padding:12px 16px; font-size:15px;
+    font-family:&#x27;Nunito Sans&#x27;,sans-serif; font-weight:700;
+  }
+  .add-row button{
+    border:none; border-radius:16px; padding:12px 22px; font-weight:800; font-size:14px; cursor:pointer;
+    background:var(--mint); color:var(--dark); box-shadow:0 4px 0 rgba(0,0,0,.08);
+  }
+
+  .screenshot-banner{
+    background:var(--yellow); border-radius:20px; padding:18px 20px; text-align:center;
+    font-weight:800; font-size:16px; margin-top:10px; box-shadow:0 4px 0 rgba(0,0,0,.08);
+  }
+
+  .reset-row{ text-align:center; margin-top:18px; }
+  .reset-row button{
+    border:none; border-radius:16px; padding:10px 22px; font-weight:800; font-size:14px; cursor:pointer;
+    background:#eee; color:var(--dark);
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;span class=&quot;decor d1&quot;&gt;🎈&lt;/span&gt;
+    &lt;span class=&quot;decor d2&quot;&gt;🎉&lt;/span&gt;
+    &lt;h1&gt;🌟 How Do You Feel? 🌟&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Self-Assessment Tracker · Review 1&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;how-box&quot;&gt;
+    &lt;b&gt;Como usar:&lt;/b&gt; adicione o nome de cada aluno, arraste um emoji da barra abaixo até a célula do tópico certo (ou toque no emoji e depois na célula, se preferir). 📸 No final, tire um print pra guardar a evolução da turma!
+  &lt;/div&gt;
+
+  &lt;div class=&quot;palette&quot;&gt;
+    &lt;div class=&quot;palette-item&quot; draggable=&quot;true&quot; data-state=&quot;happy&quot;&gt;
+      &lt;span class=&quot;emoji&quot;&gt;😄&lt;/span&gt;
+      &lt;span class=&quot;label&quot;&gt;confiante&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;palette-item&quot; draggable=&quot;true&quot; data-state=&quot;neutral&quot;&gt;
+      &lt;span class=&quot;emoji&quot;&gt;😐&lt;/span&gt;
+      &lt;span class=&quot;label&quot;&gt;mais ou menos&lt;/span&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;palette-item&quot; draggable=&quot;true&quot; data-state=&quot;sad&quot;&gt;
+      &lt;span class=&quot;emoji&quot;&gt;😟&lt;/span&gt;
+      &lt;span class=&quot;label&quot;&gt;precisa de ajuda&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;add-row&quot;&gt;
+    &lt;input type=&quot;text&quot; id=&quot;studentInput&quot; placeholder=&quot;Nome do aluno...&quot;&gt;
+    &lt;button id=&quot;addStudentBtn&quot;&gt;➕ Add Student&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;table-wrap&quot;&gt;
+    &lt;table id=&quot;assessTable&quot;&gt;
+      &lt;thead&gt;
+        &lt;tr id=&quot;headerRow&quot;&gt;
+          &lt;th class=&quot;topic-header&quot;&gt;&lt;/th&gt;
+        &lt;/tr&gt;
+      &lt;/thead&gt;
+      &lt;tbody id=&quot;tableBody&quot;&gt;&lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;screenshot-banner&quot;&gt;
+    📸 Tire um print desta tela no final da aula pra guardar a evolução da turma!
+  &lt;/div&gt;
+
+  &lt;div class=&quot;reset-row&quot;&gt;
+    &lt;button id=&quot;resetBtn&quot;&gt;🔄 Reset (nova turma)&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const topics = [
+  { name: &#x27;Greetings &amp; Introductions&#x27;, emoji: &#x27;👋&#x27; },
+  { name: &#x27;Feelings &amp; Numbers&#x27;, emoji: &#x27;🔢&#x27; },
+  { name: &#x27;Countries &amp; Nationalities&#x27;, emoji: &#x27;🌍&#x27; },
+  { name: &#x27;Food &amp; Drinks&#x27;, emoji: &#x27;🍕&#x27; },
+  { name: &#x27;School Subjects&#x27;, emoji: &#x27;📚&#x27; },
+  { name: &#x27;Sports&#x27;, emoji: &#x27;⚽&#x27; },
+  { name: &#x27;Family &amp; Pets&#x27;, emoji: &#x27;👨\u200d👩\u200d👧\u200d👦&#x27; },
+  { name: &#x27;Grammar (3rd person, negatives, questions)&#x27;, emoji: &#x27;🧩&#x27; }
+];
+
+const stateEmoji = { happy: &#x27;😄&#x27;, neutral: &#x27;😐&#x27;, sad: &#x27;😟&#x27; };
+
+let students = [];
+let cellState = {};
+let selectedState = null;
+
+function renderTable(){
+  const headerRow = document.getElementById(&#x27;headerRow&#x27;);
+  headerRow.innerHTML = &#x27;&lt;th class=&quot;topic-header&quot;&gt;&lt;/th&gt;&#x27;;
+  students.forEach((name, i)=&gt;{
+    const th = document.createElement(&#x27;th&#x27;);
+    const wrap = document.createElement(&#x27;div&#x27;);
+    wrap.className = &#x27;student-header&#x27;;
+    const span = document.createElement(&#x27;span&#x27;);
+    span.textContent = name;
+    const removeBtn = document.createElement(&#x27;button&#x27;);
+    removeBtn.className = &#x27;remove-student&#x27;;
+    removeBtn.textContent = &#x27;✕&#x27;;
+    removeBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+      students.splice(i, 1);
+      renderTable();
+    });
+    wrap.appendChild(span);
+    wrap.appendChild(removeBtn);
+    th.appendChild(wrap);
+    headerRow.appendChild(th);
+  });
+
+  const body = document.getElementById(&#x27;tableBody&#x27;);
+  body.innerHTML = &#x27;&#x27;;
+  topics.forEach((topic, topicIndex)=&gt;{
+    const tr = document.createElement(&#x27;tr&#x27;);
+    const topicTd = document.createElement(&#x27;td&#x27;);
+    topicTd.className = &#x27;topic-cell&#x27;;
+    topicTd.innerHTML = `&lt;span class=&quot;topic-emoji&quot;&gt;${topic.emoji}&lt;/span&gt;${topic.name}`;
+    tr.appendChild(topicTd);
+
+    students.forEach((name, studentIndex)=&gt;{
+      const key = topicIndex + &#x27;-&#x27; + studentIndex;
+      const td = document.createElement(&#x27;td&#x27;);
+      td.className = &#x27;drop-cell&#x27;;
+      applyCellVisual(td, key);
+
+      td.addEventListener(&#x27;dragover&#x27;, (e)=&gt;{
+        e.preventDefault();
+        td.classList.add(&#x27;dragover&#x27;);
+      });
+      td.addEventListener(&#x27;dragleave&#x27;, ()=&gt;{
+        td.classList.remove(&#x27;dragover&#x27;);
+      });
+      td.addEventListener(&#x27;drop&#x27;, (e)=&gt;{
+        e.preventDefault();
+        td.classList.remove(&#x27;dragover&#x27;);
+        const state = e.dataTransfer.getData(&#x27;text/state&#x27;);
+        if(state){
+          cellState[key] = state;
+          applyCellVisual(td, key);
+          pop(td);
+        }
+      });
+      td.addEventListener(&#x27;click&#x27;, ()=&gt;{
+        if(selectedState){
+          cellState[key] = selectedState;
+          applyCellVisual(td, key);
+          pop(td);
+        }
+      });
+
+      tr.appendChild(td);
+    });
+    body.appendChild(tr);
+  });
+}
+
+function applyCellVisual(td, key){
+  const state = cellState[key];
+  td.textContent = state ? stateEmoji[state] : &#x27;&#x27;;
+  td.className = &#x27;drop-cell&#x27; + (state ? &#x27; &#x27; + state : &#x27;&#x27;);
+}
+
+function pop(td){
+  td.classList.remove(&#x27;pop&#x27;);
+  void td.offsetWidth;
+  td.classList.add(&#x27;pop&#x27;);
+}
+
+document.querySelectorAll(&#x27;.palette-item&#x27;).forEach(item=&gt;{
+  item.addEventListener(&#x27;dragstart&#x27;, (e)=&gt;{
+    e.dataTransfer.setData(&#x27;text/state&#x27;, item.dataset.state);
+  });
+  item.addEventListener(&#x27;click&#x27;, ()=&gt;{
+    const alreadySelected = item.classList.contains(&#x27;selected&#x27;);
+    document.querySelectorAll(&#x27;.palette-item&#x27;).forEach(i=&gt;i.classList.remove(&#x27;selected&#x27;));
+    if(alreadySelected){
+      selectedState = null;
+    } else {
+      item.classList.add(&#x27;selected&#x27;);
+      selectedState = item.dataset.state;
+    }
+  });
+});
+
+document.getElementById(&#x27;addStudentBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  const input = document.getElementById(&#x27;studentInput&#x27;);
+  const name = input.value.trim();
+  if(name){
+    students.push(name);
+    input.value = &#x27;&#x27;;
+    renderTable();
+  }
+  input.focus();
+});
+document.getElementById(&#x27;studentInput&#x27;).addEventListener(&#x27;keydown&#x27;, (e)=&gt;{
+  if(e.key === &#x27;Enter&#x27;) document.getElementById(&#x27;addStudentBtn&#x27;).click();
+});
+document.getElementById(&#x27;resetBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  students = [];
+  cellState = {};
+  selectedState = null;
+  document.querySelectorAll(&#x27;.palette-item&#x27;).forEach(i=&gt;i.classList.remove(&#x27;selected&#x27;));
+  renderTable();
+});
+
+renderTable();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>You did it! 🎉🏆</h2><p class="sub">Great job!</p><div class="linkcard"><div class="e">🏆</div><div class="big2">Look how much English you know now! 🌟</div><p>Keep talking, keep practicing, and keep having fun!</p><p>See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+[].forEach.call(document.querySelectorAll('.gaps .rv'),function(p){var ab=p.querySelector('.ab');(ab||p).addEventListener('click',function(){p.classList.toggle('shown'); if(ab) ab.textContent=p.classList.contains('shown')?'🙈 Hide':'👁 Answer';});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Review 1 · Review Time!</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Memory Lane</a> · <a href=\"#s3\">Quiz Show</a> · <a href=\"#s4\">Sentence Relay</a> · <a href=\"#s5\">Negatives</a> · <a href=\"#s6\">Interrogatives</a> · <a href=\"#s7\">Interview Marathon</a> · <a href=\"#s8\">Self-Assessment</a> · <a href=\"#s9\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li>Primeira review dos kids. <b>Não tem peso de prova</b>: é um momento para revisar todo o conteúdo visto até aqui de forma leve e dinâmica, com bastante jogo, e para a professora avaliar o desenvolvimento da turma de forma geral.</li><li>Sem conteúdo novo.</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-5</td><td>1-2</td><td>This is NOT a test!</td></tr><tr><td>5-13</td><td>3-4</td><td>Memory Lane</td></tr><tr><td>13-23</td><td>5-6</td><td>Around the World Quiz Show</td></tr><tr><td>23-31</td><td>7</td><td>Sentence Relay</td></tr><tr><td>31-37</td><td>8</td><td>Change into Negatives</td></tr><tr><td>37-43</td><td>9</td><td>Change into Interrogatives</td></tr><tr><td>43-51</td><td>10-11</td><td>Interview Marathon</td></tr><tr><td>51-58</td><td>12-13</td><td>Self-Assessment Tracker</td></tr><tr><td>58-60</td><td>14</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes de cada jogo há um slide \"Get ready\" para as crianças entenderem as regras. Leia com elas e depois clique em \"Ready? Let's play!\".</div>\n<h2 id=\"s1\">⏱️ 0-5 min | This is NOT a test! (slides 1-2)</h2>\n<p>Inicie a aula deixando bem claro para a turma que hoje é dia de <b>brincar relembrando tudo</b>: sem nota, sem prova, só jogos, comunicação e celebração do progresso. Cumprimente e pergunte \"How are you today?\" para cada aluno.</p>\n<h2 id=\"s2\">⏱️ 5-13 min | Memory Lane (slides 3-4)</h2>\n<p>Jogo de recall rápido misturando vocabulário de todas as aulas (greetings, feelings, numbers, countries, food, school subjects, sports, family). Depois do \"Get ready\", toque no card para revelar a resposta; use os botões para avançar e embaralhar de novo. Deixe um aluno por card dizer a palavra em inglês antes de revelar.</p>\n<h2 id=\"s3\">⏱️ 13-23 min | Around the World Quiz Show (slides 5-6)</h2>\n<p>Tabuleiro estilo game show com <b>5 categorias x 3 níveis de pontos (10/20/30)</b>: Greetings &amp; Feelings, Countries &amp; Food, School &amp; Sports, Family e Grammar Mix (afirmativa, negativa e interrogativa misturadas). Divida a turma em 2 times; o jogo mostra a pergunta, você revela a resposta e pontua Team A x Team B. Alterne os times a cada pergunta.</p>\n<h2 id=\"s4\">⏱️ 23-31 min | Guided Practice: Sentence Relay (slide 7)</h2>\n<p>Tabela pronta na tela com <b>8 cards (2 por aluno)</b>: emoji + verbo + tipo de frase (afirmativa/negativa/pergunta). Você só aponta para o card e o aluno já sabe exatamente o que produzir: zero espaço para travar ou ficar sem ideia. Exemplos do que esperar:</p>\n<ol><li>🍕 to eat · Affirmative → <i>I eat pizza.</i></li><li>🎨 to like · Negative → <i>I don't like Art.</i></li><li>⚽ to play · Question → <i>Do you play soccer?</i></li><li>🐶 to have · Affirmative → <i>I have a dog.</i></li><li>📚 to study · Negative → <i>I don't study Math.</i></li><li>🥤 to drink · Question → <i>Do you drink juice?</i></li><li>🎵 to like · Affirmative → <i>I like music.</i></li><li>🏀 to play · Question → <i>Do you play basketball?</i></li></ol>\n<h2 id=\"s5\">⏱️ 31-37 min | Change into Negatives (slide 8)</h2>\n<p>8 frases afirmativas na tela, misturando todos os verbos vistos até aqui, para cada aluno transformar em negativa na hora, em voz alta (2 por aluno). Cada frase tem um botãozinho <b>👁 Answer</b>: clique nele para revelar só a resposta daquela frase (e em 🙈 Hide para esconder), conferindo uma por uma conforme cada aluno responde. Respostas: She doesn't like Art · He doesn't play Soccer · They don't study English · She doesn't have a dog · He doesn't eat Pizza · They don't play Basketball · She doesn't drink Juice · He doesn't study Math.</p>\n<h2 id=\"s6\">⏱️ 37-43 min | Change into Interrogatives (slide 9)</h2>\n<p>Mais 8 frases, agora para transformar em pergunta com Do/Does (2 por aluno), com o mesmo botão <b>👁 Answer</b> em cada frase para conferir a resposta: Does she like Music? · Does he play Tennis? · Do they have a cat? · Does she study Science? · Does he eat Bread? · Do they drink Soda? · Does she play Volleyball? · Does he have a sister?</p>\n<h2 id=\"s7\">⏱️ 43-51 min | Interview Marathon (slides 10-11)</h2>\n<p>Versão ampliada do Interview Time da Aula 9: os alunos se entrevistam cobrindo o máximo de tópicos possível (nome, idade, país, comida, escola, esporte, família), da forma mais livre e independente possível. Depois do \"Get ready\", abra o cronômetro: a dupla toca em cada tópico quando perguntar sobre ele e tenta ir o mais longe possível sem parar. Se completar os 7 tópicos o jogo comemora.</p>\n<h2 id=\"s8\">⏱️ 51-58 min | Self-Assessment Tracker (slides 12-13)</h2>\n<p>Momento de autoavaliação, bem mais abrangente que categorias genéricas: 8 tópicos específicos (Greetings &amp; Introductions, Feelings &amp; Numbers, Countries &amp; Nationalities, Food &amp; Drinks, School Subjects, Sports, Family &amp; Pets, Grammar). Adicione o nome de cada aluno e, conforme eles forem falando como se sentem, arraste (ou toque) o emoji certo (😄 confiante / 😐 mais ou menos / 😟 precisa de ajuda) até a célula do tópico correspondente. No final, <b>tire um print da tela</b> para guardar a evolução da turma ao longo do tempo.</p>\n<h2 id=\"s9\">⏱️ 58-60 min | Encerramento (slide 14)</h2>\n<p>Finalize parabenizando a turma pelo progresso, <b>sem menção a nota ou prova</b>: só incentivo e celebração de como eles evoluíram desde a Aula 1.</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> essa review é sobre confiança e comunicação, não avaliação formal. Use o Self-Assessment Tracker para identificar exatamente em quais tópicos cada aluno precisa de mais apoio, e ajuste o ritmo das próximas aulas com base nisso.</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Review 1</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>

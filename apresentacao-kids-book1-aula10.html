@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 10 · My Daily Routine</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 10</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">KIDS ENGLISH · DAILY ROUTINE</div><h1>Talking About<br>My Daily Routine!</h1><div class="pill">⏰🪥🛏️ Routine · meals · AT + time</div></div></section>
+<section class="slide "><h2>🔢 Get ready: Number Game!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>A <b>number card</b> appears: hours, minutes, teens and tens.</div></div><div class="st"><span class="n">2</span><div>Say the number <b>in English</b>!</div></div><div class="st"><span class="n">3</span><div>Tap the card to check the answer. ✅</div></div><div class="st"><span class="n">4</span><div>Careful with <b>TEEN</b> vs <b>TY</b>: thirTEEN or thirTY? 👂</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🔢 Warm-up: Number Game</span><small>Let&#x27;s warm up our numbers!</small></div><iframe title="Warm-up: Number Game" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Number Blast · Warm-up Game&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; height:100%;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .wrap{
+    width:100%;
+    height:100%;
+    max-width:900px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+  }
+  .top-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+    max-width:640px;
+    margin-bottom:10px;
+  }
+  .counter{ font-weight:800; font-size:clamp(13px,2vw,16px); color:#888; }
+  .category-tag{
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(13px,2.2vw,17px);
+    color:#fff;
+    background:var(--blue);
+    padding:6px 16px;
+    border-radius:20px;
+  }
+  .card{
+    width:100%;
+    max-width:640px;
+    aspect-ratio:16/9;
+    border-radius:28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    cursor:pointer;
+    transition:transform .15s;
+    box-shadow:0 8px 0 rgba(0,0,0,.08);
+  }
+  .card:active{ transform:scale(.98); }
+  .clue{
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(80px,18vw,160px);
+    text-align:center;
+    padding:10px;
+    line-height:1.1;
+    color:var(--dark);
+  }
+  .answer{
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(30px,7.5vw,58px);
+    color:var(--dark);
+    text-align:center;
+    padding:20px;
+    display:none;
+  }
+  .card.revealed .clue{ display:none; }
+  .card.revealed .answer{ display:block; }
+  .tap-hint{
+    margin-top:6px;
+    font-size:clamp(12px,2vw,14px);
+    color:#999;
+    font-weight:700;
+  }
+  .controls{
+    display:flex;
+    gap:14px;
+    margin-top:18px;
+  }
+  .btn{
+    border:none;
+    border-radius:16px;
+    padding:14px 26px;
+    font-family:&#x27;Nunito&#x27;, sans-serif;
+    font-weight:900;
+    font-size:clamp(14px,2.4vw,18px);
+    cursor:pointer;
+    color:#fff;
+    background:var(--blue);
+  }
+  .btn.secondary{
+    background:#eee;
+    color:var(--dark);
+  }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;div class=&quot;top-row&quot;&gt;
+    &lt;div class=&quot;category-tag&quot; id=&quot;categoryTag&quot;&gt;CATEGORY&lt;/div&gt;
+    &lt;div class=&quot;counter&quot; id=&quot;counter&quot;&gt;1 / 30&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;card&quot; id=&quot;card&quot;&gt;
+    &lt;div class=&quot;clue&quot; id=&quot;clue&quot;&gt;&lt;/div&gt;
+    &lt;div class=&quot;answer&quot; id=&quot;answer&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;tap-hint&quot;&gt;👆 Tap the card to reveal the answer&lt;/div&gt;
+
+  &lt;div class=&quot;controls&quot;&gt;
+    &lt;button class=&quot;btn secondary&quot; id=&quot;shuffleBtn&quot;&gt;🔀 Shuffle&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;nextBtn&quot;&gt;Next ▶&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const CARD_COLORS = [&#x27;pink&#x27;,&#x27;mint&#x27;,&#x27;lavender&#x27;,&#x27;yellow&#x27;,&#x27;coral&#x27;,&#x27;blue&#x27;];
+
+function numToWords(n){
+  const ones = [&#x27;&#x27;,&#x27;One&#x27;,&#x27;Two&#x27;,&#x27;Three&#x27;,&#x27;Four&#x27;,&#x27;Five&#x27;,&#x27;Six&#x27;,&#x27;Seven&#x27;,&#x27;Eight&#x27;,&#x27;Nine&#x27;,&#x27;Ten&#x27;,
+    &#x27;Eleven&#x27;,&#x27;Twelve&#x27;,&#x27;Thirteen&#x27;,&#x27;Fourteen&#x27;,&#x27;Fifteen&#x27;,&#x27;Sixteen&#x27;,&#x27;Seventeen&#x27;,&#x27;Eighteen&#x27;,&#x27;Nineteen&#x27;];
+  const tens = [&#x27;&#x27;,&#x27;&#x27;,&#x27;Twenty&#x27;,&#x27;Thirty&#x27;,&#x27;Forty&#x27;,&#x27;Fifty&#x27;,&#x27;Sixty&#x27;,&#x27;Seventy&#x27;,&#x27;Eighty&#x27;,&#x27;Ninety&#x27;];
+  if(n &lt; 20) return ones[n];
+  const t = Math.floor(n/10), o = n%10;
+  return o === 0 ? tens[t] : `${tens[t]}-${ones[o].toLowerCase()}`;
+}
+
+const rounds = [];
+// Hours 1-12 (used to tell time)
+for(let n=1; n&lt;=12; n++) rounds.push({ cat: &#x27;Hours (1-12)&#x27;, n, answer: numToWords(n) });
+// Minutes by 5s (used to tell time)
+[5,10,15,20,25,30,35,40,45,50,55].forEach(n =&gt; rounds.push({ cat: &#x27;Minutes (by 5s)&#x27;, n, answer: numToWords(n) }));
+// Teen vs Ty contrast pairs (pronunciation practice — also appear in times!)
+[[13,30],[14,40],[15,50],[16,60],[17,70],[18,80],[19,90]].forEach(([teen,ty]) =&gt; {
+  rounds.push({ cat: &#x27;Teen vs Ty ⚡&#x27;, n: teen, answer: numToWords(teen) });
+  rounds.push({ cat: &#x27;Teen vs Ty ⚡&#x27;, n: ty, answer: numToWords(ty) });
+});
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+let order = shuffle(rounds);
+let index = 0;
+
+const cardEl = document.getElementById(&#x27;card&#x27;);
+const clueEl = document.getElementById(&#x27;clue&#x27;);
+const answerEl = document.getElementById(&#x27;answer&#x27;);
+const categoryTag = document.getElementById(&#x27;categoryTag&#x27;);
+const counter = document.getElementById(&#x27;counter&#x27;);
+
+function render(){
+  const item = order[index];
+  cardEl.classList.remove(&#x27;revealed&#x27;);
+  cardEl.style.background = `var(--${CARD_COLORS[index % CARD_COLORS.length]})`;
+  clueEl.textContent = item.n;
+  answerEl.textContent = item.answer;
+  categoryTag.textContent = item.cat.toUpperCase();
+  counter.textContent = `${index+1} / ${order.length}`;
+}
+
+cardEl.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  cardEl.classList.toggle(&#x27;revealed&#x27;);
+});
+
+document.getElementById(&#x27;nextBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  index = (index + 1) % order.length;
+  if(index === 0) order = shuffle(rounds);
+  render();
+});
+
+document.getElementById(&#x27;shuffleBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  order = shuffle(rounds);
+  index = 0;
+  render();
+});
+
+render();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Daily Routine</h2><p class="sub">Say the routine words with your teacher!</p><div class="row" style="padding-top:4px"><div class="card" style="background:#FFD97D;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">⏰</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Wake up</div><div class="sm" style="font-style:italic">Acordar</div></div><div class="card" style="background:#A8E6CF;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🛏️</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Get up</div><div class="sm" style="font-style:italic">Levantar</div></div><div class="card" style="background:#C9A8E8;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🪥</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Brush my teeth</div><div class="sm" style="font-style:italic">Escovar os dentes</div></div><div class="card" style="background:#FFB3A7;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🚿</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Take a shower</div><div class="sm" style="font-style:italic">Tomar banho</div></div><div class="card" style="background:#9fdcf2;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">👕</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Get dressed</div><div class="sm" style="font-style:italic">Se vestir</div></div><div class="card" style="background:#F2A7C3;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🎒</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Go to school</div><div class="sm" style="font-style:italic">Ir pra escola</div></div><div class="card" style="background:#FFD97D;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">📝</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Do homework</div><div class="sm" style="font-style:italic">Fazer lição</div></div><div class="card" style="background:#A8E6CF;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🛁</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Take a bath</div><div class="sm" style="font-style:italic">Tomar banho (noite)</div></div><div class="card" style="background:#C9A8E8;min-width:150px;flex:1 1 150px;min-height:150px"><div class="e">🌙</div><div class="val" style="font-size:clamp(14px,1.8vw,19px)">Go to bed</div><div class="sm" style="font-style:italic">Ir dormir</div></div></div></section>
+<section class="slide "><h2>Meals</h2><p class="sub">Say the meals with your teacher!</p><div class="row"><div class="card" style="background:#FFD97D"><div class="e">🍳</div><div class="val">Have breakfast</div><div class="sm" style="font-style:italic">Tomar café da manhã</div></div><div class="card" style="background:#A8E6CF"><div class="e">🍽️</div><div class="val">Have lunch</div><div class="sm" style="font-style:italic">Almoçar</div></div><div class="card" style="background:#C9A8E8"><div class="e">🍝</div><div class="val">Have dinner</div><div class="sm" style="font-style:italic">Jantar</div></div></div></section>
+<section class="slide "><div class="newtag">NEW! ✨</div><br><h2>AT + TIME</h2><p class="sub">We use AT before the time!</p><div class="qa"><div class="card" style="background:#9fdcf2"><div class="e">⏰</div><div class="val">at 7 o'clock</div></div><div class="card" style="background:#A8E6CF"><div class="e">🍳</div><div class="val">I have breakfast at 7.</div></div><div class="card" style="background:#C9A8E8"><div class="e">🌙</div><div class="val">He goes to bed at 9.</div></div></div></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>✅ Positive sentence &nbsp; ❌ Negative sentence</p><p>Remember: <b>at + time</b> (at 7, at 8:30...)</p></div></section>
+<section class="slide "><h2>Do / Does</h2><p class="sub">Questions about our routine</p><div class="qa"><div class="card" style="background:#FFD97D"><div class="e">🍳</div><div class="val">Do you have breakfast at home?</div></div><div class="card" style="background:#F2A7C3"><div class="e">🍝</div><div class="val">Does he have dinner with his family?</div></div></div></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>❓ Question</p><p>Remember: <b>Do</b> you... ? <b>Does</b> he/she... ?</p></div></section>
+<section class="slide "><h2>🌀 Get ready: Routine Remix Wheel!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Two reels spin: a <b>routine sentence</b> and a <b>twist</b>.</div></div><div class="st"><span class="n">2</span><div>The twist is <b>Negative ❌</b> or <b>Question ❓</b>.</div></div><div class="st"><span class="n">3</span><div>Change the sentence and say it <b>out loud</b>!</div></div><div class="st"><span class="n">4</span><div>Then it's the next student's turn!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🌀 Communicative Activity: Routine Remix Wheel</span><small>Spin for a sentence + a twist!</small></div><iframe title="Communicative Activity: Routine Remix Wheel" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Routine Remix Wheel&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+    --brown1:#7A4A2B;
+    --brown2:#5A331B;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100%;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:16px 16px 40px; }
+
+  header{
+    background:linear-gradient(135deg, var(--brown1), var(--brown2));
+    color:#fff; text-align:center; padding:18px 16px; border-radius:20px; margin-bottom:18px;
+  }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-size:clamp(20px,3.4vw,30px); font-weight:900; margin:0; }
+  header .sub{ font-size:clamp(12px,1.8vw,15px); opacity:.9; margin-top:4px; }
+
+  .round-badge{
+    text-align:center; font-weight:900; font-family:&#x27;Nunito&#x27;,sans-serif; color:var(--blue);
+    font-size:15px; margin-bottom:10px;
+  }
+
+  .machine{
+    background:var(--dark);
+    border-radius:26px;
+    padding:18px;
+    display:flex;
+    gap:14px;
+    margin-bottom:20px;
+  }
+  .reel-box{
+    flex:1;
+    background:#fff;
+    border-radius:16px;
+    min-height:130px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:14px;
+    overflow:hidden;
+  }
+  .reel-box.sentence{ flex:1.4; }
+  .reel-text{
+    font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900;
+    font-size:clamp(16px,3.6vw,22px);
+    color:var(--dark);
+  }
+  .reel-text.twist{ font-size:clamp(20px,4.4vw,26px); }
+  .reel-label{
+    position:absolute;
+  }
+
+  .spin-row{ display:flex; justify-content:center; margin-bottom:18px; }
+  .spin-btn{
+    border:none;
+    border-radius:20px;
+    padding:18px 46px;
+    font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900;
+    font-size:clamp(18px,3.6vw,24px);
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+    box-shadow:0 6px 0 rgba(0,0,0,.15);
+  }
+  .spin-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
+  .spin-btn:disabled{ opacity:.5; cursor:default; }
+
+  .challenge-card{
+    display:none;
+    background:var(--yellow);
+    border-radius:20px;
+    padding:22px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .challenge-card.show{ display:block; }
+  .challenge-card .go{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:20px; margin-bottom:6px; }
+  .challenge-card .instructions{ font-size:15px; font-weight:700; color:#555; }
+
+  .answer-card{
+    display:none;
+    background:var(--mint);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    font-weight:800;
+    font-size:18px;
+    margin-bottom:16px;
+  }
+  .answer-card.show{ display:block; }
+
+  .controls{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn{
+    border:none;
+    border-radius:14px;
+    padding:12px 22px;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    background:var(--blue);
+    color:#fff;
+  }
+  .btn.secondary{ background:#eee; color:var(--dark); }
+  .btn:disabled{ opacity:.5; cursor:default; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;🌀 Routine Remix Wheel&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Spin for a sentence + a twist — then say it out loud!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;Round 1&lt;/div&gt;
+
+  &lt;div class=&quot;machine&quot;&gt;
+    &lt;div class=&quot;reel-box sentence&quot;&gt;
+      &lt;div class=&quot;reel-text&quot; id=&quot;sentenceReel&quot;&gt;Tap SPIN!&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;reel-box&quot;&gt;
+      &lt;div class=&quot;reel-text twist&quot; id=&quot;twistReel&quot;&gt;🎲&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;spin-row&quot;&gt;
+    &lt;button class=&quot;spin-btn&quot; id=&quot;spinBtn&quot;&gt;🎰 SPIN!&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;challenge-card&quot; id=&quot;challengeCard&quot;&gt;
+    &lt;div class=&quot;go&quot;&gt;Your turn! 🙋&lt;/div&gt;
+    &lt;div class=&quot;instructions&quot; id=&quot;challengeText&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;answer-card&quot; id=&quot;answerCard&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;controls&quot;&gt;
+    &lt;button class=&quot;btn secondary&quot; id=&quot;revealBtn&quot; disabled&gt;💡 Show Answer&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;nextBtn&quot; disabled&gt;Next Student ▶&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const sentences = [
+  { text: &#x27;He has breakfast at 7.&#x27;, neg: &quot;He doesn&#x27;t have breakfast at 7.&quot;, q: &#x27;Does he have breakfast at 7?&#x27; },
+  { text: &#x27;She has lunch at school.&#x27;, neg: &quot;She doesn&#x27;t have lunch at school.&quot;, q: &#x27;Does she have lunch at school?&#x27; },
+  { text: &#x27;He wakes up at 7.&#x27;, neg: &quot;He doesn&#x27;t wake up at 7.&quot;, q: &#x27;Does he wake up at 7?&#x27; },
+  { text: &#x27;She goes to bed at 9.&#x27;, neg: &quot;She doesn&#x27;t go to bed at 9.&quot;, q: &#x27;Does she go to bed at 9?&#x27; },
+  { text: &#x27;He brushes his teeth at 7.&#x27;, neg: &quot;He doesn&#x27;t brush his teeth at 7.&quot;, q: &#x27;Does he brush his teeth at 7?&#x27; },
+  { text: &#x27;She takes a shower at 8.&#x27;, neg: &quot;She doesn&#x27;t take a shower at 8.&quot;, q: &#x27;Does she take a shower at 8?&#x27; },
+  { text: &#x27;He does homework at 6.&#x27;, neg: &quot;He doesn&#x27;t do homework at 6.&quot;, q: &#x27;Does he do homework at 6?&#x27; },
+  { text: &#x27;She has dinner at 8.&#x27;, neg: &quot;She doesn&#x27;t have dinner at 8.&quot;, q: &#x27;Does she have dinner at 8?&#x27; },
+  { text: &#x27;He gets dressed at 7.&#x27;, neg: &quot;He doesn&#x27;t get dressed at 7.&quot;, q: &#x27;Does he get dressed at 7?&#x27; },
+  { text: &#x27;She goes to school at 8.&#x27;, neg: &quot;She doesn&#x27;t go to school at 8.&quot;, q: &#x27;Does she go to school at 8?&#x27; }
+];
+const twists = [
+  { label: &#x27;🔄 NEGATIVE!&#x27;, key: &#x27;neg&#x27; },
+  { label: &#x27;❓ QUESTION!&#x27;, key: &#x27;q&#x27; }
+];
+
+let round = 1;
+let currentSentence = null;
+let currentTwist = null;
+let spinning = false;
+
+const sentenceReel = document.getElementById(&#x27;sentenceReel&#x27;);
+const twistReel = document.getElementById(&#x27;twistReel&#x27;);
+const spinBtn = document.getElementById(&#x27;spinBtn&#x27;);
+const challengeCard = document.getElementById(&#x27;challengeCard&#x27;);
+const challengeText = document.getElementById(&#x27;challengeText&#x27;);
+const answerCard = document.getElementById(&#x27;answerCard&#x27;);
+const revealBtn = document.getElementById(&#x27;revealBtn&#x27;);
+const nextBtn = document.getElementById(&#x27;nextBtn&#x27;);
+const roundBadge = document.getElementById(&#x27;roundBadge&#x27;);
+
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function spinReel(el, pool, getLabel, duration, finalItem, onDone){
+  const start = Date.now();
+  let delay = 60;
+  function tick(){
+    const elapsed = Date.now() - start;
+    if(elapsed &gt;= duration){
+      el.textContent = getLabel(finalItem);
+      onDone();
+      return;
+    }
+    el.textContent = getLabel(randomItem(pool));
+    delay = 60 + (elapsed / duration) * 140;
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
+spinBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  if(spinning) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  revealBtn.disabled = true;
+  nextBtn.disabled = true;
+  challengeCard.classList.remove(&#x27;show&#x27;);
+  answerCard.classList.remove(&#x27;show&#x27;);
+
+  currentSentence = randomItem(sentences);
+  currentTwist = randomItem(twists);
+
+  let doneCount = 0;
+  function checkBothDone(){
+    doneCount++;
+    if(doneCount === 2){
+      spinning = false;
+      spinBtn.disabled = false;
+      revealBtn.disabled = false;
+      nextBtn.disabled = false;
+      challengeText.textContent = `&quot;${currentSentence.text}&quot;  →  ${currentTwist.label}`;
+      challengeCard.classList.add(&#x27;show&#x27;);
+    }
+  }
+
+  spinReel(sentenceReel, sentences, s =&gt; s.text, 1400, currentSentence, checkBothDone);
+  spinReel(twistReel, twists, t =&gt; t.label, 1100, currentTwist, checkBothDone);
+});
+
+revealBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  if(!currentSentence || !currentTwist) return;
+  answerCard.textContent = currentSentence[currentTwist.key];
+  answerCard.classList.add(&#x27;show&#x27;);
+});
+
+nextBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  round++;
+  roundBadge.textContent = `Round ${round}`;
+  challengeCard.classList.remove(&#x27;show&#x27;);
+  answerCard.classList.remove(&#x27;show&#x27;);
+  sentenceReel.textContent = &#x27;Tap SPIN!&#x27;;
+  twistReel.textContent = &#x27;🎲&#x27;;
+  revealBtn.disabled = true;
+  nextBtn.disabled = true;
+});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>⏰ Get ready: My Morning Routine!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Tap the button: a <b>clock</b> shows a time.</div></div><div class="st"><span class="n">2</span><div>Tell the group what <b>YOU</b> do at that time.</div></div><div class="st"><span class="n">3</span><div>Use <b>at</b> + the time. Use a <b>meal</b> if you can! 🍳</div></div><div class="st"><span class="n">4</span><div>Then it's the next student's turn!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>⏰ My Morning Routine: Time Clock</span><small>Tell us what you do at this time!</small></div><iframe title="My Morning Routine: Time Clock" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--blue:#5BC4E8;--dark:#3A3A3A}*{box-sizing:border-box}
+html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{display:flex;gap:26px;flex-wrap:wrap;justify-content:center;align-items:center;padding:10px 14px 20px}
+.clock{width:min(80vw,320px,56vh);height:min(80vw,320px,56vh);position:relative;border-radius:50%;background:#fff;border:10px solid #FFD97D;box-shadow:0 6px 18px #0003}
+.clock svg{width:100%;height:100%}
+.side{flex:1;min-width:250px;max-width:440px;display:flex;flex-direction:column;gap:12px;text-align:center}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.names input{width:92px;border:2px solid #C9A8E8;border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.card{background:#fff;border-radius:22px;box-shadow:0 6px 18px #0002;padding:16px}
+.dig{font-family:Nunito;font-weight:900;font-size:clamp(40px,8vw,64px);color:var(--blue)}
+.when{font-size:34px}.q{font-weight:800;font-size:clamp(15px,2.2vw,20px);margin-top:6px}
+.who{font-family:Nunito;font-weight:900;color:#e0719c;min-height:26px}
+.btn{border:none;border-radius:22px;padding:14px 26px;font-family:Nunito;font-weight:900;font-size:20px;cursor:pointer;background:var(--blue);color:#fff;box-shadow:0 5px 0 #0002}
+.cnt{font-weight:900;color:#888;font-family:Nunito}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;clock&quot; id=&quot;clock&quot;&gt;&lt;svg viewBox=&quot;-100 -100 200 200&quot; id=&quot;svg&quot;&gt;&lt;/svg&gt;&lt;/div&gt;
+&lt;div class=&quot;side&quot;&gt;&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input placeholder=&quot;Student 1&quot;&gt;&lt;input placeholder=&quot;Student 2&quot;&gt;&lt;input placeholder=&quot;Student 3&quot;&gt;&lt;input placeholder=&quot;Student 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;who&quot; id=&quot;who&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;card&quot;&gt;&lt;div class=&quot;when&quot; id=&quot;when&quot;&gt;⏰&lt;/div&gt;&lt;div class=&quot;dig&quot; id=&quot;dig&quot;&gt;?:??&lt;/div&gt;&lt;div class=&quot;q&quot; id=&quot;q&quot;&gt;Tap the button to see the time!&lt;/div&gt;&lt;/div&gt;
+&lt;button class=&quot;btn&quot; id=&quot;go&quot;&gt;⏰ Show me a time!&lt;/button&gt;&lt;div class=&quot;cnt&quot; id=&quot;cnt&quot;&gt;Sentences said: 0&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;script&gt;
+var TIMES=[[6,30,&#x27;am&#x27;],[7,0,&#x27;am&#x27;],[7,30,&#x27;am&#x27;],[8,0,&#x27;am&#x27;],[12,0,&#x27;pm&#x27;],[12,30,&#x27;pm&#x27;],[1,0,&#x27;pm&#x27;],[3,30,&#x27;pm&#x27;],[5,0,&#x27;pm&#x27;],[6,30,&#x27;pm&#x27;],[7,0,&#x27;pm&#x27;],[8,30,&#x27;pm&#x27;],[9,0,&#x27;pm&#x27;]];
+var svg=document.getElementById(&#x27;svg&#x27;),s=&#x27;&#x27;;
+for(var i=1;i&lt;=12;i++){var a=(i*30-90)*Math.PI/180;s+=&#x27;&lt;text x=&quot;&#x27;+(Math.cos(a)*76)+&#x27;&quot; y=&quot;&#x27;+(Math.sin(a)*76+7)+&#x27;&quot; text-anchor=&quot;middle&quot; font-family=&quot;Nunito&quot; font-weight=&quot;900&quot; font-size=&quot;20&quot; fill=&quot;#3A3A3A&quot;&gt;&#x27;+i+&#x27;&lt;/text&gt;&#x27;;}
+s+=&#x27;&lt;line id=&quot;hh&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;0&quot; y2=&quot;-44&quot; stroke=&quot;#3A3A3A&quot; stroke-width=&quot;7&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;line id=&quot;mh&quot; x1=&quot;0&quot; y1=&quot;0&quot; x2=&quot;0&quot; y2=&quot;-64&quot; stroke=&quot;#e0719c&quot; stroke-width=&quot;5&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;circle r=&quot;6&quot; fill=&quot;#3A3A3A&quot;/&gt;&#x27;;
+svg.innerHTML=s;
+var last=-1,n=0,turn=0,seen=[];
+function nm(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
+document.getElementById(&#x27;go&#x27;).addEventListener(&#x27;click&#x27;,function(){
+ var k;do{k=Math.floor(Math.random()*TIMES.length);}while(k===last);last=k;var t=TIMES[k];
+ document.getElementById(&#x27;hh&#x27;).setAttribute(&#x27;transform&#x27;,&#x27;rotate(&#x27;+(((t[0]%12)+t[1]/60)*30)+&#x27;)&#x27;);document.getElementById(&#x27;mh&#x27;).setAttribute(&#x27;transform&#x27;,&#x27;rotate(&#x27;+(t[1]*6)+&#x27;)&#x27;);
+ document.getElementById(&#x27;dig&#x27;).textContent=t[0]+&#x27;:&#x27;+(t[1]&lt;10?&#x27;0&#x27;:&#x27;&#x27;)+t[1];
+ document.getElementById(&#x27;when&#x27;).textContent=t[2]===&#x27;am&#x27;?&#x27;☀️&#x27;:(t[0]&gt;=6&amp;&amp;t[0]&lt;12?&#x27;🌙&#x27;:(t[0]&gt;=6?&#x27;🌙&#x27;:&#x27;🌤️&#x27;));
+ if(t[2]===&#x27;pm&#x27;&amp;&amp;t[0]&gt;=6)document.getElementById(&#x27;when&#x27;).textContent=&#x27;🌙&#x27;;
+ document.getElementById(&#x27;q&#x27;).innerHTML=&#x27;What do you do at this time?&lt;br&gt;Say a true sentence with &lt;b&gt;at&lt;/b&gt;! 🍳🍽️🍝🛏️&#x27;;
+ var N=nm();document.getElementById(&#x27;who&#x27;).textContent=N.length?&#x27;👉 &#x27;+N[turn%N.length]+&#x27; is up! 🎤&#x27;:&#x27;&#x27;;turn++;n++;document.getElementById(&#x27;cnt&#x27;).textContent=&#x27;Sentences said: &#x27;+n;this.textContent=&#x27;⏰ Next time!&#x27;;});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Fill in the Gaps</h2><p class="sub">Complete the sentences. Say your answers out loud!</p><div class="linkcard" style="max-width:820px;text-align:left"><div class="gaps"><p>Ex.: She has (have) breakfast at 7</p><p>1 – He <b>has</b> (have) lunch at school</p><p>2 – She <b>doesn't have</b> (not have) dinner at home</p><p>3 – <b>Do</b> you have breakfast at home?</p><p>4 – <b>Does</b> he have dinner with his family?</p><p>5 – They <b>have</b> (have) breakfast at 8</p></div><button class="mini showans">👀 Show / hide answers</button></div></section>
+<section class="slide "><h2>Now it's your turn! 🙌</h2><p class="sub">Tell a friend:</p><div class="linkcard"><div class="e">💬</div><div class="big2">What time do you have dinner?</div><p style="font-style:italic;color:#666">"I have dinner at... / I don't have..."</p><p>📚 Homework: go to the platform to practice daily routine, meals and questions!</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Lesson 10 · Talking About My Daily Routine</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Warm-up</a> · <a href=\"#s3\">Daily Routine</a> · <a href=\"#s4\">Meals</a> · <a href=\"#s5\">AT + time</a> · <a href=\"#s6\">Drills 1</a> · <a href=\"#s7\">Do / Does</a> · <a href=\"#s8\">Drills 2</a> · <a href=\"#s9\">Remix Wheel</a> · <a href=\"#s10\">Morning Routine</a> · <a href=\"#s11\">Fill in the Gaps</a> · <a href=\"#s12\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li>Primeira aula de um novo bloco, focado em <b>rotina</b>.</li><li><b>Revisão (warm-up):</b> numbers, especificamente horas (1-12) e minutos (de 5 em 5), a base para falar de horários.</li><li><b>Novo:</b> vocabulário de rotina diária e refeições, e o <b>AT</b> antes do horário (novidade da aula). Do/Does (visto na Aula 8) é revisado aplicado à rotina.</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-3</td><td>1</td><td>Abertura</td></tr><tr><td>3-11</td><td>2-3</td><td>Warm-up: Number Game</td></tr><tr><td>11-18</td><td>4</td><td>Daily Routine</td></tr><tr><td>18-22</td><td>5</td><td>Meals</td></tr><tr><td>22-27</td><td>6</td><td>AT + Time</td></tr><tr><td>27-34</td><td>7</td><td>Drills: afirmativa e negativa</td></tr><tr><td>34-38</td><td>8</td><td>Do / Does</td></tr><tr><td>38-42</td><td>9</td><td>Drills: interrogativa</td></tr><tr><td>42-48</td><td>10-11</td><td>Routine Remix Wheel</td></tr><tr><td>48-54</td><td>12-13</td><td>My Morning Routine (Time Clock)</td></tr><tr><td>54-58</td><td>14</td><td>Fill in the Gaps</td></tr><tr><td>58-60</td><td>15</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes de cada jogo há um slide \"Get ready\" para as crianças entenderem as regras. Leia com elas e depois clique em \"Ready? Let's play!\".</div>\n<h2 id=\"s1\">⏱️ 0-3 min | Abertura (slide 1)</h2>\n<p>Cumprimente a turma em inglês, pergunte \"How are you today?\" e apresente o tema: \"Today we talk about <b>our daily routine</b>!\"</p>\n<h2 id=\"s2\">⏱️ 3-11 min | Warm-up: Number Game (slides 2-3)</h2>\n<p>Comece com o joguinho de revisão de numbers, focado em <b>horas (1-12)</b> e <b>minutos (de 5 em 5)</b>, a base para falar de horários. Depois do \"Get ready\", compartilhe a tela. São cartas com números (horas 1-12, minutos de 5 em 5 e os pares TEEN x TY): mostre a carta, o aluno da vez diz o número em inglês e você toca na carta para revelar a resposta. Passe de aluno em aluno. Comemore acertos e repita os números que errarem, exagerando o TEEN x TY.</p>\n<h2 id=\"s3\">⏱️ 11-18 min | Daily Routine (slide 4)</h2>\n<p>Apresente o vocabulário de rotina diária: Wake up, Get up, Brush my teeth, Take a shower, Get dressed, Go to school, Do homework, Take a bath, Go to bed. Para cada item, leia em voz alta, peça repetição coral e pergunte a 1 aluno \"Do you ... ?\" para ancorar na vida real. Use gestos para ajudar a memorizar.</p>\n<h2 id=\"s4\">⏱️ 18-22 min | Meals (slide 5)</h2>\n<p>Apresente as refeições: Have breakfast, Have lunch, Have dinner. Aqui reaproveitamos o <b>\"have\"</b> já visto na Aula 8, agora aplicado a rotina e comida juntos.</p>\n<h2 id=\"s5\">⏱️ 22-27 min | AT + Time, novidade da aula (slide 6)</h2>\n<p>Destaque próprio para introduzir <b>\"at\" antes do horário</b>: <i>at 7 o'clock</i>, <i>I have breakfast at 7</i>, <i>He goes to bed at 9</i>. É a mesma lógica do \"for\" + refeição da Aula 4, agora com horários. Leia os exemplos em coro e peça para os alunos apontarem onde está o \"at\".</p>\n<h2 id=\"s6\">⏱️ 27-34 min | Prática de comunicação: drills afirmativa e negativa (slide 7)</h2>\n<p>Mostre o slide \"Speaking Time\" (sem nenhuma frase de drill) e conduza os drills oralmente, do <b>português para o inglês</b>, um aluno por vez.</p>\n<h3>Drills orais (somente professora)</h3>\n<p>Cada drill é <b>uma frase + 2 substituições</b>. São <b>2 frases por aluno</b>, uma afirmativa e uma negativa (4 alunos = 4 + 4). Nas afirmativas a substituição é o <b>horário</b>; nas negativas é o <b>sujeito</b>, para praticar don't x doesn't. Respostas em letra pequena.</p>\n<p><b>Afirmativas</b></p>\n<ol><li>Eu tomo café da manhã às 7 / às 7:30 / às 8<br><small>I have breakfast at 7. I have breakfast at 7:30. I have breakfast at 8.</small></li><li>Ela acorda às 6:30 / às 7 / às 8<br><small>She wakes up at 6:30. She wakes up at 7. She wakes up at 8.</small></li><li>Ele almoça na escola às 12 / às 12:30 / à 1<br><small>He has lunch at school at 12. He has lunch at school at 12:30. He has lunch at school at 1.</small></li><li>Nós jantamos em casa às 7 / às 7:30 / às 8<br><small>We have dinner at home at 7. We have dinner at home at 7:30. We have dinner at home at 8.</small></li></ol>\n<p><b>Negativas</b></p>\n<ol><li>Eu não vou para a cama cedo / ela / eles<br><small>I don't go to bed early. She doesn't go to bed early. They don't go to bed early.</small></li><li>Ele não faz lição de casa às 6 / eu / nós<br><small>He doesn't do homework at 6. I don't do homework at 6. We don't do homework at 6.</small></li><li>Ela não toma banho de banheira às 8 / eles / eu<br><small>She doesn't take a bath at 8. They don't take a bath at 8. I don't take a bath at 8.</small></li><li>Eles não tomam café da manhã às 6 / ela / você<br><small>They don't have breakfast at 6. She doesn't have breakfast at 6. You don't have breakfast at 6.</small></li></ol>\n<p>Se errarem o -s de he/she ou esquecerem o \"at\", corrija na hora e peça para repetir a frase certa.</p>\n<h2 id=\"s7\">⏱️ 34-38 min | Do / Does (slide 8)</h2>\n<p>Revisão da estrutura interrogativa (vista na Aula 8), aplicada a rotina: <i>\"Do you have breakfast at home?\"</i>, <i>\"Does he have dinner with his family?\"</i> Lembre que com <b>does</b> o verbo volta ao normal, sem -s.</p>\n<h2 id=\"s8\">⏱️ 38-42 min | Prática: drills interrogativa (slide 9)</h2>\n<p>Mostre novamente o \"Speaking Time\" e faça 4 perguntas, uma por aluno (frase + 2 substituições de sujeito). Peça a resposta curta depois: <i>Yes, I do. / No, she doesn't.</i></p>\n<ol><li>Você toma café da manhã em casa? / ela / eles<br><small>Do you have breakfast at home? Does she have breakfast at home? Do they have breakfast at home?</small></li><li>Ele janta com a família? / você / elas<br><small>Does he have dinner with his family? Do you have dinner with your family? Do they have dinner with their family?</small></li><li>Você acorda às 7? / ela / eles<br><small>Do you wake up at 7? Does she wake up at 7? Do they wake up at 7?</small></li><li>Ela almoça na escola? / você / ele<br><small>Does she have lunch at school? Do you have lunch at school? Does he have lunch at school?</small></li></ol>\n<h2 id=\"s9\">⏱️ 42-48 min | Routine Remix Wheel (slides 10-11)</h2>\n<p>Atividade em formato de jogo (caça-níquel). Depois do \"Get ready\", compartilhe a tela: dois \"rolos\" giram, um sorteia uma <b>frase de rotina</b> e o outro sorteia o <b>desafio</b> (Negative ou Question). O aluno da vez responde na hora, em voz alta; você pode revelar a resposta certa se precisar. Passe a vez com \"Next Student\". Cada rodada traz uma frase e um desafio novos e aleatórios, mantendo a turma engajada sem repetir o mesmo formato.</p>\n<h2 id=\"s10\">⏱️ 48-54 min | Produção: My Morning Routine (slides 12-13)</h2>\n<p>Depois do \"Get ready\", abra o Time Clock. Digite os nomes dos alunos para indicar a vez. O relógio mostra um horário (analógico e digital, com sol ou lua) e <b>só isso</b>: o aluno conta, do jeito mais livre possível, o que faz naquele horário usando <b>at</b> e, se quiser, uma refeição (\"I wake up at 7. I have breakfast at 7:30. I go to school at 8.\"). Pode usar mais de uma frase. Incentive frases verdadeiras e pessoais.</p>\n<h2 id=\"s11\">⏱️ 54-58 min | Fill in the Gaps (slide 14)</h2>\n<p>Fechamento misturando have/has, negativa e interrogativa com horários. Peça para os alunos completarem oralmente cada lacuna; só depois clique em \"Show answers\" para conferir. Respostas: has · has · doesn't have · Do · Does · have.</p>\n<h2 id=\"s12\">⏱️ 58-60 min | Encerramento (slide 15)</h2>\n<p>Os alunos perguntam ao colega \"What time do you have dinner?\" e respondem \"I have dinner at... / I don't have...\". Explique que o homework (vocabulário de rotina com um jogo de organizar por período do dia, relógio interativo, gravação da própria rotina e quiz) já está na plataforma.</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> o \"at\" + horário é o ponto novo; repita-o em todas as etapas. Os drills partem do português para os alunos aprenderem a montar frases sozinhos. Alterne fala, escuta e repetição a cada 5-7 minutos.</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 10</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>

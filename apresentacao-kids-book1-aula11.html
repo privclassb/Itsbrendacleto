@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lesson 11 · Days of the Week</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&family=Nunito+Sans:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--pink:#F2A7C3;--mint:#A8E6CF;--lav:#C9A8E8;--yel:#FFD97D;--cor:#FFB3A7;--blue:#5BC4E8;--dark:#3A3A3A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;font-family:'Nunito Sans',sans-serif;color:var(--dark);background:#fff;overflow:hidden}
+body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0deg,#e8e8e8 0 1px,transparent 1px 36px),repeating-linear-gradient(90deg,#e8e8e8 0 1px,transparent 1px 36px)}
+.blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
+.b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
+.top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
+.ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
+.stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
+.slide{position:absolute;inset:0;display:none;padding:18px 6vw;overflow:auto}
+.slide.on{display:block}
+.slide h2{font-family:'Arial Black','Nunito',sans-serif;font-weight:900;font-size:clamp(24px,4.2vw,40px);margin:8px 0 4px}
+.sub{font-size:clamp(14px,2vw,19px);margin:0 0 20px;color:#555}
+.cover{height:100%;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.cover .emo{font-size:clamp(30px,5vw,50px)}.cover .kick{color:var(--cor);font-weight:900;letter-spacing:2px;font-size:15px}
+.cover h1{font-family:'Arial Black','Nunito',sans-serif;font-size:clamp(40px,9vw,96px);line-height:1.02;margin:0;color:var(--blue)}
+.pill{align-self:flex-start;background:var(--pink);color:#fff;font-weight:900;padding:12px 24px;border-radius:30px;font-size:clamp(14px,2vw,18px)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;max-width:1000px}
+.c{border-radius:22px;padding:22px 14px;text-align:center;display:flex;flex-direction:column;gap:8px;min-height:230px}.c .e{font-size:54px}.c b{font-family:Nunito;font-weight:900;font-size:20px}.c span{font-size:15px}
+.box{background:#fff;border-radius:22px;padding:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);max-width:900px}
+.box.center{text-align:center}.big{font-size:clamp(50px,9vw,90px)}.lg{font-weight:900;font-size:clamp(18px,3vw,26px);font-family:Nunito}.lg2 p{font-weight:900;font-size:clamp(17px,2.8vw,26px);font-family:Nunito;margin:12px 0}
+.ideas{font-weight:800;font-size:clamp(15px,2.4vw,22px);line-height:1.9;text-align:center;margin-bottom:18px}
+.tn{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}.tn label{font-weight:900;font-family:Nunito;font-size:14px;display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.tn input{border:3px solid var(--blue);border-radius:14px;padding:12px;font-size:20px;font-weight:900;font-family:Nunito;text-align:center}
+.slide.game{padding:0;display:none;flex-direction:column}.slide.game.on{display:flex}
+.gh{padding:6px 14px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;background:#ffffffcc}.gh span{font-family:Nunito;font-weight:900;font-size:17px}.gh small{color:#777}
+.slide.game iframe{flex:1;border:0;width:100%;background:transparent}
+.bot{position:fixed;left:0;right:0;bottom:0;height:56px;display:flex;align-items:center;justify-content:space-between;gap:8px;z-index:20;background:#ffffffd9;padding:0 10px}
+.nav{border:none;background:var(--blue);color:#fff;border-radius:18px;padding:10px 26px;font-weight:900;font-family:Nunito;font-size:16px;cursor:pointer;box-shadow:0 4px 0 rgba(0,0,0,.12);flex:none}.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0}.dots::-webkit-scrollbar{display:none}.dots i{width:10px;height:10px;border-radius:50%;background:#ddd;cursor:pointer;display:block;flex:none}.dots i.on{background:var(--pink);transform:scale(1.3)}
+.steps{display:flex;flex-direction:column;gap:12px;max-width:820px}
+.st{display:flex;gap:14px;align-items:center;background:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 4px 12px rgba(0,0,0,.08);font-size:clamp(15px,2.3vw,22px);font-weight:700}
+.st .n{flex:none;width:38px;height:38px;border-radius:50%;background:var(--blue);color:#fff;font-family:Nunito;font-weight:900;display:flex;align-items:center;justify-content:center}
+.st:nth-child(2) .n{background:var(--pink)}.st:nth-child(3) .n{background:var(--lav)}.st:nth-child(4) .n{background:var(--cor)}
+.go{margin-top:18px;border:none;background:var(--mint);color:var(--dark);border-radius:22px;padding:14px 30px;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.12)}
+
+.row{display:flex;gap:14px;flex-wrap:wrap;max-width:1100px}.row>.card{flex:1;min-width:150px;min-height:210px}
+.card{border-radius:22px;padding:18px 14px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;position:relative}
+.card .lab{font-size:12px;font-weight:900;letter-spacing:1.5px;color:#666;text-transform:uppercase;font-family:Nunito}
+.card .val{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(17px,2.3vw,24px)}
+.card .e{font-size:clamp(34px,5vw,54px)}.card .sm{font-size:15px}
+.card.new{outline:4px solid var(--dark)}.card .newb{position:absolute;top:-13px;background:var(--dark);color:#fff;font-size:12px;font-weight:900;border-radius:12px;padding:3px 12px}
+.newtag{display:inline-block;background:var(--yel);font-weight:900;font-family:Nunito;padding:6px 18px;border-radius:20px;margin-bottom:4px}
+.qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;max-width:1000px}
+.qa .card{padding:22px 16px;gap:10px;min-height:230px}
+.big2{font-family:'Arial Black',Nunito;font-weight:900;font-size:clamp(18px,2.8vw,28px);text-align:center;margin:14px 0}
+.big3{font-weight:800;font-style:italic;font-size:clamp(18px,2.8vw,28px);color:var(--blue);text-align:center;margin:8px 0}
+.linkcard{background:#fff;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.1);padding:26px;max-width:760px;text-align:center}
+.linkcard .e{font-size:clamp(56px,9vw,90px)}.linkcard p{font-weight:800;font-size:18px}
+a.btn{display:inline-block;background:var(--blue);color:#fff;text-decoration:none;font-family:Nunito;font-weight:900;font-size:clamp(16px,2.4vw,22px);padding:14px 32px;border-radius:30px;box-shadow:0 5px 0 rgba(0,0,0,.14)}
+.vid{width:100%;max-width:900px;aspect-ratio:16/9;border:0;border-radius:18px;background:#000}
+table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}.tb th{background:var(--blue);color:#fff;padding:10px;border-radius:12px;font-family:Nunito}.tb td{background:#fff;padding:10px;border-radius:12px;font-weight:700;text-align:center;box-shadow:0 2px 6px rgba(0,0,0,.07)}
+.tb td.ck{cursor:pointer;font-size:24px;user-select:none}.tb td.ed{min-width:90px}
+.gaps b{display:inline-block;min-width:80px;border-bottom:3px solid var(--blue);text-align:center;color:transparent}.gaps.show b{color:var(--blue)}
+.mini{margin-top:12px;border:none;background:var(--yel);border-radius:16px;padding:8px 18px;font-family:Nunito;font-weight:900;cursor:pointer}
+#notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
+#notes.show{display:block}#notes b{font-family:Nunito}
+@media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+</style></head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 11</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="stage" id="stage">
+<section class="slide "><div class="cover"><div class="emo"></div><div class="kick">KIDS ENGLISH · WEEK BLOCK</div><h1>Days of<br>the Week!</h1><div class="pill">📅 Vocabulary + "ON" before days</div></div></section>
+<section class="slide "><h2>🏃 Get ready: Routine Race!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>You see a <b>hint</b> in Portuguese.</div></div><div class="st"><span class="n">2</span><div>Your team says the word <b>in English</b>.</div></div><div class="st"><span class="n">3</span><div>Right answer = your runner <b>moves forward</b>! 🏃💨</div></div><div class="st"><span class="n">4</span><div>The first team to cross the finish line wins!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🏃 Warm-up: Routine Race</span><small>Let&#x27;s remember our daily routine vocabulary!</small></div><iframe title="Warm-up: Routine Race" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Routine Race&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wrap{ width:100%; max-width:860px; padding:18px 16px 40px; }
+
+  .top-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:12px; flex-wrap:wrap; gap:10px;
+  }
+  .title{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,26px); }
+  .stat.timer{
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(16px,3vw,20px);
+    background:#fff; border-radius:16px; padding:8px 18px; box-shadow:0 4px 0 rgba(0,0,0,.06); color:var(--coral);
+  }
+
+  /* Team header */
+  .teams-row{ display:flex; gap:10px; margin-bottom:12px; }
+  .team-box{
+    flex:1; border-radius:16px; padding:8px 10px; text-align:center; position:relative;
+    box-shadow:0 4px 0 rgba(0,0,0,.06);
+  }
+  .team-box.a{ background:var(--blue); }
+  .team-box.b{ background:var(--coral); }
+  .team-box input{
+    width:100%; text-align:center; background:transparent; border:none; outline:none;
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; color:#fff; font-size:clamp(13px,2.4vw,16px);
+    border-bottom:2px dashed rgba(255,255,255,.55); padding-bottom:2px; margin-bottom:4px;
+  }
+  .team-box input::placeholder{ color:rgba(255,255,255,.8); }
+  .team-score{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(24px,5vw,32px); color:#fff; transition:transform .15s; }
+  .team-score.bump{ transform:scale(1.25); }
+  .team-box.active{ outline:4px solid #ffffff; outline-offset:-4px; }
+  .crown{ position:absolute; top:4px; right:8px; font-size:18px; display:none; }
+  .crown.show{ display:block; }
+
+  .turn-banner{
+    text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900;
+    font-size:clamp(15px,3vw,19px); margin-bottom:14px; padding:8px; border-radius:14px;
+  }
+  .turn-banner.a{ background:#e4f6fd; color:#1a7fa8; }
+  .turn-banner.b{ background:#ffe9e4; color:#c15a44; }
+
+  /* Tracks */
+  .track-wrap{
+    background:#f0f0f0; border-radius:16px; padding:8px 12px; margin-bottom:8px;
+    display:flex; align-items:center; gap:6px; overflow:hidden; position:relative; min-height:44px;
+  }
+  .track-wrap.a{ background:#e4f6fd; }
+  .track-wrap.b{ background:#ffe9e4; }
+  .track-flag{ font-size:16px; opacity:.4; }
+  .track-runner{ position:absolute; font-size:26px; transition:left .35s ease; left:6px; }
+  .track-finish{ position:absolute; right:8px; font-size:22px; }
+
+  .start-screen{
+    background:#fff; border-radius:24px; padding:36px 24px; text-align:center;
+    box-shadow:0 8px 0 rgba(0,0,0,.06);
+  }
+  .start-screen h2{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,26px); margin-bottom:10px; }
+  .start-screen p{ font-size:14px; color:#555; margin-bottom:22px; line-height:1.6; }
+  .big-btn{
+    border:none; border-radius:20px; padding:16px 40px; font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900; font-size:clamp(17px,3.4vw,22px); cursor:pointer; color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink)); box-shadow:0 6px 0 rgba(0,0,0,.15);
+  }
+  .big-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
+
+  .countdown{
+    text-align:center; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900;
+    font-size:clamp(60px,16vw,110px); color:var(--blue);
+  }
+
+  .game-area{ display:none; margin-top:16px; }
+  .game-area.show{ display:block; }
+  .clue-card{
+    background:#fff; border-radius:22px; padding:22px 20px; text-align:center; margin-bottom:16px;
+    box-shadow:0 6px 0 rgba(0,0,0,.06);
+  }
+  .clue-emoji{ font-size:clamp(50px,11vw,74px); margin-bottom:6px; }
+  .clue-pt{ font-size:clamp(14px,2.8vw,18px); font-weight:800; color:#666; }
+
+  .options{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .opt-btn{
+    border:none; border-radius:16px; padding:15px 10px; font-family:&#x27;Nunito Sans&#x27;,sans-serif;
+    font-weight:800; font-size:clamp(13px,2.4vw,16px); cursor:pointer; background:var(--lavender);
+    color:var(--dark); transition:transform .08s;
+  }
+  .opt-btn:active{ transform:scale(.96); }
+  .opt-btn.correct{ background:var(--mint); }
+  .opt-btn.incorrect{ background:var(--coral); }
+  .opt-btn:disabled{ opacity:.6; }
+
+  .end-screen{ display:none; background:#fff; border-radius:24px; padding:32px 24px; text-align:center; box-shadow:0 8px 0 rgba(0,0,0,.06); }
+  .end-screen.show{ display:block; }
+  .end-screen .trophy{ font-size:60px; }
+  .end-screen h2{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:22px; margin:8px 0; }
+  .end-screen .final-scores{ display:flex; gap:16px; justify-content:center; margin-bottom:14px; }
+  .end-screen .final-team{ font-size:15px; font-weight:800; }
+  .end-screen .final-team .n{ font-size:34px; font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; display:block; }
+  .end-screen p{ font-size:14px; color:#666; margin-bottom:20px; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;div class=&quot;top-row&quot;&gt;
+    &lt;div class=&quot;title&quot;&gt;🏃 Routine Race&lt;/div&gt;
+    &lt;div class=&quot;stat timer&quot; id=&quot;timerStat&quot;&gt;⏱️ 60&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;teams-row&quot;&gt;
+    &lt;div class=&quot;team-box a&quot; id=&quot;teamBoxA&quot;&gt;
+      &lt;div class=&quot;crown&quot; id=&quot;crownA&quot;&gt;👑&lt;/div&gt;
+      &lt;input id=&quot;nameA&quot; value=&quot;Team A&quot; maxlength=&quot;14&quot;&gt;
+      &lt;div class=&quot;team-score&quot; id=&quot;scoreA&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;team-box b&quot; id=&quot;teamBoxB&quot;&gt;
+      &lt;div class=&quot;crown&quot; id=&quot;crownB&quot;&gt;👑&lt;/div&gt;
+      &lt;input id=&quot;nameB&quot; value=&quot;Team B&quot; maxlength=&quot;14&quot;&gt;
+      &lt;div class=&quot;team-score&quot; id=&quot;scoreB&quot;&gt;0&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;turn-banner a&quot; id=&quot;turnBanner&quot;&gt;Get ready!&lt;/div&gt;
+
+  &lt;div class=&quot;track-wrap a&quot; id=&quot;trackWrapA&quot;&gt;
+    &lt;div class=&quot;track-runner&quot; id=&quot;runnerA&quot;&gt;🏃&lt;/div&gt;
+    &lt;div class=&quot;track-finish&quot;&gt;🏁&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;track-wrap b&quot; id=&quot;trackWrapB&quot; style=&quot;margin-bottom:16px;&quot;&gt;
+    &lt;div class=&quot;track-runner&quot; id=&quot;runnerB&quot;&gt;🏃&lt;/div&gt;
+    &lt;div class=&quot;track-finish&quot;&gt;🏁&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;start-screen&quot; id=&quot;startScreen&quot;&gt;
+    &lt;h2&gt;Ready to race? 🏁&lt;/h2&gt;
+    &lt;p&gt;Divida a turma em 2 times! A cada rodada é a vez de um time responder — se acertar, marca ponto e o corredor avança. Depois é a vez do outro time.&lt;/p&gt;
+    &lt;button class=&quot;big-btn&quot; id=&quot;startBtn&quot;&gt;▶ START&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;countdown&quot; id=&quot;countdownScreen&quot; style=&quot;display:none;&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;game-area&quot; id=&quot;gameArea&quot;&gt;
+    &lt;div class=&quot;clue-card&quot;&gt;
+      &lt;div class=&quot;clue-emoji&quot; id=&quot;clueEmoji&quot;&gt;&lt;/div&gt;
+      &lt;div class=&quot;clue-pt&quot; id=&quot;cluePt&quot;&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;options&quot; id=&quot;options&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;end-screen&quot; id=&quot;endScreen&quot;&gt;
+    &lt;div class=&quot;trophy&quot;&gt;🏆&lt;/div&gt;
+    &lt;h2 id=&quot;endTitle&quot;&gt;Time&#x27;s up!&lt;/h2&gt;
+    &lt;div class=&quot;final-scores&quot;&gt;
+      &lt;div class=&quot;final-team&quot;&gt;&lt;span class=&quot;n&quot; id=&quot;finalA&quot;&gt;0&lt;/span&gt;&lt;span id=&quot;finalNameA&quot;&gt;Team A&lt;/span&gt;&lt;/div&gt;
+      &lt;div class=&quot;final-team&quot;&gt;&lt;span class=&quot;n&quot; id=&quot;finalB&quot;&gt;0&lt;/span&gt;&lt;span id=&quot;finalNameB&quot;&gt;Team B&lt;/span&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;p id=&quot;endMsg&quot;&gt;Great job!&lt;/p&gt;
+    &lt;button class=&quot;big-btn&quot; id=&quot;playAgainBtn&quot;&gt;🔄 Play Again&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const items = [
+  // Daily routine + meals (Aula 11-12) — CORE focus of this warm-up
+  {en:&#x27;wake up&#x27;, pt:&#x27;Acordar&#x27;, emoji:&#x27;⏰&#x27;, core:true},
+  {en:&#x27;get up&#x27;, pt:&#x27;Levantar&#x27;, emoji:&#x27;🧍&#x27;, core:true},
+  {en:&#x27;brush your teeth&#x27;, pt:&#x27;Escovar os dentes&#x27;, emoji:&#x27;🪥&#x27;, core:true},
+  {en:&#x27;take a shower&#x27;, pt:&#x27;Tomar banho (chuveiro)&#x27;, emoji:&#x27;🚿&#x27;, core:true},
+  {en:&#x27;get dressed&#x27;, pt:&#x27;Se vestir&#x27;, emoji:&#x27;👕&#x27;, core:true},
+  {en:&#x27;go to school&#x27;, pt:&#x27;Ir para a escola&#x27;, emoji:&#x27;🏫&#x27;, core:true},
+  {en:&#x27;do homework&#x27;, pt:&#x27;Fazer lição de casa&#x27;, emoji:&#x27;📚&#x27;, core:true},
+  {en:&#x27;take a bath&#x27;, pt:&#x27;Tomar banho (banheira)&#x27;, emoji:&#x27;🛁&#x27;, core:true},
+  {en:&#x27;go to bed&#x27;, pt:&#x27;Ir para a cama&#x27;, emoji:&#x27;🌙&#x27;, core:true},
+  {en:&#x27;have breakfast&#x27;, pt:&#x27;Tomar café da manhã&#x27;, emoji:&#x27;🍳&#x27;, core:true},
+  {en:&#x27;have lunch&#x27;, pt:&#x27;Almoçar&#x27;, emoji:&#x27;🥪&#x27;, core:true},
+  {en:&#x27;have dinner&#x27;, pt:&#x27;Jantar&#x27;, emoji:&#x27;🍝&#x27;, core:true},
+  {en:&#x27;play sports&#x27;, pt:&#x27;Praticar esportes&#x27;, emoji:&#x27;🤸&#x27;, core:true},
+  // Sports vocab review (Aula 7) — thematically tied to &quot;play sports&quot; above
+  {en:&#x27;Soccer&#x27;, pt:&#x27;Futebol&#x27;, emoji:&#x27;⚽&#x27;},
+  {en:&#x27;Tennis&#x27;, pt:&#x27;Tênis&#x27;, emoji:&#x27;🎾&#x27;},
+  {en:&#x27;Basketball&#x27;, pt:&#x27;Basquete&#x27;, emoji:&#x27;🏀&#x27;},
+  {en:&#x27;Baseball&#x27;, pt:&#x27;Beisebol&#x27;, emoji:&#x27;⚾&#x27;},
+  {en:&#x27;Volleyball&#x27;, pt:&#x27;Vôlei&#x27;, emoji:&#x27;🏐&#x27;}
+];
+// Total must stay an EVEN number of items — with turns alternating strictly
+// between Team A and Team B, an even deck means both teams always get the exact
+// same number of turns, so a real tie is possible if both play equally well.
+const TRACK_LENGTH = 10; // flags per lane
+const GAME_SECONDS = 60;
+
+let scoreA = 0, scoreB = 0;
+let currentTeam = &#x27;A&#x27;;
+let timeLeft = GAME_SECONDS;
+let gameTimerInterval = null;
+let currentItem = null;
+let lastItemEn = null;
+let locked = false;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ---------------- NO-REPEAT DECK ---------------- */
+// Every word appears exactly once per game — no repeats at all. The deck is shuffled
+// once when the game starts; when it runs out, the round (and the game) ends early,
+// even if there&#x27;s still time on the clock.
+let deck = [];
+function buildDeck(){
+  return shuffle(items);
+}
+function drawCard(){
+  return deck.length ? deck.pop() : null;
+}
+
+/* ---------------- TRACKS ---------------- */
+function buildTrack(wrapId){
+  const wrap = document.getElementById(wrapId);
+  Array.from(wrap.querySelectorAll(&#x27;.track-flag&#x27;)).forEach(f=&gt;f.remove());
+  for(let i=0;i&lt;TRACK_LENGTH;i++){
+    const f = document.createElement(&#x27;div&#x27;);
+    f.className = &#x27;track-flag&#x27;;
+    f.textContent = &#x27;🚩&#x27;;
+    wrap.insertBefore(f, wrap.querySelector(&#x27;.track-finish&#x27;));
+  }
+}
+function updateRunner(team){
+  const score = team === &#x27;A&#x27; ? scoreA : scoreB;
+  const wrap = document.getElementById(&#x27;trackWrap&#x27; + team);
+  const runner = document.getElementById(&#x27;runner&#x27; + team);
+  const pct = Math.min(score, TRACK_LENGTH) / TRACK_LENGTH;
+  const maxLeft = wrap.clientWidth - 36;
+  runner.style.left = (6 + pct * maxLeft) + &#x27;px&#x27;;
+}
+
+/* ---------------- TEAMS ---------------- */
+function teamName(team){
+  const el = document.getElementById(team === &#x27;A&#x27; ? &#x27;nameA&#x27; : &#x27;nameB&#x27;);
+  return el.value.trim() || (&#x27;Team &#x27; + team);
+}
+function updateTurnBanner(){
+  const banner = document.getElementById(&#x27;turnBanner&#x27;);
+  banner.className = &#x27;turn-banner &#x27; + currentTeam.toLowerCase();
+  banner.textContent = `🎯 ${teamName(currentTeam)}&#x27;s turn!`;
+  document.getElementById(&#x27;teamBoxA&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;A&#x27;);
+  document.getElementById(&#x27;teamBoxB&#x27;).classList.toggle(&#x27;active&#x27;, currentTeam === &#x27;B&#x27;);
+}
+function updateCrowns(){
+  document.getElementById(&#x27;crownA&#x27;).classList.toggle(&#x27;show&#x27;, scoreA &gt; scoreB);
+  document.getElementById(&#x27;crownB&#x27;).classList.toggle(&#x27;show&#x27;, scoreB &gt; scoreA);
+}
+function bumpScore(team){
+  const el = document.getElementById(&#x27;score&#x27; + team);
+  el.textContent = team === &#x27;A&#x27; ? scoreA : scoreB;
+  el.classList.add(&#x27;bump&#x27;);
+  setTimeout(()=&gt; el.classList.remove(&#x27;bump&#x27;), 200);
+}
+
+/* ---------------- ROUNDS ---------------- */
+function nextRound(){
+  locked = false;
+  currentItem = drawCard();
+  if(!currentItem){
+    endGame(true); // deck exhausted — every word was used exactly once
+    return;
+  }
+  lastItemEn = currentItem.en;
+
+  document.getElementById(&#x27;clueEmoji&#x27;).textContent = currentItem.emoji;
+  document.getElementById(&#x27;cluePt&#x27;).textContent = currentItem.pt;
+  updateTurnBanner();
+
+  let distractors = shuffle(items.filter(it =&gt; it.en !== currentItem.en)).slice(0,3);
+  let options = shuffle([currentItem, ...distractors]);
+
+  const optBox = document.getElementById(&#x27;options&#x27;);
+  optBox.innerHTML = &#x27;&#x27;;
+  options.forEach(opt=&gt;{
+    const b = document.createElement(&#x27;button&#x27;);
+    b.className = &#x27;opt-btn&#x27;;
+    b.textContent = opt.en;
+    b.addEventListener(&#x27;click&#x27;, ()=&gt;{
+      if(locked || timeLeft&lt;=0) return;
+      locked = true;
+      const scoringTeam = currentTeam;
+      if(opt.en === currentItem.en){
+        b.classList.add(&#x27;correct&#x27;);
+        if(scoringTeam === &#x27;A&#x27;){ scoreA++; } else { scoreB++; }
+        bumpScore(scoringTeam);
+        updateRunner(scoringTeam);
+        updateCrowns();
+      } else {
+        b.classList.add(&#x27;incorrect&#x27;);
+        Array.from(optBox.children).forEach(el=&gt;{
+          if(el.textContent === currentItem.en) el.classList.add(&#x27;correct&#x27;);
+        });
+      }
+      Array.from(optBox.children).forEach(el=&gt; el.disabled = true);
+      currentTeam = currentTeam === &#x27;A&#x27; ? &#x27;B&#x27; : &#x27;A&#x27;;
+      setTimeout(()=&gt;{ if(timeLeft&gt;0) nextRound(); }, 500);
+    });
+    optBox.appendChild(b);
+  });
+}
+
+/* ---------------- GAME FLOW ---------------- */
+document.getElementById(&#x27;startBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  document.getElementById(&#x27;startScreen&#x27;).style.display = &#x27;none&#x27;;
+  const cd = document.getElementById(&#x27;countdownScreen&#x27;);
+  cd.style.display = &#x27;block&#x27;;
+  let n = 3;
+  cd.textContent = n;
+  const cdInterval = setInterval(()=&gt;{
+    n--;
+    if(n === 0){ cd.textContent = &#x27;GO!&#x27;; }
+    else if(n &lt; 0){
+      clearInterval(cdInterval);
+      cd.style.display = &#x27;none&#x27;;
+      startGame();
+    } else {
+      cd.textContent = n;
+    }
+  }, 700);
+});
+
+function startGame(){
+  scoreA = 0; scoreB = 0;
+  currentTeam = &#x27;A&#x27;;
+  timeLeft = GAME_SECONDS;
+  lastItemEn = null;
+  deck = buildDeck();
+  document.getElementById(&#x27;scoreA&#x27;).textContent = &#x27;0&#x27;;
+  document.getElementById(&#x27;scoreB&#x27;).textContent = &#x27;0&#x27;;
+  document.getElementById(&#x27;timerStat&#x27;).textContent = `⏱️ ${timeLeft}`;
+  buildTrack(&#x27;trackWrapA&#x27;);
+  buildTrack(&#x27;trackWrapB&#x27;);
+  updateRunner(&#x27;A&#x27;);
+  updateRunner(&#x27;B&#x27;);
+  updateCrowns();
+  document.getElementById(&#x27;gameArea&#x27;).classList.add(&#x27;show&#x27;);
+  nextRound();
+
+  gameTimerInterval = setInterval(()=&gt;{
+    timeLeft--;
+    document.getElementById(&#x27;timerStat&#x27;).textContent = `⏱️ ${Math.max(timeLeft,0)}`;
+    if(timeLeft &lt;= 0){
+      clearInterval(gameTimerInterval);
+      endGame();
+    }
+  }, 1000);
+}
+
+function endGame(deckExhausted){
+  clearInterval(gameTimerInterval);
+  document.getElementById(&#x27;gameArea&#x27;).classList.remove(&#x27;show&#x27;);
+  const end = document.getElementById(&#x27;endScreen&#x27;);
+  end.classList.add(&#x27;show&#x27;);
+  document.getElementById(&#x27;finalA&#x27;).textContent = scoreA;
+  document.getElementById(&#x27;finalB&#x27;).textContent = scoreB;
+  document.getElementById(&#x27;finalNameA&#x27;).textContent = teamName(&#x27;A&#x27;);
+  document.getElementById(&#x27;finalNameB&#x27;).textContent = teamName(&#x27;B&#x27;);
+  let msg;
+  if(scoreA === scoreB) msg = &quot;It&#x27;s a tie! Great job both teams! 🤝&quot;;
+  else msg = `🎉 ${teamName(scoreA &gt; scoreB ? &#x27;A&#x27; : &#x27;B&#x27;)} wins! Great game!`;
+  document.getElementById(&#x27;endTitle&#x27;).textContent = deckExhausted ? &quot;All words done! 🌟&quot; : &quot;Time&#x27;s up!&quot;;
+  document.getElementById(&#x27;endMsg&#x27;).textContent = msg;
+}
+
+document.getElementById(&#x27;playAgainBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  document.getElementById(&#x27;endScreen&#x27;).classList.remove(&#x27;show&#x27;);
+  document.getElementById(&#x27;startScreen&#x27;).style.display = &#x27;block&#x27;;
+});
+
+buildTrack(&#x27;trackWrapA&#x27;);
+buildTrack(&#x27;trackWrapB&#x27;);
+updateRunner(&#x27;A&#x27;);
+updateRunner(&#x27;B&#x27;);
+window.addEventListener(&#x27;resize&#x27;, ()=&gt;{ updateRunner(&#x27;A&#x27;); updateRunner(&#x27;B&#x27;); });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>📅 Days of the Week</h2><p class="sub">Say the days with your teacher!</p><div class="row" style="padding-top:6px"><div class="card" style="background:#F2A7C3;min-width:118px;flex:1 1 118px"><div class="val">Sunday</div><div class="sm" style="font-style:italic">Domingo</div></div><div class="card" style="background:#9fdcf2;min-width:118px;flex:1 1 118px"><div class="val">Monday</div><div class="sm" style="font-style:italic">Segunda</div></div><div class="card" style="background:#A8E6CF;min-width:118px;flex:1 1 118px"><div class="val">Tuesday</div><div class="sm" style="font-style:italic">Terça</div></div><div class="card" style="background:#C9A8E8;min-width:118px;flex:1 1 118px"><div class="val">Wednesday</div><div class="sm" style="font-style:italic">Quarta</div></div><div class="card" style="background:#FFB3A7;min-width:118px;flex:1 1 118px"><div class="val">Thursday</div><div class="sm" style="font-style:italic">Quinta</div></div><div class="card" style="background:#FFD97D;min-width:118px;flex:1 1 118px"><div class="val">Friday</div><div class="sm" style="font-style:italic">Sexta</div></div><div class="card" style="background:#9fdcf2;min-width:118px;flex:1 1 118px"><div class="val">Saturday</div><div class="sm" style="font-style:italic">Sábado</div></div></div></section>
+<section class="slide "><h2>📅 Get ready: Day Order Rush!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>The days of the week are all <b>mixed up</b>!</div></div><div class="st"><span class="n">2</span><div>One student at a time puts them in the <b>right order</b>.</div></div><div class="st"><span class="n">3</span><div>Beat the clock! ⏱️</div></div><div class="st"><span class="n">4</span><div>Your classmates can cheer and help!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>📅 Practice Time: Day Order Rush</span><small>Put the days in the right order!</small></div><iframe title="Practice Time: Day Order Rush" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Day Order Rush&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wrap{ width:100%; max-width:820px; padding:20px 16px 40px; }
+
+  .top-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:16px; flex-wrap:wrap; gap:10px;
+  }
+  .title{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); }
+  .stat{
+    font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(16px,3vw,20px);
+    background:#fff; border-radius:16px; padding:8px 18px; box-shadow:0 4px 0 rgba(0,0,0,.06);
+    color:var(--blue);
+  }
+  .stat.best{ color:#2e9e5b; }
+
+  .section-label{ font-weight:800; font-size:13px; color:#888; margin-bottom:8px; letter-spacing:.5px; }
+
+  .slots{
+    display:grid; grid-template-columns:repeat(7,1fr); gap:6px; margin-bottom:22px;
+  }
+  .slot{
+    background:#fff; border:2px dashed #ccc; border-radius:12px; min-height:64px;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    font-size:clamp(10px,2.2vw,13px); font-weight:800; padding:4px; position:relative;
+  }
+  .slot .slot-num{ position:absolute; top:2px; left:5px; font-size:9px; color:#bbb; font-weight:900; }
+  .slot.filled{ border-style:solid; cursor:pointer; }
+  .slot.correct{ background:var(--mint); border-color:var(--mint); }
+  .slot.incorrect{ background:var(--coral); border-color:var(--coral); }
+
+  .bank{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:22px;
+    min-height:64px;
+  }
+  .chip{
+    border:none; border-radius:14px; padding:14px 16px; font-weight:800; font-size:15px;
+    cursor:pointer; background:var(--yellow); color:var(--dark);
+  }
+  .chip:active{ transform:scale(.95); }
+
+  .controls{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:14px; }
+  .btn{
+    border:none; border-radius:16px; padding:14px 26px; font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900; font-size:clamp(15px,2.8vw,18px); cursor:pointer; color:#fff;
+    background:var(--blue); box-shadow:0 5px 0 rgba(0,0,0,.12);
+  }
+  .btn.secondary{ background:#eee; color:var(--dark); box-shadow:0 5px 0 rgba(0,0,0,.08); }
+  .btn:active{ transform:translateY(3px); box-shadow:0 1px 0 rgba(0,0,0,.12); }
+
+  .feedback{ text-align:center; font-weight:900; font-size:18px; min-height:28px; margin-bottom:6px; }
+  .feedback.ok{ color:#2e9e5b; }
+  .feedback.no{ color:#d9534f; }
+
+  .confetti{ position:fixed; top:-10px; font-size:22px; pointer-events:none; animation:fall 2s linear forwards; }
+  @keyframes fall{ to{ transform:translateY(100vh) rotate(360deg); opacity:0; } }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;div class=&quot;top-row&quot;&gt;
+    &lt;div class=&quot;title&quot;&gt;📅 Day Order Rush&lt;/div&gt;
+    &lt;div style=&quot;display:flex; gap:10px;&quot;&gt;
+      &lt;div class=&quot;stat&quot; id=&quot;timerStat&quot;&gt;⏱️ 0.0s&lt;/div&gt;
+      &lt;div class=&quot;stat best&quot; id=&quot;bestStat&quot;&gt;🏆 --&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;section-label&quot;&gt;TAP THE DAYS BELOW IN THE RIGHT ORDER (Sunday → Saturday)&lt;/div&gt;
+
+  &lt;div class=&quot;slots&quot; id=&quot;slots&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;bank&quot; id=&quot;bank&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;feedback&quot; id=&quot;feedback&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;controls&quot;&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;checkBtn&quot;&gt;Check ✓&lt;/button&gt;
+    &lt;button class=&quot;btn secondary&quot; id=&quot;shuffleBtn&quot;&gt;🔀 Shuffle / Restart&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const days = [&#x27;Sunday&#x27;,&#x27;Monday&#x27;,&#x27;Tuesday&#x27;,&#x27;Wednesday&#x27;,&#x27;Thursday&#x27;,&#x27;Friday&#x27;,&#x27;Saturday&#x27;];
+
+let placed = new Array(7).fill(null); // day per slot index, in the order the student placed them
+let running = false;
+let startTime = null;
+let timerInterval = null;
+let bestTime = null;
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i&gt;0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function formatTime(ms){
+  return (ms/1000).toFixed(1) + &#x27;s&#x27;;
+}
+
+function renderSlots(){
+  const slotsEl = document.getElementById(&#x27;slots&#x27;);
+  slotsEl.innerHTML = &#x27;&#x27;;
+  for(let i=0;i&lt;7;i++){
+    const s = document.createElement(&#x27;div&#x27;);
+    s.className = &#x27;slot&#x27; + (placed[i] ? &#x27; filled&#x27; : &#x27;&#x27;);
+    s.innerHTML = `&lt;span class=&quot;slot-num&quot;&gt;${i+1}&lt;/span&gt;${placed[i] || &#x27;&#x27;}`;
+    if(placed[i]){
+      s.addEventListener(&#x27;click&#x27;, ()=&gt;{
+        // send it back to the bank
+        const day = placed[i];
+        placed[i] = null;
+        renderSlots();
+        renderBank();
+        document.getElementById(&#x27;feedback&#x27;).textContent = &#x27;&#x27;;
+      });
+    }
+    slotsEl.appendChild(s);
+  }
+}
+
+function renderBank(){
+  const bankEl = document.getElementById(&#x27;bank&#x27;);
+  bankEl.innerHTML = &#x27;&#x27;;
+  const usedDays = placed.filter(Boolean);
+  const remaining = bankOrder.filter(d =&gt; !usedDays.includes(d));
+  remaining.forEach(d=&gt;{
+    const chip = document.createElement(&#x27;button&#x27;);
+    chip.className = &#x27;chip&#x27;;
+    chip.textContent = d;
+    chip.addEventListener(&#x27;click&#x27;, ()=&gt;{
+      if(!running) startTimer();
+      const emptyIdx = placed.findIndex(p =&gt; p === null);
+      if(emptyIdx === -1) return;
+      placed[emptyIdx] = d;
+      renderSlots();
+      renderBank();
+    });
+    bankEl.appendChild(chip);
+  });
+}
+
+let bankOrder = shuffle(days);
+
+function startTimer(){
+  running = true;
+  startTime = Date.now();
+  timerInterval = setInterval(()=&gt;{
+    document.getElementById(&#x27;timerStat&#x27;).textContent = `⏱️ ${formatTime(Date.now() - startTime)}`;
+  }, 100);
+}
+function stopTimer(){
+  running = false;
+  clearInterval(timerInterval);
+}
+
+document.getElementById(&#x27;checkBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  if(placed.some(p =&gt; p === null)){
+    document.getElementById(&#x27;feedback&#x27;).textContent = &#x27;🧩 Fill in all 7 days first!&#x27;;
+    document.getElementById(&#x27;feedback&#x27;).className = &#x27;feedback no&#x27;;
+    return;
+  }
+  const slotsEl = document.getElementById(&#x27;slots&#x27;);
+  let allCorrect = true;
+  Array.from(slotsEl.children).forEach((slotEl, i)=&gt;{
+    const isCorrect = placed[i] === days[i];
+    slotEl.classList.remove(&#x27;correct&#x27;,&#x27;incorrect&#x27;);
+    slotEl.classList.add(isCorrect ? &#x27;correct&#x27; : &#x27;incorrect&#x27;);
+    if(!isCorrect) allCorrect = false;
+  });
+  const fb = document.getElementById(&#x27;feedback&#x27;);
+  if(allCorrect){
+    stopTimer();
+    const elapsed = Date.now() - startTime;
+    fb.textContent = `🎉 Perfect! ${formatTime(elapsed)}`;
+    fb.className = &#x27;feedback ok&#x27;;
+    if(bestTime === null || elapsed &lt; bestTime){
+      bestTime = elapsed;
+      document.getElementById(&#x27;bestStat&#x27;).textContent = `🏆 ${formatTime(bestTime)}`;
+    }
+    launchConfetti();
+  } else {
+    fb.textContent = &#x27;🤔 Some days are in the wrong spot — try again!&#x27;;
+    fb.className = &#x27;feedback no&#x27;;
+  }
+});
+
+document.getElementById(&#x27;shuffleBtn&#x27;).addEventListener(&#x27;click&#x27;, ()=&gt;{
+  stopTimer();
+  placed = new Array(7).fill(null);
+  bankOrder = shuffle(days);
+  document.getElementById(&#x27;timerStat&#x27;).textContent = &#x27;⏱️ 0.0s&#x27;;
+  document.getElementById(&#x27;feedback&#x27;).textContent = &#x27;&#x27;;
+  renderSlots();
+  renderBank();
+});
+
+function launchConfetti(){
+  const emojis = [&#x27;🎉&#x27;,&#x27;⭐&#x27;,&#x27;📅&#x27;,&#x27;✨&#x27;];
+  for(let i=0;i&lt;20;i++){
+    const c = document.createElement(&#x27;div&#x27;);
+    c.className = &#x27;confetti&#x27;;
+    c.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    c.style.left = Math.random()*100 + &#x27;%&#x27;;
+    c.style.animationDelay = (Math.random()*0.4)+&#x27;s&#x27;;
+    document.body.appendChild(c);
+    setTimeout(()=&gt;c.remove(), 2200);
+  }
+}
+
+renderSlots();
+renderBank();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><div class="newtag">NEW! ✨</div><br><h2>We use ON before the days of the week!</h2><p class="sub">Look at the examples:</p><div class="qa"><div class="card" style="background:#9fdcf2"><div class="val">I have English class on Mondays.</div><div class="sm" style="font-style:italic">Eu tenho aula de inglês às segundas.</div></div><div class="card" style="background:#C9A8E8"><div class="val">She plays soccer on Saturdays.</div><div class="sm" style="font-style:italic">Ela joga futebol aos sábados.</div></div><div class="card" style="background:#A8E6CF"><div class="val">We don't have school on Sundays.</div><div class="sm" style="font-style:italic">Nós não temos escola aos domingos.</div></div></div></section>
+<section class="slide "><h2>🧩 Putting It Together</h2><p class="sub">Routine + ON + Day = a full sentence about your week!</p><div class="row"><div class="card" style="background:#F2A7C3"><div class="lab">Subject</div><div class="val">I</div></div><div class="card" style="background:#FFD97D"><div class="lab">Routine</div><div class="val">brush my teeth</div></div><div class="card" style="background:#A8E6CF"><div class="lab">ON</div><div class="val">on</div></div><div class="card" style="background:#9fdcf2"><div class="lab">Day</div><div class="val">Tuesdays</div></div></div><div class="big3" style="margin-top:22px">👉 "I brush my teeth on Tuesdays."</div></section>
+<section class="slide "><h2>🎰 Get ready: Sentence Machine!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Three <b>reels</b> spin: Subject · Routine · Day.</div></div><div class="st"><span class="n">2</span><div>Say the <b>full sentence</b> in English: <b>"I brush my teeth on Tuesdays."</b></div></div><div class="st"><span class="n">3</span><div>Then check the answer. Was it right?</div></div><div class="st"><span class="n">4</span><div>Remember: <b>he / she</b> needs the <b>-s</b>!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🎰 Practice Time: Sentence Machine</span><small>Spin the reels and say the sentence!</small></div><iframe title="Practice Time: Sentence Machine" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+&lt;title&gt;Sentence Machine&lt;/title&gt;
+&lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+  :root{
+    --pink:#F2A7C3;
+    --mint:#A8E6CF;
+    --lavender:#C9A8E8;
+    --yellow:#FFD97D;
+    --coral:#FFB3A7;
+    --blue:#5BC4E8;
+    --dark:#3A3A3A;
+  }
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0; min-height:100vh;
+    font-family:&#x27;Nunito Sans&#x27;, sans-serif;
+    background:
+      linear-gradient(#ffffffee,#ffffffee),
+      repeating-linear-gradient(0deg, #eee 0 1px, transparent 1px 36px),
+      repeating-linear-gradient(90deg, #eee 0 1px, transparent 1px 36px);
+    background-color:#fff;
+    color:var(--dark);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .wrap{ max-width:900px; margin:0 auto; padding:20px 16px 40px; width:100%; }
+
+  header{ text-align:center; margin-bottom:14px; }
+  header h1{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:clamp(20px,4vw,28px); margin:0; }
+  header .sub{ font-size:clamp(12px,2vw,15px); color:#777; margin-top:4px; }
+
+  .round-badge{
+    text-align:center; font-weight:900; font-family:&#x27;Nunito&#x27;,sans-serif; color:var(--blue);
+    font-size:15px; margin-bottom:10px;
+  }
+
+  .machine{
+    background:var(--dark);
+    border-radius:26px;
+    padding:16px;
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+  }
+  .reel-box{
+    flex:1;
+    background:#fff;
+    border-radius:16px;
+    min-height:110px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:10px 6px;
+    overflow:hidden;
+  }
+  .reel-label{
+    font-size:10px; font-weight:800; color:#aaa; letter-spacing:.5px; margin-bottom:6px;
+  }
+  .reel-text{
+    font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900;
+    font-size:clamp(14px,3.4vw,20px);
+    color:var(--dark);
+  }
+
+  .spin-row{ display:flex; justify-content:center; margin-bottom:18px; }
+  .spin-btn{
+    border:none;
+    border-radius:20px;
+    padding:16px 42px;
+    font-family:&#x27;Nunito&#x27;,sans-serif;
+    font-weight:900;
+    font-size:clamp(17px,3.4vw,22px);
+    cursor:pointer;
+    color:#fff;
+    background:linear-gradient(135deg, var(--coral), var(--pink));
+    box-shadow:0 6px 0 rgba(0,0,0,.15);
+  }
+  .spin-btn:active{ transform:translateY(4px); box-shadow:0 2px 0 rgba(0,0,0,.15); }
+  .spin-btn:disabled{ opacity:.5; cursor:default; }
+
+  .challenge-card{
+    display:none;
+    background:var(--yellow);
+    border-radius:20px;
+    padding:22px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .challenge-card.show{ display:block; }
+  .challenge-card .go{ font-family:&#x27;Nunito&#x27;,sans-serif; font-weight:900; font-size:18px; margin-bottom:6px; }
+  .challenge-card .pieces{ font-size:15px; font-weight:700; color:#555; }
+
+  .answer-card{
+    display:none;
+    background:var(--mint);
+    border-radius:18px;
+    padding:18px;
+    text-align:center;
+    font-weight:800;
+    font-size:19px;
+    margin-bottom:16px;
+  }
+  .answer-card.show{ display:block; }
+
+  .controls{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn{
+    border:none;
+    border-radius:14px;
+    padding:12px 22px;
+    font-weight:800;
+    font-size:14px;
+    cursor:pointer;
+    background:var(--blue);
+    color:#fff;
+  }
+  .btn.secondary{ background:#eee; color:var(--dark); }
+  .btn:disabled{ opacity:.5; cursor:default; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+&lt;div class=&quot;wrap&quot;&gt;
+  &lt;header&gt;
+    &lt;h1&gt;⚙️ Sentence Machine&lt;/h1&gt;
+    &lt;div class=&quot;sub&quot;&gt;Spin for a subject + routine + day — then say the full sentence out loud!&lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;div class=&quot;round-badge&quot; id=&quot;roundBadge&quot;&gt;Round 1&lt;/div&gt;
+
+  &lt;div class=&quot;machine&quot;&gt;
+    &lt;div class=&quot;reel-box&quot;&gt;
+      &lt;div class=&quot;reel-label&quot;&gt;SUBJECT&lt;/div&gt;
+      &lt;div class=&quot;reel-text&quot; id=&quot;subjectReel&quot;&gt;Tap SPIN!&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;reel-box&quot;&gt;
+      &lt;div class=&quot;reel-label&quot;&gt;ROUTINE&lt;/div&gt;
+      &lt;div class=&quot;reel-text&quot; id=&quot;routineReel&quot;&gt;🤸&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;reel-box&quot;&gt;
+      &lt;div class=&quot;reel-label&quot;&gt;DAY&lt;/div&gt;
+      &lt;div class=&quot;reel-text&quot; id=&quot;dayReel&quot;&gt;📅&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;spin-row&quot;&gt;
+    &lt;button class=&quot;spin-btn&quot; id=&quot;spinBtn&quot;&gt;🎰 SPIN!&lt;/button&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;challenge-card&quot; id=&quot;challengeCard&quot;&gt;
+    &lt;div class=&quot;go&quot;&gt;Your turn! Say the full sentence 🙋&lt;/div&gt;
+    &lt;div class=&quot;pieces&quot; id=&quot;challengeText&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;div class=&quot;answer-card&quot; id=&quot;answerCard&quot;&gt;&lt;/div&gt;
+
+  &lt;div class=&quot;controls&quot;&gt;
+    &lt;button class=&quot;btn secondary&quot; id=&quot;revealBtn&quot; disabled&gt;💡 Show Answer&lt;/button&gt;
+    &lt;button class=&quot;btn&quot; id=&quot;nextBtn&quot; disabled&gt;Next Student ▶&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const subjects = [&#x27;I&#x27;,&#x27;You&#x27;,&#x27;We&#x27;,&#x27;They&#x27;,&#x27;He&#x27;,&#x27;She&#x27;];
+
+// base = form used with I/You/We/They. third = form used with He/She.
+// {poss} in &quot;third&quot; gets replaced with &quot;his&quot; or &quot;her&quot; depending on the subject.
+const routines = [
+  { base: &#x27;wake up&#x27;, third: &#x27;wakes up&#x27; },
+  { base: &#x27;get up&#x27;, third: &#x27;gets up&#x27; },
+  { base: &#x27;brush {poss} teeth&#x27;, third: &#x27;brushes {poss} teeth&#x27; },
+  { base: &#x27;take a shower&#x27;, third: &#x27;takes a shower&#x27; },
+  { base: &#x27;get dressed&#x27;, third: &#x27;gets dressed&#x27; },
+  { base: &#x27;go to school&#x27;, third: &#x27;goes to school&#x27; },
+  { base: &#x27;do {poss} homework&#x27;, third: &#x27;does {poss} homework&#x27; },
+  { base: &#x27;take a bath&#x27;, third: &#x27;takes a bath&#x27; },
+  { base: &#x27;go to bed&#x27;, third: &#x27;goes to bed&#x27; },
+  { base: &#x27;have breakfast&#x27;, third: &#x27;has breakfast&#x27; },
+  { base: &#x27;have lunch&#x27;, third: &#x27;has lunch&#x27; },
+  { base: &#x27;have dinner&#x27;, third: &#x27;has dinner&#x27; }
+];
+
+const days = [&#x27;Sundays&#x27;,&#x27;Mondays&#x27;,&#x27;Tuesdays&#x27;,&#x27;Wednesdays&#x27;,&#x27;Thursdays&#x27;,&#x27;Fridays&#x27;,&#x27;Saturdays&#x27;];
+
+let round = 1;
+let currentSubject = null;
+let currentRoutine = null;
+let currentDay = null;
+let spinning = false;
+
+const subjectReel = document.getElementById(&#x27;subjectReel&#x27;);
+const routineReel = document.getElementById(&#x27;routineReel&#x27;);
+const dayReel = document.getElementById(&#x27;dayReel&#x27;);
+const spinBtn = document.getElementById(&#x27;spinBtn&#x27;);
+const challengeCard = document.getElementById(&#x27;challengeCard&#x27;);
+const challengeText = document.getElementById(&#x27;challengeText&#x27;);
+const answerCard = document.getElementById(&#x27;answerCard&#x27;);
+const revealBtn = document.getElementById(&#x27;revealBtn&#x27;);
+const nextBtn = document.getElementById(&#x27;nextBtn&#x27;);
+const roundBadge = document.getElementById(&#x27;roundBadge&#x27;);
+
+function randomItem(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function poss(subject){
+  if(subject === &#x27;He&#x27;) return &#x27;his&#x27;;
+  if(subject === &#x27;She&#x27;) return &#x27;her&#x27;;
+  if(subject === &#x27;I&#x27;) return &#x27;your&#x27;; // still taught with &quot;your&quot; for I in this A1 stage
+  return &#x27;your&#x27;;
+}
+
+function buildSentence(subject, routine, day){
+  const isThird = (subject === &#x27;He&#x27; || subject === &#x27;She&#x27;);
+  let verbPhrase = isThird ? routine.third : routine.base;
+  verbPhrase = verbPhrase.replace(&#x27;{poss}&#x27;, poss(subject));
+  return `${subject} ${verbPhrase} on ${day}.`;
+}
+
+function routineLabel(routine){
+  return routine.base.replace(&#x27;{poss}&#x27;, &#x27;your&#x27;);
+}
+
+function spinReel(el, pool, getLabel, duration, finalItem, onDone){
+  const start = Date.now();
+  let delay = 60;
+  function tick(){
+    const elapsed = Date.now() - start;
+    if(elapsed &gt;= duration){
+      el.textContent = getLabel(finalItem);
+      onDone();
+      return;
+    }
+    el.textContent = getLabel(randomItem(pool));
+    delay = 60 + (elapsed / duration) * 140;
+    setTimeout(tick, delay);
+  }
+  tick();
+}
+
+spinBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  if(spinning) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  revealBtn.disabled = true;
+  nextBtn.disabled = true;
+  challengeCard.classList.remove(&#x27;show&#x27;);
+  answerCard.classList.remove(&#x27;show&#x27;);
+
+  currentSubject = randomItem(subjects);
+  currentRoutine = randomItem(routines);
+  currentDay = randomItem(days);
+
+  let doneCount = 0;
+  function checkAllDone(){
+    doneCount++;
+    if(doneCount === 3){
+      spinning = false;
+      spinBtn.disabled = false;
+      revealBtn.disabled = false;
+      nextBtn.disabled = false;
+      challengeText.textContent = `${currentSubject}  +  ${routineLabel(currentRoutine)}  +  on ${currentDay}`;
+      challengeCard.classList.add(&#x27;show&#x27;);
+    }
+  }
+
+  spinReel(subjectReel, subjects, s =&gt; s, 1200, currentSubject, checkAllDone);
+  spinReel(routineReel, routines, r =&gt; routineLabel(r), 1500, currentRoutine, checkAllDone);
+  spinReel(dayReel, days, d =&gt; d, 1800, currentDay, checkAllDone);
+});
+
+revealBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  if(!currentSubject || !currentRoutine || !currentDay) return;
+  answerCard.textContent = `&quot;${buildSentence(currentSubject, currentRoutine, currentDay)}&quot;`;
+  answerCard.classList.add(&#x27;show&#x27;);
+});
+
+nextBtn.addEventListener(&#x27;click&#x27;, ()=&gt;{
+  round++;
+  roundBadge.textContent = `Round ${round}`;
+  challengeCard.classList.remove(&#x27;show&#x27;);
+  answerCard.classList.remove(&#x27;show&#x27;);
+  subjectReel.textContent = &#x27;Tap SPIN!&#x27;;
+  routineReel.textContent = &#x27;🤸&#x27;;
+  dayReel.textContent = &#x27;📅&#x27;;
+  revealBtn.disabled = true;
+  nextBtn.disabled = true;
+});
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>🗣️ Speaking Time</h2><p class="sub">Listen to your teacher and say it in English!</p><div class="linkcard"><div class="e">🎧🗣️</div><div class="big2">Teacher says it in Portuguese.<br><span style="color:var(--blue)">You say it in English!</span></div><p>✅ Positive sentence &nbsp; ❌ Negative sentence</p><p>Remember: <b>on + day</b> (on Mondays, on Fridays...)</p></div></section>
+<section class="slide "><h2>🗓️ Get ready: My Weekly Schedule!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>Flip a <b>day card</b>: you see a day and a <b>topic</b>.</div></div><div class="st"><span class="n">2</span><div>Say a <b>true sentence</b> about YOU: <b>"On ___, I ___."</b></div></div><div class="st"><span class="n">3</span><div>Tap the card again to win a ⭐</div></div><div class="st"><span class="n">4</span><div>Flip all 7 cards to complete your week!</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
+<section class="slide game"><div class="gh"><span>🗓️ My Weekly Schedule: Flip & Say!</span><small>Say a true sentence about you!</small></div><iframe title="My Weekly Schedule: Flip &amp; Say!" data-srcdoc="&lt;!DOCTYPE html&gt;&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width,initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&amp;family=Nunito+Sans:wght@600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--blue:#5BC4E8;--dark:#3A3A3A}*{box-sizing:border-box}
+html,body{margin:0;font-family:&#x27;Nunito Sans&#x27;,sans-serif;color:var(--dark);background:transparent}
+.wrap{padding:8px 14px 20px;max-width:1000px;margin:0 auto;text-align:center}
+.names{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-bottom:8px}.names input{width:100px;border:2px solid #C9A8E8;border-radius:10px;padding:6px;font-weight:800;text-align:center;font-family:Nunito}
+.turn{font-family:Nunito;font-weight:900;color:#e0719c;font-size:20px;min-height:28px}
+.hint{font-weight:800;color:#666;margin:2px 0 10px}
+.board{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:12px}
+.tile{perspective:700px;height:min(26vh,170px);cursor:pointer;min-height:130px}
+.in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.tile.flip .in{transform:rotateY(180deg)}
+.f,.b{position:absolute;inset:0;border-radius:20px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:0 5px 14px #0002;padding:6px}
+.f{font-family:Nunito;font-weight:900;font-size:clamp(15px,2.2vw,22px);color:#fff}
+.b{transform:rotateY(180deg);background:#fff}.b .e{font-size:clamp(34px,5vw,52px)}.b .t{font-family:Nunito;font-weight:900;font-size:clamp(14px,1.9vw,19px)}.b .d{font-size:12px;font-weight:800;color:#888}
+.tile.done .b{background:#fffbe0;outline:4px solid #FFD97D}
+.cnt{margin-top:12px;font-family:Nunito;font-weight:900;color:#888}
+.btn{margin-top:10px;border:none;border-radius:18px;padding:10px 22px;font-family:Nunito;font-weight:900;font-size:16px;cursor:pointer;background:#FFD97D;box-shadow:0 4px 0 #0002}
+.win{display:none;font-family:Nunito;font-weight:900;font-size:clamp(22px,4vw,34px);margin-top:12px;color:#e0719c}
+
+header{display:none} html,body{min-height:0!important}
+.wrap{padding:6px 12px 24px}
+.teams{margin:4px 0;gap:10px} .team-card{padding:6px 14px;min-width:120px} .team-card .score{font-size:22px}
+.turn-banner{margin-bottom:2px;font-size:14px} .round-badge{margin-bottom:6px}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div class=&quot;wrap&quot;&gt;
+&lt;div class=&quot;names&quot; id=&quot;names&quot;&gt;&lt;input placeholder=&quot;Student 1&quot;&gt;&lt;input placeholder=&quot;Student 2&quot;&gt;&lt;input placeholder=&quot;Student 3&quot;&gt;&lt;input placeholder=&quot;Student 4&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;turn&quot; id=&quot;turn&quot;&gt;&lt;/div&gt;&lt;div class=&quot;hint&quot;&gt;Tap a day to flip it. Say a true sentence about that day and that topic! Tap again when you finish ⭐&lt;/div&gt;
+&lt;div class=&quot;board&quot; id=&quot;board&quot;&gt;&lt;/div&gt;&lt;div class=&quot;cnt&quot; id=&quot;cnt&quot;&gt;&lt;/div&gt;&lt;div class=&quot;win&quot; id=&quot;win&quot;&gt;🏆 Your week is complete! Great job!&lt;/div&gt;&lt;button class=&quot;btn&quot; id=&quot;reset&quot;&gt;🔄 New week&lt;/button&gt;
+&lt;/div&gt;&lt;script&gt;
+var DAYS=[[&quot;Sunday&quot;,&quot;Domingo&quot;,&quot;#F2A7C3&quot;],[&quot;Monday&quot;,&quot;Segunda&quot;,&quot;#5BC4E8&quot;],[&quot;Tuesday&quot;,&quot;Terça&quot;,&quot;#A8E6CF&quot;],[&quot;Wednesday&quot;,&quot;Quarta&quot;,&quot;#C9A8E8&quot;],[&quot;Thursday&quot;,&quot;Quinta&quot;,&quot;#FFB3A7&quot;],[&quot;Friday&quot;,&quot;Sexta&quot;,&quot;#e7b53a&quot;],[&quot;Saturday&quot;,&quot;Sábado&quot;,&quot;#7fb8e8&quot;]];
+var TH=[[&quot;🍽️&quot;,&quot;food&quot;,&quot;Comida&quot;],[&quot;⚽&quot;,&quot;sports&quot;,&quot;Esportes&quot;],[&quot;🏠&quot;,&quot;at home&quot;,&quot;Em casa&quot;],[&quot;📺&quot;,&quot;free time&quot;,&quot;Tempo livre&quot;],[&quot;🏫&quot;,&quot;school&quot;,&quot;Escola&quot;],[&quot;👨‍👩‍👧&quot;,&quot;family&quot;,&quot;Família&quot;],[&quot;🎮&quot;,&quot;games &amp; fun&quot;,&quot;Diversão&quot;]];
+var turn=0,n=0;
+function sh(a){a=a.slice();for(var i=a.length-1;i&gt;0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function names(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
+function who(){var nm=names();document.getElementById(&#x27;turn&#x27;).textContent=nm.length?&#x27;👉 &#x27;+nm[turn%nm.length]+&#x27; is up! 🎤&#x27;:&#x27;&#x27;;}
+function build(){var th=sh(TH),b=document.getElementById(&#x27;board&#x27;);b.innerHTML=&#x27;&#x27;;n=0;turn=0;document.getElementById(&#x27;win&#x27;).style.display=&#x27;none&#x27;;
+ DAYS.forEach(function(d,i){var t=document.createElement(&#x27;div&#x27;);t.className=&#x27;tile&#x27;;var T=th[i];
+  t.innerHTML=&#x27;&lt;div class=&quot;in&quot;&gt;&lt;div class=&quot;f&quot; style=&quot;background:&#x27;+d[2]+&#x27;&quot;&gt;&lt;span style=&quot;font-size:34px&quot;&gt;📅&lt;/span&gt;&#x27;+d[0]+&#x27;&lt;/div&gt;&lt;div class=&quot;b&quot;&gt;&lt;div class=&quot;e&quot;&gt;&#x27;+T[0]+&#x27;&lt;/div&gt;&lt;div class=&quot;t&quot;&gt;&#x27;+d[0]+&#x27; + &#x27;+T[1]+&#x27;&lt;/div&gt;&lt;div class=&quot;d&quot;&gt;&#x27;+T[2]+&#x27;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;&#x27;;
+  t.addEventListener(&#x27;click&#x27;,function(){if(!t.classList.contains(&#x27;flip&#x27;)){t.classList.add(&#x27;flip&#x27;);}else if(!t.classList.contains(&#x27;done&#x27;)){t.classList.add(&#x27;done&#x27;);n++;turn++;who();upd();}});
+  b.appendChild(t);});upd();who();}
+function upd(){document.getElementById(&#x27;cnt&#x27;).textContent=&#x27;Sentences said: &#x27;+n+&#x27; / 7&#x27;;if(n===7)document.getElementById(&#x27;win&#x27;).style.display=&#x27;block&#x27;;}
+document.getElementById(&#x27;reset&#x27;).addEventListener(&#x27;click&#x27;,build);
+document.getElementById(&#x27;names&#x27;).addEventListener(&#x27;input&#x27;,who);build();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;
+"></iframe></section>
+<section class="slide "><h2>Now it's your turn! 🎉</h2><p class="sub">Practice Days of the Week + "on" at home!</p><div class="linkcard"><div class="e">📝</div><p>Your homework for this lesson is waiting on the platform!</p><p>See you next class! 👋</p></div></section>
+
+</div>
+
+<div class="bot"><button class="nav" id="prev">◀ Back</button><div class="dots" id="dots"></div><button class="nav" id="next">Next ▶</button></div>
+<script>
+(function(){
+
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots'); slides.forEach(function(_,i){ var d=document.createElement('i'); d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+function names(){ var a=document.getElementById('tnA'), b=document.getElementById('tnB'); return [(a&&a.value.trim())||'Team A',(b&&b.value.trim())||'Team B']; }
+function applyNames(fr){ try{ var w=fr.contentWindow, d=fr.contentDocument, n=names(); d.getElementById('teamNameA').value=n[0]; d.getElementById('teamNameB').value=n[1]; if(w.updateTurnBanner) w.updateTurnBanner(); }catch(e){} }
+function load(s){ var fr=s.querySelector('iframe'); if(!fr) return; if(!fr.getAttribute('data-ok')){ fr.setAttribute('data-ok','1'); fr.addEventListener('load',function(){ applyNames(fr); }); var n=names(), sd=fr.getAttribute('data-srcdoc'); sd=sd.replace('id="teamNameA" value="Team A"','id="teamNameA" value="'+n[0].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"').replace('id="teamNameB" value="Team B"','id="teamNameB" value="'+n[1].replace(/"/g,'&quot;').replace(/</g,'&lt;')+'"'); fr.srcdoc=sd; } else applyNames(fr); }
+function go(i){ if(i<0||i>=slides.length) return; cur=i; slides.forEach(function(s,k){ s.classList.toggle('on',k===i); }); [].forEach.call(dots.children,function(d,k){ d.classList.toggle('on',k===i); }); var ad=dots.children[i]; if(ad&&ad.scrollIntoView) ad.scrollIntoView({inline:'center',block:'nearest'});
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length; document.getElementById('prev').disabled=i===0; document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); try{ location.hash='s'+(i+1); }catch(e){} }
+[].forEach.call(document.querySelectorAll('.go'),function(b){ b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){ go(cur+1); });
+[].forEach.call(document.querySelectorAll('td.ck'),function(c){c.addEventListener('click',function(){c.textContent=c.textContent==='✅'?'❌':(c.textContent==='❌'?'':'✅');});});
+[].forEach.call(document.querySelectorAll('.showans'),function(b){b.addEventListener('click',function(){var g=b.parentNode.querySelector('.gaps');g.classList.toggle('show');});});
+var nw=null; var GUIDE="<h1>Teachers Guide · Lesson 11 · Days of the Week + \"on\"</h1>\n<p class=\"meta\">Kids A1 · 60 min · 4 alunos</p>\n<div class=\"toc\"><a href=\"#a\">Visão geral</a> · <a href=\"#s1\">Abertura</a> · <a href=\"#s2\">Warm-up</a> · <a href=\"#s3\">Days</a> · <a href=\"#s4\">Day Order Rush</a> · <a href=\"#s5\">ON</a> · <a href=\"#s6\">Putting It Together</a> · <a href=\"#s7\">Sentence Machine</a> · <a href=\"#s8\">Drills</a> · <a href=\"#s9\">Weekly Schedule</a> · <a href=\"#s10\">Encerramento</a></div>\n<h2 id=\"a\">Visão geral da aula</h2>\n<ul><li><b>Revisão (warm-up):</b> rotina (e esportes) das aulas anteriores, com o Routine Race.</li><li><b>Novo:</b> os 7 dias da semana e o uso de <b>ON</b> antes dos dias (<i>on Mondays</i>).</li><li><b>Sequência:</b> dias da semana → Day Order Rush (fixar) → regra do ON → Putting It Together → Sentence Machine (reforço visual) → drills orais → My Weekly Schedule (produção livre, com jogo).</li></ul>\n<table><tr><th>Min</th><th>Slides</th><th>Atividade</th></tr><tr><td>0-5</td><td>1</td><td>Abertura</td></tr><tr><td>5-13</td><td>2-3</td><td>Warm-up: Routine Race</td></tr><tr><td>13-18</td><td>4</td><td>Days of the Week</td></tr><tr><td>18-24</td><td>5-6</td><td>Day Order Rush</td></tr><tr><td>24-29</td><td>7</td><td>Grammar Highlight: ON</td></tr><tr><td>29-33</td><td>8</td><td>Putting It Together</td></tr><tr><td>33-41</td><td>9-10</td><td>Sentence Machine</td></tr><tr><td>41-50</td><td>11</td><td>Drills: afirmativa e negativa</td></tr><tr><td>50-58</td><td>12-13</td><td>My Weekly Schedule (Weekly Flip)</td></tr><tr><td>58-60</td><td>14</td><td>Encerramento</td></tr></table>\n<div class=\"tip\">Antes de cada jogo há um slide \"Get ready\" para as crianças entenderem as regras. Leia com elas e depois clique em \"Ready? Let's play!\".</div>\n<h2 id=\"s1\">⏱️ 0-5 min | Abertura (slide 1)</h2>\n<p>Cumprimente a turma e avise o tema do dia: hoje vamos revisar rotina e aprender os <b>dias da semana</b>. Pergunte rapidamente \"What time do you wake up?\" para 1-2 alunos, só para aquecer antes do jogo.</p>\n<h2 id=\"s2\">⏱️ 5-13 min | Warm-up: Routine Race (slides 2-3)</h2>\n<p>Depois do \"Get ready\", divida a turma em 2 times (edite os nomes direto no jogo). Compartilhe a tela e explique: você mostra a dica em português, o time da vez fala em inglês, e quem acertar corre na pista. São 18 palavras (rotina + esportes), cada uma aparece só uma vez; o jogo acaba quando o baralho esgota ou o tempo zera. Alterne os times a cada rodada. No final, comemore o time vencedor (ou o empate).</p>\n<h2 id=\"s3\">⏱️ 13-18 min | Days of the Week (slide 4)</h2>\n<p>Mostre o slide com os 7 dias. Leia em voz alta e peça repetição coral (2-3x). Aponte que em inglês os dias são sempre escritos com <b>letra maiúscula</b>, diferente do português. Depois pergunte \"What day is it today?\" e \"What day is it tomorrow?\".</p>\n<h2 id=\"s4\">⏱️ 18-24 min | Fixação: Day Order Rush (slides 5-6)</h2>\n<p>Depois do \"Get ready\", compartilhe a tela e chame um aluno por vez para organizar os dias na ordem certa contra o cronômetro. Deixe os outros torcerem/ajudarem. Bata o recorde da turma ao longo da aula se der tempo de repetir.</p>\n<h2 id=\"s5\">⏱️ 24-29 min | Grammar Highlight: ON (slide 7)</h2>\n<p>Apresente a regra: usamos <b>ON</b> antes dos dias da semana. Leia os 3 exemplos do slide em voz alta e peça para os alunos identificarem onde está o \"on\" em cada frase. Note que o dia vai no plural (<i>on Mondays</i>) quando falamos do que acontece toda semana.</p>\n<h2 id=\"s6\">⏱️ 29-33 min | Putting It Together (slide 8)</h2>\n<p>Mostre o slide com os blocos SUBJECT + ROUTINE + ON + DAY e o exemplo montado (\"I brush my teeth on Tuesdays.\"). Explique que agora vamos montar frases assim, na hora, com afirmativa, negativa e pergunta.</p>\n<h2 id=\"s7\">⏱️ 33-41 min | Reforço visual: Sentence Machine (slides 9-10)</h2>\n<p>Depois do \"Get ready\", compartilhe a tela, gire os 3 rolos e desafie o aluno da vez a falar a frase completa em voz alta antes de revelar a resposta (\"Show Answer\"). Passe para o próximo aluno a cada giro (\"Next Student\"). Se cair He/She, chame atenção para o -s do verbo e para his/her.</p>\n<h2 id=\"s8\">⏱️ 41-50 min | Prática de comunicação: drills (slide 11)</h2>\n<p>Mostre o slide \"Speaking Time\" (sem nenhuma frase de drill) e conduza os drills oralmente, um aluno por vez: você fala em <b>português</b> e o aluno responde em <b>inglês</b>. Não mostre estas frases na tela.</p>\n<h3>Drills orais (somente professora)</h3>\n<p>Cada drill é <b>uma frase + 2 substituições</b>. São <b>2 frases por aluno</b>: uma afirmativa e uma negativa (4 alunos = 4 + 4). Nas afirmativas a substituição é o <b>dia</b>; nas negativas é o <b>sujeito</b>, para praticar don't x doesn't. Respostas em letra pequena.</p>\n<p><b>Afirmativas</b></p>\n<ol><li>Eu acordo cedo às segundas / às quartas / aos sábados<br><small>I wake up early on Mondays. I wake up early on Wednesdays. I wake up early on Saturdays.</small></li><li>Ela toma café da manhã aos domingos / às terças / às sextas<br><small>She has breakfast on Sundays. She has breakfast on Tuesdays. She has breakfast on Fridays.</small></li><li>Eles vão para a escola às quartas / às segundas / às quintas<br><small>They go to school on Wednesdays. They go to school on Mondays. They go to school on Thursdays.</small></li><li>Ele pratica esportes aos sábados / aos domingos / às sextas<br><small>He plays sports on Saturdays. He plays sports on Sundays. He plays sports on Fridays.</small></li></ol>\n<p><b>Negativas</b> (destaque don't/doesn't)</p>\n<ol><li>Eu não vou para a escola aos domingos / ela / eles<br><small>I don't go to school on Sundays. She doesn't go to school on Sundays. They don't go to school on Sundays.</small></li><li>Ela não toma banho de banheira às segundas / eu / nós<br><small>She doesn't take a bath on Mondays. I don't take a bath on Mondays. We don't take a bath on Mondays.</small></li><li>Eles não almoçam em casa aos sábados / ele / eu<br><small>They don't have lunch at home on Saturdays. He doesn't have lunch at home on Saturdays. I don't have lunch at home on Saturdays.</small></li><li>Ele não faz lição de casa aos domingos / nós / ela<br><small>He doesn't do homework on Sundays. We don't do homework on Sundays. She doesn't do homework on Sundays.</small></li></ol>\n<p><b>Opcional, se sobrar tempo: interrogativas</b> (uma por aluno; peça a resposta curta depois, <i>Yes, I do. / No, she doesn't.</i>)</p>\n<ol><li>Você acorda cedo às segundas? / ela / eles<br><small>Do you wake up early on Mondays? Does she wake up early on Mondays? Do they wake up early on Mondays?</small></li><li>Ela pratica esportes aos domingos? / você / ele<br><small>Does she play sports on Sundays? Do you play sports on Sundays? Does he play sports on Sundays?</small></li><li>Ele toma banho de chuveiro à noite? / você / elas<br><small>Does he take a shower at night? Do you take a shower at night? Do they take a shower at night?</small></li><li>Eles almoçam em casa aos sábados? / ela / você<br><small>Do they have lunch at home on Saturdays? Does she have lunch at home on Saturdays? Do you have lunch at home on Saturdays?</small></li></ol>\n<p>Se algum aluno errar a conjugação (esquecer o -s de he/she, por exemplo), corrija na hora e peça para repetir a frase certa.</p>\n<h2 id=\"s9\">⏱️ 50-58 min | Produção: My Weekly Schedule (slides 12-13)</h2>\n<p>Depois do \"Get ready\", abra o Weekly Flip: 7 cartas, uma para cada dia. Digite os nomes dos alunos para o jogo indicar a vez. O aluno vira uma carta e vê o <b>dia + um tema</b> (comida, esportes, casa, tempo livre, escola, família, diversão). Ele completa oralmente <i>\"On ___, I ___.\"</i> com algo real da vida dele(a), por exemplo \"On Fridays, I watch movies with my family.\" Clique de novo na carta para marcar ⭐ e passar a vez. Quando as 7 cartas estiverem concluídas a semana está completa. Os outros alunos escutam e podem fazer 1 pergunta de curiosidade depois. Incentive frases pessoais, não só as de rotina (pode ser hobby, esporte, família).</p>\n<h2 id=\"s10\">⏱️ 58-60 min | Encerramento (slide 14)</h2>\n<p>Reforce: hoje aprendemos os dias da semana e o \"on\" antes deles. Mostre o slide final e explique que o homework da aula (flashcards de dias e refeições, sentence builder, uma leitura curta, quiz e missão com badge) já está na plataforma.</p>\n<div class=\"tip\"><b>Dica pedagógica:</b> a regra \"ON + dia\" costuma ser esquecida na fala espontânea; repita-a em todas as etapas. Alterne fala, escuta e repetição a cada 5-7 minutos.</div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 11</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
+var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
+})();
+</script>
+</body></html>
