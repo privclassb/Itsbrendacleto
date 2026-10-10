@@ -109,6 +109,10 @@
       <span class="folder-name">📁 Book 1</span>
       <span class="folder-chevron">›</span>
     </div>
+    <div class="folder-card" onclick="goTo('kids-extras')">
+      <span class="folder-name">📁 Aulas Extras</span>
+      <span class="folder-chevron">›</span>
+    </div>
   </div>
 
   <div class="screen" id="screen-kids-book1">
@@ -156,6 +160,10 @@
     </a>
   </div>
 
+  <div class="screen" id="screen-kids-extras">
+    <div class="empty-msg">Em breve.</div>
+  </div>
+
   <div class="screen" id="screen-adultos">
     <div class="empty-msg">Em breve.</div>
   </div>
@@ -164,8 +172,8 @@
 <script>
   // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
   // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
-  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', adultos: 'root' };
-  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', adultos: 'Adultos' };
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos' };
 
   function goTo(level) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
