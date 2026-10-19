@@ -2564,10 +2564,34 @@
           await sb.from('payments').delete().eq('student_id', student.id).eq('paid', false);
         }
       }
+
+      // Tira o aluno da grade: apaga as aulas individuais pendentes dele e,
+      // se ele tava numa turma, sai dela. Se a turma era uma dupla (só mais
+      // 1 aluno além dele), a dupla vira aula individual automaticamente
+      // pro aluno que sobrou.
+      await sb.from('class_logs').delete().eq('student_id', student.id).eq('status', 'pendente');
+
+      if (student.turma_id) {
+        const oldTurmaId = student.turma_id;
+        const otherMembers = allStudents.filter(s => s.turma_id === oldTurmaId && s.id !== student.id);
+
+        await sb.from('profiles').update({ turma_id: null }).eq('id', student.id);
+
+        if (otherMembers.length === 1) {
+          const remaining = otherMembers[0];
+          await sb.from('class_logs').update({ turma_id: null, student_id: remaining.id }).eq('turma_id', oldTurmaId).eq('status', 'pendente');
+          await sb.from('profiles').update({ turma_id: null }).eq('id', remaining.id);
+        }
+      }
     }
 
     const { data: { session } } = await sb.auth.getSession();
     await loadStudents(session.user.id, currentUserIsBrenda);
+    await loadTurmas(session.user.id, currentUserIsBrenda);
+    await loadClassLogs(session.user.id, currentUserIsBrenda);
+    await loadAulasHoje(session.user.id, currentUserIsBrenda);
+    await loadAgendaWeek();
+    await loadEquipeWeek();
     if (currentUserIsBrenda) await loadFinanceiro();
     openStudentProfile(student.id);
   }
