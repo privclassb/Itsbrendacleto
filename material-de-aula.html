@@ -102,6 +102,10 @@
       <span class="folder-name">📁 Adultos</span>
       <span class="folder-chevron">›</span>
     </div>
+    <div class="folder-card" onclick="goTo('auloes')">
+      <span class="folder-name">📁 Aulões</span>
+      <span class="folder-chevron">›</span>
+    </div>
   </div>
 
   <div class="screen" id="screen-kids">
@@ -169,13 +173,19 @@
   <div class="screen" id="screen-adultos">
     <div class="empty-msg">Em breve.</div>
   </div>
+
+  <div class="screen" id="screen-auloes">
+    <a class="lesson-item" href="apresentacao-auloes-wtf-swearing.html">
+      <span class="name">WTF?! — Swearing in English</span>
+    </a>
+  </div>
 </main>
 
 <script>
   // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
   // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
-  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root' };
-  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos' };
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões' };
 
   function goTo(level) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
