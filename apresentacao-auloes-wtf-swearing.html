@@ -109,6 +109,35 @@ html, body {
   z-index: 20;
 }
 
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.exit-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.exit-btn:hover {
+  color: var(--ink);
+  border-color: var(--marrom);
+  background: var(--surface);
+}
+
 .top-brand {
   font-family: var(--f-display);
   font-weight: 700;
@@ -116,6 +145,9 @@ html, body {
   letter-spacing: 0.02em;
   color: var(--marrom);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .top-brand em {
@@ -156,12 +188,6 @@ html, body {
 
 .btn-top:hover {
   color: var(--ink);
-  border-color: var(--marrom);
-  background: var(--surface);
-}
-
-.btn-top.guide-active {
-  color: var(--marrom);
   border-color: var(--marrom);
   background: var(--surface);
 }
@@ -249,16 +275,17 @@ html, body {
 }
 
 @media (max-width: 600px) {
-  .top-brand { font-size: 13px; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-brand { font-size: 13px; max-width: 110px; }
   .top-ctl { gap: 8px; }
   .btn-top { padding: 5px 8px; font-size: 11px; }
+  .exit-btn { padding: 5px 8px; font-size: 11px; }
   .top-counter { font-size: 11px; min-width: 32px; }
   .nav-btn { padding: 8px 8px; font-size: 12px; }
   .dots { max-width: 110px; }
 }
 
 @media (max-width: 340px) {
-  .top-brand { max-width: 100px; }
+  .top-brand { max-width: 70px; }
   .top-counter { display: none; }
 }
 
@@ -864,7 +891,10 @@ html, body {
 
 <!-- ═══ TOP BAR ══════════════════════════════════════════ -->
 <div class="top">
-  <div class="top-brand">its<em>brenda</em>cleto · WTF?!</div>
+  <div class="top-left">
+    <a class="exit-btn" href="material-de-aula.html">← Sair</a>
+    <div class="top-brand">its<em>brenda</em>cleto · WTF?!</div>
+  </div>
   <div class="top-ctl">
     <span class="top-counter" id="cnt">1 / 15</span>
     <button class="btn-top" id="guideBtn" onclick="toggleGuide()">Guia da prof.</button>
@@ -1954,7 +1984,6 @@ function goTo(n) {
   buildDots();
   updateCnt();
   updateBtns();
-  syncGuideWindow();
 
   // hash navigation
   const id = SLIDES[cur].dataset.id;
@@ -1986,42 +2015,54 @@ document.addEventListener('keydown', e => {
 // ─── TEACHER GUIDE ──────────────────────────────────────
 // Abre numa janela à parte (menor, posicionada do lado direito) em vez de
 // um painel sobreposto — assim não fica preso atrás do compartilhamento de
-// tela no Meet/Zoom. Clicar de novo com a janela já aberta só traz o foco
-// pra ela; o conteúdo é atualizado conforme o slide muda.
+// tela no Meet/Zoom. O guia inteiro (todas as etapas, com sumário) é escrito
+// de uma vez só; clicar de novo com a janela já aberta só traz o foco pra ela.
+
+const GUIDE_LABELS = [
+  'Capa', 'Etapa 1 · Vote', 'Etapa 2 · Context', 'Etapa 3 · Swearing Meter',
+  'Etapa 4 · One Word, Many Meanings', 'Etapa 5 · The F-Word',
+  'Etapa 6 · Careful Who You Say That To', 'Etapa 7 · Would You Say That?',
+  'Etapa 8 · Real English in Action', 'Etapa 9 · Safe or Strong?',
+  'Etapa 10 · Real English Upgrade', 'Etapa 11 · Situation Challenge',
+  'Etapa 12 · Final Challenge', 'Etapa 13 · What Have We Learned?',
+  'Encerramento'
+];
 
 const GCSS = `
   *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',system-ui,sans-serif;background:#FAF7F2;color:#2E1F17;}
-  .ghead{background:#5C4033;color:#fff;padding:14px 18px;position:sticky;top:0;}
-  .ghead h3{font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;}
-  .gbody{padding:16px 18px;font-size:13px;line-height:1.6;}
+  body{font-family:'DM Sans',system-ui,sans-serif;background:#FAF7F2;color:#2E1F17;max-width:720px;margin:0 auto;padding:18px 22px 60px;line-height:1.6;}
+  h1{font-size:21px;font-weight:600;margin-bottom:6px;color:#5C4033;}
+  .meta{color:#9A8880;font-size:13px;margin-bottom:14px;}
+  .toc{position:sticky;top:0;background:#FAF7F2ee;padding:10px 0;border-bottom:1px solid #E2DDD8;font-size:12.5px;margin-bottom:6px;}
+  .toc a{color:#A8763F;text-decoration:none;font-weight:600;}
+  .toc a:hover{text-decoration:underline;}
+  h2{scroll-margin-top:52px;font-size:15px;margin:26px 0 10px;padding:8px 12px;background:#F2ECE5;border-left:4px solid #E8A598;border-radius:6px;color:#5C4033;}
+  .gbody{font-size:13px;}
   .gbody p{margin-bottom:10px;}
   .gbody p:last-child{margin-bottom:0;}
   .gbody strong{color:#5C4033;font-weight:600;}
   .gbody em{font-style:italic;}
   .g-tag{display:inline-block;background:#F2ECE5;border:1px solid #E2DDD8;border-radius:3px;font-size:11px;font-weight:600;letter-spacing:.06em;padding:2px 7px;color:#9A8880;text-transform:uppercase;margin-bottom:8px;margin-right:6px;}
   .g-time{color:#A8C5B5;font-weight:600;}
+  @media print{.toc{display:none}}
 `;
 
 let nw = null;
 
-function buildGuideHTML() {
+function buildGuideDoc() {
+  const toc = GUIDE_LABELS.map((label, i) => '<a href="#s' + i + '">' + label + '</a>').join(' · ');
+  const sections = GUIDE.map((html, i) =>
+    '<h2 id="s' + i + '">' + GUIDE_LABELS[i] + '</h2><div class="gbody">' + html + '</div>'
+  ).join('');
   return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">' +
     '<title>Guia da Professora · WTF?!</title>' +
     '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap">' +
     '<style>' + GCSS + '</style></head><body>' +
-    '<div class="ghead"><h3>Guia da Professora</h3></div>' +
-    '<div class="gbody" id="guideBody">' + (GUIDE[cur] || '<p>Sem notas para este slide.</p>') + '</div>' +
+    '<h1>Guia da Professora · WTF?! — Swearing in English</h1>' +
+    '<p class="meta">Aulão mensal · A1+A2 · 75 min · todos os alunos</p>' +
+    '<div class="toc">' + toc + '</div>' +
+    sections +
     '</body></html>';
-}
-
-function syncGuideWindow() {
-  if (nw && !nw.closed) {
-    try {
-      const body = nw.document.getElementById('guideBody');
-      if (body) body.innerHTML = GUIDE[cur] || '<p>Sem notas para este slide.</p>';
-    } catch (e) {}
-  }
 }
 
 function toggleGuide() {
@@ -2032,10 +2073,9 @@ function toggleGuide() {
   } catch (e) { nw = null; }
   if (!nw) { alert('O navegador bloqueou a janela. Permita pop-ups para este site e clique em Guia de novo.'); return; }
   try {
-    nw.document.write(buildGuideHTML());
+    nw.document.write(buildGuideDoc());
     nw.document.close();
   } catch (e) { try { nw.close(); } catch (_) {} nw = null; alert("Não foi possível abrir o Guia da Professora. Tente novamente."); return; }
-  document.getElementById('guideBtn').classList.add('guide-active');
   window.focus();
 }
 
