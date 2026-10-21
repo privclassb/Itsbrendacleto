@@ -162,11 +162,10 @@
     });
   }
 
-  const GLOBAL_CATEGORIES = [
-    { key: 'adulto-materiais',    icon: '📖', label: 'Material digital',   sub: 'Slides e atividades' },
-    { key: 'adulto-auloes',       icon: '🎓', label: 'Aulões',              sub: 'Aulas especiais extras' },
-    { key: 'adulto-lexi',         icon: '🤖', label: 'Lexi — IA exclusiva', sub: 'Tire dúvidas e pratique inglês' },
-  ];
+  const CAT_MATERIAIS = { key: 'adulto-materiais', icon: '📖', label: 'Material digital',   sub: 'Slides e atividades' };
+  const CAT_AULOES    = { key: 'adulto-auloes',    icon: '🎓', label: 'Aulões',              sub: 'Aulas especiais extras' };
+  const CAT_LEXI      = { key: 'adulto-lexi',      icon: '🤖', label: 'Lexi — IA exclusiva', sub: 'Tire dúvidas e pratique inglês' };
+  const GLOBAL_CATEGORIES = [CAT_MATERIAIS, CAT_AULOES, CAT_LEXI];
 
   let userId = null;
 
@@ -191,26 +190,29 @@
     renderAll(linkMap, folders || []);
   }
 
+  function renderCategory(cat, linkMap) {
+    const url = linkMap[cat.key];
+    const hasUrl = url && url.trim() !== '';
+    return `
+      <a href="${hasUrl ? url : '#'}" target="${hasUrl ? '_blank' : '_self'}"
+         class="material-item ${!hasUrl ? 'unavailable' : ''}">
+        <div class="material-icon">${cat.icon}</div>
+        <div class="material-info">
+          <div class="material-title">${cat.label}</div>
+          <div class="material-sub">${hasUrl ? cat.sub : 'Em breve...'}</div>
+        </div>
+        <div class="material-arrow">${hasUrl ? '›' : '⏳'}</div>
+      </a>`;
+  }
+
   function renderAll(linkMap, folders) {
     const main = document.getElementById('mainContent');
     let html = '';
 
-    // Links globais
+    // Links globais, na ordem: Material digital, Aulões (gravações), Slides Aulão, Lexi por último
     html += '<div class="section-title">Recursos</div>';
-    GLOBAL_CATEGORIES.forEach(cat => {
-      const url = linkMap[cat.key];
-      const hasUrl = url && url.trim() !== '';
-      html += `
-        <a href="${hasUrl ? url : '#'}" target="${hasUrl ? '_blank' : '_self'}"
-           class="material-item ${!hasUrl ? 'unavailable' : ''}">
-          <div class="material-icon">${cat.icon}</div>
-          <div class="material-info">
-            <div class="material-title">${cat.label}</div>
-            <div class="material-sub">${hasUrl ? cat.sub : 'Em breve...'}</div>
-          </div>
-          <div class="material-arrow">${hasUrl ? '›' : '⏳'}</div>
-        </a>`;
-    });
+    html += renderCategory(CAT_MATERIAIS, linkMap);
+    html += renderCategory(CAT_AULOES, linkMap);
 
     // Slides dos aulões mensais (sempre disponível, não depende de link cadastrado)
     html += `
@@ -222,6 +224,8 @@
         </div>
         <div class="material-arrow">›</div>
       </a>`;
+
+    html += renderCategory(CAT_LEXI, linkMap);
 
     // Subpastas do aluno (gravações, materiais extras, etc. definidos pela professora)
     if (folders.length > 0) {
