@@ -212,6 +212,17 @@
         </a>`;
     });
 
+    // Slides dos aulões mensais (sempre disponível, não depende de link cadastrado)
+    html += `
+      <a href="slides-aulao.html" class="material-item">
+        <div class="material-icon">🎓</div>
+        <div class="material-info">
+          <div class="material-title">Slides Aulão</div>
+          <div class="material-sub">Reveja os slides dos aulões mensais</div>
+        </div>
+        <div class="material-arrow">›</div>
+      </a>`;
+
     // Subpastas do aluno (gravações, materiais extras, etc. definidos pela professora)
     if (folders.length > 0) {
       html += '<div class="section-title">Suas pastas</div>';
