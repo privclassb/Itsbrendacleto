@@ -1,0 +1,2153 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>WTF?! — Swearing in English</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&display=swap">
+
+<style>
+/* ─── TOKENS ─────────────────────────────────────────── */
+/* Layout: fixed top 48px + fixed bottom 60px, stage fills between */
+:root {
+  --bg:      #FAF7F2;
+  --white:   #FFFFFF;
+  --ink:     #2E1F17;
+  --marrom:  #5C4033;
+  --menta:   #A8C5B5;
+  --rosa:    #E8A598;
+  --muted:   #9A8880;
+  --border:  #E2DDD8;
+  --surface: #F2ECE5;
+
+  --top-h: 48px;
+  --bot-h: 60px;
+
+  --f-display: 'Playfair Display', Georgia, serif;
+  --f-body:    'DM Sans', system-ui, sans-serif;
+
+  /* Semantic chip tokens — light mode */
+  --chip-mild-bg:     #d4edda;
+  --chip-mild-border: #2ecc71;
+  --chip-mild-ink:    #155724;
+  --chip-mod-bg:      #fff3cd;
+  --chip-mod-border:  #f39c12;
+  --chip-mod-ink:     #856404;
+  --chip-str-bg:      #f8d7da;
+  --chip-str-border:  #e74c3c;
+  --chip-str-ink:     #721c24;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:      #1C1410;
+    --white:   #241A14;
+    --ink:     #F0E8DF;
+    --marrom:  #C49B84;
+    --menta:   #7BAF99;
+    --rosa:    #D4877A;
+    --muted:   #7A6860;
+    --border:  #3A2E28;
+    --surface: #231810;
+    color-scheme: dark;
+
+    /* Semantic chip tokens — dark mode */
+    --chip-mild-bg:     #1a3a25;
+    --chip-mild-border: #2ecc71;
+    --chip-mild-ink:    #a8e6bc;
+    --chip-mod-bg:      #3a2f00;
+    --chip-mod-border:  #f39c12;
+    --chip-mod-ink:     #ffd166;
+    --chip-str-bg:      #3a1a1a;
+    --chip-str-border:  #e74c3c;
+    --chip-str-ink:     #f5a0a0;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:      #1C1410;
+  --white:   #241A14;
+  --ink:     #F0E8DF;
+  --marrom:  #C49B84;
+  --menta:   #7BAF99;
+  --rosa:    #D4877A;
+  --muted:   #7A6860;
+  --border:  #3A2E28;
+  --surface: #231810;
+  color-scheme: dark;
+
+  /* Semantic chip tokens — dark mode */
+  --chip-mild-bg:     #1a3a25;
+  --chip-mild-border: #2ecc71;
+  --chip-mild-ink:    #a8e6bc;
+  --chip-mod-bg:      #3a2f00;
+  --chip-mod-border:  #f39c12;
+  --chip-mod-ink:     #ffd166;
+  --chip-str-bg:      #3a1a1a;
+  --chip-str-border:  #e74c3c;
+  --chip-str-ink:     #f5a0a0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-weight: 400;
+}
+
+/* ─── TOP BAR ────────────────────────────────────────── */
+.top {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--top-h);
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px)) 0 max(16px, env(safe-area-inset-right, 0px));
+  z-index: 20;
+}
+
+.top-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.exit-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  border-radius: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  flex: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.exit-btn:hover {
+  color: var(--ink);
+  border-color: var(--marrom);
+  background: var(--surface);
+}
+
+.top-brand {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--marrom);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.top-brand em {
+  font-style: italic;
+  color: var(--rosa);
+}
+
+.top-ctl {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-counter {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  min-width: 40px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-top {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.btn-top:hover {
+  color: var(--ink);
+  border-color: var(--marrom);
+  background: var(--surface);
+}
+
+/* ─── STAGE ──────────────────────────────────────────── */
+.stage {
+  position: fixed;
+  top: var(--top-h);
+  bottom: var(--bot-h);
+  left: 0; right: 0;
+  z-index: 5;
+  overflow: hidden;
+}
+
+/* ─── SLIDES ─────────────────────────────────────────── */
+.slide {
+  position: absolute;
+  inset: 0;
+  display: none;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 32px max(20px, env(safe-area-inset-left, 0px));
+}
+
+.slide.on { display: flex; flex-direction: column; }
+
+/* ─── BOTTOM BAR ─────────────────────────────────────── */
+.bot {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  height: var(--bot-h);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  z-index: 20;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--marrom);
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  letter-spacing: 0.02em;
+  flex: none;
+  white-space: nowrap;
+}
+
+.nav-btn:hover { background: var(--surface); }
+.nav-btn:disabled { color: var(--border); cursor: default; background: none; }
+
+.dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow-x: auto;
+  max-width: 140px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.dots::-webkit-scrollbar { display: none; }
+
+.dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.dots span.on {
+  background: var(--marrom);
+  transform: scale(1.4);
+}
+
+@media (max-width: 600px) {
+  .top-brand { font-size: 13px; max-width: 110px; }
+  .top-ctl { gap: 8px; }
+  .btn-top { padding: 5px 8px; font-size: 11px; }
+  .exit-btn { padding: 5px 8px; font-size: 11px; }
+  .top-counter { font-size: 11px; min-width: 32px; }
+  .nav-btn { padding: 8px 8px; font-size: 12px; }
+  .dots { max-width: 110px; }
+}
+
+@media (max-width: 340px) {
+  .top-brand { max-width: 70px; }
+  .top-counter { display: none; }
+}
+
+/* ─── SHARED SLIDE COMPONENTS ────────────────────────── */
+
+/* Etapa badge */
+.etapa-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.etapa-badge::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 1px;
+  background: var(--rosa);
+  vertical-align: middle;
+}
+
+.slide-title {
+  font-family: var(--f-display);
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  line-height: 1.05;
+  text-wrap: balance;
+  color: var(--ink);
+  margin-bottom: 8px;
+}
+
+.slide-sub {
+  font-size: 16px;
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* Activity cards */
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 12px;
+}
+
+/* Vote activity */
+.vote-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@media (max-width: 480px) {
+  .vote-grid { grid-template-columns: 1fr; }
+}
+
+.vote-opt {
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 14px 16px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--f-body);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--ink);
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.vote-opt:hover {
+  border-color: var(--menta);
+  background: var(--white);
+  transform: translateY(-1px);
+}
+
+.vote-opt.selected {
+  border-color: var(--marrom);
+  background: var(--surface);
+  color: var(--marrom);
+  font-weight: 500;
+}
+
+.vote-opt .vote-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.vote-bar-wrap {
+  margin-top: 20px;
+}
+
+.vote-bar-item {
+  margin-bottom: 14px;
+}
+
+.vote-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--ink);
+  margin-bottom: 5px;
+}
+
+.vote-bar-label span { color: var(--marrom); font-weight: 600; }
+
+.vote-bar-track {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.vote-bar-fill {
+  height: 100%;
+  background: var(--menta);
+  border-radius: 3px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 0%;
+}
+
+/* Context activity (Etapa 2) */
+.situation-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .situation-grid { grid-template-columns: 1fr; }
+}
+
+.situation-card {
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s;
+  text-align: center;
+}
+
+.situation-card:hover {
+  border-color: var(--rosa);
+  transform: translateY(-2px);
+}
+
+.situation-card.revealed {
+  border-color: var(--menta);
+}
+
+.sit-emoji {
+  font-size: 40px;
+  display: block;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.sit-scene {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.sit-word {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--rosa);
+  margin-bottom: 8px;
+}
+
+.sit-emotion {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--menta);
+  display: none;
+}
+
+.situation-card.revealed .sit-emotion {
+  display: block;
+}
+
+.reveal-all-btn {
+  background: var(--marrom);
+  color: #fff;
+  border: none;
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 10px 24px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  display: block;
+  margin: 0 auto 20px;
+}
+
+.reveal-all-btn:hover { opacity: 0.85; }
+
+.insight-box {
+  background: var(--surface);
+  border-left: 3px solid var(--rosa);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 20px;
+  margin-top: 12px;
+  display: none;
+}
+
+.insight-box.show { display: block; }
+
+.insight-box p {
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* Coming soon placeholder */
+.placeholder-slide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.placeholder-num {
+  font-family: var(--f-display);
+  font-size: 80px;
+  font-weight: 900;
+  color: var(--border);
+  line-height: 1;
+}
+
+.placeholder-label {
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Cover slide */
+.cover-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.cover-kicker {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.cover-title {
+  font-family: var(--f-display);
+  font-size: clamp(52px, 10vw, 96px);
+  font-weight: 900;
+  line-height: 0.95;
+  margin-bottom: 8px;
+  color: var(--ink);
+}
+
+.cover-title em {
+  font-style: italic;
+  color: var(--rosa);
+}
+
+.cover-sub {
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--muted);
+  font-weight: 300;
+  margin-bottom: 40px;
+  line-height: 1.5;
+}
+
+.cover-meta {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.cover-tag {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--menta);
+  border: 1px solid var(--menta);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* Activity question heading */
+.q-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.q-text {
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+/* Question section label */
+.section-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--rosa);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Reset activity button */
+.reset-btn {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: var(--f-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  margin-top: 12px;
+}
+
+.reset-btn:hover { color: var(--ink); border-color: var(--marrom); }
+
+/* ── Etapa 3 — Swearing Meter ── */
+.meter-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: clamp(13px,1.8vw,16px);
+  color: var(--ink);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.25s, border-color 0.25s, color 0.25s;
+  width: 100%;
+}
+.meter-card:hover { background: var(--white); border-color: var(--marrom); }
+.meter-card.revealed-mild  { background: var(--chip-mild-bg); border-color: var(--chip-mild-border); color: var(--chip-mild-ink); }
+.meter-card.revealed-moderate { background: var(--chip-mod-bg); border-color: var(--chip-mod-border); color: var(--chip-mod-ink); }
+.meter-card.revealed-strong { background: var(--chip-str-bg); border-color: var(--chip-str-border); color: var(--chip-str-ink); }
+
+/* ── Etapa 4 — Match items ── */
+.match-item {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.match-item:hover { border-color: var(--marrom); background: var(--white); }
+.match-sentence { font-family: var(--f-display); font-style: italic; font-size: clamp(14px,1.8vw,17px); color: var(--ink); margin-bottom: 6px; }
+.match-meaning { font-size: 14px; color: var(--muted); display: none; }
+.match-item.revealed .match-meaning { display: block; color: var(--marrom); font-weight: 500; }
+.match-item.revealed { border-color: var(--menta); background: var(--chip-mild-bg); }
+
+/* ── Etapa 5 — F-Word cards ── */
+.fword-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.fword-card:hover { border-color: var(--marrom); background: var(--white); }
+.fword-expr { font-family: var(--f-display); font-style: italic; font-size: clamp(15px,2vw,18px); color: var(--ink); margin-bottom: 6px; }
+.fword-label { font-size: 12px; color: var(--muted); }
+.fword-answer { font-size: 14px; color: var(--marrom); font-weight: 500; display: none; margin-top: 8px; }
+.fword-card.revealed { border-color: var(--rosa); background: var(--chip-str-bg); }
+.fword-card.revealed .fword-label { display: none; }
+.fword-card.revealed .fword-answer { display: block; }
+
+/* ── Etapa 6 — Context word cards ── */
+.context-word-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.context-word-card:hover { border-color: var(--marrom); }
+.ctx-expr { font-family: var(--f-display); font-style: italic; font-size: clamp(16px,2vw,20px); color: var(--ink); margin-bottom: 6px; }
+.ctx-tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--rosa); margin-bottom: 8px; }
+.ctx-body { font-size: 13px; color: var(--muted); line-height: 1.5; display: none; margin-bottom: 8px; }
+.ctx-pt { font-size: 12px; color: var(--border); font-style: italic; display: none; }
+.context-word-card.revealed { border-color: var(--rosa); background: var(--chip-str-bg); }
+.context-word-card.revealed .ctx-body,
+.context-word-card.revealed .ctx-pt { display: block; color: var(--marrom); }
+.context-word-card.revealed .ctx-pt { color: var(--muted); }
+
+/* ── Etapa 7 — Would You Say That? ── */
+.situ-opts { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.situ-opt {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-family: var(--f-body);
+  font-size: 14px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.situ-opt:hover { border-color: var(--marrom); background: var(--white); }
+.situ-opt.sel-ok      { border-color: var(--menta); background: var(--chip-mild-bg); color: var(--chip-mild-ink); }
+.situ-opt.sel-risky   { border-color: var(--chip-mod-border); background: var(--chip-mod-bg); color: var(--chip-mod-ink); }
+.situ-opt.sel-avoid   { border-color: var(--chip-str-border); background: var(--chip-str-bg); color: var(--chip-str-ink); }
+.situ-feedback { font-size: 13px; line-height: 1.6; color: var(--ink); background: var(--surface); border-radius: 6px; padding: 12px 14px; margin-top: 10px; }
+.situ-feedback p { margin: 0 0 6px; }
+.situ-feedback p:last-child { margin: 0; }
+
+/* ── Etapa 9 — Classify ── */
+.classify-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 14px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.classify-card:hover { border-color: var(--marrom); background: var(--white); }
+.cl-expr { font-family: var(--f-display); font-style: italic; font-size: clamp(14px,1.8vw,17px); color: var(--ink); flex: 1; }
+.cl-badge { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; white-space: nowrap; opacity: 0; transition: opacity .3s; }
+.cl-badge.safe    { background: var(--chip-mild-bg); color: var(--chip-mild-ink); }
+.cl-badge.caution { background: var(--chip-mod-bg); color: var(--chip-mod-ink); }
+.cl-badge.strong  { background: var(--chip-str-bg); color: var(--chip-str-ink); }
+.cl-note { font-size: 12px; color: var(--muted); display: none; }
+.classify-card.revealed .cl-badge { opacity: 1; }
+.classify-card.revealed .cl-note { display: block; }
+.classify-card.revealed { border-color: var(--menta); }
+
+/* ── Etapa 10 — Upgrade ── */
+.upgrade-block {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.upgrade-neutral { font-family: var(--f-display); font-style: italic; font-size: clamp(14px,1.8vw,17px); color: var(--muted); margin-bottom: 10px; }
+.upgrade-opts { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.upgrade-opt { font-size: 14px; padding: 8px 12px; border-radius: 6px; line-height: 1.4; }
+.upgrade-opt.safe    { background: var(--chip-mild-bg); color: var(--chip-mild-ink); }
+.upgrade-opt.caution { background: var(--chip-mod-bg); color: var(--chip-mod-ink); }
+.upgrade-opt.strong  { background: var(--chip-str-bg); color: var(--chip-str-ink); }
+.upgrade-btn {
+  background: none; border: 1px solid var(--border); color: var(--muted);
+  font-family: var(--f-body); font-size: 12px; padding: 5px 12px;
+  border-radius: 4px; cursor: pointer; transition: color .2s, border-color .2s;
+}
+.upgrade-btn:hover { color: var(--ink); border-color: var(--marrom); }
+
+/* ── Etapa 11 — Reaction levels ── */
+.reaction-level {
+  border-radius: 8px; padding: 10px 12px; text-align: center;
+}
+.rl-tag { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+.rl-text { font-family: var(--f-display); font-style: italic; font-size: clamp(12px,1.6vw,14px); line-height: 1.4; }
+.neutral-lv { background: var(--surface); border: 1px solid var(--border); }
+.neutral-lv .rl-tag { color: var(--muted); }
+.mild-lv    { background: var(--chip-mod-bg); border: 1px solid var(--chip-mod-border); }
+.mild-lv .rl-tag { color: var(--chip-mod-ink); }
+.strong-lv  { background: var(--chip-str-bg); border: 1px solid var(--chip-str-border); }
+.strong-lv .rl-tag { color: var(--chip-str-ink); }
+
+/* ── Etapa 12 — Quiz ── */
+.quiz-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.qz-sentence { font-family: var(--f-display); font-style: italic; font-size: clamp(15px,2vw,18px); color: var(--ink); margin-bottom: 12px; }
+.qz-opts { display: flex; flex-direction: column; gap: 6px; }
+.qz-opt {
+  background: var(--white); border: 1.5px solid var(--border);
+  border-radius: 6px; padding: 8px 12px;
+  font-family: var(--f-body); font-size: 13px; color: var(--ink);
+  text-align: left; cursor: pointer; transition: border-color .2s, background .2s;
+}
+.qz-opt:hover { border-color: var(--marrom); background: var(--surface); }
+.qz-opt.correct { border-color: var(--menta); background: var(--chip-mild-bg); color: var(--chip-mild-ink); font-weight: 600; }
+.qz-opt.wrong   { border-color: var(--chip-str-border); background: var(--chip-str-bg); color: var(--muted); }
+.qz-feedback { font-size: 13px; line-height: 1.5; color: var(--ink); background: var(--chip-mild-bg); border-radius: 6px; padding: 10px 14px; margin-top: 10px; border-left: 3px solid var(--menta); }
+
+/* ── Etapa 13 — Discussion + Reflection ── */
+.disc-q {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-family: var(--f-display);
+  font-style: italic;
+  color: var(--ink);
+  cursor: pointer;
+  display: flex; justify-content: space-between; align-items: center;
+  transition: border-color .2s;
+}
+.disc-q:hover { border-color: var(--marrom); }
+.disc-q.open  { border-color: var(--menta); background: var(--chip-mild-bg); color: var(--chip-mild-ink); }
+.disc-arrow { font-style: normal; font-family: var(--f-body); font-size: 12px; color: var(--muted); transition: transform .2s; }
+.disc-q.open .disc-arrow { transform: rotate(90deg); }
+.reflect-q {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.rq-num {
+  font-family: var(--f-display); font-size: 28px; font-weight: 900;
+  color: var(--rosa); line-height: 1; flex-shrink: 0;
+}
+.rq-text { font-size: 15px; font-weight: 500; color: var(--ink); padding-top: 4px; line-height: 1.4; }
+
+/* ── Insight box ── */
+.insight-box {
+  border-left: 3px solid var(--menta);
+  background: var(--surface);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px;
+  font-family: var(--f-display);
+  font-style: italic;
+  font-size: clamp(14px,1.8vw,17px);
+  color: var(--ink);
+  line-height: 1.6;
+  margin-top: 4px;
+}
+.insight-box p { margin: 0 0 8px; }
+.insight-box p:last-child { margin: 0; }
+.insight-box.show { display: block; }
+
+/* ── Reveal all button ── */
+.reveal-all-btn {
+  display: inline-block;
+  margin-top: 16px;
+  background: var(--marrom);
+  color: var(--white);
+  border: none;
+  border-radius: 6px;
+  font-family: var(--f-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: background .2s, opacity .2s;
+}
+.reveal-all-btn:hover { background: var(--ink); }
+
+</style>
+
+<!-- ═══ TOP BAR ══════════════════════════════════════════ -->
+<div class="top">
+  <div class="top-left">
+    <a class="exit-btn" href="slides-aulao.html">← Sair</a>
+    <div class="top-brand">its<em>brenda</em>cleto · WTF?!</div>
+  </div>
+  <div class="top-ctl">
+    <span class="top-counter" id="cnt">1 / 15</span>
+    <button class="btn-top" id="fsBtn" onclick="toggleFS()">Tela cheia</button>
+  </div>
+</div>
+
+<!-- ═══ STAGE ════════════════════════════════════════════ -->
+<div class="stage">
+
+  <!-- SLIDE 1 · Cover -->
+  <section class="slide on" data-id="cover">
+    <div class="cover-wrap">
+      <div class="cover-kicker">itsbrenda<em>cleto</em> · Aulão de Inglês</div>
+      <div class="cover-title">WTF?!<br><em>Swearing</em><br>in English</div>
+      <div class="cover-sub">When words get real — and why that matters.</div>
+      <div class="cover-meta">
+        <span class="cover-tag">A1 + A2</span>
+        <span class="cover-tag">75 min</span>
+        <span class="cover-tag">13 etapas</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- SLIDE 2 · Etapa 1 — Warm-up: Do you swear? -->
+  <section class="slide" data-id="e1-vote">
+    <div class="etapa-badge">Etapa 1 · Warm-up</div>
+    <div class="slide-title">Let's start<br>with a vote.</div>
+    <div class="slide-sub">Three quick questions. No wrong answers.</div>
+
+    <!-- Q1 -->
+    <div class="card">
+      <div class="section-label">Question 1 of 3</div>
+      <div class="q-text">Do you swear in your daily life?</div>
+      <div class="vote-grid" id="q1-opts">
+        <button class="vote-opt" onclick="vote('q1', 'A', this)"><span class="vote-icon">🙋</span> Yes, all the time!</button>
+        <button class="vote-opt" onclick="vote('q1', 'B', this)"><span class="vote-icon">😬</span> Sometimes…</button>
+        <button class="vote-opt" onclick="vote('q1', 'C', this)"><span class="vote-icon">🙅</span> Rarely or never</button>
+        <button class="vote-opt" onclick="vote('q1', 'D', this)"><span class="vote-icon">🤫</span> Only in my head!</button>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="card">
+      <div class="section-label">Question 2 of 3</div>
+      <div class="q-text">Where do you hear English swear words most?</div>
+      <div class="vote-grid" id="q2-opts">
+        <button class="vote-opt" onclick="vote('q2', 'A', this)"><span class="vote-icon">📺</span> Series / movies</button>
+        <button class="vote-opt" onclick="vote('q2', 'B', this)"><span class="vote-icon">🎵</span> Music</button>
+        <button class="vote-opt" onclick="vote('q2', 'C', this)"><span class="vote-icon">🌐</span> Internet / social media</button>
+        <button class="vote-opt" onclick="vote('q2', 'D', this)"><span class="vote-icon">💬</span> Real conversations</button>
+      </div>
+    </div>
+
+    <!-- Q3 · Our Swear Words Board -->
+    <div class="card" id="board-card">
+      <div class="section-label">Question 3 of 3 · Discussion</div>
+      <div class="q-text">What English swear words do you already know?</div>
+      <p style="font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5;">Students answer orally — type the words they mention below.</p>
+
+      <!-- Input row -->
+      <div style="display:flex; gap:8px; margin-bottom:16px;">
+        <input id="word-input" type="text" placeholder="Type a word and press Enter"
+          style="flex:1; padding:9px 12px; border:1.5px solid var(--border); border-radius:5px;
+                 background:var(--bg); color:var(--ink); font-family:var(--f-body); font-size:14px;
+                 outline:none; transition:border-color 0.2s;"
+          onkeydown="if(event.key==='Enter'){addWord();event.preventDefault();}"
+          onfocus="this.style.borderColor='var(--marrom)'"
+          onblur="this.style.borderColor='var(--border)'">
+        <button onclick="addWord()"
+          style="background:var(--marrom); color:#fff; border:none; border-radius:5px;
+                 padding:9px 16px; font-family:var(--f-body); font-size:13px; font-weight:500;
+                 cursor:pointer; white-space:nowrap; transition:opacity 0.2s;"
+          onmouseenter="this.style.opacity='.82'" onmouseleave="this.style.opacity='1'">Add</button>
+      </div>
+
+      <!-- Tags area -->
+      <div id="board-tags" style="display:flex; flex-wrap:wrap; gap:8px; min-height:36px;"></div>
+
+      <!-- Empty state -->
+      <p id="board-empty" style="font-size:13px; color:var(--border); font-style:italic; margin-top:4px;">No words yet — students will add them during the activity.</p>
+
+      <!-- Clear button -->
+      <div style="margin-top:14px; display:flex; justify-content:flex-end;">
+        <button onclick="clearBoard()" id="clear-btn"
+          style="display:none; background:none; border:1px solid var(--border); color:var(--muted);
+                 font-family:var(--f-body); font-size:11px; font-weight:500; letter-spacing:.05em;
+                 padding:5px 12px; border-radius:4px; cursor:pointer; transition:color .2s,border-color .2s;"
+          onmouseenter="this.style.color='var(--ink)';this.style.borderColor='var(--rosa)'"
+          onmouseleave="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">Clear board</button>
+      </div>
+    </div>
+
+    <button class="reset-btn" onclick="resetVotes()">↺ Reiniciar votos</button>
+  </section>
+
+  <!-- SLIDE 3 · Etapa 2 — It's All About Context -->
+  <section class="slide" data-id="e2-context">
+    <div class="etapa-badge">Etapa 2 · Context</div>
+    <div class="slide-title">It's All<br>About Context.</div>
+    <div class="slide-sub">Same word. Four completely different situations. Can you identify the emotion?</div>
+
+    <div class="situation-grid" id="situations">
+
+      <div class="situation-card" onclick="revealSit(this)" data-emotion="Pain / frustration">
+        <span class="sit-emoji">🤕</span>
+        <div class="sit-scene">You accidentally hit your toe against the furniture at 3am.</div>
+        <div class="sit-word">"Fuck!"</div>
+        <div class="sit-emotion">Pain / Frustration</div>
+      </div>
+
+      <div class="situation-card" onclick="revealSit(this)" data-emotion="Anger">
+        <span class="sit-emoji">😤</span>
+        <div class="sit-scene">You find out someone lied to you for months.</div>
+        <div class="sit-word">"Fuck!"</div>
+        <div class="sit-emotion">Anger</div>
+      </div>
+
+      <div class="situation-card" onclick="revealSit(this)" data-emotion="Surprise / shock">
+        <span class="sit-emoji">😱</span>
+        <div class="sit-scene">Your best friend calls and says they just won a trip to Paris.</div>
+        <div class="sit-word">"Fuck!"</div>
+        <div class="sit-emotion">Surprise / Shock</div>
+      </div>
+
+      <div class="situation-card" onclick="revealSit(this)" data-emotion="Awe / admiration">
+        <span class="sit-emoji">😍</span>
+        <div class="sit-scene">You see a sunset so beautiful it makes you stop walking.</div>
+        <div class="sit-word">"Fuck!"</div>
+        <div class="sit-emotion">Awe / Admiration</div>
+      </div>
+
+    </div>
+
+    <button class="reveal-all-btn" onclick="revealAll()">Reveal all emotions</button>
+
+    <div class="insight-box" id="insight">
+      <p>"The same word can express completely different emotions.<br>
+      Context is everything in real English."</p>
+    </div>
+
+    <button class="reset-btn" onclick="resetContext()">↺ Reiniciar atividade</button>
+  </section>
+
+  <!-- SLIDE 4 · Etapa 3 — The Swearing Meter -->
+  <section class="slide" data-id="e3">
+    <div class="etapa-badge">Etapa 3 · The Swearing Meter</div>
+    <div class="slide-title">How strong<br>is it?</div>
+    <div class="slide-sub">Not all swear words are equal. Click each expression to reveal its level.</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:20px;">
+      <!-- expressions mixed — category revealed only on click -->
+      <button class="meter-card" onclick="revealMeter(this,'strong')"  data-level="strong">What the f***?!</button>
+      <button class="meter-card" onclick="revealMeter(this,'mild')"    data-level="mild">Oh my gosh!</button>
+      <button class="meter-card" onclick="revealMeter(this,'moderate')" data-level="moderate">Damn!</button>
+      <button class="meter-card" onclick="revealMeter(this,'mild')"    data-level="mild">What the heck?!</button>
+      <button class="meter-card" onclick="revealMeter(this,'strong')"  data-level="strong">F*** you!</button>
+      <button class="meter-card" onclick="revealMeter(this,'moderate')" data-level="moderate">What the hell?!</button>
+      <button class="meter-card" onclick="revealMeter(this,'mild')"    data-level="mild">Crap!</button>
+      <button class="meter-card" onclick="revealMeter(this,'strong')"  data-level="strong">A**hole!</button>
+      <button class="meter-card" onclick="revealMeter(this,'moderate')" data-level="moderate">Shit!</button>
+    </div>
+
+    <!-- Insight (hidden until all revealed or teacher clicks) -->
+    <div id="meter-insight" class="insight-box" style="display:none;">
+      <p>These levels are <em>approximate</em> — not rules. Context, culture, and the relationship between speakers always change the impact of a word.</p>
+    </div>
+
+    <!-- Oral question (hidden) -->
+    <div id="meter-oral" class="card" style="display:none; border-left:3px solid var(--menta); background:var(--surface);">
+      <div class="q-label">Oral question</div>
+      <div class="q-text">Which expressions would you feel comfortable using?</div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+      <button class="reveal-all-btn" style="margin:0;" onclick="document.getElementById('meter-insight').style.display='block'; document.getElementById('meter-oral').style.display='block';">Show insight + question</button>
+      <button class="reset-btn" onclick="resetMeter()">↺ Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- SLIDE 5 · Etapa 4 — One Word, Many Meanings -->
+  <section class="slide" data-id="e4">
+    <div class="etapa-badge">Etapa 4 · One Word, Many Meanings</div>
+    <div class="slide-title">One word.<br>Five meanings.</div>
+    <div class="slide-sub">Can one little word change everything?</div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;">
+
+      <div class="match-item" id="m1" onclick="revealMatch(this)">
+        <div class="match-sentence">"Shit! I forgot my phone."</div>
+        <div class="match-meaning">👉 Frustration / negative surprise</div>
+      </div>
+      <div class="match-item" id="m2" onclick="revealMatch(this)">
+        <div class="match-sentence">"This movie is shit."</div>
+        <div class="match-meaning">👉 This movie is very bad.</div>
+      </div>
+      <div class="match-item" id="m3" onclick="revealMatch(this)">
+        <div class="match-sentence">"This movie is <em>the</em> shit!"</div>
+        <div class="match-meaning">👉 This movie is amazing!</div>
+      </div>
+      <div class="match-item" id="m4" onclick="revealMatch(this)">
+        <div class="match-sentence">"I have a lot of shit to do."</div>
+        <div class="match-meaning">👉 I have a lot of stuff / things to do.</div>
+      </div>
+      <div class="match-item" id="m5" onclick="revealMatch(this)">
+        <div class="match-sentence">"I don't give a shit."</div>
+        <div class="match-meaning">👉 I don't care at all.</div>
+      </div>
+
+    </div>
+
+    <!-- Contrast highlight -->
+    <div id="contrast-box" class="insight-box" style="display:none;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; text-align:center;">
+        <div>
+          <div style="font-size:12px; color:var(--muted); font-family:var(--f-body); font-style:normal; margin-bottom:6px;">❌ Negative</div>
+          <div style="font-family:var(--f-display); font-size:20px; font-style:italic; color:var(--rosa);">"This movie is shit."</div>
+        </div>
+        <div>
+          <div style="font-size:12px; color:var(--muted); font-family:var(--f-body); font-style:normal; margin-bottom:6px;">✅ Positive!</div>
+          <div style="font-family:var(--f-display); font-size:20px; font-style:italic; color:var(--menta);">"This movie is THE shit!"</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+      <button class="reveal-all-btn" style="margin:0;" onclick="document.querySelectorAll('.match-item').forEach(m=>m.classList.add('revealed')); document.getElementById('contrast-box').style.display='block';">Reveal all</button>
+      <button class="reset-btn" onclick="resetMatch()">↺ Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- SLIDE 6 · Etapa 5 — The F-Word -->
+  <section class="slide" data-id="e5">
+    <div class="etapa-badge">Etapa 5 · The F-Word</div>
+    <div class="slide-title">The most<br><em style="color:var(--rosa)">versatile</em><br>word in English.</div>
+    <div class="slide-sub">Same word. Different emotions. Can you identify the function?</div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+
+      <div class="fword-card" onclick="revealFWord(this)" data-fn="Reaction — pure emotion, no specific meaning">
+        <div class="fword-expr">"F***!"</div>
+        <div class="fword-label">What is the function?</div>
+        <div class="fword-answer">⚡ Reaction — pure emotion, no specific meaning</div>
+      </div>
+
+      <div class="fword-card" onclick="revealFWord(this)" data-fn="Surprise — genuine shock or disbelief">
+        <div class="fword-expr">"What the f***?!"</div>
+        <div class="fword-label">What is the function?</div>
+        <div class="fword-answer">😱 Surprise — genuine shock or disbelief</div>
+      </div>
+
+      <div class="fword-card" onclick="revealFWord(this)" data-fn="Positive emphasis — intensifies admiration">
+        <div class="fword-expr">"This is f***ing amazing!"</div>
+        <div class="fword-label">What is the function?</div>
+        <div class="fword-answer">🔥 Positive emphasis — intensifies admiration</div>
+      </div>
+
+      <div class="fword-card" onclick="revealFWord(this)" data-fn="Negative emphasis — intensifies frustration">
+        <div class="fword-expr">"This is f***ing terrible!"</div>
+        <div class="fword-label">What is the function?</div>
+        <div class="fword-answer">😤 Negative emphasis — intensifies frustration</div>
+      </div>
+
+      <div class="fword-card" onclick="revealFWord(this)" data-fn="Disbelief — "You can't be serious!"">
+        <div class="fword-expr">"Are you f***ing kidding me?!"</div>
+        <div class="fword-label">What is the function?</div>
+        <div class="fword-answer">🤯 Disbelief — "You can't be serious!"</div>
+      </div>
+
+    </div>
+
+    <!-- Comparison -->
+    <div id="fword-compare" class="insight-box" style="display:none;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; text-align:center; font-family:var(--f-display); font-style:italic; font-size:18px;">
+        <div style="color:var(--muted);">"This is amazing."</div>
+        <div style="color:var(--rosa);">"This is f***ing amazing!"</div>
+      </div>
+      <p style="font-size:13px; color:var(--muted); font-family:var(--f-body); font-style:normal; margin-top:12px; line-height:1.5;">
+        <strong>f***ing</strong> intensifies positive <em>and</em> negative evaluations — but it's always vulgar. Avoid in formal situations.
+      </p>
+    </div>
+
+    <!-- Oral question -->
+    <div id="fword-oral" class="card" style="display:none; border-left:3px solid var(--menta); background:var(--surface); margin-top:0;">
+      <div class="q-label">Oral question</div>
+      <div class="q-text">Can a swear word express something positive?</div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+      <button class="reveal-all-btn" style="margin:0;" onclick="document.querySelectorAll('.fword-card').forEach(c=>c.classList.add('revealed')); document.getElementById('fword-compare').style.display='block'; document.getElementById('fword-oral').style.display='block';">Reveal all + compare</button>
+      <button class="reset-btn" onclick="resetFWord()">↺ Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- SLIDE 7 · Etapa 6 — Careful Who You Say That To -->
+  <section class="slide" data-id="e6">
+    <div class="etapa-badge">Etapa 6 · Careful Who You Say That To</div>
+    <div class="slide-title">Reaction vs.<br><em style="color:var(--rosa)">Insult.</em></div>
+    <div class="slide-sub">Some expressions are aimed at the moment. Others are aimed at a person. That changes everything.</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
+
+      <div class="context-word-card" onclick="revealCtx(this)">
+        <div class="ctx-expr">"F*** you!"</div>
+        <div class="ctx-tag">Direct insult</div>
+        <div class="ctx-body">Strong direct insult. Aggressive regardless of context. Not softened by familiarity.</div>
+        <div class="ctx-pt">PT: "Vai se f***" / "Vai à merda"</div>
+      </div>
+
+      <div class="context-word-card" onclick="revealCtx(this)">
+        <div class="ctx-expr">"F*** off!"</div>
+        <div class="ctx-tag">Aggressive / Playful</div>
+        <div class="ctx-body">Can mean "go away" aggressively — but between close friends, it can be used playfully (like "no way!"). Context is key.</div>
+        <div class="ctx-pt">PT: "Vai embora" / "Para com isso" (jocoso)</div>
+      </div>
+
+      <div class="context-word-card" onclick="revealCtx(this)">
+        <div class="ctx-expr">"Bitch"</div>
+        <div class="ctx-tag">Offensive / Reclaimed</div>
+        <div class="ctx-body">Offensive term, often with gender connotations. In some groups it has been reclaimed as a term of endearment or empowerment — but it remains risky outside those contexts.</div>
+        <div class="ctx-pt">PT: "Vadia" / "Cadela" (pejorativo)</div>
+      </div>
+
+      <div class="context-word-card" onclick="revealCtx(this)">
+        <div class="ctx-expr">"A**hole"</div>
+        <div class="ctx-tag">Insult — character</div>
+        <div class="ctx-body">Insult for someone selfish, unpleasant or inconsiderate. Strong, but less gendered than "bitch".</div>
+        <div class="ctx-pt">PT: "Idiota" / "Babaca" / "Canalha"</div>
+      </div>
+
+    </div>
+
+    <!-- Warning note -->
+    <div class="insight-box show" style="border-left-color:var(--rosa);">
+      <p style="font-size:14px;">⚠️ Familiarity doesn't guarantee acceptance. Even between close friends, a directed insult can hurt.</p>
+    </div>
+
+    <!-- Oral question -->
+    <div id="ctx-oral" class="card" style="display:none; border-left:3px solid var(--menta); background:var(--surface); margin-top:12px;">
+      <div class="q-label">Oral question</div>
+      <div class="q-text">Would you say this to a stranger? Why or why not?</div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
+      <button class="reveal-all-btn" style="margin:0;" onclick="document.querySelectorAll('.context-word-card').forEach(c=>c.classList.add('revealed')); document.getElementById('ctx-oral').style.display='block';">Reveal all + question</button>
+      <button class="reset-btn" onclick="document.querySelectorAll('.context-word-card').forEach(c=>c.classList.remove('revealed')); document.getElementById('ctx-oral').style.display='none';">↺ Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- SLIDE 8 · Etapa 7 — Would You Say That? -->
+  <section class="slide" data-id="e7">
+    <div class="etapa-badge">Etapa 7 · Would You Say That?</div>
+    <div class="slide-title">Would you<br>say that?</div>
+    <div class="slide-sub">Four situations. Which response fits best? (More than one can be right!)</div>
+
+    <!-- Situation 1 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 1 — At work 💼</div>
+      <div class="q-text">Your computer stops working during an important meeting.</div>
+      <div class="situ-opts" id="s7-1">
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">Oh no! My computer isn't working.</button>
+        <button class="situ-opt" onclick="selectSitu(this,'risky')" data-eval="risky">Damn! My computer isn't working.</button>
+        <button class="situ-opt" onclick="selectSitu(this,'avoid')" data-eval="avoid">This f***ing computer!</button>
+      </div>
+      <div class="situ-feedback" id="fb7-1" style="display:none;">
+        <p><strong style="color:var(--menta);">✓ Safe:</strong> "Oh no!" — professional, appropriate anywhere.</p>
+        <p><strong style="color:var(--rosa);">⚠ Risky:</strong> "Damn!" — common but some workplaces don't accept it.</p>
+        <p><strong style="color:#c0392b;">✗ Avoid:</strong> "This f***ing…" — very inappropriate in professional settings.</p>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin:10px 0 0;" onclick="document.getElementById('fb7-1').style.display='block';">Show feedback</button>
+    </div>
+
+    <!-- Situation 2 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 2 — With your best friend 👯</div>
+      <div class="q-text">Your friend tells you they won a million dollars.</div>
+      <div class="situ-opts" id="s7-2">
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">That's amazing!</button>
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">Holy shit! No way!</button>
+        <button class="situ-opt" onclick="selectSitu(this,'avoid')" data-eval="avoid">F*** you!</button>
+      </div>
+      <div class="situ-feedback" id="fb7-2" style="display:none;">
+        <p><strong style="color:var(--menta);">✓ Safe:</strong> "That's amazing!" — enthusiastic and always appropriate.</p>
+        <p><strong style="color:var(--menta);">✓ Also works:</strong> "Holy shit!" — genuine surprise between friends. Very common.</p>
+        <p><strong style="color:var(--rosa);">⚠ Careful:</strong> "F*** you!" — sometimes used as "no way!" between very close friends, but risky and can be confusing.</p>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin:10px 0 0;" onclick="document.getElementById('fb7-2').style.display='block';">Show feedback</button>
+    </div>
+
+    <!-- Situation 3 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 3 — At a restaurant 🍽️</div>
+      <div class="q-text">The waiter brings the wrong order.</div>
+      <div class="situ-opts" id="s7-3">
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">Excuse me, I ordered something different.</button>
+        <button class="situ-opt" onclick="selectSitu(this,'risky')" data-eval="risky">What the hell is this?!</button>
+        <button class="situ-opt" onclick="selectSitu(this,'avoid')" data-eval="avoid">You're an a**hole.</button>
+      </div>
+      <div class="situ-feedback" id="fb7-3" style="display:none;">
+        <p><strong style="color:var(--menta);">✓ Best choice:</strong> Polite and effective in any situation.</p>
+        <p><strong style="color:var(--rosa);">⚠ Avoid:</strong> "What the hell?!" — rude and unnecessary in a service situation.</p>
+        <p><strong style="color:#c0392b;">✗ Never:</strong> Insulting the waiter is always inappropriate and unkind.</p>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin:10px 0 0;" onclick="document.getElementById('fb7-3').style.display='block';">Show feedback</button>
+    </div>
+
+    <!-- Situation 4 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 4 — Watching a movie 🎬</div>
+      <div class="q-text">A character does something completely unexpected.</div>
+      <div class="situ-opts" id="s7-4">
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">No way!</button>
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">What the hell?!</button>
+        <button class="situ-opt" onclick="selectSitu(this,'ok')" data-eval="ok">What the f***?!</button>
+      </div>
+      <div class="situ-feedback" id="fb7-4" style="display:none;">
+        <p><strong style="color:var(--menta);">✓ All can work</strong> — it depends on intensity and your company!</p>
+        <p>"No way!" — neutral surprise. "What the hell?!" — moderate. "What the f***?!" — very strong.</p>
+        <p>Watching alone or with friends: all acceptable. With family or strangers: stick to "No way!"</p>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin:10px 0 0;" onclick="document.getElementById('fb7-4').style.display='block';">Show feedback</button>
+    </div>
+
+    <button class="reset-btn" onclick="resetSitu()">↺ Reiniciar atividade</button>
+  </section>
+
+  <!-- SLIDE 9 · Etapa 8 — Real English in Action -->
+  <section class="slide" data-id="e8">
+    <div class="etapa-badge">Etapa 8 · Real English in Action</div>
+    <div class="slide-title">Real English<br><em style="color:var(--rosa)">in Action.</em></div>
+    <div class="slide-sub">Before watching: what do you think is happening in each scene?</div>
+
+    <!-- Video 1 — The Hangover Part II -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="section-label">Video 1 — The Hangover Part II (2011)</div>
+
+      <!-- GetYarn blocks cross-origin iframes (x-frame-options: SAMEORIGIN).
+           Fallback: branded clip card + "Watch clip" button that opens the original. -->
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px;
+                  padding:20px 18px; margin-bottom:16px; display:flex; align-items:center; gap:16px;">
+        <div style="flex-shrink:0; width:52px; height:52px; background:var(--bg);
+                    border:1px solid var(--border); border-radius:8px;
+                    display:flex; align-items:center; justify-content:center; font-size:26px;">🎬</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:2px;">
+            "What the fuck is going on?"
+          </div>
+          <div style="font-size:12px; color:var(--muted);">The Hangover Part II · GetYarn clip</div>
+        </div>
+        <a href="https://getyarn.io/yarn-clip/1417497c-d980-4e27-a8bc-bee5299226ec"
+           target="_blank" rel="noopener"
+           style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px;
+                  background:var(--rosa); color:#fff; font-size:12px; font-weight:600;
+                  padding:8px 14px; border-radius:20px; text-decoration:none;
+                  border:none; cursor:pointer; white-space:nowrap;">
+          ▶ Watch clip
+        </a>
+      </div>
+      <div class="q-label">Before watching</div>
+      <div class="q-text" id="v1-q" style="margin-bottom:12px;">What emotion do you think the character is feeling?</div>
+
+      <div id="v1-reveal" style="display:none;">
+        <div style="background:var(--surface); border-radius:6px; padding:14px 16px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--rosa); margin-bottom:6px;">Expression used</div>
+          <div style="font-size:15px; font-weight:500; color:var(--ink);">"What the fuck is going on?"</div>
+        </div>
+        <div style="background:var(--surface); border-radius:6px; padding:14px 16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--menta); margin-bottom:6px;">Emotion / Function</div>
+          <div style="font-size:14px; color:var(--ink);">Shock + disorientation — reacting to a chaotic, unexpected situation. Directed at the situation, not at a person.</div>
+        </div>
+      </div>
+
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:10px;" onclick="document.getElementById('v1-reveal').style.display='block';">Reveal expression + emotion</button>
+    </div>
+
+    <!-- Video 2 — Wolf Pack S01E03 -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="section-label">Video 2 — Wolf Pack · S01E03 "Origin Point" (2023)</div>
+
+      <!-- GetYarn blocks cross-origin iframes — same fallback pattern as Video 1 -->
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:10px;
+                  padding:20px 18px; margin-bottom:16px; display:flex; align-items:center; gap:16px;">
+        <div style="flex-shrink:0; width:52px; height:52px; background:var(--bg);
+                    border:1px solid var(--border); border-radius:8px;
+                    display:flex; align-items:center; justify-content:center; font-size:26px;">🎬</div>
+        <div style="flex:1; min-width:0;">
+          <div style="font-size:13px; font-weight:600; color:var(--ink); margin-bottom:2px;" id="v2-expr-hidden">
+            <!-- expressão oculta até o reveal -->
+            <span style="color:var(--muted); font-style:italic;">[ expression hidden — reveal after watching ]</span>
+          </div>
+          <div style="font-size:12px; color:var(--muted);">Wolf Pack · S01E03 · GetYarn clip</div>
+        </div>
+        <a href="https://getyarn.io/yarn-clip/a52b83c9-a720-47ed-84d8-eccaf1f227cf"
+           target="_blank" rel="noopener"
+           style="flex-shrink:0; display:inline-flex; align-items:center; gap:6px;
+                  background:var(--rosa); color:#fff; font-size:12px; font-weight:600;
+                  padding:8px 14px; border-radius:20px; text-decoration:none;
+                  white-space:nowrap;">
+          ▶ Watch clip
+        </a>
+      </div>
+      <!-- Before watching -->
+      <div class="q-label">Before watching</div>
+      <div class="q-text" style="margin-bottom:16px;">Do you think the character is happy, angry or scared?</div>
+
+      <!-- Reveal block -->
+      <div id="v2-reveal" style="display:none;">
+
+        <!-- expression chip revealed — filled by reveal button -->
+
+        <!-- After watching -->
+        <div style="background:var(--surface); border-radius:8px; padding:14px 16px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--rosa); margin-bottom:8px;">After watching</div>
+          <div style="font-size:14px; color:var(--ink); margin-bottom:4px;">• What expression did you hear?</div>
+          <div style="font-size:14px; color:var(--ink);">• Is the character expressing something positive or negative?</div>
+        </div>
+
+        <!-- Language discovery -->
+        <div style="background:var(--surface); border-radius:8px; padding:14px 16px; margin-bottom:10px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--menta); margin-bottom:10px;">Language discovery</div>
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap;">
+            <div style="background:var(--chip-mild-bg); color:var(--chip-mild-ink); border:1px solid var(--chip-mild-border);
+                        border-radius:6px; padding:8px 14px; font-size:14px; font-weight:500;">"This is amazing!"</div>
+            <div style="font-size:18px; color:var(--muted);">→</div>
+            <div style="background:var(--chip-str-bg); color:var(--chip-str-ink); border:1px solid var(--chip-str-border);
+                        border-radius:6px; padding:8px 14px; font-size:14px; font-weight:600;">"This is <em>fucking</em> amazing!"</div>
+          </div>
+          <div style="font-size:13px; color:var(--ink); line-height:1.6;">
+            <strong>"Fucking"</strong> acts as a vulgar intensifier. Here it amplifies a <em>positive</em> reaction —
+            the character is excited and overwhelmed. Context and tone decide whether it sounds angry or delighted.
+          </div>
+        </div>
+
+        <!-- Discussion -->
+        <div style="background:var(--surface); border-radius:8px; padding:14px 16px;">
+          <div style="font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--marrom); margin-bottom:8px;">Discussion</div>
+          <div style="font-size:14px; color:var(--ink); margin-bottom:4px;">• Can a swear word express a positive feeling?</div>
+          <div style="font-size:14px; color:var(--ink);">• Would you use this expression at work? Why or why not?</div>
+        </div>
+      </div>
+
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:12px;"
+              onclick="document.getElementById('v2-reveal').style.display='block';">
+        Reveal expression + activities
+      </button>
+    </div>
+  </section>
+
+  <!-- SLIDE 10 · Etapa 9 — Safe or Strong? -->
+  <section class="slide" data-id="e9">
+    <div class="etapa-badge">Etapa 9 · Safe or Strong?</div>
+    <div class="slide-title">Safe or<br><em style="color:var(--rosa)">Strong?</em></div>
+    <div class="slide-sub">Classify each expression. Click to see where it usually lands — and why.</div>
+
+    <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="safe" data-note="Very mild — acceptable in most contexts, including in front of children.">
+        <div class="cl-expr">"Oh my gosh!"</div>
+        <div class="cl-badge safe">Generally safer</div>
+        <div class="cl-note">Very mild — acceptable in most contexts, including in front of children.</div>
+      </div>
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="caution" data-note="Relatively mild, but some environments (school, formal work) still consider it inappropriate.">
+        <div class="cl-expr">"Damn!"</div>
+        <div class="cl-badge caution">Use with caution</div>
+        <div class="cl-note">Relatively mild, but some environments (school, formal work) still consider it inappropriate.</div>
+      </div>
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="safe" data-note="Euphemism for 'what the hell' — milder and more TV-friendly, but still informal.">
+        <div class="cl-expr">"What the heck?!"</div>
+        <div class="cl-badge safe">Generally safer</div>
+        <div class="cl-note">Euphemism for "what the hell" — milder and more TV-friendly, but still informal.</div>
+      </div>
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="strong" data-note="Very strong and vulgar. Avoid in public, professional, or family settings.">
+        <div class="cl-expr">"What the f***?!"</div>
+        <div class="cl-badge strong">Strong or offensive</div>
+        <div class="cl-note">Very strong and vulgar. Avoid in public, professional, or family settings.</div>
+      </div>
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="caution" data-note='"Sucks" is informal and can be impolite, but is widely used and generally not offensive.'>
+        <div class="cl-expr">"This sucks."</div>
+        <div class="cl-badge caution">Use with caution</div>
+        <div class="cl-note">"Sucks" is informal and can be impolite, but is widely used and generally not offensive.</div>
+      </div>
+
+      <div class="classify-card" onclick="revealClassify(this)" data-cat="strong" data-note="Direct insult targeting someone's character. Always offensive when directed at someone.">
+        <div class="cl-expr">"He's an a**hole."</div>
+        <div class="cl-badge strong">Strong or offensive</div>
+        <div class="cl-note">Direct insult targeting someone's character. Always offensive when directed at someone.</div>
+      </div>
+
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="reveal-all-btn" style="margin:0;" onclick="document.querySelectorAll('.classify-card').forEach(c=>c.classList.add('revealed'));">Reveal all</button>
+      <button class="reset-btn" onclick="document.querySelectorAll('.classify-card').forEach(c=>c.classList.remove('revealed'));">↺ Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- SLIDE 11 · Etapa 10 — Real English Upgrade -->
+  <section class="slide" data-id="e10">
+    <div class="etapa-badge">Etapa 10 · Real English Upgrade</div>
+    <div class="slide-title">Say it with<br><em style="color:var(--rosa)">more feeling.</em></div>
+    <div class="slide-sub">Neutral English is still real English. But sometimes you want more expressiveness. Click to see options — then choose yours!</div>
+
+    <div style="display:flex; flex-direction:column; gap:14px; margin-bottom:16px;">
+
+      <!-- Upgrade 1 -->
+      <div class="upgrade-block">
+        <div class="upgrade-neutral">"This movie is very good."</div>
+        <div class="upgrade-opts" id="up1" style="display:none;">
+          <div class="upgrade-opt safe">✅ "This movie is amazing!"</div>
+          <div class="upgrade-opt caution">⚡ "This movie is so damn good!"</div>
+          <div class="upgrade-opt strong">🔥 "This movie is f***ing amazing!"</div>
+        </div>
+        <button class="upgrade-btn" onclick="toggleUpgrade('up1', this)">Show options ▼</button>
+      </div>
+
+      <!-- Upgrade 2 -->
+      <div class="upgrade-block">
+        <div class="upgrade-neutral">"I'm very tired."</div>
+        <div class="upgrade-opts" id="up2" style="display:none;">
+          <div class="upgrade-opt safe">✅ "I'm exhausted."</div>
+          <div class="upgrade-opt caution">⚡ "I'm tired as hell."</div>
+        </div>
+        <button class="upgrade-btn" onclick="toggleUpgrade('up2', this)">Show options ▼</button>
+      </div>
+
+      <!-- Upgrade 3 -->
+      <div class="upgrade-block">
+        <div class="upgrade-neutral">"I'm surprised."</div>
+        <div class="upgrade-opts" id="up3" style="display:none;">
+          <div class="upgrade-opt safe">✅ "No way!"</div>
+          <div class="upgrade-opt strong">🔥 "Holy shit!"</div>
+        </div>
+        <button class="upgrade-btn" onclick="toggleUpgrade('up3', this)">Show options ▼</button>
+      </div>
+
+      <!-- Upgrade 4 -->
+      <div class="upgrade-block">
+        <div class="upgrade-neutral">"This situation is bad."</div>
+        <div class="upgrade-opts" id="up4" style="display:none;">
+          <div class="upgrade-opt caution">⚡ "This situation sucks."</div>
+          <div class="upgrade-opt strong">🔥 "This is f***ing terrible."</div>
+        </div>
+        <button class="upgrade-btn" onclick="toggleUpgrade('up4', this)">Show options ▼</button>
+      </div>
+
+    </div>
+
+    <div class="insight-box show">
+      <p>💡 The neutral options are <em>also</em> real English. Choosing not to swear is not less fluent — it's contextually smarter in many situations.</p>
+    </div>
+  </section>
+
+  <!-- SLIDE 12 · Etapa 11 — Situation Challenge -->
+  <section class="slide" data-id="e11">
+    <div class="etapa-badge">Etapa 11 · Situation Challenge</div>
+    <div class="slide-title">How would<br><em style="color:var(--rosa)">you</em> react?</div>
+    <div class="slide-sub">Three situations. Three levels of reaction. Choose yours — and say why.</div>
+
+    <div style="background:var(--surface); border-radius:6px; padding:10px 16px; margin-bottom:16px; font-size:13px; color:var(--muted); line-height:1.5;">
+      💬 Scaffolding for A1: <strong>"I would say… because I'm angry / surprised / because we're friends."</strong>
+    </div>
+
+    <!-- Situation 1 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 1</div>
+      <div class="q-text">👟 You hit your little toe against the table.</div>
+      <div id="ch11-1" style="display:none; margin-top:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div class="reaction-level neutral-lv">
+            <div class="rl-tag">Neutral</div>
+            <div class="rl-text">"Ouch!" / "Ow!"</div>
+          </div>
+          <div class="reaction-level mild-lv">
+            <div class="rl-tag">Mild</div>
+            <div class="rl-text">"Damn it!" / "Crap!"</div>
+          </div>
+          <div class="reaction-level strong-lv">
+            <div class="rl-tag">Strong</div>
+            <div class="rl-text">"F***!" / "Son of a b****!"</div>
+          </div>
+        </div>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:10px;" onclick="document.getElementById('ch11-1').style.display='block';">Show reaction levels</button>
+    </div>
+
+    <!-- Situation 2 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 2</div>
+      <div class="q-text">💰 Your friend tells you they won a million dollars.</div>
+      <div id="ch11-2" style="display:none; margin-top:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div class="reaction-level neutral-lv">
+            <div class="rl-tag">Neutral</div>
+            <div class="rl-text">"That's amazing!" / "No way!"</div>
+          </div>
+          <div class="reaction-level mild-lv">
+            <div class="rl-tag">Mild</div>
+            <div class="rl-text">"Holy cow!" / "Oh my gosh!"</div>
+          </div>
+          <div class="reaction-level strong-lv">
+            <div class="rl-tag">Strong</div>
+            <div class="rl-text">"Holy shit!" / "What the f***?!"</div>
+          </div>
+        </div>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:10px;" onclick="document.getElementById('ch11-2').style.display='block';">Show reaction levels</button>
+    </div>
+
+    <!-- Situation 3 -->
+    <div class="card" style="margin-bottom:12px;">
+      <div class="section-label">Situation 3</div>
+      <div class="q-text">🍱 Someone eats the food you saved.</div>
+      <div id="ch11-3" style="display:none; margin-top:12px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div class="reaction-level neutral-lv">
+            <div class="rl-tag">Neutral</div>
+            <div class="rl-text">"That was my food!" / "Really?!"</div>
+          </div>
+          <div class="reaction-level mild-lv">
+            <div class="rl-tag">Mild</div>
+            <div class="rl-text">"What the heck!" / "Seriously?!"</div>
+          </div>
+          <div class="reaction-level strong-lv">
+            <div class="rl-tag">Strong</div>
+            <div class="rl-text">"What the f***!" / "Are you kidding me?!"</div>
+          </div>
+        </div>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:10px;" onclick="document.getElementById('ch11-3').style.display='block';">Show reaction levels</button>
+    </div>
+
+    <button class="reset-btn" onclick="document.getElementById('ch11-1').style.display='none'; document.getElementById('ch11-2').style.display='none'; document.getElementById('ch11-3').style.display='none';">↺ Reiniciar</button>
+  </section>
+
+  <!-- SLIDE 13 · Etapa 12 — Final Challenge -->
+  <section class="slide" data-id="e12">
+    <div class="etapa-badge">Etapa 12 · Final Challenge</div>
+    <div class="slide-title">Do you get<br>the meaning?</div>
+    <div class="slide-sub">Four idioms with "shit." What does each one actually mean?</div>
+
+    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+
+      <div class="quiz-card" id="qz1">
+        <div class="qz-sentence">"This party is the shit."</div>
+        <div class="qz-opts">
+          <button class="qz-opt" onclick="answerQuiz('qz1', this, false)">A. This party is terrible.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz1', this, true)">B. This party is amazing.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz1', this, false)">C. This party is boring.</button>
+        </div>
+        <div class="qz-feedback" id="fb-qz1" style="display:none;">
+          <strong>✅ B — "the shit" = something or someone excellent.</strong> The article "the" flips the meaning completely!
+        </div>
+      </div>
+
+      <div class="quiz-card" id="qz2">
+        <div class="qz-sentence">"I don't give a shit."</div>
+        <div class="qz-opts">
+          <button class="qz-opt" onclick="answerQuiz('qz2', this, false)">A. I'm very upset.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz2', this, true)">B. I don't care at all.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz2', this, false)">C. I want to help.</button>
+        </div>
+        <div class="qz-feedback" id="fb-qz2" style="display:none;">
+          <strong>✅ B — Total indifference.</strong> "I don't give a damn" is a milder alternative.
+        </div>
+      </div>
+
+      <div class="quiz-card" id="qz3">
+        <div class="qz-sentence">"Get your shit together."</div>
+        <div class="qz-opts">
+          <button class="qz-opt" onclick="answerQuiz('qz3', this, false)">A. Pack your belongings.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz3', this, false)">B. Clean up this mess.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz3', this, true)">C. Organize yourself / get it together.</button>
+        </div>
+        <div class="qz-feedback" id="fb-qz3" style="display:none;">
+          <strong>✅ C — "Get yourself organized / focused."</strong> Used when someone is falling apart or being unreliable.
+        </div>
+      </div>
+
+      <div class="quiz-card" id="qz4">
+        <div class="qz-sentence">"Shit happens."</div>
+        <div class="qz-opts">
+          <button class="qz-opt" onclick="answerQuiz('qz4', this, false)">A. Be more careful next time.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz4', this, true)">B. Bad things happen — it's part of life.</button>
+          <button class="qz-opt" onclick="answerQuiz('qz4', this, false)">C. That was a big mistake.</button>
+        </div>
+        <div class="qz-feedback" id="fb-qz4" style="display:none;">
+          <strong>✅ B — A very common phrase expressing acceptance.</strong> "These things happen" or "c'est la vie" — just more direct!
+        </div>
+      </div>
+
+    </div>
+
+    <button class="reset-btn" onclick="resetQuiz()">↺ Reiniciar quiz</button>
+  </section>
+
+  <!-- SLIDE 14 · Etapa 13 — What Have We Learned? -->
+  <section class="slide" data-id="e13">
+    <div class="etapa-badge">Etapa 13 · What Have We Learned?</div>
+    <div class="slide-title">What have<br>we learned?</div>
+    <div class="slide-sub">Your words from the beginning of class — and what you know now.</div>
+
+    <!-- Board recovery -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="section-label">Our Swear Words Board — do início do aulão</div>
+      <div id="board-mirror" style="display:flex; flex-wrap:wrap; gap:8px; min-height:28px; margin-bottom:8px;"></div>
+      <p id="board-mirror-empty" style="font-size:13px; color:var(--border); font-style:italic; margin:0;">Nenhuma palavra registrada ainda.</p>
+
+      <!-- Discussion questions -->
+      <div style="margin-top:16px; display:none; flex-direction:column; gap:10px;" id="board-qs">
+        <div class="disc-q" onclick="this.classList.toggle('open')">Which words do you understand better now? <span class="disc-arrow">▸</span></div>
+        <div class="disc-q" onclick="this.classList.toggle('open')">Which words would you avoid using? <span class="disc-arrow">▸</span></div>
+        <div class="disc-q" onclick="this.classList.toggle('open')">Did any expression surprise you? <span class="disc-arrow">▸</span></div>
+      </div>
+
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:12px;" onclick="document.getElementById('board-qs').style.display='flex';">Show discussion questions</button>
+    </div>
+
+    <!-- 4 Reflection questions -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="section-label">4 Questions to always ask yourself</div>
+      <div style="display:none; grid-template-columns:1fr 1fr; gap:10px;" id="reflect-grid">
+        <div class="reflect-q">
+          <div class="rq-num">1</div>
+          <div class="rq-text">Who am I talking to?</div>
+        </div>
+        <div class="reflect-q">
+          <div class="rq-num">2</div>
+          <div class="rq-text">Where am I?</div>
+        </div>
+        <div class="reflect-q">
+          <div class="rq-num">3</div>
+          <div class="rq-text">How close are we?</div>
+        </div>
+        <div class="reflect-q">
+          <div class="rq-num">4</div>
+          <div class="rq-text">How strong is this expression?</div>
+        </div>
+      </div>
+      <button class="reveal-all-btn" style="font-size:12px; padding:7px 16px; margin-top:4px;" onclick="document.getElementById('reflect-grid').style.display='grid'; this.style.display='none';">Reveal the 4 questions</button>
+    </div>
+
+    <!-- Closing message -->
+    <div id="e13-closing" class="insight-box" style="display:none; border-left-color:var(--marrom);">
+      <p>"You don't need to swear in English.<br>But you need to understand when other people do."</p>
+    </div>
+    <button class="reveal-all-btn" style="margin:0; margin-top:8px;" onclick="document.getElementById('e13-closing').style.display='block'; this.style.display='none';">Show closing message</button>
+  </section>
+
+  <!-- SLIDE 15 · Fim -->
+  <section class="slide" data-id="fim">
+    <div class="cover-wrap" style="align-items:center; text-align:center;">
+      <div style="font-size:12px; font-weight:600; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:20px;">its<em style="font-style:italic; color:var(--rosa)">brenda</em>cleto · Aulão de Inglês</div>
+
+      <div class="cover-title" style="font-size:clamp(48px,8vw,88px);">That's a<br><em style="color:var(--rosa)">wrap!</em></div>
+
+      <div class="cover-sub" style="max-width:480px; margin:0 auto 32px;">Now you know why context matters.</div>
+
+      <div style="font-family:var(--f-display); font-style:italic; font-size:clamp(16px,2.5vw,22px);
+                  color:var(--marrom); border-top:1px solid var(--border); padding-top:20px; max-width:480px;">
+        "You don't need to swear in English.<br>But you need to understand when other people do."
+      </div>
+
+      <div style="margin-top:32px; font-size:14px; color:var(--muted); font-weight:500; letter-spacing:.04em;">
+        @itsbrendacleto
+      </div>
+    </div>
+  </section>
+
+</div><!-- /stage -->
+
+<!-- ═══ BOTTOM BAR ════════════════════════════════════════ -->
+<div class="bot">
+  <button class="nav-btn" id="prevBtn" onclick="go(-1)" disabled>◀ Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" id="nextBtn" onclick="go(1)">Next ▶</button>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────
+
+const SLIDES = Array.from(document.querySelectorAll('.slide'));
+const TOTAL  = SLIDES.length;
+let cur = 0;
+
+// ─── NAVIGATION ─────────────────────────────────────────
+
+function buildDots() {
+  const d = document.getElementById('dots');
+  d.innerHTML = '';
+  SLIDES.forEach((_, i) => {
+    const s = document.createElement('span');
+    if (i === cur) s.classList.add('on');
+    s.onclick = () => goTo(i);
+    d.appendChild(s);
+  });
+  const activeDot = d.children[cur];
+  if (activeDot) activeDot.scrollIntoView({ inline: 'center', block: 'nearest' });
+}
+
+function updateCnt() {
+  document.getElementById('cnt').textContent = (cur + 1) + ' / ' + TOTAL;
+}
+
+function updateBtns() {
+  document.getElementById('prevBtn').disabled = cur === 0;
+  document.getElementById('nextBtn').disabled = cur === TOTAL - 1;
+}
+
+function goTo(n) {
+  SLIDES[cur].classList.remove('on');
+  cur = Math.max(0, Math.min(TOTAL - 1, n));
+  SLIDES[cur].classList.add('on');
+  buildDots();
+  updateCnt();
+  updateBtns();
+
+  // hash navigation
+  const id = SLIDES[cur].dataset.id;
+  if (id) history.replaceState(null, '', '#' + id);
+}
+
+function go(dir) { goTo(cur + dir); }
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
+  if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   go(-1);
+});
+
+// Hash on load
+(function() {
+  const h = location.hash.replace('#', '');
+  if (h) {
+    const idx = SLIDES.findIndex(s => s.dataset.id === h);
+    if (idx > -1) { cur = idx; }
+  }
+  SLIDES.forEach((s, i) => { if (i !== cur) s.classList.remove('on'); });
+  SLIDES[cur].classList.add('on');
+  buildDots();
+  updateCnt();
+  updateBtns();
+})();
+
+// ─── FULLSCREEN ─────────────────────────────────────────
+
+function toggleFS() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+
+// ─── SWEAR WORDS BOARD ───────────────────────────────────
+
+const STORE_KEY = 'wtf_board_words';
+let boardWords = [];
+
+try {
+  const saved = localStorage.getItem(STORE_KEY);
+  if (saved) boardWords = JSON.parse(saved);
+} catch(e) {}
+
+function saveBoard() {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(boardWords)); } catch(e) {}
+}
+
+function renderBoard() {
+  const container = document.getElementById('board-tags');
+  const empty     = document.getElementById('board-empty');
+  const clearBtn  = document.getElementById('clear-btn');
+  const mirror    = document.getElementById('board-mirror');
+  const mirrorEmp = document.getElementById('board-mirror-empty');
+
+  container.innerHTML = '';
+  if (mirror) mirror.innerHTML = '';
+
+  if (boardWords.length === 0) {
+    empty.style.display = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    if (mirrorEmp) mirrorEmp.style.display = '';
+    return;
+  }
+
+  empty.style.display = 'none';
+  if (clearBtn) clearBtn.style.display = '';
+  if (mirrorEmp) mirrorEmp.style.display = 'none';
+
+  boardWords.forEach((word, idx) => {
+    container.appendChild(makeTag(word, idx, true));
+    if (mirror) mirror.appendChild(makeTag(word, idx, false));
+  });
+}
+
+function makeTag(word, idx, editable) {
+  const wrap = document.createElement('span');
+  wrap.style.cssText = [
+    'display:inline-flex', 'align-items:center', 'gap:5px',
+    'background:var(--surface)', 'border:1.5px solid var(--border)',
+    'border-radius:20px', 'padding:5px 12px',
+    'font-family:var(--f-body)', 'font-size:13px', 'font-weight:500',
+    'color:var(--marrom)', 'transition:border-color .15s'
+  ].join(';');
+
+  const label = document.createElement('span');
+  label.textContent = word;
+
+  if (editable) {
+    wrap.addEventListener('mouseenter', () => wrap.style.borderColor = 'var(--menta)');
+    wrap.addEventListener('mouseleave', () => wrap.style.borderColor = 'var(--border)');
+
+    label.style.cursor = 'text';
+    label.title = 'Double-click to edit';
+    label.addEventListener('dblclick', () => startEdit(wrap, label, idx));
+
+    const del = document.createElement('button');
+    del.textContent = '×';
+    del.title = 'Remove';
+    del.style.cssText = [
+      'background:none', 'border:none', 'color:var(--muted)',
+      'font-size:15px', 'line-height:1', 'cursor:pointer',
+      'padding:0 2px', 'font-family:var(--f-body)'
+    ].join(';');
+    del.addEventListener('mouseenter', () => del.style.color = 'var(--rosa)');
+    del.addEventListener('mouseleave', () => del.style.color = 'var(--muted)');
+    del.addEventListener('click', () => { boardWords.splice(idx, 1); saveBoard(); renderBoard(); });
+
+    wrap.appendChild(label);
+    wrap.appendChild(del);
+  } else {
+    wrap.style.opacity = '0.8';
+    wrap.style.cursor = 'default';
+    wrap.appendChild(label);
+  }
+  return wrap;
+}
+
+function startEdit(wrap, label, idx) {
+  const input = document.createElement('input');
+  input.value = boardWords[idx];
+  input.style.cssText = [
+    'border:none', 'background:transparent', 'outline:none',
+    'font-family:var(--f-body)', 'font-size:13px', 'font-weight:500',
+    'color:var(--marrom)', 'width:' + Math.max(60, boardWords[idx].length * 9) + 'px'
+  ].join(';');
+
+  const finish = () => {
+    const v = input.value.trim();
+    if (v) { boardWords[idx] = v; saveBoard(); }
+    renderBoard();
+  };
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); finish(); }
+    if (e.key === 'Escape') renderBoard();
+  });
+  input.addEventListener('blur', finish);
+  wrap.replaceChild(input, label);
+  input.focus(); input.select();
+}
+
+function addWord() {
+  const inp = document.getElementById('word-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  if (!boardWords.some(w => w.toLowerCase() === v.toLowerCase())) {
+    boardWords.push(v);
+    saveBoard();
+    renderBoard();
+  }
+  inp.value = '';
+  inp.focus();
+}
+
+let clearPending = false;
+function clearBoard() {
+  const btn = document.getElementById('clear-btn');
+  if (!clearPending) {
+    clearPending = true;
+    btn.textContent = 'Confirm clear?';
+    btn.style.color = 'var(--rosa)';
+    btn.style.borderColor = 'var(--rosa)';
+    setTimeout(() => {
+      if (!clearPending) return;
+      clearPending = false;
+      btn.textContent = 'Clear board';
+      btn.style.color = 'var(--muted)';
+      btn.style.borderColor = 'var(--border)';
+    }, 3000);
+  } else {
+    clearPending = false;
+    boardWords = [];
+    saveBoard();
+    renderBoard();
+  }
+}
+
+renderBoard();
+
+// ─── VOTE ACTIVITY (Etapa 1) ────────────────────────────
+
+const votes = { q1: null, q2: null };
+
+function vote(q, opt, btn) {
+  // Clear previous selection in this question
+  const opts = btn.parentElement.querySelectorAll('.vote-opt');
+  opts.forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+  votes[q] = opt;
+}
+
+function resetVotes() {
+  document.querySelectorAll('.vote-opt').forEach(o => o.classList.remove('selected'));
+  votes.q1 = null;
+  votes.q2 = null;
+}
+
+// ─── CONTEXT ACTIVITY (Etapa 2) ──────────────────────────
+
+function revealSit(card) {
+  card.classList.add('revealed');
+  checkAllRevealed();
+}
+
+function revealAll() {
+  document.querySelectorAll('.situation-card').forEach(c => c.classList.add('revealed'));
+  checkAllRevealed();
+}
+
+function checkAllRevealed() {
+  const all = document.querySelectorAll('.situation-card');
+  const done = document.querySelectorAll('.situation-card.revealed');
+  if (done.length === all.length) {
+    document.getElementById('insight').classList.add('show');
+  }
+}
+
+function resetContext() {
+  document.querySelectorAll('.situation-card').forEach(c => c.classList.remove('revealed'));
+  document.getElementById('insight').classList.remove('show');
+}
+
+// ─── METER ACTIVITY (Etapa 3) ────────────────────────────
+
+function revealMeter(btn, level) {
+  btn.classList.add('revealed-' + level);
+  btn.onclick = null;
+  // append level label so the category is visible after reveal
+  const labels = { mild: '🟢 Mild', moderate: '🟡 Moderate', strong: '🔴 Strong' };
+  const tag = document.createElement('span');
+  tag.style.cssText = 'display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-top:4px;opacity:.85;';
+  tag.textContent = labels[level] || level;
+  btn.appendChild(tag);
+}
+
+function resetMeter() {
+  document.querySelectorAll('.meter-card').forEach(btn => {
+    btn.className = 'meter-card';
+    const lvl = btn.dataset.level;
+    // remove any appended label span
+    btn.querySelectorAll('span').forEach(s => s.remove());
+    btn.onclick = () => revealMeter(btn, lvl);
+  });
+  document.getElementById('meter-insight').style.display = 'none';
+  document.getElementById('meter-oral').style.display = 'none';
+}
+
+// ─── MATCH ACTIVITY (Etapa 4) ────────────────────────────
+
+function revealMatch(el) {
+  el.classList.add('revealed');
+}
+
+function resetMatch() {
+  document.querySelectorAll('.match-item').forEach(m => m.classList.remove('revealed'));
+  document.getElementById('contrast-box').style.display = 'none';
+}
+
+// ─── F-WORD ACTIVITY (Etapa 5) ───────────────────────────
+
+function revealFWord(card) {
+  card.classList.add('revealed');
+}
+
+function resetFWord() {
+  document.querySelectorAll('.fword-card').forEach(c => c.classList.remove('revealed'));
+  document.getElementById('fword-compare').style.display = 'none';
+  document.getElementById('fword-oral').style.display = 'none';
+}
+
+// ─── CONTEXT WORD ACTIVITY (Etapa 6) ─────────────────────
+
+function revealCtx(card) {
+  card.classList.add('revealed');
+}
+
+// ─── SITUATION ACTIVITY (Etapa 7) ────────────────────────
+
+function selectSitu(btn, eval_) {
+  btn.classList.add('sel-' + eval_);
+}
+
+function resetSitu() {
+  document.querySelectorAll('.situ-opt').forEach(b => {
+    b.classList.remove('sel-ok', 'sel-risky', 'sel-avoid');
+  });
+  ['fb7-1','fb7-2','fb7-3','fb7-4'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+// ─── CLASSIFY ACTIVITY (Etapa 9) ─────────────────────────
+
+function revealClassify(card) {
+  card.classList.add('revealed');
+}
+
+// ─── UPGRADE ACTIVITY (Etapa 10) ─────────────────────────
+
+function toggleUpgrade(id, btn) {
+  const el = document.getElementById(id);
+  const visible = el.style.display !== 'none';
+  el.style.display = visible ? 'none' : 'flex';
+  btn.textContent = visible ? 'Show options ▼' : 'Hide options ▲';
+}
+
+// ─── QUIZ ACTIVITY (Etapa 12) ────────────────────────────
+
+function answerQuiz(cardId, btn, correct) {
+  const card = document.getElementById(cardId);
+  // Disable all options in this card
+  card.querySelectorAll('.qz-opt').forEach(o => {
+    o.style.pointerEvents = 'none';
+    o.style.opacity = '0.6';
+  });
+  btn.style.opacity = '1';
+  btn.classList.add(correct ? 'correct' : 'wrong');
+  document.getElementById('fb-' + cardId).style.display = 'block';
+}
+
+function resetQuiz() {
+  document.querySelectorAll('.quiz-card').forEach(card => {
+    card.querySelectorAll('.qz-opt').forEach(o => {
+      o.style.pointerEvents = '';
+      o.style.opacity = '';
+      o.classList.remove('correct', 'wrong');
+    });
+    const fb = card.querySelector('.qz-feedback');
+    if (fb) fb.style.display = 'none';
+  });
+}
+</script>
+
+</body></html>
