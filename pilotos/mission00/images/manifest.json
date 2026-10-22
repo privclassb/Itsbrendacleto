@@ -1,0 +1,68 @@
+{
+ "cover": {
+  "file": "images/01-cover-coastal-flight.jpg",
+  "alt": "A civil helicopter flying over Botafogo Bay in Rio de Janeiro, with the city and mountains behind it",
+  "author": "Wilfredor",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_206L-4_LongRanger_IV_over_Botafogo_Bay,_Rio_de_Janeiro.jpg",
+  "position": "62% 50%"
+ },
+ "cockpit": {
+  "file": "images/02-cockpit.jpg",
+  "alt": "Instrument panel of a civil Airbus H125 helicopter",
+  "author": "Kakoula10",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:F-HGRU_Airbus_H125_helicopter_cockpit_Ard%C3%A8che_Fev_2024.jpg"
+ },
+ "preflight": {
+  "file": "images/03-preflight-inspection.jpg",
+  "alt": "A pilot inspecting a helicopter with a flashlight before a flight",
+  "author": "U.S. Customs and Border Protection",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:A_CBP,_AMO_Pilot_Conducts_Preflight_Inspection_(35799981183).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:A_CBP,_AMO_Pilot_Conducts_Preflight_Inspection_(35799981183).jpg",
+  "position": "60% 50%"
+ },
+ "operations": {
+  "file": "images/04-flight-operations.jpg",
+  "alt": "A yellow EC135 air ambulance helicopter in flight against a cloudy sky",
+  "author": "Stiopa",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:EC_135_(SP-DXB).jpg"
+ },
+ "approach": {
+  "file": "images/05-helipad-approach.jpg",
+  "alt": "A helicopter approaching a cliff-top landing area by the sea while a ground crew member watches",
+  "author": "KarelZe",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_412_EP.JPG"
+ },
+ "weather": {
+  "file": "images/06-unfavourable-weather.jpg",
+  "alt": "A civil helicopter flying in thick fog",
+  "author": "Olga Ernst",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Air-Glaciers,_HB-ZNA_(Airbus_Helicopters_H125).jpg"
+ },
+ "cabin": {
+  "file": "images/07-passenger-cabin.jpg",
+  "alt": "Passenger cabin of a civil helicopter with the door open",
+  "author": "JetRequest.com",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_430_helicopter_interior_3.jpg"
+ },
+ "helipad": {
+  "file": "images/08-helipad-overcast.jpg",
+  "alt": "A helicopter parked on a ship's helideck under dark, heavy clouds",
+  "author": "Antoine Lamielle",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2020-11_Marion_Dufresne_-_Helicopter_04.jpg"
+ }
+}

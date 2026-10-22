@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mission 00 · Diagnostic Flight Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --petrol:#142C38; --petrol-2:#23424C; --mint:#A8C5B5; --cream:#FAF7F2; --white:#FFFFFF;
+  --ink:#142C38; --muted:#4E6670; --line:rgba(20,44,56,.12); --mint-soft:rgba(168,197,181,.22);
+  --radius:14px; --shadow:0 1px 2px rgba(20,44,56,.06),0 8px 28px rgba(20,44,56,.08);
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+button:focus-visible{outline:2px solid var(--mint);outline-offset:3px}
+img{display:block;max-width:100%}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100vh;height:100dvh}
+.topbar{display:flex;align-items:center;gap:16px;padding:12px 24px;background:var(--petrol);color:var(--cream)}
+.brand{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand b{font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-weight:700}
+.brand span{font-family:var(--mono);font-size:11px;color:var(--mint);letter-spacing:.06em}
+.screen-label{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--mint);white-space:nowrap}
+.screen-label strong{color:var(--white);font-weight:500}
+.icon-btn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;color:var(--cream);border:1px solid rgba(250,247,242,.18);flex:none;text-decoration:none}
+.icon-btn:hover{background:rgba(250,247,242,.08)}
+.icon-btn svg{width:18px;height:18px}
+.guide-btn{width:auto;padding:0 12px;gap:8px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.guide-btn span{white-space:nowrap}
+.progress{height:4px;background:var(--petrol-2)}
+.progress i{display:block;height:100%;width:0;background:var(--mint);transition:width .5s ease}
+
+.stage{position:relative;overflow:hidden}
+.screen{position:absolute;inset:0;overflow-y:auto;padding:40px 48px 48px;opacity:0;visibility:hidden;transform:translateX(24px);transition:opacity .45s ease,transform .45s ease,visibility 0s linear .45s}
+.screen.active{opacity:1;visibility:visible;transform:none;transition:opacity .45s ease,transform .45s ease}
+.screen.from-left{transform:translateX(-24px)}
+.wrap{max-width:1120px;margin:0 auto}
+
+.navbar{display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--white);border-top:1px solid var(--line)}
+.dots{display:flex;gap:6px;margin:0 auto;flex-wrap:wrap;justify-content:center}
+.navbar .mid{display:none}
+.dots button{width:26px;height:26px;border-radius:7px;font-family:var(--mono);font-size:11px;color:var(--muted);border:1px solid var(--line)}
+.dots button.done{background:var(--mint-soft);color:var(--petrol)}
+.dots button.current{background:var(--petrol);color:var(--white);border-color:var(--petrol)}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:12px 20px;border-radius:999px;font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase;transition:background .2s,transform .15s,opacity .2s}
+.btn:active{transform:scale(.98)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--petrol);color:var(--white)}
+.btn-primary:hover{background:var(--petrol-2)}
+.btn-ghost{border:1px solid var(--line);color:var(--petrol);background:var(--white)}
+.btn-ghost:hover{border-color:var(--petrol)}
+.btn-mint{background:var(--mint);color:var(--petrol)}
+.btn-mint:hover{background:#B9D2C4}
+.btn[disabled]{opacity:.35;pointer-events:none}
+
+/* ---------- typography ---------- */
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol-2);display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.eyebrow::before{content:"";width:22px;height:2px;background:var(--mint)}
+h1.title{font-size:clamp(28px,3.4vw,44px);line-height:1.08;font-weight:800;letter-spacing:-.02em;max-width:22ch}
+.subtitle{font-size:clamp(16px,1.6vw,19px);color:var(--muted);margin-top:10px;max-width:60ch}
+.head{margin-bottom:32px}
+
+/* ---------- cover ---------- */
+.screen.cover{padding:0;background:var(--petrol);color:var(--cream)}
+.cover-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);min-height:100%}
+.cover-text{padding:56px 48px;display:flex;flex-direction:column;justify-content:center;gap:24px}
+.cover-text .eyebrow{color:var(--mint)}
+.cover-text h1{font-size:clamp(36px,5vw,64px);line-height:1;font-weight:800;letter-spacing:-.03em}
+.cover-text p.lead{font-size:clamp(17px,1.7vw,21px);color:rgba(250,247,242,.82);max-width:34ch}
+.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(168,197,181,.25);border:1px solid rgba(168,197,181,.25);border-radius:12px;overflow:hidden;max-width:460px}
+.specs div{background:var(--petrol);padding:12px 14px}
+.specs dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.specs dd{font-weight:600;font-size:15px;margin-top:2px}
+.cover-media{position:relative;min-height:320px}
+.cover-media .photo{position:absolute;inset:0;border-radius:0}
+.cover-media .photo img{width:100%;height:100%;object-fit:cover}
+.cover-media::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--petrol) 0%,rgba(20,44,56,0) 28%);pointer-events:none}
+
+/* ---------- photo + credit ---------- */
+.photo{position:relative;overflow:hidden;border-radius:var(--radius);background:var(--petrol-2)}
+.photo img{width:100%;height:100%;object-fit:cover}
+.credit{position:absolute;right:8px;bottom:8px;max-width:calc(100% - 16px);font-size:10px;line-height:1.3;color:rgba(255,255,255,.88);background:rgba(20,44,56,.62);padding:3px 7px;border-radius:5px;backdrop-filter:blur(2px);z-index:2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.credit a{color:inherit}
+.pending{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--mint);font-family:var(--mono);font-size:12px;letter-spacing:.06em;border:1.5px dashed rgba(168,197,181,.6);border-radius:inherit}
+
+/* ---------- cards ---------- */
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+
+/* briefing */
+.brief-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:24px;align-items:stretch}
+.brief-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.brief-card{padding:14px 16px;display:grid;grid-template-columns:auto 1fr;gap:2px 12px;align-items:start;box-shadow:none}
+.brief-card .num{grid-row:span 2;font-family:var(--mono);font-size:11px;color:var(--petrol-2);background:var(--mint-soft);border-radius:6px;padding:3px 7px;margin-top:2px}
+.brief-card h3{font-size:16px;font-weight:700;line-height:1.3}
+.brief-card p{color:var(--muted);font-size:14.5px;line-height:1.4}
+.brief-side .photo{height:100%;min-height:220px}
+.final-q{margin-top:16px;padding:20px 22px;border-radius:var(--radius);background:var(--petrol);color:var(--cream);font-size:clamp(18px,1.8vw,22px);font-weight:600;line-height:1.35;transition:opacity .45s,transform .45s}
+.final-q small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--mint);margin-bottom:8px}
+.hidden-soft{opacity:0;transform:translateY(8px);pointer-events:none}
+
+/* question stepper */
+.qstep{padding:36px 40px;display:flex;flex-direction:column;gap:28px;min-height:300px}
+.qstep-meta{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.qcount{font-family:var(--mono);font-size:13px;color:var(--petrol-2)}
+.qbar{display:flex;gap:6px}
+.qbar i{width:28px;height:4px;border-radius:2px;background:var(--line);transition:background .3s}
+.qbar i.on{background:var(--petrol)}
+.qtext{font-size:clamp(24px,3vw,38px);font-weight:700;line-height:1.2;letter-spacing:-.01em;min-height:2.4em;transition:opacity .3s}
+.qactions{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+/* operation cards */
+.op-card{overflow:hidden;display:flex;flex-direction:column;box-shadow:none}
+.op-card .photo{aspect-ratio:16/9;border-radius:0;cursor:zoom-in}
+.op-card .body{padding:14px 18px 18px;display:flex;flex-direction:column;gap:6px}
+.op-card .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--petrol-2);text-transform:uppercase}
+.op-card h3{font-size:16px;font-weight:700}
+.op-card .q{font-size:clamp(17px,1.5vw,19px);font-weight:600;line-height:1.35;padding-top:8px;border-top:1px solid var(--line);margin-top:2px}
+
+/* lightbox */
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(10,24,31,.86);display:grid;place-items:center;padding:28px;opacity:0;visibility:hidden;transition:opacity .3s,visibility 0s linear .3s}
+.lightbox.open{opacity:1;visibility:visible;transition:opacity .3s}
+.lb-inner{width:min(1100px,100%);max-height:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;background:var(--petrol);border-radius:18px;overflow:hidden;transform:scale(.97);transition:transform .3s}
+.lightbox.open .lb-inner{transform:none}
+.lb-inner .photo{border-radius:0;width:100%;height:min(64vh,640px)}
+.lb-caption{padding:22px 28px;color:var(--cream);display:flex;gap:20px;align-items:center;justify-content:space-between}
+.lb-caption .tag{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.lb-caption p{font-size:clamp(19px,2.2vw,27px);font-weight:700;line-height:1.25;margin-top:6px}
+.lb-close{position:absolute;top:18px;right:18px;width:44px;height:44px;border-radius:50%;background:rgba(250,247,242,.12);color:var(--white);display:grid;place-items:center}
+.lb-close svg{width:20px;height:20px}
+
+/* audio */
+.audio-tabs{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+.audio-tabs button{padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--white);font-weight:600;font-size:14px;display:flex;gap:10px;align-items:center}
+.audio-tabs button .n{font-family:var(--mono);font-size:11px;color:var(--petrol-2)}
+.audio-tabs button.current{background:var(--petrol);color:var(--white);border-color:var(--petrol)}
+.audio-tabs button.current .n{color:var(--mint)}
+.audio-tabs button .chk{width:8px;height:8px;border-radius:50%;background:var(--line)}
+.audio-tabs button.heard .chk{background:var(--mint)}
+.audio-panel{display:none}
+.audio-panel.current{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;animation:fade .4s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.player{background:var(--petrol);color:var(--cream);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;gap:20px;min-height:260px}
+.player .label{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.player h3{font-size:22px;font-weight:700;margin-top:6px}
+.wave{display:flex;align-items:center;gap:4px;height:44px}
+.wave i{flex:1;max-width:6px;border-radius:3px;background:rgba(168,197,181,.35);height:28%;transition:height .2s}
+.player.playing .wave i{background:var(--mint);animation:bar 1s ease-in-out infinite}
+@keyframes bar{0%,100%{height:18%}50%{height:var(--h,80%)}}
+.ptrack{height:4px;border-radius:2px;background:rgba(250,247,242,.15);overflow:hidden}
+.ptrack i{display:block;height:100%;width:0;background:var(--mint)}
+.pstatus{font-family:var(--mono);font-size:12px;color:rgba(250,247,242,.75);display:flex;justify-content:space-between}
+.pbtns{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto}
+.unavailable{border:1.5px dashed rgba(168,197,181,.6);border-radius:10px;padding:14px;font-family:var(--mono);font-size:12px;color:var(--mint);line-height:1.5}
+.qlist{padding:26px 28px;display:flex;flex-direction:column;gap:14px;position:relative}
+.qlist h4{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol-2);font-weight:500}
+.qlist ol{list-style:none;display:flex;flex-direction:column;gap:12px;counter-reset:q}
+.qlist li{counter-increment:q;display:grid;grid-template-columns:34px 1fr;gap:12px;font-size:clamp(17px,1.6vw,20px);font-weight:600;line-height:1.35;align-items:start}
+.qlist li::before{content:counter(q,decimal-leading-zero);font-family:var(--mono);font-size:12px;font-weight:500;color:var(--petrol-2);background:var(--mint-soft);border-radius:6px;padding:4px 0;text-align:center;margin-top:2px}
+.qlist .instruction{font-size:clamp(18px,1.7vw,21px);font-weight:600;line-height:1.4}
+.locked-note{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--muted);min-height:180px}
+.locked-note svg{width:28px;height:28px;color:var(--petrol-2)}
+.reveal-area[data-locked="true"] .reveal-content{display:none}
+.reveal-area[data-locked="false"] .locked-note{display:none}
+.reveal-area[data-locked="false"] .reveal-content{animation:fade .45s ease}
+
+/* progressive question list */
+.prog li{transition:opacity .35s,transform .35s}
+.prog li.off{display:none}
+.prog-actions{display:flex;gap:10px;margin-top:6px;flex-wrap:wrap}
+.task{margin-top:14px;padding:16px 20px;border-radius:12px;background:var(--petrol);color:var(--cream);font-size:clamp(17px,1.6vw,20px);font-weight:600;line-height:1.4}
+.task small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--mint);margin-bottom:6px}
+
+/* situations */
+.sit-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.sit-layout .photo{aspect-ratio:4/3}
+.context{font-size:clamp(17px,1.6vw,20px);font-weight:600;line-height:1.4;padding:14px 18px;border-left:3px solid var(--mint);background:var(--white);border-radius:0 12px 12px 0;margin-bottom:12px}
+.context small{display:block;font-family:var(--mono);font-size:11px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol-2);margin-bottom:6px}
+
+/* picture */
+.pic-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:22px;align-items:stretch}
+.pic-layout .photo{min-height:420px;cursor:zoom-in}
+.zoom-hint{position:absolute;left:10px;top:10px;z-index:2;background:rgba(20,44,56,.62);color:var(--white);border-radius:999px;padding:6px 10px;font-size:11px;font-family:var(--mono);display:flex;gap:6px;align-items:center}
+.zoom-hint svg{width:13px;height:13px}
+
+/* scenario */
+.scenario-band{background:var(--petrol);color:var(--cream);border-radius:var(--radius);padding:28px 32px;display:grid;grid-template-columns:auto 1fr;gap:22px;align-items:center;margin-bottom:22px}
+.scenario-band .ic{width:56px;height:56px;border-radius:14px;background:rgba(168,197,181,.16);display:grid;place-items:center;color:var(--mint)}
+.scenario-band .ic svg{width:28px;height:28px}
+.scenario-band small{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.scenario-band p{font-size:clamp(19px,2vw,25px);font-weight:600;line-height:1.35;margin-top:6px}
+
+/* debrief */
+.screen.debrief{background:var(--petrol);color:var(--cream)}
+.debrief .eyebrow{color:var(--mint)}
+.debrief h1.title{color:var(--white)}
+.debrief .subtitle{color:rgba(250,247,242,.78)}
+.debrief-msg{font-size:clamp(20px,2.2vw,28px);font-weight:600;line-height:1.35;max-width:36ch}
+.debrief-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:28px;margin-top:28px;align-items:start}
+.debrief .qlist{background:rgba(250,247,242,.05);border:1px solid rgba(168,197,181,.2);border-radius:var(--radius);color:var(--cream)}
+.debrief .qlist h4{color:var(--mint)}
+.debrief .qlist li::before{background:rgba(168,197,181,.18);color:var(--mint)}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid rgba(168,197,181,.35);border-radius:999px;font-family:var(--mono);font-size:12px;color:var(--mint);margin-top:20px}
+.badge svg{width:16px;height:16px}
+.finished{margin-top:24px;padding:18px 20px;border-radius:12px;background:rgba(168,197,181,.14);color:var(--cream);font-size:17px;display:none}
+.finished.show{display:block;animation:fade .5s ease}
+
+.timechip{font-family:var(--mono);font-size:11px;color:var(--petrol-2);border:1px solid var(--line);border-radius:999px;padding:3px 9px;margin-left:auto;letter-spacing:.06em}
+
+/* ---------- responsive ---------- */
+@media (max-width:1024px){
+  .screen{padding:28px 28px 36px}
+  .brief-layout,.debrief-grid{grid-template-columns:1fr}
+  .pic-layout .photo{min-height:340px}
+  .brief-side{display:none}
+  .grid-3{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .audio-panel.current{grid-template-columns:1fr}
+  .cover-text{padding:40px 32px}
+}
+@media (max-width:860px){
+  .sit-layout,.pic-layout{grid-template-columns:1fr}
+  .pic-layout .photo{min-height:360px}
+}
+@media (max-width:760px){
+  .topbar{padding:10px 14px;gap:10px}
+  .brand span{display:none}
+  .guide-btn{padding:0;width:38px}
+  .guide-btn span{display:none}
+  .screen-label{display:none}
+  .screen{padding:22px 16px 30px}
+  .cover-grid{grid-template-columns:1fr;grid-template-rows:240px auto}
+  .cover-media{order:-1;min-height:240px}
+  .cover-media::after{background:linear-gradient(0deg,var(--petrol) 0%,rgba(20,44,56,0) 40%)}
+  .cover-text{padding:24px 16px 32px}
+  .brief-cards,.grid-2,.grid-3{grid-template-columns:1fr}
+  .qstep{padding:24px 20px}
+  .navbar{padding:10px 12px;gap:8px}
+  .dots{display:none}
+  .navbar .btn{padding:11px 14px}
+  .navbar .btn .txt{display:none}
+  .navbar .mid{display:block;margin:0 auto;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .scenario-band{grid-template-columns:1fr;padding:22px}
+  .lb-caption{flex-direction:column;align-items:flex-start}
+  .pic-layout .photo{min-height:240px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header>
+    <div class="topbar">
+      <a class="icon-btn" href="../../material-de-aula.html" aria-label="Sair" title="Voltar para Material de Aula">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+      </a>
+      <div class="brand"><b>ICAO English Preparation</b><span>Helicopter Pilot Edition · Mission 00</span></div>
+      <div class="screen-label" id="screenLabel">Screen <strong>01</strong> / 12</div>
+      <button class="icon-btn guide-btn" id="guideBtn" aria-label="Guia da Professora" title="Guia da Professora (G)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5.5A2.5 2.5 0 0 1 5.5 3H19a1 1 0 0 1 1 1v14.5a1 1 0 0 1-1 1H6a1 1 0 0 0-1 1"/><path d="M3 5.5v14A2.5 2.5 0 0 0 5.5 22H19"/></svg>
+        <span>Guia da prof.</span>
+      </button>
+      <button class="icon-btn" id="fsBtn" aria-label="Full screen" title="Full screen (F)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+    </div>
+    <div class="progress" role="progressbar" aria-valuemin="1" aria-valuemax="12" id="progress"><i id="progressFill"></i></div>
+  </header>
+
+  <main class="stage" id="stage">
+
+    <!-- 01 WELCOME ABOARD -->
+    <section class="screen cover" data-title="Welcome Aboard">
+      <div class="cover-grid">
+        <div class="cover-text">
+          <div class="eyebrow">ICAO English Preparation · Mission 00</div>
+          <h1>Diagnostic Flight Check</h1>
+          <p class="lead">Let's discover your English communication skills.</p>
+          <dl class="specs">
+            <div><dt>Course</dt><dd>ICAO English Preparation</dd></div>
+            <div><dt>Edition</dt><dd>Helicopter Pilot Edition</dd></div>
+            <div><dt>Mission</dt><dd>Mission 00</dd></div>
+            <div><dt>Duration</dt><dd>60 minutes</dd></div>
+            <div style="grid-column:1/-1"><dt>Focus</dt><dd>Speaking &amp; Listening</dd></div>
+          </dl>
+          <div><button class="btn btn-mint" data-go="next">Start your flight check
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>
+        </div>
+        <div class="cover-media"><div class="photo" data-img="cover"></div></div>
+      </div>
+    </section>
+
+    <!-- 02 PRE-FLIGHT BRIEFING -->
+    <section class="screen" data-title="Pre-flight Briefing">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">02 · Pre-flight Briefing</div>
+          <h1 class="title">Before We Take Off</h1>
+          <p class="subtitle">Every great flight starts with a briefing.</p></div>
+        <div class="brief-layout">
+          <div>
+            <div class="brief-cards">
+              <div class="card brief-card"><span class="num">01</span><h3>Communicate Naturally</h3><p>Use your own words.</p></div>
+              <div class="card brief-card"><span class="num">02</span><h3>Listen Carefully</h3><p>Focus on what you hear.</p></div>
+              <div class="card brief-card"><span class="num">03</span><h3>Keep It Going</h3><p>Ask for clarification when needed.</p></div>
+              <div class="card brief-card"><span class="num">04</span><h3>Think and Explain</h3><p>Share your ideas and reasons.</p></div>
+            </div>
+            <div class="final-q"><small>Question</small>What do you expect from this English preparation course?</div>
+          </div>
+          <aside class="brief-side"><div class="photo" data-img="cockpit"></div></aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 MEET THE PILOT -->
+    <section class="screen" data-title="Meet the Pilot">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">03 · Meet the Pilot</div>
+          <h1 class="title">Tell Me About Your Flying Experience</h1>
+          <p class="subtitle">Every pilot has a story. What's yours?</p></div>
+        <div class="card qstep" data-stepper>
+          <div class="qstep-meta"><span class="qcount" data-count></span><div class="qbar" data-bar></div></div>
+          <p class="qtext" data-text aria-live="polite"></p>
+          <div class="qactions">
+            <button class="btn btn-ghost" data-prev><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>Previous question</button>
+            <button class="btn btn-primary" data-next>Next question<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <template>
+            <q>How long have you been flying helicopters?</q>
+            <q>Why did you decide to become a helicopter pilot?</q>
+            <q>What types of helicopters have you flown?</q>
+            <q>What kind of flights do you usually operate?</q>
+            <q>Can you describe your most memorable flight?</q>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 HELICOPTER OPERATIONS -->
+    <section class="screen" data-title="Helicopter Operations">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">04 · Helicopter Operations</div>
+          <h1 class="title">A Day in the Life of a Helicopter Pilot</h1>
+          <p class="subtitle">Let's talk about real helicopter operations.</p></div>
+        <div class="grid-3">
+          <article class="card op-card">
+            <div class="photo" data-img="preflight" data-zoom data-tag="Card A · Pre-flight Inspection" data-q="Can you describe what you normally check before a flight?"></div>
+            <div class="body"><div class="tag">Card A</div><h3>Pre-flight Inspection</h3><p class="q">Can you describe what you normally check before a flight?</p></div>
+          </article>
+          <article class="card op-card">
+            <div class="photo" data-img="operations" data-zoom data-tag="Card B · Flight Operations" data-q="What factors can make a helicopter flight more challenging?"></div>
+            <div class="body"><div class="tag">Card B</div><h3>Flight Operations</h3><p class="q">What factors can make a helicopter flight more challenging?</p></div>
+          </article>
+          <article class="card op-card">
+            <div class="photo" data-img="approach" data-zoom data-tag="Card C · Landing Operations" data-q="What should a pilot consider when approaching an unfamiliar landing area?"></div>
+            <div class="body"><div class="tag">Card C</div><h3>Landing Operations</h3><p class="q">What should a pilot consider when approaching an unfamiliar landing area?</p></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 LISTEN & UNDERSTAND -->
+    <section class="screen" data-title="Listen &amp; Understand">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">05 · Listen &amp; Understand</div>
+          <h1 class="title">Listen Carefully</h1>
+          <p class="subtitle">Listen to the information and explain what you understood.</p></div>
+        <div data-audio-group>
+          <div class="audio-tabs">
+            <button class="current"><span class="n">01</span>Weather Update<span class="chk"></span></button>
+            <button><span class="n">02</span>Landing Area Information<span class="chk"></span></button>
+            <button><span class="n">03</span>Operational Update<span class="chk"></span></button>
+          </div>
+          <div class="audio-panel current" data-audio="audio/mission00_audio01_weather.mp3" data-manual-reveal data-label="Audio 01" data-name="Weather Update">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Questions will appear after you listen.</div>
+              <div class="reveal-content"><h4>Questions</h4><ol>
+                <li>What has changed?</li><li>What weather conditions were mentioned?</li><li>Why might this information be important to a helicopter pilot?</li></ol></div>
+            </div>
+          </div>
+          <div class="audio-panel" data-audio="audio/mission00_audio02_landing.mp3" data-manual-reveal data-label="Audio 02" data-name="Landing Area Information">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Questions will appear after you listen.</div>
+              <div class="reveal-content"><h4>Questions</h4><ol>
+                <li>Why is the landing area unavailable?</li><li>What is expected to happen next?</li><li>What information would you want to confirm?</li></ol></div>
+            </div>
+          </div>
+          <div class="audio-panel" data-audio="audio/mission00_audio03_operations.mp3" data-manual-reveal data-label="Audio 03" data-name="Operational Update">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Questions will appear after you listen.</div>
+              <div class="reveal-content"><h4>Questions</h4><ol>
+                <li>What is the main problem?</li><li>What alternative is being considered?</li><li>How would you explain this situation to another pilot?</li></ol></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 INTERACTING AS A PILOT -->
+    <section class="screen" data-title="Interacting as a Pilot">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">06 · Interacting as a Pilot</div>
+          <h1 class="title">Your Turn, Pilot</h1>
+          <p class="subtitle">Listen, respond and keep the communication going.</p></div>
+        <div data-audio-group>
+          <div class="audio-tabs">
+            <button class="current"><span class="n">A</span>Request for Clarification<span class="chk"></span></button>
+            <button><span class="n">B</span>Communication Difficulty<span class="chk"></span></button>
+          </div>
+          <div class="audio-panel current" data-audio="audio/mission00_audio04_clarification.mp3" data-label="Scenario A" data-name="Request for Clarification">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Your task will appear after you listen.</div>
+              <div class="reveal-content"><h4>Your task</h4><p class="instruction">You have received this message. Explain what you understood and what information you would like to confirm.</p></div>
+            </div>
+          </div>
+          <div class="audio-panel" data-audio="audio/mission00_audio05_communication.mp3" data-label="Scenario B" data-name="Communication Difficulty">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Your task will appear after you listen.</div>
+              <div class="reveal-content"><h4>Your task</h4><p class="instruction">Respond to the message. Ask for clarification if necessary.</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 UNEXPECTED SITUATIONS -->
+    <section class="screen" data-title="Unexpected Situations">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">07 · Unexpected Situations</div>
+          <h1 class="title">When Things Don't Go as Planned</h1></div>
+        <div data-tabs>
+          <div class="audio-tabs">
+            <button class="current"><span class="n">A</span>Deteriorating Weather</button>
+            <button><span class="n">B</span>Passenger Medical Problem</button>
+          </div>
+          <div class="tab-panel">
+            <div class="sit-layout">
+              <div class="photo" data-img="weather" data-zoom></div>
+              <div>
+                <div class="context"><small>Situation A</small>You are flying toward your destination when weather conditions begin to deteriorate.</div>
+                <div class="card qlist"><h4>Questions</h4><ol>
+                  <li>What is happening?</li><li>What information would you need?</li><li>How would you communicate your concerns?</li><li>What could happen if conditions continue to deteriorate?</li></ol></div>
+                <div class="task"><small>Communication task</small>Explain the situation to another crew member.</div>
+              </div>
+            </div>
+          </div>
+          <div class="tab-panel" hidden>
+            <div class="sit-layout">
+              <div class="photo" data-img="cabin" data-zoom></div>
+              <div>
+                <div class="context"><small>Situation B</small>During a flight, a passenger suddenly becomes seriously ill.</div>
+                <div class="card qlist"><h4>Questions</h4><ol>
+                  <li>How would you describe the situation?</li><li>What information would you communicate?</li><li>How would you explain the urgency?</li><li>What additional information might be necessary?</li></ol></div>
+                <div class="task"><small>Communication task</small>Imagine you need to inform someone on the ground about the situation. What would you say?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 PICTURE DESCRIPTION -->
+    <section class="screen" data-title="Picture Description">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">08 · Picture Description</div>
+          <h1 class="title">Describe What You See</h1>
+          <p class="subtitle">Look at the picture and describe everything you can see.</p></div>
+        <div class="pic-layout">
+          <div class="photo" data-img="helipad" data-zoom></div>
+          <div class="card qlist prog"><h4>Follow-up questions</h4><ol>
+            <li>Where do you think this helicopter is?</li><li>What is happening around it?</li><li>What details caught your attention?</li><li>What can you say about the weather?</li></ol>
+            <div class="prog-actions"><button class="btn btn-primary" data-prog-next data-start="0">Show question</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 PICTURE DISCUSSION -->
+    <section class="screen" data-title="Picture Discussion">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">09 · Picture Discussion</div>
+          <h1 class="title">Look Beyond the Picture</h1></div>
+        <div class="pic-layout">
+          <div class="photo" data-img="helipad" data-zoom></div>
+          <div class="card qlist prog"><h4>Questions</h4><ol>
+            <li>What do you think happened before this moment?</li><li>What might happen next?</li><li>What challenges could the pilot face?</li><li>What could make this operation safer?</li></ol>
+            <div class="prog-actions"><button class="btn btn-primary" data-prog-next>Next question</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 DECISION MAKING -->
+    <section class="screen" data-title="Decision Making">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">10 · Decision Making</div>
+          <h1 class="title">Explain Your Decision</h1></div>
+        <div class="scenario-band">
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></div>
+          <div><small>Scenario</small><p>During a helicopter flight, a passenger asks you to change the destination because of an unexpected personal situation. However, changing the destination may not be possible.</p></div>
+        </div>
+        <div class="card qlist"><h4>Questions</h4><ol>
+          <li>How would you respond to the passenger?</li><li>What information would you need before discussing any changes?</li><li>How would you explain the possible limitations?</li><li>What alternatives could you suggest?</li></ol></div>
+      </div>
+    </section>
+
+    <!-- 11 FINAL COMMUNICATION CHALLENGE -->
+    <section class="screen" data-title="Final Communication Challenge">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">11 · Final Communication Challenge</div>
+          <h1 class="title">Final Flight Check</h1>
+          <p class="subtitle">One final challenge before landing.</p></div>
+        <div data-audio-group>
+          <div class="audio-panel current" data-audio="audio/mission00_audio06_final.mp3" data-label="Final audio" data-name="Flight Update">
+            <div class="reveal-area card qlist" data-locked="true">
+              <div class="locked-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14v-2a9 9 0 0 1 18 0v2"/><path d="M21 15a2 2 0 0 1-2 2h-1v-6h1a2 2 0 0 1 2 2zM3 15a2 2 0 0 0 2 2h1v-6H5a2 2 0 0 0-2 2z"/></svg>Your task will appear after you listen.</div>
+              <div class="reveal-content prog"><h4>Your task</h4>
+                <p class="instruction">Imagine you need to explain this situation to another pilot who has not heard the update.</p>
+                <ol style="margin-top:8px"><li class="off">What information would you want to confirm before continuing the discussion?</li></ol>
+                <div class="prog-actions"><button class="btn btn-ghost" data-prog-next data-start="0" data-label-first="Follow-up question">Follow-up question</button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 POST-FLIGHT DEBRIEF -->
+    <section class="screen debrief" data-title="Post-flight Debrief">
+      <div class="wrap">
+        <div class="head"><div class="eyebrow">12 · Post-flight Debrief</div>
+          <h1 class="title">Mission Completed</h1></div>
+        <div class="debrief-grid">
+          <div>
+            <p class="debrief-msg">Great work! You've completed your Diagnostic Flight Check.</p>
+            <p class="subtitle" style="margin-top:16px">Your communication skills will help guide your personalized preparation for ICAO Level 4.</p>
+            <div class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Mission 00 · Diagnostic Flight Check</div>
+          </div>
+          <div>
+            <div class="qlist"><h4>Final questions</h4><ol>
+              <li>Which activity was the most challenging for you?</li>
+              <li>What would you most like to improve?</li>
+              <li>How confident do you feel communicating in English during aviation-related situations?</li></ol></div>
+            <div style="margin-top:20px"><button class="btn btn-mint" id="finishBtn">Finish mission
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></button></div>
+            <div class="finished" id="finished">Mission 00 closed. Thank you for flying with us — see you on your next mission.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="navbar" aria-label="Screen navigation">
+    <button class="btn btn-ghost" id="prevBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span class="txt">Previous</span></button>
+    <div class="dots" id="dots"></div>
+    <span class="mid" id="midLabel"></span>
+    <button class="btn btn-primary" id="nextBtn"><span class="txt">Next</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+  </nav>
+</div>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+  <button class="lb-close" id="lbClose" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  <div class="lb-inner">
+    <div class="photo" id="lbPhoto"></div>
+    <div class="lb-caption" id="lbCaption"><div><div class="tag" id="lbTag"></div><p id="lbQ"></p></div></div>
+  </div>
+</div>
+
+<script>
+/* ============ IMAGE MANIFEST (local files + license credits) ============ */
+const IMAGES = /*IMAGES_START*/{
+ "cover": {
+  "file": "images/01-cover-coastal-flight.jpg",
+  "alt": "A civil helicopter flying over Botafogo Bay in Rio de Janeiro, with the city and mountains behind it",
+  "author": "Wilfredor",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_206L-4_LongRanger_IV_over_Botafogo_Bay,_Rio_de_Janeiro.jpg",
+  "position": "62% 50%"
+ },
+ "cockpit": {
+  "file": "images/02-cockpit.jpg",
+  "alt": "Instrument panel of a civil Airbus H125 helicopter",
+  "author": "Kakoula10",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:F-HGRU_Airbus_H125_helicopter_cockpit_Ard%C3%A8che_Fev_2024.jpg"
+ },
+ "preflight": {
+  "file": "images/03-preflight-inspection.jpg",
+  "alt": "A pilot inspecting a helicopter with a flashlight before a flight",
+  "author": "U.S. Customs and Border Protection",
+  "license": "Public domain",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:A_CBP,_AMO_Pilot_Conducts_Preflight_Inspection_(35799981183).jpg",
+  "source": "https://commons.wikimedia.org/wiki/File:A_CBP,_AMO_Pilot_Conducts_Preflight_Inspection_(35799981183).jpg",
+  "position": "60% 50%"
+ },
+ "operations": {
+  "file": "images/04-flight-operations.jpg",
+  "alt": "A yellow EC135 air ambulance helicopter in flight against a cloudy sky",
+  "author": "Stiopa",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:EC_135_(SP-DXB).jpg"
+ },
+ "approach": {
+  "file": "images/05-helipad-approach.jpg",
+  "alt": "A helicopter approaching a cliff-top landing area by the sea while a ground crew member watches",
+  "author": "KarelZe",
+  "license": "CC0",
+  "licenseUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_412_EP.JPG"
+ },
+ "weather": {
+  "file": "images/06-unfavourable-weather.jpg",
+  "alt": "A civil helicopter flying in thick fog",
+  "author": "Olga Ernst",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Air-Glaciers,_HB-ZNA_(Airbus_Helicopters_H125).jpg"
+ },
+ "cabin": {
+  "file": "images/07-passenger-cabin.jpg",
+  "alt": "Passenger cabin of a civil helicopter with the door open",
+  "author": "JetRequest.com",
+  "license": "CC BY-SA 3.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+  "source": "https://commons.wikimedia.org/wiki/File:Bell_430_helicopter_interior_3.jpg"
+ },
+ "helipad": {
+  "file": "images/08-helipad-overcast.jpg",
+  "alt": "A helicopter parked on a ship's helideck under dark, heavy clouds",
+  "author": "Antoine Lamielle",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+  "source": "https://commons.wikimedia.org/wiki/File:2020-11_Marion_Dufresne_-_Helicopter_04.jpg"
+ }
+}/*IMAGES_END*/;
+
+(function(){
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+  const screens = $$('.screen');
+  const TOTAL = screens.length;
+  let current = 0;
+
+  /* ---------- images ---------- */
+  function fillPhoto(el, key){
+    el.innerHTML = '';
+    const meta = IMAGES[key];
+    if(!meta){
+      el.innerHTML = '<div class="pending">IMAGE PENDING<br>' + key + '</div>';
+      return;
+    }
+    const img = new Image();
+    img.src = meta.file; img.alt = meta.alt || ''; img.loading = 'lazy'; img.decoding = 'async';
+    if(meta.position) img.style.objectPosition = meta.position;
+    img.onerror = () => { el.innerHTML = '<div class="pending">IMAGE FILE NOT FOUND<br>' + meta.file + '</div>'; };
+    el.appendChild(img);
+    const c = document.createElement('div');
+    c.className = 'credit';
+    c.innerHTML = 'Photo: ' + meta.author + ' · <a href="' + meta.licenseUrl + '" target="_blank" rel="noopener">' + meta.license + '</a>' + (meta.modified ? ' · cropped' : '');
+    c.title = meta.source;
+    el.appendChild(c);
+    if(el.hasAttribute('data-zoom')){
+      const h = document.createElement('div'); h.className='zoom-hint';
+      h.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5M11 8v6M8 11h6"/></svg>Enlarge';
+      el.appendChild(h);
+    }
+  }
+  $$('[data-img]').forEach(el => fillPhoto(el, el.dataset.img));
+
+  /* ---------- lightbox ---------- */
+  const lb = $('#lightbox');
+  function openLightbox(key, tag, q){
+    fillPhoto($('#lbPhoto'), key);
+    $('#lbTag').textContent = tag || '';
+    $('#lbQ').textContent = q || '';
+    $('#lbCaption').style.display = (tag || q) ? '' : 'none';
+    lb.classList.add('open');
+    $('#lbClose').focus();
+  }
+  function closeLightbox(){ lb.classList.remove('open'); }
+  $('#lbClose').addEventListener('click', closeLightbox);
+  lb.addEventListener('click', e => { if(e.target === lb) closeLightbox(); });
+  $$('[data-zoom]').forEach(p => p.addEventListener('click', e => { if(e.target.closest('a')) return; openLightbox(p.dataset.img, p.dataset.tag, p.dataset.q); }));
+
+  /* ---------- navigation ---------- */
+  const dots = $('#dots');
+  screens.forEach((s, i) => {
+    const b = document.createElement('button');
+    b.textContent = String(i+1).padStart(2,'0');
+    b.title = s.dataset.title.replace('&amp;','&');
+    b.setAttribute('aria-label', 'Go to screen ' + (i+1) + ': ' + b.title);
+    b.addEventListener('click', () => go(i));
+    dots.appendChild(b);
+  });
+
+  let channel = null;
+  try { channel = new BroadcastChannel('mission00-sync'); } catch(e){}
+
+  function go(i){
+    if(i < 0 || i >= TOTAL || i === current && screens[i].classList.contains('active')) return;
+    const dir = i > current ? 1 : -1;
+    stopAllAudio();
+    closeLightbox();
+    screens.forEach((s, k) => {
+      s.classList.remove('from-left');
+      if(k === i){
+        if(dir < 0){ s.classList.add('from-left'); void s.offsetWidth; }
+        s.classList.add('active'); s.scrollTop = 0; s.removeAttribute('aria-hidden');
+      } else { s.classList.remove('active'); s.setAttribute('aria-hidden','true'); }
+    });
+    current = i;
+    const n = String(i+1).padStart(2,'0');
+    $('#screenLabel').innerHTML = 'Screen <strong>' + n + '</strong> / ' + TOTAL;
+    $('#midLabel').textContent = n + ' / ' + TOTAL;
+    $('#progressFill').style.width = ((i+1)/TOTAL*100) + '%';
+    $('#progress').setAttribute('aria-valuenow', i+1);
+    Array.from(dots.children).forEach((d, k) => { d.classList.toggle('current', k===i); d.classList.toggle('done', k<i); });
+    $('#prevBtn').disabled = i === 0;
+    $('#nextBtn').disabled = i === TOTAL-1;
+    document.title = 'Mission 00 · ' + screens[i].dataset.title.replace('&amp;','&');
+    try { history.replaceState(null, '', '#screen-' + (i+1)); } catch(e){}
+    if(channel) channel.postMessage({screen: i+1});
+    try { localStorage.setItem('mission00-screen', String(i+1)); } catch(e){}
+  }
+  $('#prevBtn').addEventListener('click', () => go(current-1));
+  $('#nextBtn').addEventListener('click', () => go(current+1));
+  $$('[data-go="next"]').forEach(b => b.addEventListener('click', () => go(current+1)));
+
+  document.addEventListener('keydown', e => {
+    if(e.target.matches('input,textarea')) return;
+    if(e.key === 'Escape' && lb.classList.contains('open')){ closeLightbox(); return; }
+    if(lb.classList.contains('open')) return;
+    if(e.key === 'ArrowRight' || e.key === 'PageDown') go(current+1);
+    else if(e.key === 'ArrowLeft' || e.key === 'PageUp') go(current-1);
+    else if(e.key === 'f' || e.key === 'F') toggleFs();
+    else if(e.key === 'g' || e.key === 'G') openGuide();
+  });
+
+  /* ---------- teacher guide: separate window, opened via button or keyboard (G) ---------- */
+  function openGuide(){
+    const url = 'mission00-teacher-guide.html#screen-' + (current+1);
+    window.open(url, 'mission00-teacher-guide', 'width=760,height=900');
+  }
+  $('#guideBtn').addEventListener('click', openGuide);
+
+  /* ---------- fullscreen ---------- */
+  function toggleFs(){
+    const d = document, el = d.documentElement;
+    if(!(d.fullscreenElement || d.webkitFullscreenElement)){
+      (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+    } else {
+      (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+    }
+  }
+  $('#fsBtn').addEventListener('click', toggleFs);
+  if(!(document.fullscreenEnabled || document.webkitFullscreenEnabled)) $('#fsBtn').style.display = 'none';
+
+  /* ---------- question stepper ---------- */
+  $$('[data-stepper]').forEach(st => {
+    const qs = Array.from(st.querySelector('template').content.querySelectorAll('q')).map(q => q.textContent);
+    let i = 0;
+    const text = st.querySelector('[data-text]'), count = st.querySelector('[data-count]'), bar = st.querySelector('[data-bar]');
+    bar.innerHTML = qs.map(() => '<i></i>').join('');
+    function render(){
+      text.style.opacity = 0;
+      setTimeout(() => { text.textContent = qs[i]; text.style.opacity = 1; }, 150);
+      count.textContent = 'Question ' + (i+1) + ' of ' + qs.length;
+      Array.from(bar.children).forEach((b, k) => b.classList.toggle('on', k <= i));
+      st.querySelector('[data-prev]').disabled = i === 0;
+      st.querySelector('[data-next]').disabled = i === qs.length-1;
+    }
+    st.querySelector('[data-prev]').addEventListener('click', () => { if(i>0){ i--; render(); } });
+    st.querySelector('[data-next]').addEventListener('click', () => { if(i<qs.length-1){ i++; render(); } });
+    text.textContent = qs[0]; render();
+  });
+
+  /* ---------- progressive question lists ---------- */
+  $$('.prog').forEach(box => {
+    const items = $$('li', box);
+    const btn = box.querySelector('[data-prog-next]');
+    if(!btn) return;
+    const start = btn.dataset.start !== undefined ? parseInt(btn.dataset.start, 10) : 1;
+    let shown = start;
+    items.forEach((li, k) => li.classList.toggle('off', k >= shown));
+    const label = () => { btn.textContent = shown === 0 ? (btn.dataset.labelFirst || 'Show question') : 'Next question'; };
+    label();
+    if(shown >= items.length) btn.disabled = true;
+    btn.addEventListener('click', () => {
+      if(shown < items.length){ items[shown].classList.remove('off'); shown++; }
+      label();
+      if(shown >= items.length) btn.disabled = true;
+    });
+  });
+
+  /* ---------- simple tabs (screen 07) ---------- */
+  $$('[data-tabs]').forEach(t => {
+    const btns = $$('.audio-tabs button', t), panels = $$('.tab-panel', t);
+    btns.forEach((b, k) => b.addEventListener('click', () => {
+      btns.forEach((x, j) => x.classList.toggle('current', j===k));
+      panels.forEach((p, j) => p.hidden = j!==k);
+    }));
+  });
+
+  /* ---------- audio players ---------- */
+  const players = [];
+  const ICON_PLAY = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5z"/></svg>';
+  const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4" height="15" rx="1"/><rect x="14" y="4.5" width="4" height="15" rx="1"/></svg>';
+  const ICON_REPLAY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>';
+  const fmt = s => isFinite(s) ? Math.floor(s/60) + ':' + String(Math.floor(s%60)).padStart(2,'0') : '0:00';
+
+  $$('.audio-panel').forEach(panel => {
+    const reveal = panel.querySelector('.reveal-area');
+    const player = document.createElement('div');
+    player.className = 'player';
+    const bars = Array.from({length: 28}, () => '<i style="--h:' + (35 + Math.round(Math.random()*60)) + '%;animation-delay:' + (Math.random()*.8).toFixed(2) + 's"></i>').join('');
+    player.innerHTML =
+      '<div><div class="label">' + panel.dataset.label + '</div><h3>' + panel.dataset.name + '</h3></div>' +
+      '<div class="wave" aria-hidden="true">' + bars + '</div>' +
+      '<div><div class="ptrack"><i></i></div><div class="pstatus" style="margin-top:8px"><span data-state>Checking audio…</span><span data-time>0:00</span></div></div>' +
+      '<div class="pbtns">' +
+        '<button class="btn btn-mint" data-play disabled>' + ICON_PLAY + '<span>Listen</span></button>' +
+        '<button class="btn btn-ghost" data-replay disabled style="background:transparent;color:var(--cream);border-color:rgba(250,247,242,.25)">' + ICON_REPLAY + '<span>Replay</span></button>' +
+      '</div>';
+    panel.insertBefore(player, panel.firstChild);
+
+    const audio = new Audio();
+    audio.preload = 'metadata';
+    const playBtn = player.querySelector('[data-play]'), replayBtn = player.querySelector('[data-replay]');
+    const state = player.querySelector('[data-state]'), time = player.querySelector('[data-time]'), fill = player.querySelector('.ptrack i');
+    let heard = false, ok = false;
+
+    function setPlaying(p){
+      player.classList.toggle('playing', p);
+      playBtn.innerHTML = (p ? ICON_PAUSE : ICON_PLAY) + '<span>' + (p ? 'Pause' : (heard || audio.currentTime > 0 ? 'Resume' : 'Listen')) + '</span>';
+      if(!p && audio.ended) playBtn.innerHTML = ICON_PLAY + '<span>Listen</span>';
+    }
+    audio.addEventListener('loadedmetadata', () => {
+      ok = true; playBtn.disabled = false;
+      state.textContent = 'Ready'; time.textContent = '0:00 / ' + fmt(audio.duration);
+    });
+    audio.addEventListener('error', () => {
+      ok = false;
+      player.querySelector('.pbtns').innerHTML = '<div class="unavailable">AUDIO FILE UNAVAILABLE<br>' + panel.dataset.audio + '</div>';
+      state.textContent = 'Not available'; player.querySelector('.wave').style.opacity = .3;
+      reveal.querySelector('.locked-note').lastChild.textContent = ' Audio pending — the teacher can continue orally.';
+    });
+    audio.addEventListener('timeupdate', () => {
+      if(audio.duration){ fill.style.width = (audio.currentTime/audio.duration*100) + '%'; time.textContent = fmt(audio.currentTime) + ' / ' + fmt(audio.duration); }
+    });
+    audio.addEventListener('play', () => { state.textContent = 'Playing…'; setPlaying(true); });
+    audio.addEventListener('pause', () => { if(!audio.ended){ state.textContent = 'Paused'; } setPlaying(false); });
+    audio.addEventListener('ended', () => {
+      heard = true; state.textContent = 'Played'; fill.style.width = '100%'; setPlaying(false);
+      replayBtn.disabled = false;
+      if(panel.hasAttribute('data-manual-reveal')){
+        if(reveal.dataset.locked === 'true' && !reveal.querySelector('[data-show-q]')){
+          const note = reveal.querySelector('.locked-note');
+          note.lastChild.textContent = ' Questions are ready.';
+          const b = document.createElement('button');
+          b.className = 'btn btn-primary'; b.setAttribute('data-show-q',''); b.textContent = 'Show questions';
+          b.addEventListener('click', () => { reveal.dataset.locked = 'false'; });
+          note.appendChild(b);
+        }
+      } else {
+        reveal.dataset.locked = 'false';
+      }
+      const group = panel.closest('[data-audio-group]');
+      if(group){
+        const idx = $$('.audio-panel', group).indexOf(panel);
+        const tab = $$('.audio-tabs button', group)[idx];
+        if(tab) tab.classList.add('heard');
+      }
+    });
+    playBtn.addEventListener('click', () => {
+      if(!ok) return;
+      if(audio.paused){ stopAllAudio(audio); if(audio.ended) audio.currentTime = 0; audio.play().catch(() => { state.textContent = 'Playback blocked — tap Listen again'; }); }
+      else audio.pause();
+    });
+    replayBtn.addEventListener('click', () => { stopAllAudio(audio); audio.currentTime = 0; audio.play(); });
+    audio.src = panel.dataset.audio;
+    players.push(audio);
+  });
+  function stopAllAudio(except){ players.forEach(a => { if(a !== except && !a.paused) a.pause(); }); }
+
+  /* audio tab switching */
+  $$('[data-audio-group]').forEach(g => {
+    const btns = $$('.audio-tabs button', g), panels = $$('.audio-panel', g);
+    btns.forEach((b, k) => b.addEventListener('click', () => {
+      stopAllAudio();
+      btns.forEach((x, j) => x.classList.toggle('current', j===k));
+      panels.forEach((p, j) => p.classList.toggle('current', j===k));
+    }));
+  });
+
+  /* ---------- finish ---------- */
+  $('#finishBtn').addEventListener('click', () => {
+    $('#finished').classList.add('show');
+    $('#finishBtn').disabled = true;
+    if(channel) channel.postMessage({finished: true});
+  });
+
+  /* ---------- start ---------- */
+  const m = location.hash.match(/screen-(\d+)/);
+  const startAt = m ? Math.min(Math.max(parseInt(m[1],10)-1, 0), TOTAL-1) : 0;
+  current = -1; go(startAt);
+  window.addEventListener('hashchange', () => {
+    const h = location.hash.match(/screen-(\d+)/);
+    if(h) go(Math.min(Math.max(parseInt(h[1],10)-1, 0), TOTAL-1));
+  });
+})();
+</script>
+</body>
+</html>
