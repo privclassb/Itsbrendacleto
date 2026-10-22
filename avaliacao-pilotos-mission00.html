@@ -1,0 +1,519 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnostic Assessment · Clear to Speak</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --petrol:#142C38; --petrol-2:#23424C; --mint:#A8C5B5; --cream:#FAF7F2; --white:#FFFFFF;
+  --ink:#142C38; --muted:#4E6670; --line:rgba(20,44,56,.12); --mint-soft:rgba(168,197,181,.22);
+  --radius:14px; --shadow:0 1px 2px rgba(20,44,56,.06),0 8px 28px rgba(20,44,56,.08);
+  --sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--cream);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;padding-bottom:60px}
+button,input,select,textarea{font:inherit;color:inherit}
+
+header{background:var(--petrol);color:var(--cream);padding:14px 20px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10}
+.btn-back{background:rgba(250,247,242,.12);border:1px solid rgba(250,247,242,.25);border-radius:8px;padding:7px 14px;font-size:13px;font-weight:600;color:var(--cream);text-decoration:none}
+.btn-back:hover{background:rgba(250,247,242,.2)}
+.header-title{font-size:15px;font-weight:700;letter-spacing:.02em}
+.header-title span{display:block;font-family:var(--mono);font-size:11px;color:var(--mint);font-weight:400;letter-spacing:.06em;margin-top:2px}
+
+main{max-width:760px;margin:0 auto;padding:24px 18px 60px}
+
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:16px}
+.card-title{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--petrol-2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title .n{font-family:var(--mono);background:var(--petrol);color:var(--white);border-radius:6px;padding:2px 8px;font-size:11px}
+
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--petrol-2);margin-bottom:6px;letter-spacing:.02em}
+.field input[type=text],.field input[type=date],.field select,.field textarea{
+  width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14.5px;background:var(--cream);
+}
+.field input[readonly]{background:var(--mint-soft);color:var(--petrol-2);border-color:transparent}
+.field textarea{resize:vertical;min-height:64px;font-family:var(--sans)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:600px){.grid-2{grid-template-columns:1fr}}
+
+/* student picker */
+.student-picker{position:relative}
+.student-chip{display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--petrol);color:var(--cream);border-radius:10px;padding:10px 14px}
+.student-chip.show{display:flex}
+.student-chip.show + input{display:none}
+.student-chip b{font-size:14.5px}
+.student-chip small{display:block;font-family:var(--mono);font-size:11px;color:var(--mint);margin-top:2px}
+.student-chip button{background:rgba(250,247,242,.15);border:1px solid rgba(250,247,242,.3);color:var(--cream);border-radius:7px;padding:5px 10px;font-size:12px;cursor:pointer}
+.student-results{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--white);border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);max-height:260px;overflow-y:auto;z-index:5;display:none}
+.student-results.show{display:block}
+.student-result{padding:10px 14px;cursor:pointer;font-size:14px;border-bottom:1px solid var(--line)}
+.student-result:last-child{border-bottom:none}
+.student-result:hover,.student-result.active{background:var(--mint-soft)}
+.student-result .role{font-family:var(--mono);font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.student-empty{padding:12px 14px;color:var(--muted);font-size:13px}
+
+/* accordions */
+details.acc{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+details.acc[open]{border-color:var(--petrol-2)}
+details.acc summary{list-style:none;cursor:pointer;padding:13px 16px;display:flex;align-items:center;gap:10px;background:var(--cream);font-weight:700;font-size:14.5px}
+details.acc summary::-webkit-details-marker{display:none}
+details.acc summary .ch{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--muted);transition:transform .2s}
+details.acc[open] summary .ch{transform:rotate(90deg)}
+details.acc summary .lvl-tag{font-family:var(--mono);font-size:11px;background:var(--mint-soft);color:var(--petrol-2);border-radius:999px;padding:2px 9px}
+.acc-body{padding:16px}
+.descriptor{background:var(--mint-soft);border-left:3px solid var(--mint);border-radius:0 8px 8px 0;padding:10px 12px;font-size:13.5px;margin-bottom:10px}
+.support-q{font-size:13px;color:var(--muted);margin:0 0 12px 18px}
+.support-q li{margin-top:2px}
+
+.levels{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.levels label{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;background:var(--white)}
+.levels input{accent-color:var(--petrol)}
+.levels label:has(input:checked){background:var(--petrol);color:var(--white);border-color:var(--petrol)}
+.levels label.na{font-family:var(--mono);font-size:11.5px}
+
+.activity-field{margin-bottom:12px}
+.activity-field label{display:block;font-size:13px;font-weight:600;color:var(--petrol-2);margin-bottom:5px}
+.activity-field textarea{min-height:52px}
+
+.note{background:var(--mint-soft);border-left:3px solid var(--mint);border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;margin-bottom:16px}
+
+.err{display:none;background:#fdeceb;border:1px solid #e8b4ac;color:#a33a2b;border-radius:10px;padding:12px 14px;font-size:13.5px;margin-bottom:16px}
+.err.show{display:block}
+
+.save-bar{position:sticky;bottom:0;background:var(--cream);padding:14px 0 4px;border-top:1px solid var(--line);margin-top:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;font-weight:700;font-size:13.5px;letter-spacing:.03em;border:0;cursor:pointer}
+.btn-primary{background:var(--petrol);color:var(--white);width:100%;justify-content:center}
+.btn-primary:disabled{opacity:.5;cursor:default}
+.btn-ghost{background:var(--white);border:1px solid var(--line);color:var(--petrol)}
+
+/* confirmation */
+#confirmPanel{display:none;text-align:center;padding:40px 20px}
+#confirmPanel.show{display:block}
+#confirmPanel .ok{width:56px;height:56px;border-radius:50%;background:var(--petrol);color:var(--mint);display:grid;place-items:center;margin:0 auto 16px}
+#confirmPanel h2{font-size:21px;margin-bottom:8px}
+#confirmPanel p{color:var(--muted);margin-bottom:24px}
+.confirm-actions{display:flex;flex-direction:column;gap:10px;max-width:340px;margin:0 auto}
+.confirm-actions a,.confirm-actions button{text-align:center;text-decoration:none}
+
+#formWrap.hidden{display:none}
+.loading{text-align:center;padding:60px 20px;color:var(--muted)}
+</style>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#142C38" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="itsbrendacleto" />
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        setInterval(function () { reg.update(); }, 60000);
+      }).catch(function () {});
+    });
+  }
+</script>
+</head>
+<body>
+
+<header>
+  <a href="painel-professora.html" class="btn-back">← Voltar</a>
+  <div class="header-title">Diagnostic Assessment<span>Clear to Speak — Aviation English Training</span></div>
+</header>
+
+<main>
+  <div id="loadingState" class="loading">Carregando...</div>
+
+  <div id="formWrap" class="hidden">
+    <div class="err" id="formError"></div>
+
+    <div class="card">
+      <div class="card-title">Avaliação</div>
+      <div class="field student-picker">
+        <label for="studentSearch">Student</label>
+        <div class="student-chip" id="studentChip">
+          <div><b id="studentChipName"></b><small id="studentChipMeta"></small></div>
+          <button type="button" onclick="clearSelectedStudent()">Trocar</button>
+        </div>
+        <input type="text" id="studentSearch" placeholder="Buscar aluno pelo nome..." autocomplete="off" oninput="renderStudentResults()" onfocus="renderStudentResults()">
+        <div class="student-results" id="studentResults"></div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="assessmentDate">Assessment Date</label>
+          <input type="date" id="assessmentDate">
+        </div>
+        <div class="field">
+          <label for="teacherName">Teacher</label>
+          <input type="text" id="teacherName" readonly>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Assessment</label>
+          <input type="text" value="Mission 00 — Diagnostic Flight Check" readonly>
+        </div>
+        <div class="field">
+          <label>Program</label>
+          <input type="text" value="Clear to Speak — Aviation English Training" readonly>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="n">01</span>ICAO Language Proficiency — 6 competências</div>
+      <div class="note">Escala de 1 (pré-elementar) a 6 (especialista), com "Not assessed" quando não houver evidência suficiente. Isto é uma avaliação diagnóstica interna, <strong>não é uma certificação oficial ICAO/SDEA</strong>.</div>
+      <div id="competencyAccordions"></div>
+    </div>
+
+    <div class="card">
+      <details class="acc">
+        <summary>Observações por atividade (opcional)<span class="ch">›</span></summary>
+        <div class="acc-body" id="activityFields"></div>
+      </details>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="n">02</span>Síntese diagnóstica</div>
+      <div class="field">
+        <label for="currentProfile">Current Communication Profile</label>
+        <textarea id="currentProfile" placeholder="Descrição geral do desempenho observado..."></textarea>
+      </div>
+      <div class="field">
+        <label for="strengths">Strengths</label>
+        <textarea id="strengths" placeholder="Pontos fortes do aluno..."></textarea>
+      </div>
+      <div class="field">
+        <label for="areasDevelopment">Areas for Development</label>
+        <textarea id="areasDevelopment" placeholder="Principais dificuldades identificadas..."></textarea>
+      </div>
+      <div class="field">
+        <label for="recommendedPriorities">Recommended Learning Priorities</label>
+        <textarea id="recommendedPriorities" placeholder="Competências a priorizar nas próximas aulas..."></textarea>
+      </div>
+      <div class="field">
+        <label for="additionalNotes">Teacher's Additional Notes</label>
+        <textarea id="additionalNotes" placeholder="Observações complementares..."></textarea>
+      </div>
+      <div class="field">
+        <label for="internalEstimate">Estimativa diagnóstica interna (opcional, não oficial)</label>
+        <select id="internalEstimate">
+          <option value="">— Sem estimativa —</option>
+          <option value="Pre A1 (abaixo do Level 1)">Pre A1 (abaixo do Level 1)</option>
+          <option value="Level 1 — Pre-elementary">Level 1 — Pre-elementary</option>
+          <option value="Level 2 — Elementary">Level 2 — Elementary</option>
+          <option value="Level 3 — Pre-operational">Level 3 — Pre-operational</option>
+          <option value="Level 4 — Operational">Level 4 — Operational</option>
+          <option value="Level 5 — Extended">Level 5 — Extended</option>
+          <option value="Level 6 — Expert">Level 6 — Expert</option>
+        </select>
+      </div>
+      <div class="note" style="margin-top:14px;margin-bottom:0;">Essa estimativa não é calculada automaticamente a partir dos níveis acima nem substitui uma aplicação oficial do exame.</div>
+    </div>
+
+    <div class="save-bar">
+      <button class="btn btn-primary" id="saveBtn" onclick="saveAssessment()">Save Assessment</button>
+    </div>
+  </div>
+
+  <div id="confirmPanel">
+    <div class="ok">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+    </div>
+    <h2>Assessment saved successfully.</h2>
+    <p id="confirmSub"></p>
+    <div class="confirm-actions">
+      <a class="btn btn-primary" id="viewProfileLink" href="#">View Student Profile</a>
+      <button class="btn btn-ghost" onclick="startNewAssessment()">New Assessment</button>
+      <a class="btn btn-ghost" href="painel-professora.html">Back to Teacher Dashboard</a>
+    </div>
+  </div>
+</main>
+
+<script>
+const SUPABASE_URL = 'https://vbqumpzlxseakvmyvkem.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_NjK_Rdqnl1ZCRd9LlUG-fA_OvdYsKvj';
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    storage: window.localStorage,
+    autoRefreshToken: true,
+    detectSessionInUrl: false,
+    lock: async (_name, _acquireTimeout, fn) => fn(),
+  }
+});
+
+/* ---------- ICAO competency data ---------- */
+const COMPETENCIES = [
+  { key: 'pronunciation', label: 'A. Pronunciation',
+    descriptor: 'Inteligibilidade dos sons, acentuação, ritmo e entonação, mesmo com influência do sotaque ou da língua materna.',
+    questions: ['A fala foi compreensível?', 'Houve necessidade frequente de repetição?', 'A pronúncia dificultou a comunicação?'] },
+  { key: 'structure', label: 'B. Structure',
+    descriptor: 'Uso de estruturas gramaticais básicas e complexas na construção de frases compreensíveis.',
+    questions: ['Consegue formular frases completas?', 'Usa tempos verbais de maneira funcional?', 'Os erros gramaticais comprometem a compreensão?'] },
+  { key: 'vocabulary', label: 'C. Vocabulary',
+    descriptor: 'Vocabulário geral e relacionado ao contexto aeronáutico, e capacidade de reformular quando falta uma palavra.',
+    questions: ['Possui vocabulário suficiente para as situações apresentadas?', 'Consegue reformular usando outras palavras?', 'Depende excessivamente de termos isolados?'] },
+  { key: 'fluency', label: 'D. Fluency',
+    descriptor: 'Continuidade da fala, pausas, hesitações e organização do discurso.',
+    questions: ['Consegue sustentar uma explicação?', 'As pausas dificultam a comunicação?', 'Consegue desenvolver respostas sem depender constantemente da professora?'] },
+  { key: 'comprehension', label: 'E. Comprehension',
+    descriptor: 'Compreensão de perguntas, instruções e mensagens orais.',
+    questions: ['Compreende a ideia principal dos áudios?', 'Identifica informações específicas?', 'Precisa de repetição ou reformulação frequente?'] },
+  { key: 'interactions', label: 'F. Interactions',
+    descriptor: 'Capacidade de participar ativamente da comunicação.',
+    questions: ['Consegue pedir esclarecimentos?', 'Confirma e reformula informações?', 'Reage adequadamente a informações inesperadas?', 'Consegue manter a troca comunicativa?'] },
+];
+
+const ACTIVITIES = [
+  ['meet_the_pilot', 'Meet the Pilot'],
+  ['helicopter_operations', 'Helicopter Operations'],
+  ['listen_understand', 'Listen & Understand'],
+  ['interacting_as_pilot', 'Interacting as a Pilot'],
+  ['unexpected_situations', 'Unexpected Situations'],
+  ['picture_description', 'Picture Description'],
+  ['picture_discussion', 'Picture Discussion'],
+  ['explain_your_decision', 'Explain Your Decision'],
+  ['final_communication_challenge', 'Final Communication Challenge'],
+];
+
+function buildCompetencyAccordions() {
+  const wrap = document.getElementById('competencyAccordions');
+  wrap.innerHTML = COMPETENCIES.map(c => `
+    <details class="acc">
+      <summary>${c.label}<span class="lvl-tag" id="tag-${c.key}">Not assessed</span><span class="ch">›</span></summary>
+      <div class="acc-body">
+        <div class="descriptor">${c.descriptor}</div>
+        <ul class="support-q">${c.questions.map(q => `<li>${q}</li>`).join('')}</ul>
+        <div class="levels" id="levels-${c.key}">
+          ${[1,2,3,4,5,6].map(n => `<label><input type="radio" name="level-${c.key}" value="${n}" onchange="updateLevelTag('${c.key}')"> ${n}</label>`).join('')}
+          <label class="na"><input type="radio" name="level-${c.key}" value="" checked onchange="updateLevelTag('${c.key}')"> Not assessed</label>
+        </div>
+        <div class="field"><label>Observações</label><textarea id="notes-${c.key}"></textarea></div>
+        <div class="field"><label>Exemplos concretos (fala/compreensão do aluno)</label><textarea id="examples-${c.key}"></textarea></div>
+      </div>
+    </details>`).join('');
+}
+
+function updateLevelTag(key) {
+  const val = (document.querySelector(`input[name="level-${key}"]:checked`) || {}).value;
+  document.getElementById('tag-' + key).textContent = val ? 'Level ' + val : 'Not assessed';
+}
+
+function buildActivityFields() {
+  const wrap = document.getElementById('activityFields');
+  wrap.innerHTML = ACTIVITIES.map(([slug, label]) => `
+    <div class="activity-field">
+      <label for="act-${slug}">${label}</label>
+      <textarea id="act-${slug}" placeholder="Observações (opcional)..."></textarea>
+    </div>`).join('');
+}
+
+/* ---------- students ---------- */
+let allStudents = [];
+let selectedStudent = null;
+let studentActiveIndex = -1;
+
+async function loadStudentsForPicker(teacherId, seeAll) {
+  let query = sb.from('profiles').select('id, full_name, role, teacher_id, active').in('role', ['kids', 'adulto']);
+  if (!seeAll) query = query.eq('teacher_id', teacherId);
+  const { data, error } = await query.order('full_name');
+  if (error) { allStudents = []; return; }
+  allStudents = (data || []).filter(s => s.active !== false);
+}
+
+function renderStudentResults() {
+  const box = document.getElementById('studentResults');
+  const q = document.getElementById('studentSearch').value.toLowerCase().trim();
+  const matches = (q ? allStudents.filter(s => (s.full_name || '').toLowerCase().includes(q)) : allStudents).slice(0, 30);
+  studentActiveIndex = -1;
+  if (matches.length === 0) {
+    box.innerHTML = '<div class="student-empty">Nenhum aluno encontrado.</div>';
+  } else {
+    box.innerHTML = matches.map(s => `
+      <div class="student-result" onclick='selectStudent(${JSON.stringify(s.id)})'>
+        ${s.full_name || 'Aluno'} <span class="role">${s.role === 'kids' ? 'kids' : 'adulto'}</span>
+      </div>`).join('');
+  }
+  box.classList.add('show');
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.student-picker')) document.getElementById('studentResults').classList.remove('show');
+});
+
+function selectStudent(id) {
+  const s = allStudents.find(st => st.id === id);
+  if (!s) return;
+  selectedStudent = s;
+  document.getElementById('studentChipName').textContent = s.full_name || 'Aluno';
+  document.getElementById('studentChipMeta').textContent = (s.role === 'kids' ? 'Kids' : 'Adulto');
+  document.getElementById('studentChip').classList.add('show');
+  document.getElementById('studentResults').classList.remove('show');
+  document.getElementById('studentSearch').value = '';
+}
+
+function clearSelectedStudent() {
+  selectedStudent = null;
+  document.getElementById('studentChip').classList.remove('show');
+  document.getElementById('studentSearch').value = '';
+  document.getElementById('studentSearch').focus();
+}
+
+/* ---------- save ---------- */
+let saving = false;
+
+function showFormError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.classList.add('show');
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function clearFormError() {
+  document.getElementById('formError').classList.remove('show');
+}
+
+async function saveAssessment() {
+  if (saving) return;
+  clearFormError();
+
+  if (!selectedStudent) { showFormError('Selecione um aluno antes de salvar.'); return; }
+  const assessmentDate = document.getElementById('assessmentDate').value;
+  if (!assessmentDate) { showFormError('Informe a data da avaliação.'); return; }
+
+  saving = true;
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { showFormError('Sessão expirada. Recarregue a página e faça login novamente.'); saving = false; btn.disabled = false; btn.textContent = 'Save Assessment'; return; }
+
+  const levelOf = key => {
+    const v = (document.querySelector(`input[name="level-${key}"]:checked`) || {}).value;
+    return v ? Number(v) : null;
+  };
+  const valOf = id => document.getElementById(id).value.trim() || null;
+
+  const activityNotes = {};
+  ACTIVITIES.forEach(([slug]) => { const v = valOf('act-' + slug); if (v) activityNotes[slug] = v; });
+
+  const payload = {
+    student_id: selectedStudent.id,
+    teacher_id: session.user.id,
+    teacher_name: document.getElementById('teacherName').value || null,
+    assessment_date: assessmentDate,
+    mission: 'Mission 00 — Diagnostic Flight Check',
+    program: 'Clear to Speak — Aviation English Training',
+    activity_notes: activityNotes,
+    current_profile: valOf('currentProfile'),
+    strengths: valOf('strengths'),
+    areas_for_development: valOf('areasDevelopment'),
+    recommended_priorities: valOf('recommendedPriorities'),
+    additional_notes: valOf('additionalNotes'),
+    internal_estimate: document.getElementById('internalEstimate').value || null,
+  };
+  COMPETENCIES.forEach(c => {
+    payload[c.key + '_level'] = levelOf(c.key);
+    payload[c.key + '_notes'] = valOf('notes-' + c.key);
+    payload[c.key + '_examples'] = valOf('examples-' + c.key);
+  });
+
+  const { data, error } = await sb.from('aviation_assessments').insert(payload).select().single();
+
+  saving = false;
+  if (error) {
+    btn.disabled = false;
+    btn.textContent = 'Save Assessment';
+    if (error.code === '42P01' || /relation .* does not exist/i.test(error.message || '')) {
+      showFormError('A tabela "aviation_assessments" ainda não existe no banco de dados. Rode o arquivo sql/aviation_assessments.sql no SQL Editor do Supabase antes de salvar avaliações.');
+    } else {
+      showFormError('Erro ao salvar: ' + error.message);
+    }
+    return;
+  }
+
+  showConfirmation(selectedStudent, data);
+}
+
+function showConfirmation(student, saved) {
+  document.getElementById('formWrap').classList.add('hidden');
+  const panel = document.getElementById('confirmPanel');
+  document.getElementById('confirmSub').textContent = (student.full_name || 'Aluno') + ' — Mission 00 — Diagnostic Flight Check';
+  document.getElementById('viewProfileLink').href = 'painel-professora.html?openStudent=' + encodeURIComponent(student.id) + '&ptab=aviacao';
+  panel.classList.add('show');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  clearSelectedStudent();
+  document.getElementById('assessmentDate').valueAsDate = new Date();
+  COMPETENCIES.forEach(c => {
+    const naRadio = document.querySelector(`input[name="level-${c.key}"][value=""]`);
+    if (naRadio) naRadio.checked = true;
+    updateLevelTag(c.key);
+    document.getElementById('notes-' + c.key).value = '';
+    document.getElementById('examples-' + c.key).value = '';
+  });
+  ACTIVITIES.forEach(([slug]) => { document.getElementById('act-' + slug).value = ''; });
+  ['currentProfile', 'strengths', 'areasDevelopment', 'recommendedPriorities', 'additionalNotes'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('internalEstimate').value = '';
+  clearFormError();
+  document.querySelectorAll('details.acc').forEach(d => d.open = false);
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = false;
+  btn.textContent = 'Save Assessment';
+}
+
+function startNewAssessment() {
+  resetForm();
+  document.getElementById('confirmPanel').classList.remove('show');
+  document.getElementById('formWrap').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ---------- init ---------- */
+async function init(session) {
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).maybeSingle();
+  if (!profile || profile.role !== 'professora') {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  document.getElementById('teacherName').value = profile.full_name || session.user.email;
+  const seeAll = (profile.full_name || '').toLowerCase().includes('brenda');
+  await loadStudentsForPicker(session.user.id, seeAll);
+
+  buildCompetencyAccordions();
+  buildActivityFields();
+  document.getElementById('assessmentDate').valueAsDate = new Date();
+  COMPETENCIES.forEach(c => updateLevelTag(c.key));
+
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('formWrap').classList.remove('hidden');
+}
+
+(async () => {
+  for (let i = 0; i < 5; i++) {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) { await init(session); return; }
+    await new Promise(r => setTimeout(r, 400 * (i + 1)));
+  }
+  window.location.href = 'index.html';
+})();
+</script>
+</body>
+</html>
