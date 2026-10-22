@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Teacher Guide · Mission 00</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--petrol:#142C38;--petrol-2:#23424C;--mint:#A8C5B5;--cream:#FAF7F2;--white:#FFFFFF;--muted:#4E6670;--line:rgba(20,44,56,.12);--mint-soft:rgba(168,197,181,.22);
+--sans:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--cream);color:var(--petrol);line-height:1.55;-webkit-font-smoothing:antialiased}
+header{background:var(--petrol);color:var(--cream);padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+header b{font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+header span{font-family:var(--mono);font-size:11px;color:var(--mint)}
+.sync{margin-left:auto;display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--mint)}
+.sync input{accent-color:var(--mint)}
+nav.toc{display:flex;gap:6px;overflow-x:auto;padding:10px 20px;background:var(--white);border-bottom:1px solid var(--line)}
+.top{position:sticky;top:0;z-index:5}
+nav.toc a{flex:none;font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--muted);border:1px solid var(--line);border-radius:7px;padding:4px 9px}
+nav.toc a.current{background:var(--petrol);color:var(--white);border-color:var(--petrol)}
+main{max-width:820px;margin:0 auto;padding:28px 20px 80px}
+.intro{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:28px}
+.intro h1{font-size:26px;line-height:1.15;margin-bottom:8px}
+.intro p{color:var(--muted);margin-top:8px}
+.intro ul{margin:10px 0 0 18px;color:var(--muted)}
+.intro li{margin-top:4px}
+.note{border-left:3px solid var(--mint);background:var(--mint-soft);padding:12px 14px;border-radius:0 10px 10px 0;margin-top:14px;font-size:14.5px}
+section.g{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:18px;scroll-margin-top:140px;transition:box-shadow .3s,border-color .3s}
+section.g.current{border-color:var(--petrol);box-shadow:0 0 0 3px var(--mint-soft)}
+.ghead{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.ghead .n{font-family:var(--mono);font-size:12px;background:var(--petrol);color:var(--white);border-radius:6px;padding:3px 8px}
+.ghead h2{font-size:21px;line-height:1.2}
+.ghead .t{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--petrol-2);border:1px solid var(--line);border-radius:999px;padding:2px 10px}
+h3{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--petrol-2);font-weight:500;margin:16px 0 6px}
+p,li{font-size:15.5px}
+ul.l{margin-left:18px}
+ul.l li{margin-top:3px}
+.script{background:var(--cream);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-style:italic}
+.script + .script{margin-top:8px}
+.tr{background:var(--petrol);color:var(--cream);border-radius:10px;padding:12px 14px}
+.tr small{display:block;font-family:var(--mono);font-size:11px;color:var(--mint);letter-spacing:.06em;margin-bottom:4px;font-style:normal}
+.tr + .tr{margin-top:8px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{font-size:13px;background:var(--mint-soft);border-radius:999px;padding:3px 10px}
+footer{max-width:820px;margin:0 auto;padding:0 20px 40px;color:var(--muted);font-size:13px}
+@media (max-width:600px){.ghead .t{margin-left:0}}
+</style>
+</head>
+<body>
+<div class="top"><header>
+  <div><b>Teacher Guide</b><br><span>ICAO English Preparation · Mission 00 · Helicopter Pilot Edition</span></div>
+  <label class="sync" title="Acompanha automaticamente a tela aberta na apresentação"><input type="checkbox" id="follow" checked> Seguir a apresentação</label>
+</header>
+<nav class="toc" id="toc"></nav></div>
+
+<main>
+  <div class="intro">
+    <h1>Mission 00 — Diagnostic Flight Check</h1>
+    <p>Guia de consulta para conduzir a aula diagnóstica de 60 minutos (online, individual, ao vivo). As atividades são em inglês; as orientações estão em português.</p>
+    <div class="note"><strong>Avaliação diagnóstica pedagógica</strong> — não é uma aplicação oficial do exame ICAO/SDEA. Não há nota, classificação ou resultado automático. O registro diagnóstico será feito depois, na área do perfil do aluno.</div>
+    <h3>Princípios para toda a aula</h3>
+    <ul>
+      <li>Não ensinar vocabulário antes das atividades e não apresentar traduções durante as tarefas.</li>
+      <li>Não corrigir respostas orais durante a aula e não oferecer respostas-modelo.</li>
+      <li>Não revelar transcrições ao aluno.</li>
+      <li>Não penalizar o sotaque brasileiro quando a comunicação for inteligível.</li>
+      <li>Não confundir conhecimento técnico com proficiência linguística: decisões operacionais não são critério de avaliação.</li>
+      <li>Permitir que o aluno peça esclarecimentos e priorizar a comunicação espontânea.</li>
+      <li>Observar a compreensão global antes dos detalhes.</li>
+      <li>Os tempos são referências. A professora pode adaptar perguntas quando necessário.</li>
+    </ul>
+    <h3>Como usar com a apresentação</h3>
+    <ul>
+      <li>Compartilhe <strong>apenas a janela/aba da apresentação</strong> (não a tela inteira) para que este guia nunca apareça para o aluno.</li>
+      <li>Na apresentação, clique em "Guia da prof." no topo da tela (ou pressione a tecla <strong>G</strong>) para abrir este guia em uma janela separada.</li>
+      <li>Com "Seguir a apresentação" ativado, este guia rola sozinho até a tela atual (funciona quando os dois arquivos estão abertos no mesmo navegador).</li>
+      <li>Atalhos da apresentação: ← → navegar · F tela cheia · G Teacher Guide.</li>
+    </ul>
+  </div>
+
+  <section class="g" id="screen-1"><div class="ghead"><span class="n">01</span><h2>Welcome Aboard</h2><span class="t">2 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Acolher o aluno, apresentar a proposta da sessão em inglês e observar a primeira reação espontânea ao input oral.</p>
+    <h3>Script de apresentação</h3>
+    <p class="script">"Welcome to your first ICAO English preparation session! Today, we're going to explore your communication skills through different aviation-related activities. Don't worry about being perfect. Just try to communicate as naturally as possible."</p>
+    <h3>Orientações de condução</h3><ul class="l"><li>Não corrigir erros durante a apresentação.</li><li>Clicar em START YOUR FLIGHT CHECK para avançar.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Compreensão de instruções</span><span>Reação espontânea</span></div>
+  </section>
+
+  <section class="g" id="screen-2"><div class="ghead"><span class="n">02</span><h2>Pre-flight Briefing</h2><span class="t">3 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Explicar o formato da sessão e verificar se o aluno compreende e consegue reformular instruções orais.</p>
+    <h3>Script de apresentação (antes de revelar os cartões)</h3>
+    <p class="script">"Before we begin, I'd like to explain how today's session will work. We'll talk about your flying experience, listen to aviation-related communications and discuss some situations you might encounter as a helicopter pilot. You can ask me to repeat or clarify anything."</p>
+    <h3>Pergunta</h3><p class="script">"Could you tell me, in your own words, what we're going to do today?"</p>
+    <h3>Orientações de condução</h3><ul class="l"><li>Apresentar o briefing oralmente <strong>antes de mostrar esta tela</strong> (ainda na tela 01), para observar a compreensão auditiva inicial sem apoio visual.</li><li>Depois da reformulação do aluno, avançar: os quatro cartões e a pergunta final aparecem juntos, como um briefing rápido. Pergunta final: <em>"What do you expect from this English preparation course?"</em></li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Compreensão espontânea</span><span>Necessidade de repetição</span><span>Reformulação</span></div>
+  </section>
+
+  <section class="g" id="screen-3"><div class="ghead"><span class="n">03</span><h2>Meet the Pilot</h2><span class="t">7 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a produção oral em um tema familiar (a própria experiência de voo) e a capacidade de narrar experiências.</p>
+    <h3>Perguntas na tela (uma por vez)</h3><ul class="l"><li>How long have you been flying helicopters?</li><li>Why did you decide to become a helicopter pilot?</li><li>What types of helicopters have you flown?</li><li>What kind of flights do you usually operate?</li><li>Can you describe your most memorable flight?</li></ul>
+    <h3>Perguntas complementares</h3><ul class="l"><li>What happened during that flight?</li><li>Why was it memorable?</li><li>What did you learn from that experience?</li><li>How is flying now different from when you started?</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Fluência</span><span>Gramática</span><span>Vocabulário</span><span>Pronúncia</span><span>Narrativa (passado)</span></div>
+  </section>
+
+  <section class="g" id="screen-4"><div class="ghead"><span class="n">04</span><h2>Helicopter Operations</h2><span class="t">6 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a capacidade de descrever procedimentos e explicar fatores operacionais com sequência e justificativas.</p>
+    <h3>Cartões (título e pergunta já visíveis; clicar na foto para ampliar é opcional)</h3><ul class="l"><li><strong>Card A — Pre-flight Inspection:</strong> "Can you describe what you normally check before a flight?"</li><li><strong>Card B — Flight Operations:</strong> "What factors can make a helicopter flight more challenging?"</li><li><strong>Card C — Landing Operations:</strong> "What should a pilot consider when approaching an unfamiliar landing area?"</li></ul>
+    <h3>Pergunta adicional</h3><p class="script">"How do weather conditions affect helicopter operations?"</p>
+    <h3>Orientações de condução</h3><ul class="l"><li>As três perguntas ficam visíveis ao mesmo tempo: escolha a ordem conforme a conversa, sem abrir e fechar janelas.</li><li>Caso o aluno não conheça determinada operação, permitir que utilize experiências próprias.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Explicação</span><span>Organização de ideias</span><span>Sequência de procedimentos</span><span>Justificativas</span></div>
+  </section>
+
+  <section class="g" id="screen-5"><div class="ghead"><span class="n">05</span><h2>Listen &amp; Understand</h2><span class="t">8 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a compreensão auditiva (ideia principal e detalhes) e a capacidade de explicar oralmente o que foi ouvido.</p>
+    <h3>Transcrições (somente para a professora)</h3>
+    <div class="tr"><small>AUDIO 01 — WEATHER UPDATE · mission00_audio01_weather.mp3</small>"Weather conditions near the destination have deteriorated. Visibility is decreasing, and low clouds have been reported in the area."</div>
+    <div class="tr"><small>AUDIO 02 — LANDING AREA INFORMATION · mission00_audio02_landing.mp3</small>"The landing area is temporarily unavailable because another helicopter is still on the ground. Further information will be provided shortly."</div>
+    <div class="tr"><small>AUDIO 03 — OPERATIONAL UPDATE · mission00_audio03_operations.mp3</small>"The planned landing site is no longer available due to strong winds. The crew is considering an alternative location."</div>
+    <h3>Perguntas (botão SHOW QUESTIONS, após a primeira reprodução)</h3>
+    <ul class="l"><li><strong>Audio 01:</strong> What has changed? · What weather conditions were mentioned? · Why might this information be important to a helicopter pilot?</li><li><strong>Audio 02:</strong> Why is the landing area unavailable? · What is expected to happen next? · What information would you want to confirm?</li><li><strong>Audio 03:</strong> What is the main problem? · What alternative is being considered? · How would you explain this situation to another pilot?</li></ul>
+    <h3>Sequência de condução (para cada áudio)</h3><ol class="l" style="margin-left:20px"><li>Tocar o áudio uma vez (LISTEN).</li><li><strong>Antes de olhar as perguntas da tela</strong>, perguntar oralmente: <span class="script" style="display:inline;padding:2px 8px">"What was the message about?"</span> — observa a compreensão global.</li><li>Clicar em SHOW QUESTIONS e trabalhar as perguntas específicas (compreensão de detalhes).</li><li>Permitir REPLAY quando o aluno pedir ou quando necessário, sem fornecer respostas. Observar quantas repetições foram necessárias.</li></ol>
+    <h3>Orientações de condução</h3><ul class="l"><li>Depois da primeira reprodução, as perguntas continuam ocultas: aparece o botão SHOW QUESTIONS. Faça a pergunta global primeiro e só então clique para mostrar as perguntas específicas.</li><li>Esses áudios representam mensagens informativas simuladas, não fraseologia ATC oficial.</li><li>Se usar a chamada de vídeo, ative o compartilhamento de áudio do navegador ao compartilhar a aba.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Ideia principal</span><span>Detalhes</span><span>Necessidade de repetição</span><span>Explicação oral</span></div>
+  </section>
+
+  <section class="g" id="screen-6"><div class="ghead"><span class="n">06</span><h2>Interacting as a Pilot</h2><span class="t">8 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a interação: respostas relevantes, pedidos de esclarecimento e manutenção da comunicação.</p>
+    <h3>Transcrições (somente para a professora)</h3>
+    <div class="tr"><small>SCENARIO A — REQUEST FOR CLARIFICATION · mission00_audio04_clarification.mp3</small>"Helicopter ABC123, be advised that the landing area is currently unavailable. Stand by for further information."</div>
+    <div class="tr"><small>SCENARIO B — COMMUNICATION DIFFICULTY · mission00_audio05_communication.mp3</small>"Helicopter ABC123, we have updated information regarding your destination. Please confirm that you are receiving this transmission clearly."</div>
+    <h3>Instruções exibidas ao aluno (após ouvir)</h3><ul class="l"><li><strong>A:</strong> "You have received this message. Explain what you understood and what information you would like to confirm."</li><li><strong>B:</strong> "Respond to the message. Ask for clarification if necessary."</li></ul>
+    <h3>Segunda etapa da interação</h3>
+    <p><strong>Scenario A — Request for Clarification.</strong> Depois da resposta inicial do aluno, acrescentar:</p>
+    <p class="script">"The landing area may become available in approximately ten minutes, but this has not been confirmed."</p>
+    <p style="margin-top:6px">Em seguida, perguntar:</p>
+    <p class="script">"What would you like to know before continuing?"</p>
+    <p style="margin-top:6px">O aluno deve reagir à informação incompleta e formular perguntas espontaneamente.</p>
+    <p style="margin-top:14px"><strong>Scenario B — Communication Difficulty.</strong> Depois da primeira resposta do aluno, dizer:</p>
+    <p class="script">"I'm sorry, I didn't understand your last message. Could you explain that again?"</p>
+    <p style="margin-top:6px">O aluno deve reformular a mensagem usando outras palavras.</p>
+    <h3>Orientações de condução</h3><ul class="l"><li>A professora assume o papel de interlocutora e continua a conversa de acordo com as respostas do aluno.</li><li>As falas da segunda etapa são simulações para avaliação linguística, não fraseologia ATC oficial.</li><li>Os cenários são exercícios linguísticos. Não apresentar respostas inventadas como fraseologia aeronáutica oficial.</li><li>No áudio, o indicativo ABC123 é lido dígito a dígito ("ABC, one two three"), como no rádio.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Compreensão</span><span>Respostas relevantes</span><span>Pedidos de esclarecimento</span><span>Confirmação</span><span>Reformulação</span><span>Manutenção da interação</span></div>
+  </section>
+
+  <section class="g" id="screen-7"><div class="ghead"><span class="n">07</span><h2>Unexpected Situations</h2><span class="t">8 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a capacidade de lidar linguisticamente com uma situação inesperada: descrever, organizar informações e justificar.</p>
+    <h3>Situações (abas A e B; perguntas visíveis de uma vez)</h3>
+    <ul class="l"><li><strong>A — Deteriorating Weather:</strong> "You are flying toward your destination when weather conditions begin to deteriorate." What is happening? · What information would you need? · How would you communicate your concerns? · What could happen if conditions continue to deteriorate?</li>
+    <li><strong>B — Passenger Medical Problem:</strong> "During a flight, a passenger suddenly becomes seriously ill." How would you describe the situation? · What information would you communicate? · How would you explain the urgency? · What additional information might be necessary?</li></ul>
+    <h3>Tarefa de comunicação (na tela, abaixo das perguntas)</h3>
+    <ul class="l"><li><strong>A:</strong> "Explain the situation to another crew member."</li><li><strong>B:</strong> "Imagine you need to inform someone on the ground about the situation. What would you say?"</li></ul>
+    <h3>Orientações de condução</h3><ul class="l"><li>Propor a tarefa depois das perguntas, como fechamento de cada situação. Observar se a mensagem é clara e organizada.</li><li>Não criar respostas-modelo. Não avaliar decisões técnicas ou a correção de procedimentos como critério de proficiência linguística.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Explicar o inesperado</span><span>Organização da informação</span><span>Justificativas</span><span>Reformulação</span></div>
+  </section>
+
+  <section class="g" id="screen-8"><div class="ghead"><span class="n">08</span><h2>Picture Description</h2><span class="t">5 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a descrição espontânea a partir de um estímulo visual.</p>
+    <h3>Instrução</h3><p class="script">"Look at the picture and describe everything you can see."</p>
+    <h3>Perguntas complementares (botão SHOW QUESTION)</h3><ul class="l"><li>Where do you think this helicopter is?</li><li>What is happening around it?</li><li>What details caught your attention?</li><li>What can you say about the weather?</li></ul>
+    <h3>Orientações de condução</h3><ul class="l"><li>Deixe o aluno descrever livremente antes de revelar as perguntas. A imagem permanece visível; clique nela para ampliar.</li><li>A mesma fotografia é usada nas telas 08 e 09.</li><li>Não apresentar respostas-modelo nem vocabulário de apoio antes da produção oral.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Descrição espontânea</span><span>Vocabulário</span><span>Organização de frases</span><span>Pronúncia</span><span>Fluência</span></div>
+  </section>
+
+  <section class="g" id="screen-9"><div class="ghead"><span class="n">09</span><h2>Picture Discussion</h2><span class="t">4 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a capacidade de levantar hipóteses, explicar possibilidades e justificar opiniões sobre a mesma imagem.</p>
+    <h3>Perguntas</h3><ul class="l"><li>What do you think happened before this moment?</li><li>What might happen next?</li><li>What challenges could the pilot face?</li><li>What could make this operation safer?</li></ul>
+    <h3>Orientações de condução</h3><ul class="l"><li>Prestar atenção ao uso de estruturas como <em>might, could, may, because</em> e <em>if</em>, sem exigir palavras específicas.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Hipóteses</span><span>Possibilidade</span><span>Justificativa de opinião</span></div>
+  </section>
+
+  <section class="g" id="screen-10"><div class="ghead"><span class="n">10</span><h2>Decision Making</h2><span class="t">4 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar a capacidade de explicar limitações, justificar decisões, negociar possibilidades e adaptar a linguagem ao interlocutor (um passageiro, não um colega de tripulação).</p>
+    <h3>Cenário</h3><p class="script">"During a helicopter flight, a passenger asks you to change the destination because of an unexpected personal situation. However, changing the destination may not be possible."</p>
+    <h3>Perguntas</h3><ul class="l"><li>How would you respond to the passenger?</li><li>What information would you need before discussing any changes?</li><li>How would you explain the possible limitations?</li><li>What alternatives could you suggest?</li></ul>
+    <h3>Orientações de condução</h3><ul class="l"><li>Se fizer sentido, assuma o papel do passageiro para tornar a negociação mais real.</li><li>Não avaliar decisões técnicas ou procedimentos operacionais.</li></ul>
+    <h3>Competências a observar</h3><div class="chips"><span>Explicar limitações</span><span>Justificativas</span><span>Negociação</span><span>Adequação ao interlocutor</span></div>
+  </section>
+
+  <section class="g" id="screen-11"><div class="ghead"><span class="n">11</span><h2>Final Communication Challenge</h2><span class="t">3 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Observar compreensão, capacidade de resumir e de transmitir uma informação a um terceiro.</p>
+    <h3>Transcrição (somente para a professora)</h3>
+    <div class="tr"><small>FINAL AUDIO · mission00_audio06_final.mp3</small>"During the flight, the crew received updated weather information indicating reduced visibility near the planned destination. The original landing area may not be available, and an alternative location is being considered."</div>
+    <h3>Instrução (aparece após ouvir)</h3><p class="script">"Imagine you need to explain this situation to another pilot who has not heard the update."</p>
+    <p style="margin-top:6px">O aluno deverá resumir as informações, explicar o problema e mencionar a alternativa.</p>
+    <h3>Pergunta inesperada (somente depois da explicação inicial do aluno)</h3><p class="script">"Sorry, I missed part of your explanation. Could you summarize the main problem again?"</p>
+    <p style="margin-top:6px">Observar a capacidade de resumir, reformular e responder sem preparação.</p>
+    <h3>Pergunta complementar (botão FOLLOW-UP QUESTION)</h3><p class="script">"What information would you want to confirm before continuing the discussion?"</p>
+    <h3>Competências a observar</h3><div class="chips"><span>Compreensão</span><span>Resumo</span><span>Reformulação</span><span>Organização da informação</span><span>Resposta sem preparação</span></div>
+  </section>
+
+  <section class="g" id="screen-12"><div class="ghead"><span class="n">12</span><h2>Post-flight Debrief</h2><span class="t">2 min</span></div>
+    <h3>Objetivo pedagógico</h3><p>Fechar a sessão de forma positiva e ouvir a autopercepção do aluno sobre dificuldades e confiança.</p>
+    <h3>Perguntas finais</h3><ul class="l"><li>Which activity was the most challenging for you?</li><li>What would you most like to improve?</li><li>How confident do you feel communicating in English during aviation-related situations?</li></ul>
+    <h3>Orientações de condução</h3><ul class="l"><li>Não comunicar nota, nível ou resultado durante a sessão. O botão FINISH MISSION apenas encerra a aula na tela.</li><li>Fazer o registro diagnóstico depois, na área do perfil do aluno.</li></ul>
+  </section>
+</main>
+<footer>Teacher Guide — uso interno. Não compartilhar com o aluno.</footer>
+
+<script>
+(function(){
+  const sections = Array.from(document.querySelectorAll('section.g'));
+  const toc = document.getElementById('toc');
+  sections.forEach((s, i) => {
+    const a = document.createElement('a');
+    a.href = '#screen-' + (i+1);
+    a.textContent = String(i+1).padStart(2,'0');
+    a.title = s.querySelector('h2').textContent;
+    toc.appendChild(a);
+  });
+  const follow = document.getElementById('follow');
+  function mark(n, scroll){
+    sections.forEach((s, i) => s.classList.toggle('current', i === n-1));
+    Array.from(toc.children).forEach((a, i) => a.classList.toggle('current', i === n-1));
+    if(scroll){ const el = document.getElementById('screen-' + n); if(el) el.scrollIntoView({behavior:'smooth', block:'start'}); }
+  }
+  try {
+    const ch = new BroadcastChannel('mission00-sync');
+    ch.onmessage = e => { if(e.data && e.data.screen) mark(e.data.screen, follow.checked); };
+  } catch(e){}
+  window.addEventListener('storage', e => { if(e.key === 'mission00-screen' && e.newValue) mark(parseInt(e.newValue,10), follow.checked); });
+  const m = location.hash.match(/screen-(\d+)/);
+  if(m) setTimeout(() => mark(parseInt(m[1],10), true), 50);
+  else { try { const v = localStorage.getItem('mission00-screen'); if(v) mark(parseInt(v,10), false); } catch(e){} }
+})();
+</script>
+</body>
+</html>
