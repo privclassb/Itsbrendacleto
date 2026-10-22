@@ -1603,6 +1603,24 @@
       await loadEquipeOverview(user.id);
       renderEquipeActivity();
     }
+
+    // Link direto de "View Student Profile" (avaliacao-pilotos-mission00.html):
+    // abre o perfil do aluno já na aba certa. Os modais ficam depois deste
+    // <script> no HTML, então espera o documento terminar de parsear antes
+    // de mexer neles — do contrário, com uma sessão já em cache (resposta
+    // quase instantânea), isso pode rodar antes do parser chegar lá embaixo.
+    const params = new URLSearchParams(location.search);
+    const openStudentId = params.get('openStudent');
+    if (openStudentId) {
+      if (document.readyState === 'loading') {
+        await new Promise(r => document.addEventListener('DOMContentLoaded', r, { once: true }));
+      }
+      if (allStudents.some(s => s.id === openStudentId)) {
+        await openStudentProfile(openStudentId);
+        const ptab = params.get('ptab');
+        if (ptab) showProfileTab(ptab);
+      }
+    }
   }
 
   async function loadStudents(teacherId, seeAll) {
@@ -2158,16 +2176,19 @@
       { data: payments },
       { data: allStatusRows },
       { data: logs },
-      { data: studentReports }
+      { data: studentReports },
+      { data: aviationAssessments }
     ] = await Promise.all([
       student.teacher_id ? sb.from('profiles').select('full_name').eq('id', student.teacher_id).maybeSingle() : Promise.resolve({ data: null }),
       sb.from('profiles').select('full_name, email').eq('guardian_of', studentId),
       currentUserIsBrenda ? sb.from('payments').select('*').eq('student_id', studentId).order('due_date', { ascending: true }) : Promise.resolve({ data: null }),
       statusQuery,
       classQuery,
-      sb.from('reports').select('*').eq('student_id', studentId)
+      sb.from('reports').select('*').eq('student_id', studentId),
+      sb.from('aviation_assessments').select('*').eq('student_id', studentId).order('assessment_date', { ascending: false }).order('created_at', { ascending: false })
     ]);
     await contractHistoryPromise;
+    renderAviationList(aviationAssessments || []);
 
     // Dados
     const teacherName = teacher?.full_name || '—';
@@ -2337,6 +2358,85 @@
     document.querySelectorAll('#modalStudentProfile .profile-tab-panel').forEach(panel => {
       panel.classList.toggle('active', panel.id === 'profileTabPanel' + tab.charAt(0).toUpperCase() + tab.slice(1));
     });
+  }
+
+  // ---- Aviation English — Diagnostic History (Clear to Speak) ----
+
+  let profileAviationCache = [];
+  const AVIATION_COMPETENCIES = [
+    { key: 'pronunciation', label: 'Pronunciation' },
+    { key: 'structure', label: 'Structure' },
+    { key: 'vocabulary', label: 'Vocabulary' },
+    { key: 'fluency', label: 'Fluency' },
+    { key: 'comprehension', label: 'Comprehension' },
+    { key: 'interactions', label: 'Interactions' },
+  ];
+
+  function renderAviationList(assessments) {
+    profileAviationCache = assessments;
+    const el = document.getElementById('profileAviationList');
+    if (!el) return;
+    if (assessments.length === 0) {
+      el.innerHTML = '<div class="empty-reports">Nenhuma avaliação diagnóstica lançada ainda.</div>';
+      return;
+    }
+    el.innerHTML = assessments.map(a => {
+      const dateLabel = a.assessment_date ? new Date(a.assessment_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+      return `
+      <div class="detail-row" style="cursor:pointer;" onclick="openAviationAssessmentDetail('${a.id}')">
+        <span class="detail-label">${a.mission || 'Avaliação'} — ${dateLabel}</span>
+        <span class="detail-value">${a.teacher_name || '—'}</span>
+      </div>`;
+    }).join('');
+  }
+
+  function openAviationAssessmentDetail(id) {
+    const a = profileAviationCache.find(x => x.id === id);
+    if (!a) return;
+    const dateLabel = a.assessment_date ? new Date(a.assessment_date + 'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    document.getElementById('aviationDetailMeta').textContent = (a.mission || '') + ' · ' + (a.program || '') + ' · ' + dateLabel + ' · ' + (a.teacher_name || 'Professora');
+
+    const competencyRows = AVIATION_COMPETENCIES.map(c => {
+      const level = a[c.key + '_level'];
+      const notes = a[c.key + '_notes'];
+      const examples = a[c.key + '_examples'];
+      if (level == null && !notes && !examples) return '';
+      return `
+        <div class="profile-section" style="margin-top:10px;">
+          <div class="profile-section-title">${c.label} ${level != null ? '— Level ' + level : '— Not assessed'}</div>
+          ${notes ? `<div class="detail-row"><span class="detail-label">Observações</span><span class="detail-value">${notes}</span></div>` : ''}
+          ${examples ? `<div class="detail-row"><span class="detail-label">Exemplos</span><span class="detail-value">${examples}</span></div>` : ''}
+        </div>`;
+    }).join('');
+
+    const activityNotes = a.activity_notes && typeof a.activity_notes === 'object' ? Object.entries(a.activity_notes) : [];
+    const activityHtml = activityNotes.length ? `
+      <div class="profile-section" style="margin-top:10px;">
+        <div class="profile-section-title">Observações por atividade</div>
+        ${activityNotes.map(([slug, text]) => `<div class="detail-row"><span class="detail-label">${slug.replace(/_/g, ' ')}</span><span class="detail-value">${text}</span></div>`).join('')}
+      </div>` : '';
+
+    const synthesisFields = [
+      ['Current Communication Profile', a.current_profile],
+      ['Strengths', a.strengths],
+      ['Areas for Development', a.areas_for_development],
+      ['Recommended Learning Priorities', a.recommended_priorities],
+      ["Teacher's Additional Notes", a.additional_notes],
+      ['Estimativa interna (não oficial)', a.internal_estimate],
+    ].filter(([, v]) => v);
+    const synthesisHtml = synthesisFields.length ? `
+      <div class="profile-section" style="margin-top:10px;">
+        <div class="profile-section-title">Síntese diagnóstica</div>
+        ${synthesisFields.map(([label, v]) => `<div class="detail-row"><span class="detail-label">${label}</span><span class="detail-value">${v}</span></div>`).join('')}
+      </div>` : '';
+
+    document.getElementById('aviationDetailBody').innerHTML = competencyRows + activityHtml + synthesisHtml
+      || '<div class="empty-reports">Sem dados registrados nessa avaliação.</div>';
+    document.getElementById('modalAviationAssessment').classList.add('open');
+  }
+
+  function closeAviationAssessmentDetail() {
+    document.getElementById('modalAviationAssessment').classList.remove('open');
   }
 
   // ---- Histórico de contratos ----
@@ -7972,6 +8072,7 @@
       <button class="profile-tab-btn" data-ptab="aulas" onclick="showProfileTab('aulas')">Aulas</button>
       <button class="profile-tab-btn" data-ptab="pendentes" onclick="showProfileTab('pendentes')">Pendentes</button>
       <button class="profile-tab-btn" data-ptab="progresso" onclick="showProfileTab('progresso')">Progresso</button>
+      <button class="profile-tab-btn" data-ptab="aviacao" onclick="showProfileTab('aviacao')">Aviação</button>
     </div>
 
     <div class="profile-tab-panel active" id="profileTabPanelDados">
@@ -8047,8 +8148,29 @@
       </div>
     </div>
 
+    <div class="profile-tab-panel" id="profileTabPanelAviacao">
+      <div class="profile-section" style="margin-top:16px;">
+        <div class="profile-section-title">Aviation English — Diagnostic History</div>
+        <div class="modal-hint" style="margin-bottom:8px;">Avaliações diagnósticas do Clear to Speak — Aviation English Training lançadas pela professora. Clique numa avaliação pra ver completa.</div>
+        <div style="margin-bottom:10px;"><a class="btn-sm" href="avaliacao-pilotos-mission00.html" style="text-decoration:none;display:inline-block;">+ Nova avaliação</a></div>
+        <div id="profileAviationList"><div class="empty-reports">Carregando...</div></div>
+      </div>
+    </div>
+
     <div class="detail-actions">
       <button class="btn-modal-cancel" onclick="closeStudentProfile()" style="flex:1;">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Avaliação diagnóstica completa (Aviation English) -->
+<div class="modal-overlay" id="modalAviationAssessment">
+  <div class="modal-box" style="max-width:600px;">
+    <div class="modal-title">Diagnostic Assessment</div>
+    <div class="modal-sub" id="aviationDetailMeta"></div>
+    <div id="aviationDetailBody" style="margin-top:14px;"></div>
+    <div class="detail-actions">
+      <button class="btn-modal-cancel" onclick="closeAviationAssessmentDetail()" style="flex:1;">Fechar</button>
     </div>
   </div>
 </div>
