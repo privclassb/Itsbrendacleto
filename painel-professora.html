@@ -1554,6 +1554,7 @@
     }
 
     await loadStudents(user.id, isBrenda);
+    await cleanupStaleInactiveTurmaLinks();
     await loadTasks(user.id);
     await loadTeacherAvatar(user.id);
     currentUserIsBrenda = isBrenda;
@@ -2538,6 +2539,34 @@
     openPayments(id);
   }
 
+  // Corrige, na carga do painel, alunos inativados antes da desmatrícula
+  // automática existir: tira da turma quem ficou com turma_id preso e some
+  // com as aulas pendentes presas a eles, colapsando dupla -> individual se
+  // for o caso. Não mexe em nada de quem já foi inativado corretamente.
+  async function cleanupStaleInactiveTurmaLinks() {
+    const staleInactive = allStudents.filter(s => s.active === false && s.turma_id);
+
+    for (const student of staleInactive) {
+      const oldTurmaId = student.turma_id;
+      const otherMembers = allStudents.filter(s => s.turma_id === oldTurmaId && s.id !== student.id && s.active !== false);
+
+      await sb.from('profiles').update({ turma_id: null }).eq('id', student.id);
+      student.turma_id = null;
+
+      if (otherMembers.length === 1) {
+        const remaining = otherMembers[0];
+        await sb.from('class_logs').update({ turma_id: null, student_id: remaining.id }).eq('turma_id', oldTurmaId).eq('status', 'pendente');
+        await sb.from('profiles').update({ turma_id: null }).eq('id', remaining.id);
+        remaining.turma_id = null;
+      }
+    }
+
+    const inactiveIds = allStudents.filter(s => s.active === false).map(s => s.id);
+    if (inactiveIds.length > 0) {
+      await sb.from('class_logs').delete().in('student_id', inactiveIds).eq('status', 'pendente');
+    }
+  }
+
   async function profileOptionToggleActive() {
     const student = allStudents.find(s => s.id === currentProfileStudentId);
     if (!student) return;
@@ -2573,7 +2602,7 @@
 
       if (student.turma_id) {
         const oldTurmaId = student.turma_id;
-        const otherMembers = allStudents.filter(s => s.turma_id === oldTurmaId && s.id !== student.id);
+        const otherMembers = allStudents.filter(s => s.turma_id === oldTurmaId && s.id !== student.id && s.active !== false);
 
         await sb.from('profiles').update({ turma_id: null }).eq('id', student.id);
 
@@ -2592,7 +2621,7 @@
     await loadAulasHoje(session.user.id, currentUserIsBrenda);
     await loadAgendaWeek();
     await loadEquipeWeek();
-    if (currentUserIsBrenda) await loadFinanceiro();
+    if (currentUserIsBrenda) { await loadFinanceiro(); await loadContratos(); }
     openStudentProfile(student.id);
   }
 
@@ -4678,7 +4707,7 @@
     if (allTurmas.length === 0) { listEl.innerHTML = '<div class="empty-reports">Nenhuma turma cadastrada ainda.</div>'; return; }
 
     listEl.innerHTML = allTurmas.map(t => {
-      const members = allStudents.filter(s => s.turma_id === t.id);
+      const members = allStudents.filter(s => s.turma_id === t.id && s.active !== false);
       const teacherLabel = t.teacher_id ? teacherNameById(t.teacher_id) : 'Sem professora';
       const names = firstNamesAlphabetical(members);
       const actions = currentUserIsBrenda
@@ -4804,7 +4833,7 @@
     if (!turma) return;
     currentProfileTurmaId = turmaId;
 
-    const members = allStudents.filter(s => s.turma_id === turmaId);
+    const members = allStudents.filter(s => s.turma_id === turmaId && s.active !== false);
     document.getElementById('turmaProfileName').textContent = turma.name;
     document.getElementById('turmaProfileMeta').textContent = (turma.student_type === 'kids' ? 'Kids' : 'Adulto') + ' · ' + members.length + ' aluno(s)';
     document.getElementById('turmaProfileNames').textContent = firstNamesAlphabetical(members);
@@ -4888,7 +4917,7 @@
 
   function renderTurmaProfileAulasList() {
     const listEl = document.getElementById('turmaProfileClassLogsList');
-    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId && s.active !== false);
     const logs = (turmaProfileClassLogsCache || []).filter(l => l.status !== 'pendente');
     if (logs.length === 0) {
       listEl.innerHTML = '<div class="empty-reports">Nenhuma aula registrada ainda.</div>';
@@ -4905,7 +4934,7 @@
   function renderTurmaProfilePendentesList() {
     const listEl = document.getElementById('turmaProfilePendentesList');
     if (!listEl) return;
-    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId && s.active !== false);
     const logs = (turmaProfileClassLogsCache || []).filter(l => l.status === 'pendente').sort((a, b) => {
       if (a.class_date !== b.class_date) return a.class_date < b.class_date ? -1 : 1;
       return (a.start_time || '') < (b.start_time || '') ? -1 : 1;
@@ -4929,7 +4958,7 @@
   async function openTurmaClassReport(classLogId) {
     const turma = allTurmas.find(t => t.id === currentProfileTurmaId);
     const log = turmaProfileClassLogsCache.find(l => l.id === classLogId);
-    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId && s.active !== false);
     const dateLabel = log ? new Date(log.class_date + 'T00:00:00').toLocaleDateString('pt-BR') : '';
 
     document.getElementById('turmaReportClassLogId').value = classLogId;
@@ -4981,7 +5010,7 @@
       return;
     }
 
-    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId);
+    const members = allStudents.filter(s => s.turma_id === currentProfileTurmaId && s.active !== false);
     if (members.length === 0) {
       errEl.textContent = 'Essa turma não tem alunos matriculados.';
       errEl.style.display = 'block';
@@ -5543,7 +5572,7 @@
 
   function renderAttendanceList(containerId, turmaId, attendanceMap) {
     const container = document.getElementById(containerId);
-    const members = allStudents.filter(s => s.turma_id === turmaId);
+    const members = allStudents.filter(s => s.turma_id === turmaId && s.active !== false);
     if (members.length === 0) {
       container.innerHTML = '<div class="empty-reports">Nenhum aluno matriculado nessa turma.</div>';
       return;
@@ -5763,7 +5792,7 @@
       const turma = allTurmas.find(t => t.id === l.turma_id);
       const student = allStudents.find(s => s.id === l.student_id);
       const who = turma ? turma.name : (student ? student.full_name : 'Aluno removido');
-      const names = turma ? firstNamesAlphabetical(allStudents.filter(s => s.turma_id === turma.id)) : '';
+      const names = turma ? firstNamesAlphabetical(allStudents.filter(s => s.turma_id === turma.id && s.active !== false)) : '';
       const time = formatTimeRange(l) || 'sem horário';
       const badgeClass = 'status-' + l.status;
       const statusLabel = CLASS_STATUS_LABEL[l.status] || l.status;
