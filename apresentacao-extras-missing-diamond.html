@@ -1,0 +1,809 @@
+<title>The Missing Diamond</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,500;0,6..96,700;1,6..96,500&family=Courier+Prime:wght@400;700&family=Libre+Franklin:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a detective's desk at night — sticky case header with the six-mission track, one scene at a time below, documents as cream paper on deep navy */
+:root{
+  --navy:#0e1828; --navy2:#142238; --navy3:#1d2f4d; --line:#2b4166;
+  --gold:#c9a24a; --gold2:#e8cd86; --paper:#efe5ca; --ink:#2a241b;
+  --burg:#7a1f33; --burg2:#c25a72; --green:#3d9a69; --green2:#86d6a8;
+  --text:#ebe5d8; --muted:#9eabc2;
+  --display:"Bodoni Moda","Didot","Bodoni 72",Georgia,serif;
+  --body:"Libre Franklin","Helvetica Neue",Arial,sans-serif;
+  --type:"Courier Prime","Courier New",Courier,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--navy)}
+body{color:var(--text);font:400 16px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:70;background:var(--navy)}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold2);outline-offset:2px}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:50;background:rgba(14,24,40,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:.02em;white-space:nowrap;background:none;border:0;cursor:pointer;padding:0}
+.brand em{font-style:italic;font-weight:500;color:var(--gold2)}
+.track{display:flex;gap:4px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.track::-webkit-scrollbar{display:none}
+.step{flex:none;display:flex;align-items:center;gap:7px;padding:6px 10px;border-radius:999px;border:1px solid transparent;background:none;color:var(--muted);font-size:12.5px;font-weight:600;letter-spacing:.04em;cursor:pointer;white-space:nowrap}
+.step .n{font-family:var(--type);font-size:12px;width:22px;height:22px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line)}
+.step.done{color:var(--text)} .step.done .n{background:var(--green);border-color:var(--green);color:#fff}
+.step.now{color:var(--gold2);border-color:rgba(201,162,74,.5);background:rgba(201,162,74,.08)} .step.now .n{border-color:var(--gold);color:var(--gold2)}
+.step[disabled]{opacity:.38;cursor:not-allowed}
+.tools{display:flex;gap:6px;align-items:center}
+.icon-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:8px;border:1px solid var(--line);background:var(--navy2);font-size:13px;font-weight:600;cursor:pointer}
+.icon-btn:hover{border-color:var(--gold)}
+.icon-btn svg{width:16px;height:16px}
+.icon-btn.t{border-style:dashed;color:var(--muted);font-weight:500}
+.icon-btn.t.on{color:var(--gold2);border-color:var(--gold)}
+
+/* layout */
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 96px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.scene{display:flex;flex-direction:column;gap:22px;animation:rise .45s ease both}
+.eyebrow{font:700 12px/1 var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--gold)}
+h1,h2,h3{font-family:var(--display);font-weight:700;line-height:1.1;margin:0;text-wrap:balance}
+h2{font-size:clamp(30px,4.4vw,46px)}
+h3{font-size:22px}
+.lede{margin:6px 0 0;color:var(--muted);font-size:17px;max-width:62ch}
+.head{display:flex;flex-direction:column;gap:8px}
+.panel{background:var(--navy2);border:1px solid var(--line);border-radius:14px;padding:20px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 22px;border-radius:10px;border:1px solid var(--gold);background:var(--gold);color:#16120a;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:transform .15s,background .15s}
+.btn:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--gold2)}
+.btn.ghost:hover{background:rgba(201,162,74,.1)}
+.btn.small{padding:9px 14px;font-size:13px}
+.btn svg{width:18px;height:18px}
+.tbtn{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:8px;border:1px dashed var(--gold);background:rgba(201,162,74,.06);color:var(--gold2);font-size:12.5px;font-weight:600;cursor:pointer;letter-spacing:.02em}
+.tbtn:hover{background:rgba(201,162,74,.16)}
+.tbtn svg{width:14px;height:14px}
+.tbtn small{font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.speak{display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--navy3);cursor:pointer;flex:none}
+.speak:hover{border-color:var(--gold)}
+.speak svg{width:16px;height:16px}
+
+/* paper documents */
+.paper{background:var(--paper);color:var(--ink);font-family:var(--type);font-size:15px;line-height:1.5;padding:20px 20px 18px;border-radius:3px;box-shadow:0 12px 28px rgba(0,0,0,.4);position:relative}
+.paper h4{font-family:var(--body);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin:0 0 10px;color:#6b5a3a}
+.paper .big{font-family:var(--display);font-size:22px;font-weight:700;margin:0 0 8px;color:var(--ink)}
+.stamp{position:absolute;top:12px;right:14px;border:2px solid var(--burg);color:var(--burg);font:700 10px/1 var(--body);letter-spacing:.16em;padding:4px 7px;transform:rotate(7deg);border-radius:2px;opacity:.85}
+.hand{font-family:var(--display);font-style:italic;font-size:19px}
+.paper table{border-collapse:collapse;width:100%;font-size:14px}
+.paper td{border-bottom:1px dashed #b9a77d;padding:5px 4px;vertical-align:top}
+.paper .x{color:var(--burg);font-weight:700}
+
+/* intro */
+.intro{display:grid;grid-template-columns:1.05fr 1fr;gap:34px;align-items:center}
+.intro .art{border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 60px rgba(0,0,0,.45)}
+.intro .art svg{display:block;width:100%;height:auto}
+.intro h1{font-size:clamp(40px,6vw,72px);letter-spacing:-.01em}
+.intro h1 em{display:block;font-style:italic;font-weight:500;color:var(--gold2);font-size:.5em;letter-spacing:.02em;margin-top:6px}
+.welcome{font-family:var(--type);font-size:17px;line-height:1.7;background:var(--paper);color:var(--ink);padding:22px 24px;border-radius:3px;box-shadow:0 14px 30px rgba(0,0,0,.4);position:relative}
+.welcome p{margin:0 0 4px}
+.welcome .lab{font-family:var(--body);font-weight:700;letter-spacing:.2em;font-size:11px;color:var(--burg);margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.field input,.field textarea{background:var(--navy);border:1px solid var(--line);border-radius:8px;padding:11px 12px;color:var(--text);font:500 16px var(--body);width:100%}
+.field input:focus,.field textarea:focus{border-color:var(--gold);outline:none}
+
+/* mission 1 */
+.m1{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:20px;align-items:start}
+.room-wrap{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0b1322;position:relative}
+.room{display:block;width:100%;height:auto}
+.hot{cursor:pointer;transition:filter .2s}
+.hot:hover,.hot:focus{filter:drop-shadow(0 0 7px rgba(232,205,134,.95));outline:none}
+.hot.sel{filter:drop-shadow(0 0 10px rgba(232,205,134,1))}
+.room-tip{position:absolute;left:12px;bottom:10px;background:rgba(14,24,40,.85);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--muted)}
+.clue-card{min-height:230px;display:flex;flex-direction:column;gap:14px}
+.qbig{font-family:var(--display);font-size:30px;font-weight:700;line-height:1.15;color:var(--gold2)}
+.answer{display:flex;align-items:center;gap:10px;background:rgba(61,154,105,.14);border:1px solid rgba(61,154,105,.5);border-radius:10px;padding:10px 12px;font-weight:600;color:var(--green2)}
+.checklist{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.checklist li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--muted)}
+.checklist li .b{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.checklist li.ok{color:var(--text)} .checklist li.ok .b{background:var(--green);border-color:var(--green)}
+.checklist li .b svg{width:12px;height:12px}
+.meter{height:6px;background:var(--navy);border-radius:9px;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width .4s}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;background:linear-gradient(120deg,rgba(61,154,105,.22),rgba(61,154,105,.06));border:1px solid rgba(61,154,105,.55);border-radius:14px;padding:18px 20px;animation:pop .45s ease both}
+.banner strong{font-family:var(--display);font-size:24px;display:block}
+.banner.alert{background:linear-gradient(120deg,rgba(122,31,51,.45),rgba(122,31,51,.12));border-color:var(--burg2)}
+.banner.alert strong{color:#ffd9e1}
+
+/* mission 2 */
+.docs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.docbtn{all:unset;cursor:pointer;display:block}
+.docbtn .paper{transition:transform .2s;min-height:150px}
+.docbtn:nth-child(odd) .paper{transform:rotate(-1.2deg)}
+.docbtn:nth-child(even) .paper{transform:rotate(1deg)}
+.docbtn:hover .paper,.docbtn:focus-visible .paper{transform:rotate(0) translateY(-4px)}
+.docbtn .open{display:block;margin-top:10px;font:700 11px var(--body);letter-spacing:.16em;color:#7a6338}
+.cal{width:100%;font-family:var(--body);text-align:center;font-size:13px}
+.cal th{font-size:10px;letter-spacing:.1em;color:#7a6338;padding:3px}
+.cal td{border:0;padding:4px 0}
+.cal td.hl{background:var(--burg);color:#fff;border-radius:50%;font-weight:700}
+.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;position:relative}
+.slot{border:1.5px dashed var(--line);border-radius:12px;padding:12px;min-height:150px;display:flex;flex-direction:column;gap:10px;background:rgba(255,255,255,.015);transition:border-color .2s,background .2s;cursor:pointer}
+.slot.ready{border-color:var(--gold);background:rgba(201,162,74,.06)}
+.slot.over{border-color:var(--gold2);background:rgba(201,162,74,.12)}
+.slot .time{display:flex;align-items:center;gap:8px;font-family:var(--type);font-weight:700;font-size:17px;color:var(--gold2)}
+.slot .time svg{width:26px;height:26px}
+.slot.filled{border-style:solid;border-color:rgba(61,154,105,.6);cursor:default}
+.ecard{background:var(--paper);color:var(--ink);font-family:var(--type);font-size:14.5px;line-height:1.35;padding:12px 12px;border-radius:4px;box-shadow:0 6px 14px rgba(0,0,0,.35);cursor:grab;user-select:none;border:2px solid transparent;transition:transform .15s,border-color .15s}
+.ecard:hover{transform:translateY(-2px)}
+.ecard.picked{border-color:var(--gold);transform:translateY(-3px) rotate(-1deg);box-shadow:0 10px 24px rgba(201,162,74,.3)}
+.ecard.placed{cursor:default;box-shadow:none;border-color:rgba(61,154,105,.6)}
+.tray{display:flex;gap:12px;flex-wrap:wrap;min-height:60px}
+.tray .ecard{flex:1 1 200px;max-width:280px}
+.inserted{grid-column:1/-1;display:flex;align-items:center;gap:12px;background:rgba(122,31,51,.25);border:1px solid var(--burg2);border-radius:10px;padding:10px 14px;font-family:var(--type);font-weight:700;animation:pop .5s ease both}
+.qlist{display:flex;flex-direction:column;gap:8px;margin:0;padding:0;list-style:none}
+.qlist li{display:flex;align-items:center;gap:10px;justify-content:space-between;background:var(--navy3);border-radius:10px;padding:10px 12px;font-weight:600;font-size:16px}
+.qlist li.ok{background:rgba(61,154,105,.16)}
+.qlist li .q{display:flex;align-items:center;gap:10px;min-width:0}
+
+/* suspects */
+.suspects{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sus{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;background:var(--navy2);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:border-color .2s,transform .2s}
+.sus:hover,.sus:focus-visible{border-color:var(--gold);transform:translateY(-2px)}
+.sus.on{border-color:var(--gold2);box-shadow:0 0 0 1px var(--gold2)}
+.sus .pic svg{display:block;width:100%;height:auto}
+.sus .meta{padding:12px 14px 14px;display:flex;flex-direction:column;gap:2px}
+.sus .meta b{font-family:var(--display);font-size:21px}
+.sus .meta span{font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.tag{align-self:flex-start;margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border-radius:5px;background:var(--navy3);color:var(--muted)}
+.tag.ok{background:rgba(61,154,105,.2);color:var(--green2)}
+.dossier{display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px;animation:rise .35s ease both}
+.dossier .pic{border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+.dossier .pic svg{display:block;width:100%;height:auto}
+.stmt{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.stmt li{font-family:var(--display);font-style:italic;font-size:20px;line-height:1.3}
+.qgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.qtile{background:var(--navy3);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qtile .hint{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.qtile .model{font-size:19px;font-weight:700;color:var(--gold2)}
+.qtile .ans{font-family:var(--display);font-style:italic;font-size:18px;color:var(--text);border-left:3px solid var(--green);padding-left:10px}
+.linkbtn{all:unset;cursor:pointer;color:var(--gold2);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.file-box{display:flex;flex-direction:column;gap:2px}
+
+/* evidence board */
+.board{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:start}
+.evlist{display:flex;flex-direction:column;gap:12px}
+.ev{display:flex;gap:12px;align-items:flex-start;background:var(--paper);color:var(--ink);border-radius:4px;padding:12px 14px;box-shadow:0 8px 18px rgba(0,0,0,.35);cursor:grab;border:2px solid transparent;user-select:none;font-family:var(--type)}
+.ev.picked{border-color:var(--gold);transform:translateX(4px)}
+.ev.linked{opacity:.45;cursor:default;box-shadow:none}
+.ev .lt{font-family:var(--display);font-weight:700;font-size:26px;line-height:1;color:var(--burg);flex:none;width:26px}
+.ev .tt{font-family:var(--body);font-weight:700;font-size:15px}
+.ev .ss{font-size:13px;color:#5d4f37}
+.ev .opn{margin-left:auto;align-self:center;flex:none;font:700 11px var(--body);letter-spacing:.12em;color:#7a6338;background:none;border:1px solid #b9a77d;border-radius:5px;padding:5px 7px;cursor:pointer}
+.cols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.col{border:1.5px dashed var(--line);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:8px;min-height:230px;cursor:pointer;transition:border-color .2s,background .2s}
+.col.ready{border-color:var(--gold);background:rgba(201,162,74,.06)}
+.col.over{border-color:var(--gold2);background:rgba(201,162,74,.12)}
+.col .who{display:flex;align-items:center;gap:8px}
+.col .who svg{width:44px;height:52px;border-radius:6px;flex:none}
+.col .who b{font-family:var(--display);font-size:18px;line-height:1.1}
+.chip{display:flex;align-items:center;gap:8px;background:rgba(61,154,105,.18);border:1px solid rgba(61,154,105,.5);border-radius:8px;padding:6px 8px;font-size:13px;font-weight:600;animation:pop .3s ease both}
+.chip .l{font-family:var(--display);font-size:18px;color:var(--gold2)}
+.liar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.liar button{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--navy3);text-align:center;font-family:var(--display);font-size:20px;font-weight:700}
+.liar button svg{width:90px;height:105px;border-radius:8px}
+.liar button:hover,.liar button:focus-visible{border-color:var(--gold)}
+.liar button.on{border-color:var(--burg2);background:rgba(122,31,51,.3)}
+.frame{font-family:var(--type);font-size:17px;background:var(--navy);border:1px solid var(--line);border-radius:10px;padding:12px 14px;color:var(--gold2)}
+
+/* interrogation */
+.iroom{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(ellipse 60% 70% at 50% -10%,rgba(232,205,134,.22),rgba(232,205,134,0) 60%),linear-gradient(#111b2c,#0a1220);padding:22px}
+.lamp{position:absolute;top:0;left:50%;width:120px;height:26px;transform:translateX(-50%);background:#2a2f3a;border-radius:0 0 60px 60px;box-shadow:0 10px 40px rgba(232,205,134,.35)}
+.ipick{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 18px}
+.ipick button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;border-radius:999px;border:1px solid var(--line);background:rgba(20,34,56,.9);font-weight:700}
+.ipick button svg{width:36px;height:42px;border-radius:50%}
+.ipick button.on{border-color:var(--gold2);color:var(--gold2)}
+.istage{display:grid;grid-template-columns:200px minmax(0,1fr);gap:22px;align-items:start}
+.istage .pic svg{display:block;width:100%;height:auto;border-radius:10px;filter:drop-shadow(0 18px 30px rgba(0,0,0,.6))}
+.iq{display:flex;flex-direction:column;gap:10px}
+.newev{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.newev .paper{font-size:13.5px;padding:14px;min-height:120px}
+.locked{border:1.5px dashed var(--line);border-radius:6px;display:grid;place-items:center;color:var(--muted);font-size:13px;min-height:120px;text-align:center;padding:10px}
+.locked svg{width:20px;height:20px;display:block;margin:0 auto 6px}
+
+/* report */
+.report{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.rbox{background:var(--paper);color:var(--ink);border-radius:4px;padding:16px 18px;box-shadow:0 10px 22px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:10px}
+.rbox .h{font-family:var(--display);font-weight:700;font-size:26px;color:var(--burg);line-height:1}
+.rbox .s{font-family:var(--type);font-size:14px;color:#5d4f37}
+.rbox input{background:#f8f2e2;border:1px solid #c9b891;border-radius:6px;padding:10px;font:500 16px var(--type);color:var(--ink);width:100%}
+.whopick{display:flex;gap:10px;flex-wrap:wrap}
+.whopick button{all:unset;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px;border-radius:8px;border:2px solid transparent;font:700 13px var(--body)}
+.whopick button svg{width:62px;height:72px;border-radius:6px}
+.whopick button.on{border-color:var(--burg)}
+.evchips{display:flex;gap:6px;flex-wrap:wrap}
+.evchips button{all:unset;cursor:pointer;font:600 12.5px var(--body);padding:6px 9px;border-radius:6px;border:1px solid #c9b891;background:#f8f2e2}
+.evchips button.on{background:var(--burg);color:#fff;border-color:var(--burg)}
+.sol{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.sol li{font-family:var(--display);font-size:22px;line-height:1.3;animation:rise .5s ease both;display:flex;gap:12px}
+.sol li .t{font-family:var(--type);font-size:14px;color:var(--gold);min-width:84px;padding-top:6px}
+
+/* closed */
+.closed{text-align:center;align-items:center}
+.closed h1{font-size:clamp(46px,8vw,92px);letter-spacing:.02em}
+.closed .bigstamp{display:inline-block;border:4px solid var(--burg2);color:var(--burg2);font:700 clamp(28px,5vw,48px)/1 var(--display);letter-spacing:.08em;padding:10px 22px;transform:rotate(-6deg);animation:stamp .6s cubic-bezier(.2,1.6,.4,1) .2s both}
+.gem{width:min(220px,60vw);animation:float 4s ease-in-out infinite}
+.gem-wrap{position:relative;display:grid;place-items:center}
+.spark{position:absolute;width:8px;height:8px;background:var(--gold2);transform:rotate(45deg);animation:twinkle 1.8s ease-in-out infinite}
+.notebook{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;width:100%;text-align:left}
+.notebook .paper ul{margin:0;padding-left:18px}
+.notebook .paper .p{font-family:var(--display);font-size:40px;font-weight:700;color:var(--burg);line-height:1}
+.stats{display:flex;gap:28px;justify-content:center;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-family:var(--display);font-size:40px;color:var(--gold2);font-variant-numeric:tabular-nums}
+.stats span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+
+/* help */
+details.help{background:var(--navy2);border:1px solid var(--line);border-radius:12px}
+details.help summary{cursor:pointer;padding:11px 14px;font-weight:600;font-size:14px;color:var(--muted);list-style:none;display:flex;align-items:center;gap:8px}
+details.help summary::-webkit-details-marker{display:none}
+details.help summary svg{width:16px;height:16px}
+details.help[open] summary{color:var(--gold2)}
+.frames{display:flex;gap:8px;flex-wrap:wrap;padding:0 14px 14px}
+.frames span{font-family:var(--type);background:var(--navy3);border-radius:7px;padding:6px 10px;font-size:15px}
+
+/* overlays */
+.modal{position:fixed;inset:0;z-index:90;background:rgba(5,9,16,.78);display:grid;place-items:center;padding:20px}
+.modal-card{max-width:560px;width:100%;max-height:86vh;overflow:auto;animation:pop .3s ease both}
+.modal-card.wide{max-width:760px}
+.x-btn{position:absolute;top:10px;right:10px;width:32px;height:32px;border-radius:50%;border:1px solid #b9a77d;background:#f8f2e2;color:var(--ink);cursor:pointer;font-size:18px;line-height:1;z-index:2}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);z-index:85;background:var(--navy2);border-left:1px solid var(--line);box-shadow:-20px 0 50px rgba(0,0,0,.5);display:flex;flex-direction:column;animation:slide .3s ease both}
+.drawer header{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) 18px 14px;border-bottom:1px solid var(--line)}
+.drawer .body{overflow:auto;padding:18px 18px calc(30px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:16px}
+.drawer h4{margin:0 0 6px;font:700 12px var(--body);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.drawer ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.empty{color:var(--muted);font-style:italic;font-size:14px}
+.tm{position:fixed;left:max(14px,env(safe-area-inset-left,0px));bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:80;width:min(400px,calc(100% - 28px));max-height:55vh;overflow:auto;background:#1a1408;border:1px dashed var(--gold);border-radius:12px;padding:14px 16px;font-size:14px;line-height:1.5;color:#f1e4c2;box-shadow:0 20px 40px rgba(0,0,0,.5);animation:rise .3s ease both}
+.tm h5{margin:0 0 8px;font:700 11px var(--body);letter-spacing:.2em;text-transform:uppercase;color:var(--gold2);display:flex;justify-content:space-between;gap:8px}
+.tm ul{margin:4px 0 8px;padding-left:18px}
+.tm b{color:var(--gold2)}
+.tm .close{background:none;border:0;color:var(--gold2);cursor:pointer;font-size:16px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);opacity:0;z-index:95;background:var(--navy3);border:1px solid var(--gold);padding:11px 18px;border-radius:999px;font-weight:700;letter-spacing:.02em;transition:all .3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.good{border-color:var(--green);color:var(--green2)}
+.toast.warn{border-color:var(--burg2);color:#ffd2dc}
+.shake{animation:shake .4s ease}
+
+@keyframes rise{from{opacity:.001;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:.001;transform:scale(.96)}to{opacity:1;transform:none}}
+@keyframes slide{from{transform:translateX(30px);opacity:.3}to{transform:none;opacity:1}}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes stamp{from{transform:rotate(-6deg) scale(2.2);opacity:0}to{transform:rotate(-6deg) scale(1);opacity:1}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes twinkle{0%,100%{opacity:0;transform:rotate(45deg) scale(.3)}50%{opacity:1;transform:rotate(45deg) scale(1)}}
+@keyframes flick{0%,100%{opacity:.95}50%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+@media (max-width:980px){
+  .intro,.m1,.board{grid-template-columns:1fr}
+  .docs{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .newev{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:700px){
+  .timeline{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .suspects,.cols,.liar,.notebook{grid-template-columns:1fr}
+  .dossier,.istage{grid-template-columns:1fr}
+  .dossier .pic,.istage .pic{max-width:180px}
+  .qgrid,.report{grid-template-columns:1fr}
+  .brand span.full{display:none}
+  .icon-btn .lbl{display:none}
+}
+@media (max-width:440px){.docs,.newev{grid-template-columns:1fr}}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <a class="icon-btn" href="material-de-aula.html" aria-label="Sair" title="Voltar para Material de Aula">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    </a>
+    <button class="brand" data-act="home" aria-label="Back to the start">
+      <svg width="26" height="26" viewBox="0 0 40 40" aria-hidden="true"><polygon points="8,14 14,6 26,6 32,14 20,34" fill="#c9a24a"/><polygon points="8,14 32,14 20,34" fill="#e8cd86"/><polyline points="14,6 17,14 20,34 23,14 26,6" fill="none" stroke="#0e1828" stroke-width="1.2"/></svg>
+      <span>The Missing <em>Diamond</em></span>
+    </button>
+    <nav class="track" id="track" aria-label="Missions"></nav>
+    <div class="tools">
+      <button class="icon-btn" data-act="casefile" title="Case file"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h6l2 2h10v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></svg><span class="lbl">Case file</span></button>
+      <button class="icon-btn" data-act="restart" title="Restart the game"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span class="lbl">Restart</span></button>
+      <button class="icon-btn t" data-act="guide" title="Teacher's guide (G)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg><span class="lbl">Guide</span></button>
+      <button class="icon-btn t" id="tmBtn" data-act="tm" title="Teacher mode (T)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg><span class="lbl">TM</span></button>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="stage"></main>
+<div id="layer"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+var KEY='missingDiamond_v1';
+function fresh(){return {view:'intro',name:'',unlocked:0,
+  m1:{found:{},sel:null},
+  m2:{placed:{},done:false,qs:{}},
+  m3:{open:null,seen:{emma:{},jack:{},sophia:{}},asked:{emma:{},jack:{},sophia:{}},file:{}},
+  m4:{links:{},choice:null,result:null,qs:{}},
+  m5:{who:'sophia',seen:{},asked:{},ev:{},fin:{}},
+  m6:{who:null,where:'',when:'',ev:{},solved:false,step:0,msg:''},
+  tm:false};}
+var S;
+try{S=JSON.parse(localStorage.getItem(KEY));}catch(e){S=null;}
+if(!S||typeof S!=='object'){S=fresh();}else{var F=fresh();for(var k in F){if(!(k in S))S[k]=F[k];}}
+var sel=null; // tap-to-select {kind,id}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function $(s){return document.querySelector(s);}
+function cnt(o){return Object.keys(o||{}).filter(function(k){return o[k];}).length;}
+
+/* ---------- audio ---------- */
+var voice=null,ttsTimer=null;
+function pickVoice(){if(!window.speechSynthesis)return null;var v=window.speechSynthesis.getVoices();if(!v.length)return null;
+  var NOV=/\b(albert|bad news|bahh|bells|boing|bubbles|cellos|wobble|deranged|good news|hysterical|pipe organ|trinoids|whisper|zarvox|jester|organ|superstar|fred|ralph)\b/i;
+  var en=v.filter(function(x){return x.lang&&x.lang.toLowerCase().indexOf('en')===0&&!NOV.test(x.name);});if(!en.length)return null;
+  var us=en.filter(function(x){return x.lang.toLowerCase()==='en-us';});var pool=us.length?us:en;
+  return pool.filter(function(x){return /siri|google|natural|online|enhanced|premium/i.test(x.name);})[0]||pool[0];}
+if(window.speechSynthesis){voice=pickVoice();window.speechSynthesis.onvoiceschanged=function(){voice=pickVoice();};}
+function speakEn(t){if(!window.speechSynthesis)return;window.speechSynthesis.cancel();clearTimeout(ttsTimer);
+  ttsTimer=setTimeout(function(){var u=new SpeechSynthesisUtterance(t.replace(/<[^>]+>/g,''));u.lang='en-US';u.rate=.8;u.pitch=1;u.volume=1;if(voice)u.voice=voice;window.speechSynthesis.speak(u);},60);}
+
+/* ---------- icons ---------- */
+var I={
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2"><path d="M5 12l5 5 9-10"/></svg>',
+ key:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg>',
+ spk:'<svg viewBox="0 0 24 24" fill="none" stroke="#e8cd86" stroke-width="2"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>',
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+ search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+ arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4z"/></svg>',
+ map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/></svg>'
+};
+function clock(h,m){var a=(h%12)*30+m*.5,b=m*6;function p(ang,l){var r=(ang-90)*Math.PI/180;return (13+l*Math.cos(r)).toFixed(1)+' '+(13+l*Math.sin(r)).toFixed(1);}
+ return '<svg viewBox="0 0 26 26"><circle cx="13" cy="13" r="11.5" fill="#efe5ca" stroke="#c9a24a" stroke-width="1.5"/><path d="M13 13L'+p(a,6)+'" stroke="#2a241b" stroke-width="2" stroke-linecap="round"/><path d="M13 13L'+p(b,8.5)+'" stroke="#2a241b" stroke-width="1.4" stroke-linecap="round"/></svg>';}
+function spk(t){return '<button class="speak" data-act="say" data-arg="'+encodeURIComponent(t)+'" aria-label="Listen">'+I.spk+'</button>';}
+function tb(act,arg,label){return '<button class="tbtn" data-act="'+act+'"'+(arg!=null?' data-arg="'+arg+'"':'')+'>'+I.key+'<span>'+label+'</span><small>teacher</small></button>';}
+function help(frames){return '<details class="help"><summary>'+I.chat+'Speaking help</summary><div class="frames">'+frames.map(function(f){return '<span>'+f+'</span>';}).join('')+'</div></details>';}
+
+/* ---------- art ---------- */
+function portrait(id){
+ var P={emma:{bg:'#24395c',skin:'#ecc6a6',hair:'#8a3b22',cloth:'#1b2a45'},jack:{bg:'#26303e',skin:'#c48d66',hair:'#2b211b',cloth:'#14171d'},sophia:{bg:'#3a1e2b',skin:'#a8714f',hair:'#16110f',cloth:'#7a1f33'}}[id];
+ var s='<svg viewBox="0 0 120 140" role="img" aria-label="'+id+'"><rect width="120" height="140" fill="'+P.bg+'"/><circle cx="60" cy="62" r="46" fill="#ffffff" opacity=".04"/>';
+ if(id==='sophia')s+='<path d="M33 58 C28 92 30 116 40 124 L80 124 C90 116 92 92 87 58 Z" fill="'+P.hair+'"/>';
+ s+='<path d="M12 140 C14 112 34 101 60 101 C86 101 106 112 108 140 Z" fill="'+P.cloth+'"/>';
+ s+='<rect x="52" y="78" width="16" height="26" fill="'+P.skin+'"/><ellipse cx="60" cy="61" rx="21" ry="25" fill="'+P.skin+'"/>';
+ s+='<ellipse cx="52" cy="63" rx="2.2" ry="2.6" fill="#1a1410"/><ellipse cx="68" cy="63" rx="2.2" ry="2.6" fill="#1a1410"/>';
+ s+='<path d="M47 56 q5 -3 10 0 M63 56 q5 -3 10 0" stroke="#2a1d14" stroke-width="1.6" fill="none"/><path d="M60 64 l-2 8 h4" stroke="#00000033" stroke-width="1.4" fill="none"/>';
+ if(id==='emma'){s+='<path d="M54 77 q6 3 12 0" stroke="#9c4a3c" stroke-width="2" fill="none"/>';
+  s+='<path d="M36 70 C33 40 45 32 60 32 C77 32 88 42 84 72 L84 84 C79 76 80 60 74 48 C66 54 52 55 45 50 C41 60 41 74 36 84 Z" fill="'+P.hair+'"/>';
+  s+='<path d="M44 104 L60 126 L76 104" fill="#efe5ca"/><path d="M40 106 L56 140 M80 106 L64 140" stroke="#0f1a2e" stroke-width="3"/>';
+  for(var i=0;i<7;i++){s+='<circle cx="'+(49+i*3.7)+'" cy="'+(103+Math.sin(i/6*Math.PI)*5)+'" r="1.9" fill="#f6f1e4"/>';}}
+ if(id==='jack'){s+='<path d="M53 77 h14" stroke="#5a3a2a" stroke-width="2"/><path d="M41 70 q2 16 19 18 q17 -2 19 -18" fill="#2b211b" opacity=".35"/>';
+  s+='<path d="M36 50 C38 30 82 30 84 50 Z" fill="#14171d"/><rect x="33" y="47" width="54" height="6" rx="3" fill="#0b0d11"/><circle cx="60" cy="40" r="4" fill="#c9a24a"/>';
+  s+='<path d="M50 102 L60 114 L70 102" fill="#2a3242"/><polygon points="84,116 87,122 93,122 88,126 90,132 84,128 78,132 80,126 75,122 81,122" fill="#c9a24a"/><rect x="28" y="118" width="16" height="4" fill="#c9a24a" opacity=".7"/>';}
+ if(id==='sophia'){s+='<path d="M54 77 q6 3 12 0" stroke="#7a1f33" stroke-width="2.4" fill="none"/>';
+  s+='<path d="M38 64 C35 37 47 31 62 31 C78 31 86 43 84 66 C80 51 72 45 61 43 C53 49 45 53 38 64 Z" fill="'+P.hair+'"/>';
+  s+='<circle cx="39" cy="70" r="3" fill="#e8cd86"/><circle cx="81" cy="70" r="3" fill="#e8cd86"/><path d="M46 102 L60 122 L74 102" fill="'+P.skin+'"/>';}
+ return s+'</svg>';}
+
+function gemSVG(cls){return '<svg class="'+(cls||'')+'" viewBox="0 0 200 180" aria-hidden="true"><polygon points="30,60 65,20 135,20 170,60 100,165" fill="#8fc3ea"/><polygon points="30,60 170,60 100,165" fill="#5d9fd4"/><polygon points="65,20 85,60 115,60 135,20" fill="#c4e3f7"/><polygon points="30,60 65,20 85,60" fill="#a8d3f0"/><polygon points="135,20 170,60 115,60" fill="#7fb6e0"/><polygon points="85,60 100,165 115,60" fill="#3f82bd"/><polyline points="30,60 170,60" stroke="#e8f5ff" stroke-width="1.5"/><polyline points="65,20 85,60 100,165 115,60 135,20" fill="none" stroke="#e8f5ff" stroke-width="1.2" opacity=".8"/><polygon points="30,60 65,20 135,20 170,60 100,165" fill="none" stroke="#c9a24a" stroke-width="3"/></svg>';}
+
+function hotelSVG(){
+ var w='',stars='';
+ for(var r=0;r<4;r++)for(var c=0;c<9;c++){var x=118+c*42,y=128+r*42,lit=((r*9+c)*7)%5===1;var sp=(r===1&&c===4);
+  w+='<rect x="'+x+'" y="'+y+'" width="22" height="28" rx="11" ry="3" fill="'+(sp?'#e8cd86':(lit?'#d6b86a':'#1a2a45'))+'"'+(sp?' style="animation:flick 2.4s infinite"':'')+' opacity="'+(lit&&!sp?.75:1)+'"/>';}
+ for(var i=0;i<26;i++){stars+='<circle cx="'+((i*137)%600)+'" cy="'+((i*53)%90+6)+'" r="'+(i%3?0.9:1.4)+'" fill="#efe5ca" opacity="'+(0.3+(i%4)*0.15)+'"/>';}
+ return '<svg viewBox="0 0 600 380" role="img" aria-label="The Royal Palace Hotel at night"><defs><linearGradient id="hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070d18"/><stop offset="1" stop-color="#1d2f4d"/></linearGradient></defs>'+
+ '<rect width="600" height="380" fill="url(#hsky)"/>'+stars+'<circle cx="520" cy="56" r="22" fill="#efe5ca"/><circle cx="530" cy="50" r="20" fill="#0b1322"/>'+
+ '<rect x="40" y="200" width="70" height="180" fill="#121d31"/><rect x="490" y="180" width="80" height="200" fill="#121d31"/>'+
+ '<rect x="96" y="104" width="408" height="276" fill="#d9ccab"/><rect x="96" y="104" width="408" height="276" fill="#0f1a2e" opacity=".55"/>'+
+ '<polygon points="86,106 300,52 514,106" fill="#c9bb98"/><polygon points="86,106 300,52 514,106" fill="#0f1a2e" opacity=".5"/><polygon points="120,100 300,62 480,100" fill="none" stroke="#c9a24a" stroke-width="1.5" opacity=".7"/>'+
+ '<rect x="96" y="104" width="408" height="8" fill="#c9a24a" opacity=".8"/>'+w+
+ '<rect x="96" y="300" width="408" height="80" fill="#0f1a2e" opacity=".55"/>'+
+ '<rect x="250" y="312" width="100" height="68" rx="50" ry="10" fill="#e8cd86" opacity=".85"/><rect x="262" y="322" width="76" height="58" fill="#3a2a1a"/>'+
+ [120,170,220,380,430,480].map(function(x){return '<rect x="'+x+'" y="306" width="10" height="74" fill="#d9ccab" opacity=".6"/>';}).join('')+
+ '<rect x="170" y="282" width="260" height="22" fill="#0e1828" stroke="#c9a24a" stroke-width="1.5"/>'+
+ '<text x="300" y="298" text-anchor="middle" fill="#e8cd86" font-family="Bodoni Moda, Georgia, serif" font-size="13" font-weight="700" letter-spacing="3">THE ROYAL PALACE HOTEL</text>'+
+ '<rect x="0" y="372" width="600" height="8" fill="#060b14"/></svg>';}
+
+function roomSVG(){
+ var f=S.m1.found,sl=S.m1.sel;
+ function g(id,hit,inner){return '<g class="hot'+(sl===id?' sel':'')+'" data-act="m1obj" data-arg="'+id+'" tabindex="0" role="button" aria-label="'+M1[id].label+'">'+(hit?'<rect x="'+hit[0]+'" y="'+hit[1]+'" width="'+hit[2]+'" height="'+hit[3]+'" fill="#000" fill-opacity="0"/>':'')+inner+'</g>';}
+ function mk(id,x,y){return f[id]?'<g transform="translate('+x+' '+y+')" pointer-events="none"><circle r="9" fill="#3d9a69" stroke="#efe5ca" stroke-width="2"/><path d="M-4 0l3 3 5-6" stroke="#fff" stroke-width="2.2" fill="none"/></g>':'';}
+ var stars='';for(var i=0;i<8;i++){stars+='<circle cx="'+(62+(i*37)%126)+'" cy="'+(64+(i*29)%60)+'" r="1" fill="#efe5ca" opacity=".7"/>';}
+ return '<svg class="room" viewBox="0 0 800 480" role="img" aria-label="The Exhibition Room"><defs>'+
+ '<pattern id="wp" width="26" height="26" patternUnits="userSpaceOnUse"><rect width="26" height="26" fill="#1b2c48"/><path d="M13 4l5 9-5 9-5-9z" fill="#21365a"/></pattern>'+
+ '<linearGradient id="fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2a20"/><stop offset="1" stop-color="#1e140d"/></linearGradient>'+
+ '<radialGradient id="glow" cx=".5" cy="0" r="1"><stop offset="0" stop-color="#e8cd86" stop-opacity=".18"/><stop offset=".6" stop-color="#e8cd86" stop-opacity="0"/></radialGradient></defs>'+
+ '<rect width="800" height="340" fill="url(#wp)"/><rect y="262" width="800" height="78" fill="#15233a"/><rect y="260" width="800" height="3" fill="#c9a24a" opacity=".55"/>'+
+ '<rect y="340" width="800" height="140" fill="url(#fl)"/>'+[372,410,452].map(function(y){return '<line x1="0" y1="'+y+'" x2="800" y2="'+y+'" stroke="#000" stroke-opacity=".25"/>';}).join('')+
+ '<ellipse cx="310" cy="414" rx="236" ry="46" fill="#5a1a2a"/><ellipse cx="310" cy="414" rx="220" ry="38" fill="none" stroke="#c9a24a" stroke-opacity=".5" stroke-width="2"/>'+
+ '<rect width="800" height="480" fill="url(#glow)" pointer-events="none"/>'+
+ // window
+ g('window',[38,36,176,196],'<rect x="50" y="50" width="150" height="170" fill="#0a111f" stroke="#d6c7a1" stroke-width="6"/>'+stars+'<circle cx="160" cy="88" r="14" fill="#efe5ca"/><circle cx="167" cy="83" r="12" fill="#0a111f"/><line x1="125" y1="50" x2="125" y2="220" stroke="#d6c7a1" stroke-width="4"/><line x1="50" y1="135" x2="200" y2="135" stroke="#d6c7a1" stroke-width="4"/><line x1="36" y1="40" x2="214" y2="40" stroke="#c9a24a" stroke-width="4"/><path d="M40 40h34c-10 60-6 130 6 196H40z" fill="#7a1f33"/><path d="M210 40h-34c10 60 6 130-6 196h40z" fill="#7a1f33"/><path d="M60 40c-6 60-2 130 8 196M190 40c6 60 2 130-8 196" stroke="#5c1525" stroke-width="2" fill="none"/>')+mk('window',204,46)+
+ // photo
+ g('photo',null,'<rect x="250" y="70" width="96" height="76" fill="#0f1a2e" stroke="#c9a24a" stroke-width="6"/><polygon points="298,84 318,104 298,134 278,104" fill="#8fc3ea"/><polygon points="278,104 318,104 298,134" fill="#5d9fd4"/><rect x="278" y="152" width="40" height="7" fill="#c9a24a" opacity=".8"/>')+mk('photo',346,66)+
+ // clock
+ g('clock',null,'<circle cx="420" cy="96" r="34" fill="#efe5ca" stroke="#c9a24a" stroke-width="4"/>'+[0,90,180,270].map(function(a){var r=a*Math.PI/180;return '<line x1="'+(420+27*Math.sin(r))+'" y1="'+(96-27*Math.cos(r))+'" x2="'+(420+31*Math.sin(r))+'" y2="'+(96-31*Math.cos(r))+'" stroke="#2a241b" stroke-width="3"/>';}).join('')+'<line x1="420" y1="96" x2="398" y2="96" stroke="#2a241b" stroke-width="4" stroke-linecap="round"/><line x1="420" y1="96" x2="420" y2="70" stroke="#2a241b" stroke-width="2.5" stroke-linecap="round"/><circle cx="420" cy="96" r="3" fill="#7a1f33"/>')+mk('clock',452,64)+
+ // camera
+ g('camera',[660,14,70,52],'<rect x="702" y="16" width="8" height="18" fill="#7d8796"/><g transform="rotate(20 694 42)"><rect x="668" y="32" width="50" height="22" rx="4" fill="#c7ccd4"/><rect x="660" y="35" width="10" height="16" rx="2" fill="#9aa2ae"/><circle cx="664" cy="43" r="5" fill="#1a1d22"/><circle cx="710" cy="38" r="2.6" fill="#4a4f57"/></g>')+mk('camera',740,24)+
+ // door
+ g('door',[594,96,160,246],'<rect x="620" y="100" width="130" height="240" fill="#2b1c14" stroke="#8a6a3a" stroke-width="4"/><rect x="638" y="120" width="94" height="90" fill="none" stroke="#4a3324" stroke-width="3"/><rect x="638" y="226" width="94" height="98" fill="none" stroke="#4a3324" stroke-width="3"/><circle cx="736" cy="232" r="5" fill="#c9a24a"/><rect x="598" y="204" width="14" height="24" rx="2" fill="#1a1d22" stroke="#7d8796"/><circle cx="605" cy="211" r="2.2" fill="#3d9a69"/>')+mk('door',752,98)+
+ // cabinet (static) + box
+ '<rect x="455" y="150" width="130" height="190" fill="#4a3324" stroke="#2a1b12" stroke-width="3"/><rect x="465" y="160" width="110" height="170" fill="#170f0a"/><rect x="465" y="246" width="110" height="5" fill="#4a3324"/><rect x="474" y="282" width="12" height="44" fill="#2f4a6d"/><rect x="488" y="288" width="10" height="38" fill="#7a1f33"/><rect x="500" y="284" width="12" height="42" fill="#6b5a3a"/><path d="M455 150L424 163V328L455 340Z" fill="#5a3f2c" stroke="#2a1b12" stroke-width="2"/><circle cx="432" cy="250" r="3.5" fill="#c9a24a"/>'+
+ g('box',[480,198,80,50],'<rect x="488" y="214" width="64" height="32" fill="#9b7a45" stroke="#5a4426" stroke-width="2"/><rect x="484" y="206" width="72" height="10" fill="#b08b52" stroke="#5a4426" stroke-width="1.5"/>')+mk('box',560,204)+
+ // table
+ '<rect x="168" y="298" width="284" height="14" rx="2" fill="#6b4a31"/><rect x="176" y="312" width="268" height="12" fill="#4f3523"/><rect x="186" y="324" width="12" height="88" fill="#4f3523"/><rect x="422" y="324" width="12" height="88" fill="#4f3523"/>'+
+ // jewel box
+ g('jewelbox',[204,232,84,68],'<polygon points="214,270 278,270 270,238 222,238" fill="#5e1727" stroke="#c9a24a" stroke-width="1.5"/><polygon points="224,244 268,244 273,266 219,266" fill="#efe5ca" opacity=".9"/><rect x="214" y="270" width="64" height="28" fill="#7a1f33" stroke="#c9a24a" stroke-width="1.5"/><ellipse cx="246" cy="271" rx="18" ry="3" fill="#2a0c14"/>')+mk('jewelbox',282,236)+
+ // key
+ g('key',[338,276,58,24],'<g transform="translate(360 290)"><circle r="6" fill="none" stroke="#d9dde3" stroke-width="2.6"/><line x1="6" y1="0" x2="28" y2="0" stroke="#d9dde3" stroke-width="2.6"/><path d="M22 0v6M26 0v5" stroke="#d9dde3" stroke-width="2.4"/><rect x="-17" y="-7" width="9" height="12" fill="#efe5ca" transform="rotate(-18)"/></g>')+mk('key',394,278)+
+ // chair + card
+ g('card',[64,206,98,196],'<rect x="80" y="214" width="66" height="88" rx="10" fill="#5a3d29"/><rect x="88" y="222" width="50" height="72" rx="8" fill="#7a1f33"/><rect x="70" y="300" width="86" height="16" rx="3" fill="#6b4a31"/><rect x="76" y="316" width="8" height="82" fill="#4f3523"/><rect x="142" y="316" width="8" height="82" fill="#4f3523"/><g transform="rotate(-8 113 296)"><rect x="98" y="288" width="32" height="18" rx="2" fill="#f4f0e6" stroke="#c9a24a"/><rect x="98" y="291" width="32" height="4" fill="#7a1f33"/></g>')+mk('card',156,292)+
+ // bag + note
+ g('note',[460,360,104,80],'<rect x="498" y="378" width="22" height="20" fill="#f4f0e6" transform="rotate(12 509 388)"/><path d="M470 434L478 394H548L556 434Z" fill="#8a5a3a" stroke="#4a2e1c" stroke-width="2"/><path d="M490 394C492 368 534 368 536 394" fill="none" stroke="#4a2e1c" stroke-width="4"/><rect x="507" y="400" width="12" height="7" rx="1" fill="#c9a24a"/>')+mk('note',560,372)+
+ '</svg>';}
+
+function mapSVG(){
+ var R=[['Restaurant',20,20,170,120,0],['Exhibition Room',215,20,170,120,1],['Room 12 · Meetings',410,20,170,120,0],['Reception',20,215,170,105,0],['Main Entrance',215,245,170,75,0],['Security Room',410,215,170,105,0]];
+ var s='<svg viewBox="0 0 600 340" role="img" aria-label="Map of the hotel, ground floor" style="display:block;width:100%;height:auto"><rect width="600" height="340" fill="#f6efdc"/><rect x="20" y="152" width="560" height="50" fill="#e6dcc0"/><text x="300" y="182" text-anchor="middle" font-family="Courier Prime, monospace" font-size="13" fill="#6b5a3a" letter-spacing="3">CORRIDOR</text>';
+ R.forEach(function(r){s+='<rect x="'+r[1]+'" y="'+r[2]+'" width="'+r[3]+'" height="'+r[4]+'" fill="'+(r[5]?'#f1d9de':'#fbf7ec')+'" stroke="#2a241b" stroke-width="2"/><text x="'+(r[1]+r[3]/2)+'" y="'+(r[2]+r[4]/2+5)+'" text-anchor="middle" font-family="Libre Franklin, Arial, sans-serif" font-weight="700" font-size="14" fill="'+(r[5]?'#7a1f33':'#2a241b')+'">'+r[0]+'</text>';});
+ s+='<polygon points="300,52 312,66 300,84 288,66" fill="#5d9fd4"/><text x="300" y="334" text-anchor="middle" font-family="Courier Prime, monospace" font-size="11" fill="#6b5a3a">THE ROYAL PALACE HOTEL · GROUND FLOOR</text></svg>';
+ return s;}
+
+function lockerSVG(){var s='<svg viewBox="0 0 320 170" style="display:block;width:100%;max-width:340px;height:auto" aria-label="Locker 7, open, with the diamond inside"><rect width="320" height="170" fill="#1d2f4d"/>';
+ for(var i=0;i<5;i++){var x=14+i*60,n=i+5;s+='<rect x="'+x+'" y="14" width="52" height="142" fill="#53627a" stroke="#2b3a52" stroke-width="2"/><text x="'+(x+26)+'" y="34" text-anchor="middle" font-family="Courier Prime, monospace" font-size="13" font-weight="700" fill="#efe5ca">'+n+'</text><rect x="'+(x+8)+'" y="46" width="36" height="3" fill="#2b3a52"/><rect x="'+(x+8)+'" y="54" width="36" height="3" fill="#2b3a52"/>';
+  if(n===7){s+='<rect x="'+x+'" y="14" width="52" height="142" fill="#0b1322"/><path d="M'+(x+52)+' 14l18 8v126l-18 8z" fill="#7d8ba3"/><text x="'+(x+26)+'" y="34" text-anchor="middle" font-family="Courier Prime, monospace" font-size="13" font-weight="700" fill="#e8cd86">7</text><polygon points="'+(x+16)+',96 '+(x+22)+',88 '+(x+30)+',88 '+(x+36)+',96 '+(x+26)+',112" fill="#8fc3ea" stroke="#e8cd86"/>';}}
+ return s+'</svg>';}
+
+/* ---------- data ---------- */
+var M1={
+ key:{label:'Key',gate:true,q:'Where is the key?',a:'The key is on the table.',title:'A small key',text:'A silver key. The label says: <b>SECURITY ROOM · LOCKER 7</b>.'},
+ note:{label:'Bag',gate:true,q:'Where is the note?',a:'The note is in the bag.',title:'A note in the bag',text:'<span class="hand">Sophia — Meeting in Room 12 at 8:30 p.m. Please don’t be late! — Mr. Reed</span>'},
+ box:{label:'Box in the cabinet',gate:true,q:'Where is the box?',a:'The box is in the cabinet.',title:'A small box',text:'In the box: black gloves. The label says: <b>HOTEL SECURITY</b>. One glove is missing!'},
+ photo:{label:'Photo',gate:true,q:'Where is the photo?',a:'The photo is on the wall.',title:'A photo',text:'<b>The Star of London.</b> A blue diamond. It is very old and very valuable.'},
+ card:{label:'Chair',gate:true,q:'Where is the card?',a:'The card is on the chair.',title:'An access card!',text:'ACCESS CARD · <b>S. Moore</b> · Event Team.<br>This card opens the Exhibition Room door.'},
+ jewelbox:{label:'Jewelry box',title:'The jewelry box',text:'The jewelry box is on the table. It is open. It is empty!'},
+ clock:{label:'Clock',title:'The clock',text:'The clock is on the wall. It says 9 o’clock. The alarm was at 9 p.m.'},
+ window:{label:'Window',title:'The window',text:'The window is closed. It is locked. The thief didn’t use the window.'},
+ door:{label:'Door',title:'The door',text:'The door opens with an access card. The card reader is next to the door.'},
+ camera:{label:'Camera',title:'The camera',text:'The camera is on the wall, over the door. The red light is off. The camera is off!'}
+};
+var M1MAIN=['key','note','box','card'];
+var SLOTS=[['s7','7:00 p.m.',7],['s8','8:00 p.m.',8],['s9','9:00 p.m.',9],['s10','10:00 p.m.',10]];
+var CARDS={c1:['The exhibition starts.','s7'],c2:['Security check: the diamond is in the box.','s8'],c3:['ALARM! The diamond is missing!','s9'],c4:['The exhibition ends.','s10']};
+var CORDER=['c3','c1','c4','c2'];
+var DOCS2={
+ agenda:{t:'Hotel agenda',h:'<h4>Hotel agenda</h4><p class="big">Diamond Exhibition</p><p>Day: <b>Friday</b><br>Room: Exhibition Room<br>Time: <b>7 p.m. – 10 p.m.</b></p>'},
+ cal:{t:'Calendar',h:'<h4>October</h4><table class="cal"><tr><th>MON</th><th>TUE</th><th>WED</th><th>THU</th><th>FRI</th><th>SAT</th><th>SUN</th></tr><tr><td>12</td><td>13</td><td>14</td><td>15</td><td class="hl">16</td><td>17</td><td>18</td></tr></table><p style="margin:10px 0 0">Friday, <b>October 16th</b>: the exhibition.</p>'},
+ log:{t:'Security log',h:'<span class="stamp">STAFF ONLY</span><h4>Security log</h4><table><tr><td>Time</td><td>Check</td></tr><tr><td><b>8:00 p.m.</b></td><td>Exhibition Room. Diamond in the box. OK ✓<br><i>— J. Hayes</i></td></tr></table>'},
+ alarm:{t:'Alarm report',h:'<span class="stamp">URGENT</span><h4>Alarm report</h4><p class="big x">ALARM!</p><p>Time: <b>9:00 p.m.</b><br>The diamond is not in the box!</p>'}
+};
+var Q2=[['When was the exhibition?','On Friday. / On October 16th. / In October.'],['What time was the security check?','At 8 p.m.'],['When did the diamond disappear?','At 9 p.m. / On Friday, at night.'],['What time did the camera stop?','At 8:45 p.m.']];
+var SUS={
+ emma:{name:'Emma Clarke',job:'Hotel Manager',stmt:['I was at the reception at 9 p.m.','I work in the hotel.','I was in my office in the afternoon.'],file:['Age: 45','At the hotel since 2015','Her office is on the ground floor.','She has keys to many rooms.'],
+  qs:[['9 p.m.','Where were you at 9 p.m.?','I was at the reception, at the desk.'],['work','Where do you work?','I work in the hotel. I’m the manager.'],['the afternoon','Where were you in the afternoon?','I was in my office.'],['her bag','Where was your bag?','My bag was in my office.']]},
+ jack:{name:'Jack Hayes',job:'Security Guard',stmt:['I was at the main entrance at 9 p.m.','I work at night.','My security card was in my pocket.'],file:['Age: 38','At the hotel since 2022','He works at night: 6 p.m. to 6 a.m.','He did the security check at 8 p.m.'],
+  qs:[['9 p.m.','Where were you at 9 p.m.?','I was at the main entrance. At the door.'],['work','Where do you work?','I work at the hotel. I work at night.'],['the afternoon','Where were you in the afternoon?','I was at home. I work at night!'],['his card','Where was your card?','My security card was in my pocket.']]},
+ sophia:{name:'Sophia Moore',job:'Event Organizer',stmt:['I was in the restaurant at 9 p.m.','I arrived at the hotel on Friday.','My bag was in the event room.'],file:['Age: 31','She lives in Paris.','She organized the diamond exhibition.','She arrived at the hotel on Friday, in the afternoon.'],
+  qs:[['9 p.m.','Where were you at 9 p.m.?','I was in the restaurant. I had dinner.'],['work','Where do you work?','I work in Paris and in London. I organize events.'],['the afternoon','Where were you in the afternoon?','I was at the airport. I arrived at the hotel in the afternoon.'],['her bag','Where was your bag?','My bag was in the event room.']]}
+};
+var EV={
+ A:{t:'Security camera',s:'Reception · Camera 2',who:'emma',h:'<span class="stamp">EVIDENCE A</span><h4>Security camera · Reception</h4><p class="big">9:00 p.m.</p><p>Camera 2 shows <b>Emma Clarke</b> at the reception desk.</p>'},
+ B:{t:'Entrance register',s:'Main entrance · Friday',who:'jack',h:'<span class="stamp">EVIDENCE B</span><h4>Main entrance register</h4><table><tr><td>Friday</td><td>9:00 p.m.</td><td><b>Jack Hayes</b> — Security ✓</td></tr></table>'},
+ C:{t:'Restaurant register',s:'Restaurant · 8:30–9:30 p.m.',who:'sophia',h:'<span class="stamp">EVIDENCE C</span><h4>Restaurant register · 8:30–9:30 p.m.</h4><table><tr><td>Table 2</td><td>Mr. and Mrs. Lee</td></tr><tr><td>Table 4</td><td>Dr. Patel</td></tr><tr><td>Table 7</td><td>Ms. Grant</td></tr></table><p class="x" style="margin:10px 0 0">Sophia Moore? Not in the register.</p>'},
+ D:{t:'Access card log',s:'Exhibition Room door',who:'sophia',h:'<span class="stamp">EVIDENCE D</span><h4>Access card log</h4><table><tr><td>Card</td><td><b>S. Moore</b> (the card from the chair)</td></tr><tr><td>Door</td><td>Exhibition Room</td></tr><tr><td>Time</td><td><b>8:50 p.m.</b></td></tr></table><p style="margin:10px 0 0">The card was at the door. But who used it?</p>'}
+};
+var EVORDER=['C','A','D','B'];
+var Q4=[['Where was Emma at 9 p.m.?','She was at the reception.'],['Where was Jack at 9 p.m.?','He was at the main entrance.'],['Was Sophia in the restaurant?','No, she wasn’t. She wasn’t in the restaurant.'],['Where was Sophia’s card at 8:50 p.m.?','It was at the Exhibition Room door. / In the Exhibition Room.']];
+var Q5={
+ sophia:[['Where were you at 8:50 p.m.?','OK… I wasn’t in the restaurant. I was in a meeting room, in Room 12. I was at a meeting with Mr. Reed.','E'],['Where was your access card?','At 8:30 p.m., Jack asked for my card. He said: “My card is not working.” So I gave my card to Jack.','H'],['Why weren’t you in the restaurant?','It was a secret meeting. A new job! I’m sorry.',null]],
+ emma:[['Where were you at 8:50 p.m.?','I was at the reception. I was on the phone with a guest.',null],['Who can turn off the cameras?','Only the security team. The camera controls are in the security room.',null],['Whose key is this? (Locker 7)','Locker 7? That’s Jack’s locker. It’s in the security room.','F']],
+ jack:[['Where were you at 8:50 p.m.?','I was… at the main entrance. At the door. All night!','G'],['Where was your access card?','My card was in my pocket. I didn’t use my card.',null],['Where is your locker key?','My key? It’s… in my locker. No… I don’t know.',null]]
+};
+var EV5={
+ E:{t:'Meeting room register',h:'<h4>Room 12 · Meetings</h4><p>Friday<br><b>8:30 – 9:15 p.m.</b><br>Ms. S. Moore and Mr. T. Reed</p>'},
+ H:{t:'Sophia’s statement',h:'<h4>New statement</h4><p>At <b>8:30 p.m.</b>, Sophia gave her access card to <b>Jack</b>.</p>'},
+ F:{t:'Locker list',h:'<h4>Security Room · Lockers</h4><p>Locker 5: M. Brown<br>Locker 6: L. Silva<br><b>Locker 7: Jack Hayes</b></p>'},
+ G:{t:'Corridor camera',h:'<span class="stamp">CAMERA 4</span><h4>Corridor camera</h4><p><b>8:50 p.m.</b><br>A man in a security uniform at the Exhibition Room door.</p>'}
+};
+var EV5ORDER=['E','H','F','G'];
+var QF=[['Who took the diamond?','Jack took the diamond. / It was Jack.'],['Where was he at 8:50 p.m.?','He was in the Exhibition Room / at the Exhibition Room door.'],['Where was the diamond?','It was in Jack’s locker, in the security room. (Locker 7)'],['When did the crime happen?','At 8:50 p.m., on Friday, October 16th.']];
+var ALLEV=[['key','The key: Locker 7'],['card','The access card'],['note','The note in the bag'],['box','Security gloves'],['cam','Camera off at 8:45'],['A','A · Reception camera'],['B','B · Entrance register'],['C','C · Restaurant register'],['D','D · Access card log'],['E','E · Room 12 register'],['H','H · Sophia’s statement'],['F','F · Locker list'],['G','G · Corridor camera']];
+var SOL=[['8:30 p.m.','Jack was with Sophia. He asked for her access card.'],['8:45 p.m.','Jack was in the security room. He turned off the camera.'],['8:50 p.m.','Jack was at the Exhibition Room door. He used Sophia’s card.'],['8:52 p.m.','He took the diamond. He dropped his key on the table!'],['8:55 p.m.','He put the diamond in his locker, in the security room.'],['9:00 p.m.','He was at the main entrance again. The alarm started.'],['Today','The police opened Locker 7 with the key. The diamond was in the locker!']];
+var MISSIONS=['Crime Scene','Timeline','Suspects','Evidence','Interrogation','Case Closed'];
+
+/* ---------- teacher notes (pt-BR) ---------- */
+var TMN={
+ intro:'<p>Pergunte o nome da aluna e digite no campo: ela vira “Detective ___” na tela final.</p><p>Leia a introdução com ela. Perguntas rápidas: <b>Where was the diamond?</b> → <i>In a special room.</i> <b>Where were the people?</b> → <i>At the hotel.</i></p>',
+ 1:'<p>A aluna clica nos objetos. Nos objetos com pergunta, <b>ela responde antes</b> e só então você clica em <b>Reveal clue</b>.</p><ul><li>Where is the key? → <i>It’s on the table.</i></li><li>Where is the note? → <i>It’s in the bag.</i></li><li>Where is the box? → <i>It’s in the cabinet.</i></li><li>Where is the photo? → <i>It’s on the wall.</i></li><li>Where is the card? → <i>It’s on the chair.</i></li></ul><p><b>Erros comuns:</b> “in the table”, “on the bag”. Corrija com contraste: <i>Inside or on top?</i> Deixe ela se corrigir.</p><p><b>Extra:</b> Where is the clock? / the camera? (on the wall) · Where is the bag? (on the floor)</p>',
+ 2:'<p>Ela lê os documentos (clique para abrir) e coloca cada evento no horário certo: toque no cartão e depois no horário (ou arraste).</p><ul><li>When was the exhibition? → <i>On Friday / On October 16th / In October.</i></li><li>What time was the security check? → <i>At 8 p.m.</i></li><li>When did the diamond disappear? → <i>At 9 p.m.</i></li><li>What time did the camera stop? → <i>At 8:45 p.m.</i></li></ul><p><b>Erros comuns:</b> “in Friday”, “in 9 p.m.”. Dica de 1 linha: <b>AT</b> = ponto no relógio · <b>ON</b> = quadradinho do calendário · <b>IN</b> = mês, parte do dia.</p><p>Marque ✓ em cada pergunta respondida.</p>',
+ 3:'<p>Você interpreta os suspeitos. A aluna escolhe um tema, pode ver o modelo, mas <b>pergunta em voz alta antes</b> de você clicar em Answer.</p><ul><li>Emma: reception às 9 · office à tarde.</li><li>Jack: main entrance às 9 · em casa à tarde · cartão “in my pocket”.</li><li>Sophia: “restaurant” às 9 (mentira) · airport à tarde · bolsa “in the event room”.</li></ul><p><b>Erro comum:</b> “Where you were?” → modele <i>Where <b>were</b> you…?</i> Não transforme em aula de passado.</p><p>Cada suspeito precisa de pelo menos 2 perguntas.</p>',
+ 4:'<p>Gabarito: <b>A → Emma · B → Jack · C → Sophia · D → Sophia</b>.</p><ul><li>Where was Emma at 9 p.m.? → <i>At the reception.</i></li><li>Where was Jack? → <i>At the main entrance.</i></li><li>Was Sophia in the restaurant? → <i>No, she wasn’t.</i></li><li>Where was Sophia’s card at 8:50? → <i>At the Exhibition Room door.</i></li></ul><p><b>Who is lying?</b> Esperado: Sophia — <i>“She wasn’t in the restaurant at 9 p.m.”</i> Deixe ela justificar e só então clique em <b>Check reasoning</b>. Ponto-chave: o cartão é dela, mas <b>quem usou?</b></p>',
+ 5:'<p>Plot twist: Sophia estava na sala de reunião (Room 12) e emprestou o cartão para Jack às 8:30.</p><p>Para liberar o desafio final, ela precisa perguntar: Sophia (perguntas 1 e 2), Emma (pergunta 3, a chave) e Jack (pergunta 1).</p><p><b>Pista que liga Jack ao diamante:</b> a chave da missão 1 é do <b>Locker 7</b> → lista de armários = Jack, na security room.</p><ul><li>Who took the diamond? → <i>Jack.</i></li><li>Where was he at 8:50? → <i>In / at the Exhibition Room.</i></li><li>Where was the diamond? → <i>In his locker, in the security room.</i></li><li>When? → <i>At 8:50 p.m., on Friday.</i></li></ul>',
+ 6:'<p>A aluna apresenta a teoria oralmente; você digita palavras-chave em WHERE e WHEN e marca as evidências que ela citar (2 ou mais).</p><p>Aceite <i>in the Exhibition Room</i> ou <i>at the Exhibition Room door</i>. Depois da solução, leia as frases com ela; peça para repetir 2 ou 3 com IN/ON/AT.</p>',
+ closed:'<p>Use o caderno IN / ON / AT para um fechamento de 2 minutos: peça uma frase nova dela para cada coluna, sobre a vida dela (<i>I work at…</i>, <i>on Mondays</i>, <i>in the morning</i>).</p>'
+};
+
+/* ---------- rendering ---------- */
+function track(){
+ var h='';for(var i=1;i<=6;i++){var dis=i>S.unlocked,cur=S.view===i||(i===6&&S.view==='closed'),done=i<S.unlocked||(i===6&&S.m6.solved&&S.view==='closed');
+  h+='<button class="step'+(done?' done':'')+(cur?' now':'')+'" data-act="go" data-arg="'+i+'"'+(dis?' disabled':'')+'><span class="n">'+(done?'✓':i)+'</span>'+MISSIONS[i-1]+'</button>';}
+ $('#track').innerHTML=h;
+ var a=$('#track .now');if(a&&a.scrollIntoView)try{a.scrollIntoView({inline:'center',block:'nearest'});}catch(e){}
+ $('#tmBtn').classList.toggle('on',!!S.tm);
+}
+function head(n,place,title,lede){return '<div class="head"><p class="eyebrow">Mission 0'+n+' · '+place+'</p><h2>'+title+'</h2><p class="lede">'+lede+'</p></div>';}
+function nextBtn(n,label){return '<button class="btn" data-act="go" data-arg="'+n+'">'+(label||'Continue investigation')+' '+I.arrow+'</button>';}
+
+function vIntro(){
+ var going=S.unlocked>0;
+ return '<section class="scene"><div class="intro"><div class="art">'+hotelSVG()+'</div><div style="display:flex;flex-direction:column;gap:22px">'+
+ '<h1>The Missing Diamond<em>An English mystery · The Royal Palace Hotel, London</em></h1>'+
+ '<div class="welcome"><span class="stamp">CONFIDENTIAL</span><p class="lab">WELCOME, DETECTIVE!</p><p>Last night, a valuable diamond disappeared at the Royal Palace Hotel.</p><p>The diamond was in a special room.</p><p>At 9 p.m., the diamond was gone.</p><p>Three people were at the hotel.</p><p><b>One person is lying.</b></p><p>Your mission is to find the diamond!</p></div>'+
+ '<div class="row" style="align-items:flex-end"><div class="field" style="flex:1 1 200px"><label for="detName">Detective name</label><input id="detName" type="text" maxlength="30" placeholder="Your name" value="'+(S.name||'').replace(/"/g,'&quot;')+'"></div>'+
+ '<button class="btn" data-act="start">'+I.search+(going?'Continue investigation':'Start investigation')+'</button>'+
+ '<button class="btn ghost small" data-act="say" data-arg="'+encodeURIComponent('Welcome, Detective! Last night, a valuable diamond disappeared at the Royal Palace Hotel. The diamond was in a special room. At 9 p.m., the diamond was gone. Three people were at the hotel. One person is lying. Your mission is to find the diamond!')+'">'+I.spk+' Listen</button></div>'+
+ '</div></div></section>';}
+
+function vM1(){
+ var f=S.m1.found,id=S.m1.sel,o=id?M1[id]:null,card='';
+ if(!o){card='<p class="eyebrow">Detective notes</p><p class="qbig" style="font-size:24px">Click on an object in the room.</p><p style="color:var(--muted);margin:0">Some clues are small. Look carefully!</p>';}
+ else if(o.gate&&!f[id]){card='<p class="eyebrow">Detective question</p><p class="qbig">'+o.q+'</p><div class="row">'+spk(o.q)+'<span style="color:var(--muted)">Answer first. Then the clue opens.</span></div><div class="row">'+tb('reveal1',id,'Reveal clue')+'</div>';}
+ else{card='<div class="paper"><h4>Clue · '+o.title+'</h4><p style="margin:0;font-size:16px">'+o.text+'</p></div>'+(o.gate?'<div class="answer">'+spk(o.a)+o.a+'</div>':'');}
+ var found=cnt(f),done=M1MAIN.every(function(k){return f[k];});
+ var list=M1MAIN.map(function(k){var n={key:'The key',note:'The note',box:'The box',card:'The access card'}[k];return '<li class="'+(f[k]?'ok':'')+'"><span class="b">'+(f[k]?I.check:'')+'</span>'+n+'</li>';}).join('');
+ return '<section class="scene">'+head(1,'The Exhibition Room','The Crime Scene','Explore the room. Click on the objects and find the clues. The detective question comes first!')+
+ '<div class="m1"><div class="room-wrap">'+roomSVG()+'<span class="room-tip">Clues found: '+found+' / 10</span></div>'+
+ '<aside class="panel clue-card" id="clueCard">'+card+'<div style="margin-top:auto;display:flex;flex-direction:column;gap:10px"><p class="eyebrow" style="margin:0">Key clues</p><ul class="checklist">'+list+'</ul><div class="meter"><i style="width:'+(found*10)+'%"></i></div></div></aside></div>'+
+ help(['It’s in the…','It’s on the…','It’s at the…','The key is…'])+
+ (done?'<div class="banner"><div><strong>Good job, Detective! You found an important clue.</strong>An access card: <b>S. Moore</b>. Whose card is it?</div>'+nextBtn(2)+'</div>':(f.card?'<div class="banner alert"><div><strong>An access card!</strong>Find the other key clues.</div></div>':''))+
+ '</section>';}
+
+function vM2(){
+ var P=S.m2.placed,used={};for(var s in P)used[P[s]]=1;
+ var docs=Object.keys(DOCS2).map(function(k){return '<button class="docbtn" data-act="doc2" data-arg="'+k+'"><div class="paper">'+DOCS2[k].h+'<span class="open">OPEN ▸</span></div></button>';}).join('');
+ var slots=SLOTS.map(function(sl){var c=P[sl[0]];var ready=sel&&sel.kind==='m2'&&!c;
+  return '<div class="slot'+(c?' filled':'')+(ready?' ready':'')+'" data-drop="m2" data-id="'+sl[0]+'"><span class="time">'+clock(sl[2],0)+sl[1]+'</span>'+(c?'<div class="ecard placed">'+CARDS[c][0]+'</div>':'<span style="color:var(--muted);font-size:13px">Place an event here</span>')+'</div>';}).join('');
+ var tray=CORDER.filter(function(c){return !used[c];}).map(function(c){return '<div class="ecard'+(sel&&sel.id===c?' picked':'')+'" data-pick="m2" data-id="'+c+'" draggable="true" tabindex="0" role="button">'+CARDS[c][0]+'</div>';}).join('');
+ var after='';
+ if(S.m2.done){
+  after='<div class="banner alert"><div><strong>NEW EVIDENCE UNLOCKED!</strong>The security camera stopped working at <b>8:45 p.m.</b> Five minutes before the card was used…</div>'+clock(8,45).replace('<svg','<svg style="width:54px;height:54px"')+'</div>'+
+  '<div class="panel"><p class="eyebrow" style="margin:0 0 10px">The teacher asks</p><ul class="qlist">'+Q2.map(function(q,i){var ok=S.m2.qs[i];return '<li class="'+(ok?'ok':'')+'"><span class="q">'+spk(q[0])+q[0]+'</span>'+(ok?'<span style="color:var(--green2)">✓ Good thinking!</span>':tb('q2',i,'✓'))+'</li>';}).join('')+'</ul></div>'+
+  help(['It was on…','It was at…','It happened at…','It happened on…'])+
+  '<div class="row" style="justify-content:flex-end">'+nextBtn(3)+'</div>';
+ }
+ return '<section class="scene">'+head(2,'Friday, October 16th','The Hotel Timeline','Read the hotel documents. Then put the events on the timeline: tap a card, then tap the time.')+
+ '<div class="docs">'+docs+'</div>'+
+ '<div class="panel" style="display:flex;flex-direction:column;gap:16px"><p class="eyebrow" style="margin:0">Timeline · Friday night</p><div class="timeline">'+slots+'</div>'+
+ (S.m2.done?'<div class="inserted">'+clock(8,45).replace('<svg','<svg style="width:30px;height:30px;flex:none"')+'8:45 p.m. — The security camera stops working.</div>':'<div class="tray">'+tray+'</div>')+'</div>'+after+'</section>';}
+
+function m3done(k){return cnt(S.m3.asked[k])>=2;}
+function vM3(){
+ var cards=Object.keys(SUS).map(function(k){var s=SUS[k];return '<button class="sus'+(S.m3.open===k?' on':'')+'" data-act="sus" data-arg="'+k+'"><div class="pic">'+portrait(k)+'</div><div class="meta"><b>'+s.name+'</b><span>'+s.job+'</span><span class="tag'+(m3done(k)?' ok':'')+'">'+(m3done(k)?'✓ Interviewed':'Not interviewed')+'</span></div></button>';}).join('');
+ var d='';
+ if(S.m3.open){var k=S.m3.open,s=SUS[k];
+  d='<div class="panel dossier"><div style="display:flex;flex-direction:column;gap:10px"><div class="pic">'+portrait(k)+'</div><button class="btn ghost small" data-act="file3" data-arg="'+k+'">'+(S.m3.file[k]?'Close the file':'Open the file')+'</button>'+
+  (S.m3.file[k]?'<div class="paper" style="font-size:13.5px"><span class="stamp">FILE</span><h4>Investigation file</h4>'+s.file.join('<br>')+'</div>':'')+'</div>'+
+  '<div style="display:flex;flex-direction:column;gap:18px;min-width:0"><div><p class="eyebrow">'+s.job+'</p><h3 style="font-size:32px">'+s.name+'</h3></div>'+
+  '<div class="row" style="align-items:flex-start;flex-wrap:nowrap">'+spk(s.stmt.join(' '))+'<ul class="stmt">'+s.stmt.map(function(x){return '<li>“'+x+'”</li>';}).join('')+'</ul></div>'+
+  '<div><p class="eyebrow" style="margin:0 0 10px">Your questions · ask first, then hear the answer</p><div class="qgrid">'+s.qs.map(function(q,i){var seen=S.m3.seen[k][i],ans=S.m3.asked[k][i];
+   return '<div class="qtile"><span class="hint">Ask about: '+q[0]+'</span>'+(seen||ans?'<span class="model">'+q[1]+'</span>':'<button class="linkbtn" data-act="seen3" data-arg="'+i+'">See the model question</button>')+
+   (ans?'<div class="row" style="flex-wrap:nowrap">'+spk(q[2])+'<span class="ans">'+q[2]+'</span></div>':'<div>'+tb('ans3',i,'Answer')+'</div>')+'</div>';}).join('')+'</div></div></div></div>';}
+ var all=Object.keys(SUS).every(m3done);
+ return '<section class="scene">'+head(3,'The hotel lobby','Meet the Suspects','Open each suspect’s file. Read the statement. Then ask questions. The teacher is the suspect!')+
+ '<div class="suspects">'+cards+'</div>'+d+help(['Where were you at…?','Where was your…?','Where do you work?','She was in…','He was at…'])+
+ (all?'<div class="banner"><div><strong>Great observation!</strong>You talked to the three suspects. Now, check the secret evidence.</div>'+nextBtn(4)+'</div>':'<p style="color:var(--muted);margin:0">Ask each suspect at least two questions.</p>')+'</section>';}
+
+function vM4(){
+ var L=S.m4.links,linkedAll=Object.keys(EV).every(function(e){return L[e];});
+ var list=EVORDER.map(function(e){var x=EV[e],ln=L[e];return '<div class="ev'+(ln?' linked':'')+(sel&&sel.id===e?' picked':'')+'" '+(ln?'':'data-pick="m4" data-id="'+e+'" draggable="true" tabindex="0" role="button"')+'><span class="lt">'+e+'</span><div><div class="tt">'+x.t+'</div><div class="ss">'+x.s+'</div></div><button class="opn" data-act="ev4" data-arg="'+e+'">OPEN</button></div>';}).join('');
+ var cols=Object.keys(SUS).map(function(k){var ready=sel&&sel.kind==='m4';return '<div class="col'+(ready?' ready':'')+'" data-drop="m4" data-id="'+k+'"><div class="who">'+portrait(k)+'<b>'+SUS[k].name.split(' ')[0]+'</b></div>'+Object.keys(L).filter(function(e){return L[e]===k;}).map(function(e){return '<div class="chip"><span class="l">'+e+'</span>'+EV[e].t+'</div>';}).join('')+'</div>';}).join('');
+ var after='';
+ if(linkedAll){
+  after='<div class="panel"><p class="eyebrow" style="margin:0 0 10px">The teacher asks</p><ul class="qlist">'+Q4.map(function(q,i){var ok=S.m4.qs[i];return '<li class="'+(ok?'ok':'')+'"><span class="q">'+spk(q[0])+q[0]+'</span>'+(ok?'<span style="color:var(--green2)">✓</span>':tb('q4',i,'✓'))+'</li>';}).join('')+'</ul></div>';
+  var ch=S.m4.choice,res=S.m4.result;
+  after+='<div class="panel" style="display:flex;flex-direction:column;gap:16px"><div><p class="eyebrow">Detective challenge</p><h3 style="font-size:34px;color:#ffd2dc">WHO IS LYING?</h3></div>'+
+  '<div class="liar">'+Object.keys(SUS).map(function(k){return '<button class="'+(ch===k?'on':'')+'" data-act="liar" data-arg="'+k+'"'+(res==='ok'?' disabled':'')+'>'+portrait(k)+SUS[k].name.split(' ')[0]+'</button>';}).join('')+'</div>';
+  if(ch&&!res){after+='<p style="margin:0;font-size:17px">Explain your answer. Say it out loud:</p><div class="frame">'+SUS[ch].name.split(' ')[0]+' is lying because '+(ch==='jack'?'he':'she')+' wasn’t in / at ______ at ______.</div><div class="row">'+tb('check4',null,'Check reasoning')+'</div>';}
+  if(res==='retry'){var ev=ch==='emma'?'A':'B';after+='<div class="banner alert"><div><strong>Check the evidence!</strong>Look at Evidence '+ev+'. '+SUS[ch].name.split(' ')[0]+' was '+(ch==='emma'?'at the reception':'at the main entrance')+' at 9 p.m. The statement is true.</div><button class="btn ghost small" data-act="retry4">Choose again</button></div>';}
+  if(res==='ok'){after+='<div class="banner"><div><strong>Good thinking, Detective!</strong>Sophia wasn’t in the restaurant. Her statement is false. But a card is not a person… <b>Who used the card at 8:50 p.m.?</b></div>'+nextBtn(5,'Interrogate again')+'</div>';}
+  after+='</div>';}
+ return '<section class="scene">'+head(4,'The investigation board','The Secret Evidence','Read the hotel records. Connect each piece of evidence to a suspect: tap the evidence, then tap the person.')+
+ '<div class="row"><button class="btn ghost small" data-act="map">'+I.map+' Hotel map</button></div>'+
+ '<div class="board"><div class="evlist">'+list+'</div><div class="cols">'+cols+'</div></div>'+help(['She was at…','He was in…','She wasn’t in…','The card was at…'])+after+'</section>';}
+
+function vM5(){
+ var w=S.m5.who,s=SUS[w];
+ var pick=Object.keys(SUS).map(function(k){return '<button class="'+(k===w?'on':'')+'" data-act="who5" data-arg="'+k+'">'+portrait(k)+SUS[k].name.split(' ')[0]+'</button>';}).join('');
+ var qs=Q5[w].map(function(q,i){var id=w+i,seen=S.m5.seen[id],ans=S.m5.asked[id];
+  return '<div class="qtile"><span class="hint">Question '+(i+1)+'</span><span class="model">'+q[0]+'</span>'+(ans?'<div class="row" style="flex-wrap:nowrap">'+spk(q[1])+'<span class="ans">'+q[1]+'</span></div>':'<div>'+tb('ans5',i,'Answer')+'</div>')+'</div>';}).join('');
+ var newev=EV5ORDER.map(function(e){return S.m5.ev[e]?'<div class="paper" style="animation:pop .4s ease both">'+EV5[e].h+'</div>':'<div class="locked">'+I.lock+'Evidence '+e+'<br>locked</div>';}).join('');
+ var ready=EV5ORDER.every(function(e){return S.m5.ev[e];});
+ var fin='';
+ if(ready){var allf=QF.every(function(q,i){return S.m5.fin[i];});
+  fin='<div class="panel" style="display:flex;flex-direction:column;gap:14px"><div><p class="eyebrow">Final challenge</p><h3 style="font-size:30px">Answer the four questions</h3></div><ul class="qlist">'+QF.map(function(q,i){var ok=S.m5.fin[i];return '<li class="'+(ok?'ok':'')+'"><span class="q">'+spk(q[0])+q[0]+'</span>'+(ok?'<span style="color:var(--green2)">✓</span>':tb('fin5',i,'✓'))+'</li>';}).join('')+'</ul>'+
+  help(['He was in the…','He was at the…','It was in his…','It happened at… on…'])+
+  (allf?'<div class="row" style="justify-content:flex-end">'+nextBtn(6,'Write your report')+'</div>':'')+'</div>';}
+ return '<section class="scene">'+head(5,'The interrogation room','The Final Interrogation','Choose a suspect. Ask a question out loud. Listen to the answer. New evidence will appear!')+
+ '<div class="iroom"><span class="lamp"></span><div class="ipick">'+pick+'</div><div class="istage"><div class="pic">'+portrait(w)+'</div><div class="iq"><p class="eyebrow" style="margin:0">'+s.name+' · '+s.job+'</p><div class="qgrid" style="grid-template-columns:1fr">'+qs+'</div></div></div></div>'+
+ '<div class="row" style="justify-content:space-between"><p class="eyebrow" style="margin:0">New evidence</p><div class="row"><button class="btn ghost small" data-act="map">'+I.map+' Hotel map</button><button class="btn ghost small" data-act="keyclue">'+I.key+' The key from the crime scene</button></div></div>'+
+ '<div class="newev">'+newev+'</div>'+fin+'</section>';}
+
+function vM6(){
+ var R=S.m6;
+ if(R.solved){var lines=SOL.slice(0,R.step).map(function(l){return '<li><span class="t">'+l[0]+'</span><span>'+l[1]+'</span></li>';}).join('');
+  return '<section class="scene">'+head(6,'The solution','What really happened','Your report is correct. Read the story, line by line.')+
+  '<div class="panel" style="display:flex;flex-direction:column;gap:18px"><ul class="sol">'+lines+'</ul>'+(R.step>=SOL.length?'<div>'+lockerSVG()+'</div>':'')+
+  '<div class="row">'+(R.step<SOL.length?'<button class="btn" data-act="solnext">Next '+I.arrow+'</button>'+spk(SOL[Math.max(0,R.step-1)][1]):'<button class="btn" data-act="close">Close the case 💎</button>')+'</div></div></section>';}
+ var evc=ALLEV.map(function(e){return '<button class="'+(R.ev[e[0]]?'on':'')+'" data-act="ev6" data-arg="'+e[0]+'">'+e[1]+'</button>';}).join('');
+ return '<section class="scene">'+head(6,'Final detective report','Case Closed?','Present your theory out loud. The teacher writes the key words.')+
+ '<div class="report">'+
+ '<div class="rbox"><span class="h">WHO?</span><span class="s">Who took the diamond?</span><div class="whopick">'+Object.keys(SUS).map(function(k){return '<button class="'+(R.who===k?'on':'')+'" data-act="who6" data-arg="'+k+'">'+portrait(k)+SUS[k].name.split(' ')[0]+'</button>';}).join('')+'</div></div>'+
+ '<div class="rbox"><span class="h">WHERE?</span><span class="s">Where was the suspect?</span><input id="rWhere" type="text" placeholder="key words…" value="'+R.where.replace(/"/g,'&quot;')+'"><span class="s">She says: “He was in / at the…”</span></div>'+
+ '<div class="rbox"><span class="h">WHEN?</span><span class="s">When did it happen?</span><input id="rWhen" type="text" placeholder="key words…" value="'+R.when.replace(/"/g,'&quot;')+'"><span class="s">She says: “It happened at… on…”</span></div>'+
+ '<div class="rbox"><span class="h">EVIDENCE</span><span class="s">What evidence supports your conclusion? (two or more)</span><div class="evchips">'+evc+'</div></div></div>'+
+ (R.msg?'<div class="banner alert shake"><div><strong>'+R.msg.split('|')[0]+'</strong>'+R.msg.split('|')[1]+'</div></div>':'')+
+ '<div class="row" style="justify-content:flex-end">'+help(['He took the diamond at…','He was in…','The diamond was in…','The evidence is…'])+'<button class="btn" data-act="submit6">Submit the report '+I.arrow+'</button></div></section>';}
+
+function vClosed(){
+ var nm=S.name?(' '+S.name.replace(/[<>&"]/g,'')):'';
+ var asked=cnt(S.m3.asked.emma)+cnt(S.m3.asked.jack)+cnt(S.m3.asked.sophia)+cnt(S.m5.asked);
+ var sp='';[[8,20],[86,14],[18,70],[92,62],[50,4],[70,88]].forEach(function(p,i){sp+='<span class="spark" style="left:'+p[0]+'%;top:'+p[1]+'%;animation-delay:'+(i*.3)+'s"></span>';});
+ return '<section class="scene closed"><span class="bigstamp">CASE CLOSED</span><div class="gem-wrap">'+gemSVG('gem')+sp+'</div>'+
+ '<h1>Congratulations, Detective'+nm+'!</h1><p class="lede" style="font-size:20px;margin:0 auto">You solved the mystery! The diamond is safe!</p>'+
+ '<div class="stats"><div><b>'+cnt(S.m1.found)+'</b><span>clues found</span></div><div><b>'+(4+cnt(S.m5.ev)+1)+'</b><span>pieces of evidence</span></div><div><b>'+asked+'</b><span>questions asked</span></div></div>'+
+ '<div style="width:100%"><p class="eyebrow" style="margin:10px 0 12px">Your detective notebook</p><div class="notebook">'+
+ '<div class="paper"><p class="p">IN</p><ul><li>in the bag</li><li>in the cabinet</li><li>in the restaurant</li><li>in Room 12</li><li>in his locker</li><li>in the afternoon</li><li>in October</li></ul></div>'+
+ '<div class="paper"><p class="p">ON</p><ul><li>on the table</li><li>on the chair</li><li>on the wall</li><li>on Friday</li><li>on October 16th</li></ul></div>'+
+ '<div class="paper"><p class="p">AT</p><ul><li>at 8:50 p.m.</li><li>at 9 p.m.</li><li>at the reception</li><li>at the main entrance</li><li>at the hotel</li><li>at night</li></ul></div></div></div>'+
+ '<div class="row" style="justify-content:center"><button class="btn ghost" data-act="go" data-arg="1">Review the case</button><button class="btn" data-act="restart">New investigation</button></div></section>';}
+
+function render(){
+ track();
+ var v=S.view,h=v==='intro'?vIntro():v===1?vM1():v===2?vM2():v===3?vM3():v===4?vM4():v===5?vM5():v===6?vM6():vClosed();
+ $('#stage').innerHTML=h;
+ bindDnD();renderTM();save();
+}
+function go(v){S.view=v;sel=null;render();window.scrollTo({top:0,behavior:'smooth'});}
+function unlock(n){if(S.unlocked<n)S.unlocked=n;}
+
+/* ---------- overlays ---------- */
+function layer(h){$('#layer').innerHTML=h;}
+function modal(inner,wide){layer('<div class="modal" data-act="closeLayer" data-self="1"><div class="modal-card'+(wide?' wide':'')+'" style="position:relative"><button class="x-btn" data-act="closeLayer" aria-label="Close">×</button>'+inner+'</div></div>');}
+function toast(m,t){var el=$('#toast');el.textContent=m;el.className='toast show '+(t||'');clearTimeout(toast._t);toast._t=setTimeout(function(){el.className='toast';},2200);}
+function confirmRestart(){modal('<div class="paper" style="padding:26px"><span class="stamp">NEW CASE</span><p class="big">Start a new investigation?</p><p>All progress will be deleted.</p><div class="row" style="margin-top:14px"><button class="btn" data-act="doRestart">Yes, restart</button><button class="btn ghost" data-act="closeLayer" style="color:#7a1f33;border-color:#7a1f33">Cancel</button></div></div>');}
+function caseFile(){
+ var f=S.m1.found,b='';
+ var clues=Object.keys(M1).filter(function(k){return f[k];}).map(function(k){return '<li><b>'+M1[k].title+':</b> '+M1[k].text.replace(/<span class="hand">|<\/span>/g,'')+'</li>';}).join('');
+ b+='<div><h4>Crime scene clues</h4>'+(clues?'<ul>'+clues+'</ul>':'<p class="empty">No clues yet.</p>')+'</div>';
+ b+='<div><h4>Timeline · Friday, October 16th</h4>'+(S.m2.done?'<ul><li>7 p.m. The exhibition starts.</li><li>8 p.m. Security check (J. Hayes). Diamond OK.</li><li><b>8:45 p.m. The camera stops working.</b></li><li>9 p.m. ALARM: the diamond is missing.</li><li>10 p.m. The exhibition ends.</li></ul>':'<p class="empty">Locked.</p>')+'</div>';
+ var st=Object.keys(SUS).filter(function(k){return cnt(S.m3.asked[k])||S.m3.open===k;}).map(function(k){return '<li><b>'+SUS[k].name+':</b> '+SUS[k].stmt.join(' ')+'</li>';}).join('');
+ b+='<div><h4>Statements</h4>'+(st?'<ul>'+st+'</ul>':'<p class="empty">No statements yet.</p>')+'</div>';
+ var ev=S.unlocked>=4?Object.keys(EV).map(function(e){return '<li><b>'+e+' · '+EV[e].t+'</b></li>';}).join(''):'';
+ ev+=EV5ORDER.filter(function(e){return S.m5.ev[e];}).map(function(e){return '<li><b>'+e+' · '+EV5[e].t+'</b></li>';}).join('');
+ b+='<div><h4>Evidence</h4>'+(ev?'<ul>'+ev+'</ul>':'<p class="empty">Locked.</p>')+(S.unlocked>=4?'<p style="margin:10px 0 0"><button class="btn ghost small" data-act="map">'+I.map+' Hotel map</button></p>':'')+'</div>';
+ layer('<div class="modal" data-act="closeLayer" data-self="1" style="background:rgba(5,9,16,.5)"><aside class="drawer" role="dialog" aria-label="Case file"><header><h3>Case file</h3><button class="icon-btn" data-act="closeLayer">Close</button></header><div class="body">'+b+'</div></aside></div>');}
+function renderTM(){
+ var el=$('#tmPanel');if(el)el.remove();if(!S.tm)return;
+ var d=document.createElement('div');d.className='tm';d.id='tmPanel';
+ var key=typeof S.view==='number'?S.view:S.view;
+ d.innerHTML='<h5><span>Teacher mode · '+(typeof S.view==='number'?'Mission 0'+S.view:S.view==='intro'?'Intro':'Final')+'</span><button class="close" data-act="tm" aria-label="Close teacher mode">×</button></h5>'+TMN[key]+'<p style="font-size:12px;opacity:.7;margin:6px 0 0">Aparece na tela compartilhada. Prefira o Guia em janela separada (G). Atalho: T.</p>';
+ document.body.appendChild(d);}
+
+/* ---------- teacher guide ---------- */
+function guideHTML(){
+ var css='body{font-family:Georgia,serif;background:#f6efdc;color:#2a241b;margin:0;padding:22px;line-height:1.55;font-size:15px}h1{font-size:24px;margin:0 0 4px}h2{font-size:17px;color:#7a1f33;border-bottom:1px solid #c9b891;padding-bottom:4px;margin:24px 0 8px;font-family:Arial,sans-serif;letter-spacing:.06em;text-transform:uppercase}h3{font-size:15px;margin:16px 0 4px;font-family:Arial,sans-serif}ul{padding-left:20px;margin:6px 0}li{margin:3px 0}i{color:#5d4f37}.tip{background:#efe2bd;border-left:4px solid #c9a24a;padding:8px 12px;margin:10px 0}small{color:#6b5a3a}';
+ var m='';for(var i=1;i<=6;i++){m+='<h3>Missão 0'+i+' · '+MISSIONS[i-1]+'</h3>'+TMN[i];}
+ return '<style>'+css+'</style><h1>The Missing Diamond · Guia da professora</h1><small>Aula individual online · A1 · 45–55 min · IN / ON / AT (tempo e lugar)</small>'+
+ '<h2>Antes da aula</h2><h3>Objetivos</h3><ul><li>Usar IN, ON e AT em frases completas sobre lugares e horários, sem consultar regras.</li><li>Fazer perguntas simples com <i>Where…?</i> e <i>When…? / What time…?</i></li><li>Usar <i>was/were</i> com apoio, sem virar aula de passado.</li></ul>'+
+ '<h3>Materiais</h3><ul><li>Este arquivo aberto no navegador, com compartilhamento de tela (compartilhe só a aba do jogo).</li><li>Este guia em janela separada, fora do compartilhamento.</li><li>Áudio do navegador ligado (botões de ouvir).</li></ul>'+
+ '<h3>Preparação</h3><ul><li>Clique em <b>Restart</b> antes da aula para começar do zero.</li><li>Leia a solução abaixo uma vez.</li><li>Botões com borda tracejada e a palavra <b>teacher</b> são seus: só clique depois que a aluna falar.</li></ul>'+
+ '<div class="tip"><b>Solução:</b> Jack pegou o cartão da Sophia às 8:30, desligou a câmera às 8:45 (security room), entrou na Exhibition Room às 8:50 com o cartão dela, deixou cair a chave do Locker 7 na mesa, guardou o diamante no armário dele (Locker 7, security room) e voltou para a main entrance às 9:00. Sophia mentiu sobre o restaurante porque estava numa reunião secreta (Room 12).</div>'+
+ '<h3>Tempo sugerido</h3><ul><li>Intro: 3 min · M1: 8–10 · M2: 7–8 · M3: 10 · M4: 7–8 · M5: 8–10 · M6: 5–7</li></ul>'+
+ '<h2>Durante a aula</h2>'+m+
+ '<h3>Estratégias de correção</h3><ul><li>Não dê a resposta: pergunte <i>In, on or at?</i> e espere.</li><li>Contraste visual: <i>Inside? On top? A point?</i></li><li>Recast: ela diz “in Friday” → você responde “Yes! <b>On</b> Friday.” e segue a história.</li><li>Feedback curto e positivo: <i>Great observation! Good thinking! Look again! Check the evidence!</i></li><li>Explicação máxima de uma linha: <b>AT</b> ponto exato · <b>ON</b> superfície / dia · <b>IN</b> dentro / mês / parte do dia.</li></ul>'+
+ '<h2>Depois da aula</h2><h3>Observe se a aluna consegue</h3><ul><li>Identificar IN, ON e AT em contextos familiares.</li><li>Usar as preposições em frases completas.</li><li>Formular perguntas simples.</li><li>Descrever lugares e horários.</li><li>Usar as preposições sem consultar regras.</li><li>Corrigir alguns dos próprios erros.</li></ul>'+
+ '<h3>Sugestões de feedback</h3><ul><li>Cite 2 frases certas que ela disse durante o caso.</li><li>Escolha 1 padrão de erro para focar (ex.: dias com ON).</li></ul>'+
+ '<h3>Reforço posterior</h3><ul><li>Próxima aula: ela descreve o próprio quarto ou mesa de trabalho (lugar) e a própria semana (tempo).</li><li>Mini-relato: “My day yesterday” com 5 horários (at…).</li><li>Revisitar o caderno IN / ON / AT da tela final no aquecimento da próxima aula.</li></ul>';}
+var gWin=null;
+function openGuide(){
+ if(gWin&&!gWin.closed){try{gWin.focus();}catch(e){}return;}
+ var w=null;try{var L=Math.max(0,(screen.availWidth||1200)-540);w=window.open('','guiaMissingDiamond','width=520,height=760,left='+L+',top=40,resizable=yes,scrollbars=yes');}catch(e){w=null;}
+ if(w&&w.document){try{w.document.open();w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Guia · The Missing Diamond</title></head><body>'+guideHTML()+'</body></html>');w.document.close();gWin=w;try{window.focus();}catch(e){}return;}catch(e){}}
+ layer('<div class="modal" data-act="closeLayer" data-self="1" style="background:rgba(5,9,16,.5)"><aside class="drawer" role="dialog" aria-label="Teacher guide" style="background:#f6efdc;color:#2a241b"><header style="border-color:#c9b891"><h3>Guia da professora</h3><button class="icon-btn" data-act="closeLayer" style="background:#fff;color:#2a241b">Close</button></header><div class="body"><p style="margin:0;font-size:13px;background:#7a1f33;color:#fff;padding:8px 10px;border-radius:6px">O navegador bloqueou a janela separada, então o guia abriu aqui e aparece na tela compartilhada. Para usar em janela separada, permita pop-ups.</p><div>'+guideHTML()+'</div></div></aside></div>');}
+
+/* ---------- interactions ---------- */
+function place(kind,id,target,el){
+ if(kind==='m2'){
+  if(S.m2.placed[target])return;
+  if(CARDS[id][1]===target){S.m2.placed[target]=id;sel=null;toast('Great observation!','good');
+   if(Object.keys(S.m2.placed).length===4){S.m2.done=true;unlock(3);setTimeout(function(){toast('NEW EVIDENCE UNLOCKED!','warn');},700);}render();}
+  else{sel=null;toast('Check the evidence!','warn');render();var s=document.querySelector('[data-drop="m2"][data-id="'+target+'"]');if(s){s.classList.add('shake');}}
+ }
+ if(kind==='m4'){
+  if(EV[id].who===target){S.m4.links[id]=target;sel=null;toast('Great observation!','good');render();}
+  else{sel=null;toast('Look again! Read the evidence.','warn');render();var c=document.querySelector('[data-drop="m4"][data-id="'+target+'"]');if(c)c.classList.add('shake');}
+ }
+}
+function bindDnD(){
+ document.querySelectorAll('[data-pick]').forEach(function(p){p.addEventListener('dragstart',function(e){try{e.dataTransfer.setData('text/plain',p.dataset.pick+':'+p.dataset.id);}catch(x){}sel={kind:p.dataset.pick,id:p.dataset.id};});});
+ document.querySelectorAll('[data-drop]').forEach(function(d){
+  d.addEventListener('dragover',function(e){e.preventDefault();d.classList.add('over');});
+  d.addEventListener('dragleave',function(){d.classList.remove('over');});
+  d.addEventListener('drop',function(e){e.preventDefault();d.classList.remove('over');var v='';try{v=e.dataTransfer.getData('text/plain');}catch(x){}var parts=v?v.split(':'):(sel?[sel.kind,sel.id]:null);if(parts&&parts[0]===d.dataset.drop)place(parts[0],parts[1],d.dataset.id);});
+ });}
+
+document.addEventListener('click',function(e){
+ var pk=e.target.closest('[data-pick]');
+ if(pk&&!e.target.closest('[data-act]')){var k=pk.dataset.pick,id=pk.dataset.id;sel=(sel&&sel.id===id)?null:{kind:k,id:id};render();return;}
+ var dr=e.target.closest('[data-drop]');
+ if(dr&&!e.target.closest('[data-act]')){if(sel&&sel.kind===dr.dataset.drop)place(sel.kind,sel.id,dr.dataset.id);else if(!dr.classList.contains('filled'))toast(dr.dataset.drop==='m2'?'First, tap an event card.':'First, tap a piece of evidence.');return;}
+ var t=e.target.closest('[data-act]');if(!t)return;
+ if(t.dataset.self&&e.target!==t)return;
+ var a=t.dataset.act,g=t.dataset.arg;
+ switch(a){
+  case 'home':go('intro');break;
+  case 'start':var n=$('#detName');if(n)S.name=n.value.trim();if(S.unlocked<1)S.unlocked=1;go(S.unlocked>6?6:Math.min(S.unlocked,6));break;
+  case 'go':var v=+g;if(v<=S.unlocked)go(v);break;
+  case 'say':speakEn(decodeURIComponent(g));break;
+  case 'casefile':caseFile();break;
+  case 'restart':confirmRestart();break;
+  case 'doRestart':var tm=S.tm;S=fresh();S.tm=tm;sel=null;layer('');go('intro');toast('New case. Good luck, Detective!');break;
+  case 'closeLayer':layer('');break;
+  case 'guide':openGuide();break;
+  case 'tm':S.tm=!S.tm;track();renderTM();save();break;
+  case 'map':modal('<div class="paper" style="padding:14px"><h4>Hotel map</h4>'+mapSVG()+'</div>',true);break;
+  case 'keyclue':modal('<div class="paper"><span class="stamp">CLUE</span><h4>From the crime scene</h4><p class="big">The key</p><p>'+M1.key.text+'</p><p>It was on the table, in the Exhibition Room.</p></div>');break;
+  // M1
+  case 'm1obj':S.m1.sel=g;if(!M1[g].gate){if(!S.m1.found[g]){S.m1.found[g]=1;}}render();var cc=$('#clueCard');if(cc&&window.innerWidth<980)cc.scrollIntoView({behavior:'smooth',block:'nearest'});break;
+  case 'reveal1':S.m1.found[g]=1;toast(g==='card'?'An important clue!':'Great observation!','good');if(M1MAIN.every(function(k){return S.m1.found[k];}))unlock(2);render();break;
+  // M2
+  case 'doc2':modal('<div class="paper" style="font-size:17px;padding:26px">'+DOCS2[g].h+'</div>');break;
+  case 'q2':S.m2.qs[g]=1;render();break;
+  // M3
+  case 'sus':S.m3.open=S.m3.open===g?null:g;render();break;
+  case 'file3':S.m3.file[g]=!S.m3.file[g];render();break;
+  case 'seen3':S.m3.seen[S.m3.open][g]=1;render();break;
+  case 'ans3':var sk=S.m3.open;S.m3.asked[sk][g]=1;S.m3.seen[sk][g]=1;speakEn(SUS[sk].qs[g][2]);if(Object.keys(SUS).every(m3done))unlock(4);render();break;
+  // M4
+  case 'ev4':e.stopPropagation();modal('<div class="paper" style="font-size:16px;padding:26px">'+EV[g].h+'</div>');break;
+  case 'q4':S.m4.qs[g]=1;render();break;
+  case 'liar':if(S.m4.result==='ok')break;S.m4.choice=g;S.m4.result=null;render();break;
+  case 'check4':if(S.m4.choice==='sophia'){S.m4.result='ok';unlock(5);toast('Good thinking!','good');}else{S.m4.result='retry';}render();break;
+  case 'retry4':S.m4.choice=null;S.m4.result=null;render();break;
+  // M5
+  case 'who5':S.m5.who=g;render();break;
+  case 'ans5':var w=S.m5.who,q=Q5[w][g];S.m5.asked[w+g]=1;speakEn(q[1]);if(q[2]&&!S.m5.ev[q[2]]){S.m5.ev[q[2]]=1;setTimeout(function(){toast('NEW EVIDENCE UNLOCKED!','warn');},400);}render();break;
+  case 'fin5':S.m5.fin[g]=1;if(QF.every(function(x,i){return S.m5.fin[i];}))unlock(6);render();break;
+  // M6
+  case 'who6':S.m6.who=g;S.m6.msg='';render();break;
+  case 'ev6':S.m6.ev[g]=!S.m6.ev[g];S.m6.msg='';render();break;
+  case 'submit6':var R=S.m6;
+   if(!R.who){R.msg='Who took the diamond?|Choose a suspect first.';}
+   else if(R.who!=='jack'){R.msg='Look again!|Check Evidence F and G. Where was the key from? Who was at the door at 8:50 p.m.?';}
+   else if(cnt(R.ev)<2){R.msg='Check the evidence!|Choose two or more pieces of evidence.';}
+   else{R.msg='';R.solved=true;R.step=1;speakEn(SOL[0][1]);}
+   render();break;
+  case 'solnext':S.m6.step++;speakEn(SOL[S.m6.step-1][1]);render();break;
+  case 'close':S.view='closed';sel=null;render();window.scrollTo({top:0,behavior:'smooth'});speakEn('Congratulations, Detective! You solved the mystery! The diamond is safe!');break;
+ }
+});
+document.addEventListener('input',function(e){if(e.target.id==='rWhere'){S.m6.where=e.target.value;save();}if(e.target.id==='rWhen'){S.m6.when=e.target.value;save();}if(e.target.id==='detName'){S.name=e.target.value;save();}});
+document.addEventListener('keydown',function(e){
+ var tag=(e.target.tagName||'').toLowerCase();
+ if(e.key==='Escape'){layer('');return;}
+ if((e.key==='Enter'||e.key===' ')&&(e.target.matches&&(e.target.matches('.hot')||e.target.matches('[data-pick]')))){e.preventDefault();e.target.dispatchEvent(new MouseEvent('click',{bubbles:true}));return;}
+ if(tag==='input'||tag==='textarea')return;
+ if(e.key==='t'||e.key==='T'){S.tm=!S.tm;track();renderTM();save();}
+ if(e.key==='g'||e.key==='G'){openGuide();}
+});
+render();
+})();
+</script>

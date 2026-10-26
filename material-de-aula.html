@@ -110,6 +110,10 @@
       <span class="folder-name">📁 Pilotos</span>
       <span class="folder-chevron">›</span>
     </div>
+    <div class="folder-card" onclick="goTo('extras')">
+      <span class="folder-name">📁 Aulas Extras</span>
+      <span class="folder-chevron">›</span>
+    </div>
   </div>
 
   <div class="screen" id="screen-kids">
@@ -193,13 +197,20 @@
       <span class="name">Formulário Diagnóstico — Mission 00</span>
     </a>
   </div>
+
+  <div class="screen" id="screen-extras">
+    <a class="lesson-item" href="apresentacao-extras-missing-diamond.html">
+      <span class="emoji">🔍</span>
+      <span class="name">The Missing Diamond</span>
+    </a>
+  </div>
 </main>
 
 <script>
   // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
   // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
-  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root', pilotos: 'root' };
-  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões', pilotos: 'Pilotos' };
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root', pilotos: 'root', extras: 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões', pilotos: 'Pilotos', extras: 'Aulas Extras' };
 
   function goTo(level) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
