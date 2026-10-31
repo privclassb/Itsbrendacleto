@@ -253,7 +253,7 @@ button{font:inherit;color:inherit}
 .prog{flex:1;height:6px;background:var(--line);border-radius:3px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--accent);transition:width .25s}
 .cnum{font-size:20px;color:var(--muted);font-variant-numeric:tabular-nums;min-width:80px;text-align:right}
-.cbtn{height:52px;min-width:52px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;font-size:20px;font-weight:600}
+.cbtn{height:52px;min-width:52px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:0 16px;font-size:20px;font-weight:600;color:inherit;text-decoration:none}
 .cbtn svg{width:20px;height:20px;fill:currentColor}
 .overlay{position:absolute;inset:0;background:var(--stage);z-index:20;padding:70px 96px;display:flex;flex-direction:column}
 .overlay .x{position:absolute;top:50px;right:70px}
@@ -768,6 +768,7 @@ function render(){
 }
 function chromeHTML(){
   return `<div class="chrome"><span class="brandtag">Borana <i>×</i> Brenda Cleto</span><div class="prog"><i style="width:${(cur/(S.length-1))*100}%"></i></div><span class="cnum">${cur+1} / ${S.length}</span>
+   <a class="cbtn" href="material-de-aula.html" title="Sair e voltar para Material de Aula">← Sair</a>
    <button class="cbtn" data-menu title="Módulos (M)">☰ Módulos</button><button class="cbtn" data-kit title="Survival kit (K)">Help! kit</button>
    ${Speech.ok?`<button class="cbtn" data-speed title="Velocidade do áudio">${Speech.rate<0.8?"🐢 devagar":"▶ normal"}</button>`:""}
    <button class="cbtn fsbtn" data-fs title="Tela cheia (tecla F)">${isFS()?"⤡ Sair da tela cheia":"⛶ Tela cheia"}</button>
