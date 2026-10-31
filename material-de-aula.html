@@ -114,6 +114,10 @@
       <span class="folder-name">📁 Aulas Extras</span>
       <span class="folder-chevron">›</span>
     </div>
+    <div class="folder-card" id="folderWorkshopBorana" onclick="goTo('workshop-borana')" style="display:none;">
+      <span class="folder-name">📁 Workshop Borana</span>
+      <span class="folder-chevron">›</span>
+    </div>
   </div>
 
   <div class="screen" id="screen-kids">
@@ -204,13 +208,20 @@
       <span class="name">The Missing Diamond</span>
     </a>
   </div>
+
+  <div class="screen" id="screen-workshop-borana">
+    <a class="lesson-item" href="apresentacao-workshop-borana.html">
+      <span class="emoji">🏖️</span>
+      <span class="name">Borana English for Sales</span>
+    </a>
+  </div>
 </main>
 
 <script>
   // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
   // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
-  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root', pilotos: 'root', extras: 'root' };
-  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões', pilotos: 'Pilotos', extras: 'Aulas Extras' };
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root', pilotos: 'root', extras: 'root', 'workshop-borana': 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões', pilotos: 'Pilotos', extras: 'Aulas Extras', 'workshop-borana': 'Workshop Borana' };
 
   function goTo(level) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
@@ -243,9 +254,14 @@
   });
 
   async function init(session) {
-    const { data: profile } = await sb.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+    const { data: profile } = await sb.from('profiles').select('role, full_name').eq('id', session.user.id).maybeSingle();
     if (!profile || profile.role !== 'professora') {
       window.location.href = 'index.html';
+      return;
+    }
+    const isBrenda = (profile.full_name || '').toLowerCase().includes('brenda');
+    if (isBrenda) {
+      document.getElementById('folderWorkshopBorana').style.display = 'flex';
     }
   }
 
