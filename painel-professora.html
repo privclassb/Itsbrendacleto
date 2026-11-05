@@ -3569,7 +3569,7 @@
       const { data: { session: adminSession } } = await sb.auth.getSession();
 
       // Create user in Supabase Auth using admin signup
-      const { data, error } = await sb.auth.signUp({
+      let { data, error } = await sb.auth.signUp({
         email,
         password,
         options: {
@@ -3577,11 +3577,52 @@
         }
       });
 
-      if (error) throw error;
+      let convertedExisting = false;
+      let studentUpsertError = null;
+
+      if (error && /already registered/i.test(error.message || '')) {
+        // E-mail já tem conta (ex: responsável que agora também é aluno).
+        // Em vez de criar outro usuário, converte o perfil existente, preservando
+        // o guardian_of pra manter o acesso duplo (mesmo login, duas áreas).
+        const { data: existingProfile, error: existingErr } = await sb.from('profiles')
+          .select('id, full_name, role, guardian_of')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (existingErr || !existingProfile) {
+          throw error;
+        }
+
+        const confirmMsg = 'Esse e-mail já pertence à conta de ' + (existingProfile.full_name || email) +
+          ' (perfil "' + existingProfile.role + '"). Deseja transformar essa conta também em aluno, ' +
+          'mantendo o mesmo login (acesso duplo)?';
+        if (!window.confirm(confirmMsg)) {
+          throw new Error('Cadastro cancelado.');
+        }
+
+        const { error: convertErr } = await sb.from('profiles').update({
+          full_name: name,
+          role,
+          teacher_id: teacherId,
+          level: 1,
+          turma_id: turmaId,
+          birth_date: birthDate,
+          contract_start: contractStart,
+          contract_end: contractEnd,
+          monthly_fee: monthlyFee,
+          payment_status: paymentStatus
+        }).eq('id', existingProfile.id);
+
+        studentUpsertError = convertErr;
+        data = { user: { id: existingProfile.id } };
+        error = null;
+        convertedExisting = true;
+      } else if (error) {
+        throw error;
+      }
 
       // Update profile with teacher_id and correct role (trigger creates base profile)
-      let studentUpsertError = null;
-      if (data.user) {
+      if (data.user && !convertedExisting) {
         // Garante explicitamente que a sessão ativa é a do aluno recém-criado,
         // em vez de confiar na troca automática (evita corrida de sessão)
         if (data.session) {
@@ -3731,9 +3772,11 @@
       }
 
       if (studentUpsertError) {
-        sucEl.textContent = 'Aluno criado, mas houve erro ao salvar turma/professora: ' + (studentUpsertError.message || studentUpsertError.code || JSON.stringify(studentUpsertError));
+        sucEl.textContent = (convertedExisting ? 'Conta convertida, mas houve erro ao salvar turma/professora: ' : 'Aluno criado, mas houve erro ao salvar turma/professora: ') + (studentUpsertError.message || studentUpsertError.code || JSON.stringify(studentUpsertError));
       } else if (guardianErrorMsg) {
         sucEl.textContent = 'Aluno ' + name + ' criado com sucesso! Erro ao criar responsável: ' + guardianErrorMsg + scheduleMsg + financeMsg;
+      } else if (convertedExisting) {
+        sucEl.textContent = name + ' agora também é aluno(a), com acesso duplo pelo mesmo login (as duas áreas)!' + scheduleMsg + financeMsg;
       } else {
         sucEl.textContent = 'Aluno ' + name + ' criado com sucesso!' + (guardianCreated ? ' Responsável também cadastrado.' : '') + scheduleMsg + financeMsg;
       }
