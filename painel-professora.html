@@ -1783,6 +1783,7 @@
     const prevMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const prevMonthStartStr = new Date(Date.UTC(prevMonthDate.getFullYear(), prevMonthDate.getMonth(), 1)).toISOString();
     const prevMonthLabel = prevMonthDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const prevMonthKeyStr = prevMonthDate.getFullYear() + '-' + String(prevMonthDate.getMonth() + 1).padStart(2, '0');
     const myActiveStudents = myStudents.filter(s => s.active !== false && (!s.contract_start || s.contract_start < prevMonthStartStr.slice(0, 10)));
     const { data: recentMonthlyReports } = myActiveStudents.length
       ? await sb.from('reports').select('student_id').is('class_log_id', null).in('student_id', myActiveStudents.map(s => s.id)).gte('created_at', prevMonthStartStr)
@@ -1887,7 +1888,7 @@
     }).join('');
 
     const missingMonthlyRows = missingMonthlyReportStudents.map(s => `
-      <div class="report-row" style="cursor:pointer;" onclick="openMonthlyReportForStudent('${s.id}')">
+      <div class="report-row" style="cursor:pointer;" onclick="openMonthlyReportForStudent('${s.id}', '${prevMonthKeyStr}')">
         <div class="report-row-info">
           <div class="report-row-student">${s.full_name || 'Aluno'}</div>
           <div class="report-row-title">Relatório mensal de ${prevMonthLabel} pendente</div>
@@ -1919,9 +1920,12 @@
   // Abre o relatório mensal de um aluno de OUTRA professora, direto da aba
   // "Acompanhar equipe" — sem trocar de aba (o modal flutua por cima),
   // pra não misturar com o checklist pessoal da Brenda em "Relatórios".
-  async function openMonthlyReportForStudent(studentId) {
+  async function openMonthlyReportForStudent(studentId, monthStrOverride) {
     const student = allStudents.find(s => s.id === studentId);
-    const monthStr = document.getElementById('equipeMonthlyReportMonth').value;
+    // monthStrOverride vem de quem já calculou o mês certo (ex.: o card "Minhas
+    // tarefas", que sabe que é o mês passado) — só cai pro seletor da aba
+    // "Acompanhar equipe" quando chamado de lá, sem mês explícito.
+    const monthStr = monthStrOverride || document.getElementById('equipeMonthlyReportMonth').value;
     const monthLabel = monthKeyLabel(monthStr);
     const { startDateStr, endDateStr } = equipeMonthRange(monthStr);
     const startISO = startDateStr + 'T00:00:00.000Z';
@@ -2119,6 +2123,7 @@
   const AULAS_LIST_PAGE_SIZE = 8;
   let currentProfileStudentId = null;
   let profileReportsByClassLog = {};
+  let profileReportsCache = [];
   let profileClassLogsCache = [];
   let profileAulasExpanded = false;
   let profilePendentesExpanded = false;
@@ -2277,6 +2282,9 @@
     profileReportsByClassLog = {};
     (studentReports || []).forEach(r => { if (r.class_log_id) profileReportsByClassLog[r.class_log_id] = r; });
 
+    profileReportsCache = (studentReports || []).slice().sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+    renderProfileReportsList();
+
     renderProfileAulasList();
     renderProfilePendentesList();
 
@@ -2344,6 +2352,77 @@
       ? `<button class="btn-sm" onclick="profilePendentesExpanded=true;renderProfilePendentesList()" style="margin-top:8px;">Ver mais (${logs.length - AULAS_LIST_PAGE_SIZE})</button>`
       : '';
     listEl.innerHTML = rowsHtml + moreBtn;
+  }
+
+  // Relatórios do aluno (todos: mensais e os ligados a uma aula específica) —
+  // é aqui que dá pra ver tudo que já foi lançado e excluir algo lançado por
+  // engano ou duplicado.
+  function renderProfileReportsList() {
+    const listEl = document.getElementById('profileReportsList');
+    if (!listEl) return;
+    const reports = profileReportsCache || [];
+    if (reports.length === 0) {
+      listEl.innerHTML = '<div class="empty-reports">Nenhum relatório lançado ainda.</div>';
+      return;
+    }
+    listEl.innerHTML = reports.map(r => {
+      const dt = r.created_at ? new Date(r.created_at) : null;
+      const dateLabel = dt ? dt.toLocaleDateString('pt-BR') + ' às ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '—';
+      const kindLabel = r.class_log_id ? 'Relatório de aula' : 'Relatório mensal';
+      const statusLabel = r.is_published ? 'Publicado' : 'Rascunho';
+      const statusClass = r.is_published ? 'published' : 'draft';
+      return `
+        <div class="report-row">
+          <div class="report-row-info" style="cursor:pointer;" onclick="editReportFromProfile('${r.id}')">
+            <div class="report-row-student">${r.title || 'Relatório'}${r.period ? ' · ' + r.period : ''}</div>
+            <div class="report-row-title">${kindLabel} · lançado em ${dateLabel}</div>
+          </div>
+          <span class="report-status ${statusClass}">${statusLabel}</span>
+          <button class="btn-report-action btn-delete" onclick="deleteReportFromProfile('${r.id}')">Excluir</button>
+        </div>`;
+    }).join('');
+  }
+
+  // Abre o relatório já lançado pra edição, reaproveitando o mesmo formulário
+  // usado pra criar relatório novo (modalReportForm + saveReport).
+  function editReportFromProfile(id) {
+    const r = (profileReportsCache || []).find(x => x.id === id);
+    if (!r) return;
+    const student = allStudents.find(s => s.id === r.student_id);
+    currentEditingReportId = r.id;
+    document.getElementById('reportStudent').value = r.student_id;
+    document.getElementById('reportFormTitle').textContent = (student ? student.full_name : 'Aluno') + ' — editar relatório';
+    document.getElementById('reportTitle').value = r.title || '';
+    document.getElementById('reportPeriod').value = r.period || '';
+    document.getElementById('reportContent').value = r.content || '';
+    document.getElementById('modalReportForm').classList.add('open');
+  }
+
+  async function deleteReportFromProfile(id) {
+    if (!confirm('Excluir este relatório? Essa ação não pode ser desfeita.')) return;
+    const { error } = await sb.from('reports').delete().eq('id', id);
+    if (error) { alert('Erro ao excluir relatório: ' + error.message); return; }
+    profileReportsCache = (profileReportsCache || []).filter(r => r.id !== id);
+    renderProfileReportsList();
+  }
+
+  // Botão "+ Novo relatório" da aba Relatórios do perfil — sempre cria um
+  // relatório mensal novo (sem ligar a nenhuma aula), com o mês atual
+  // pré-preenchido. Pra editar o mês anterior, ou um já existente, use o
+  // checklist da aba "Relatórios" ou clique no relatório lançado aqui mesmo.
+  function openNewReportForProfileStudent() {
+    const studentId = currentProfileStudentId;
+    if (!studentId) return;
+    const student = allStudents.find(s => s.id === studentId);
+    const monthKey = todayLocalISO().slice(0, 7);
+    const monthLabel = monthKeyLabel(monthKey);
+    currentEditingReportId = null;
+    document.getElementById('reportStudent').value = studentId;
+    document.getElementById('reportFormTitle').textContent = (student ? student.full_name : 'Aluno') + ' — ' + monthLabel;
+    document.getElementById('reportTitle').value = 'Relatório de ' + monthLabel;
+    document.getElementById('reportPeriod').value = monthLabel;
+    document.getElementById('reportContent').value = '';
+    document.getElementById('modalReportForm').classList.add('open');
   }
 
   function closeStudentProfile() {
@@ -4801,6 +4880,14 @@
 
     await loadReports(session.user.id, currentUserIsBrenda);
     if (currentUserIsBrenda) await renderEquipeMissingMonthlyForSelectedMonth();
+
+    // Se o perfil desse aluno estiver aberto (ex.: salvou pela aba Relatórios
+    // do perfil, ou editou um relatório lançado), atualiza a lista ali também.
+    if (currentProfileStudentId === studentId && document.getElementById('modalStudentProfile').classList.contains('open')) {
+      const { data: freshReports } = await sb.from('reports').select('*').eq('student_id', studentId);
+      profileReportsCache = (freshReports || []).slice().sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+      renderProfileReportsList();
+    }
   }
 
   async function toggleReportStatus(id, newStatus) {
@@ -8113,6 +8200,7 @@
       <button class="profile-tab-btn active" data-ptab="dados" onclick="showProfileTab('dados')">Dados</button>
       <button class="profile-tab-btn" id="profileTabFinanceiroBtn" data-ptab="financeiro" onclick="showProfileTab('financeiro')" style="display:none;">Financeiro</button>
       <button class="profile-tab-btn" data-ptab="aulas" onclick="showProfileTab('aulas')">Aulas</button>
+      <button class="profile-tab-btn" data-ptab="relatorios" onclick="showProfileTab('relatorios')">Relatórios</button>
       <button class="profile-tab-btn" data-ptab="pendentes" onclick="showProfileTab('pendentes')">Pendentes</button>
       <button class="profile-tab-btn" data-ptab="progresso" onclick="showProfileTab('progresso')">Progresso</button>
       <button class="profile-tab-btn" data-ptab="aviacao" onclick="showProfileTab('aviacao')">Aviação</button>
@@ -8173,6 +8261,17 @@
         <div id="profileReposicoesAReporList"><div class="empty-reports">Carregando...</div></div>
         <div style="font-size:12px;color:var(--muted);margin:16px 0 4px;">Já reagendadas</div>
         <div id="profileReposicoesFeitasList"><div class="empty-reports">Carregando...</div></div>
+      </div>
+    </div>
+
+    <div class="profile-tab-panel" id="profileTabPanelRelatorios">
+      <div class="profile-section" style="margin-top:16px;">
+        <div class="profile-section-title" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span>Relatórios lançados</span>
+          <button class="btn-sm" onclick="openNewReportForProfileStudent()">+ Novo relatório</button>
+        </div>
+        <div class="modal-hint" style="margin-bottom:8px;">Relatórios mensais e de aula já lançados pra esse aluno — o mais recente primeiro. Clique num relatório pra editar, ou em Excluir pra remover.</div>
+        <div id="profileReportsList"></div>
       </div>
     </div>
 
