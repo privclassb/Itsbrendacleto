@@ -4,14 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dicionário | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033;
-      --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598;
-      --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF;
-      --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08);
+      --cream: #FAF8F5; --sand: #E9E5EF; --brown: #56468A;
+      --brown-light: #7A6BAE; --mint: #3C8580; --rose: #B9707A;
+      --text: #24213A; --muted: #6A6680; --white: #FFFFFF;
+      --radius: 16px; --shadow: 0 2px 16px rgba(36,33,58,0.08);
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
 
@@ -26,7 +26,7 @@
       z-index: 10;
     }
     .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: white; text-decoration: none; }
-    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: white; font-weight: 400; }
+    .header-title { font-family: 'Fraunces', serif; font-size: 18px; color: white; font-weight: 400; }
 
     .search-section { background: var(--brown); padding: 0 24px 28px; }
 
@@ -45,7 +45,7 @@
 
     .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
     .empty-icon { font-size: 48px; margin-bottom: 12px; }
-    .empty-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
+    .empty-title { font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
 
     .loading-state { text-align: center; padding: 48px 20px; color: var(--muted); display: none; }
     .spinner { width: 32px; height: 32px; border: 3px solid var(--sand); border-top-color: var(--brown); border-radius: 50%; animation: spin 0.7s linear infinite; margin: 0 auto 16px; }
@@ -56,7 +56,7 @@
     .result-card { background: white; border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; display: none; }
 
     .result-header { background: linear-gradient(135deg, var(--brown), var(--brown-light)); padding: 24px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .result-word { font-family: 'DM Serif Display', serif; font-size: 36px; color: white; font-weight: 400; line-height: 1.1; }
+    .result-word { font-family: 'Fraunces', serif; font-size: 36px; color: white; font-weight: 400; line-height: 1.1; }
     .result-phonetic { font-size: 14px; color: rgba(255,255,255,0.6); margin-top: 4px; font-style: italic; }
     .btn-audio { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 50%; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; flex-shrink: 0; }
     .btn-audio:hover { background: rgba(255,255,255,0.25); }
@@ -65,7 +65,7 @@
 
     .translation-box { background: var(--cream); border-radius: 12px; padding: 16px 18px; margin-bottom: 16px; }
     .trans-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-    .trans-text { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--brown); font-weight: 400; }
+    .trans-text { font-family: 'Fraunces', serif; font-size: 24px; color: var(--brown); font-weight: 400; }
 
     .pos-chip { display: inline-block; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
 
@@ -92,7 +92,7 @@
     .recent-chip:hover { border-color: var(--brown); }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />

@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestão Financeira | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --gold: #D8B15C; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    :root { --cream: #FAF8F5; --sand: #E9E5EF; --brown: #56468A; --brown-light: #7A6BAE; --mint: #3C8580; --rose: #B9707A; --gold: #C99A3E; --text: #24213A; --muted: #6A6680; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(36,33,58,0.08); }
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
 
     header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
     .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-brand { font-family: 'Fraunces', serif; font-size: 20px; color: var(--white); }
     .header-tag { background: rgba(255,255,255,0.15); border-radius: 6px; padding: 3px 8px; font-size: 11px; color: rgba(255,255,255,0.8); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
     .btn-logout { background: none; border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 5px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: rgba(255,255,255,0.8); cursor: pointer; }
     .btn-logout:hover { border-color: white; color: white; }
@@ -22,7 +22,7 @@
     .btn-back:hover { background: rgba(255,255,255,0.25); }
 
     .welcome-strip { background: var(--white); border-bottom: 1px solid var(--sand); padding: 20px 20px 0; }
-    .welcome-strip h1 { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
+    .welcome-strip h1 { font-family: 'Fraunces', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 2px; }
     .welcome-strip p { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
 
     /* ── Layout: menu lateral + conteúdo (mesmo padrão do painel-professora.html) ── */
@@ -57,7 +57,7 @@
     .fin-panel.active { display: block; }
 
     .card { background: var(--white); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 20px; }
-    .card-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .card-title { font-family: 'Fraunces', serif; font-size: 17px; color: var(--text); margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 
     .pending-box { background: #FBF3E3; border: 1.5px dashed var(--gold); border-radius: 10px; padding: 14px 16px; font-size: 12.5px; color: var(--brown); line-height: 1.55; margin-bottom: 20px; }
     .pending-box b { display: block; font-size: 13px; margin-bottom: 4px; color: var(--text); }
@@ -68,7 +68,7 @@
     .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
     .stat-card { background: var(--cream); border-radius: 12px; padding: 14px 16px; }
     .stat-label { font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
-    .stat-value { font-family: 'DM Serif Display', serif; font-size: 19px; color: var(--text); }
+    .stat-value { font-family: 'Fraunces', serif; font-size: 19px; color: var(--text); }
     .stat-value.positive { color: #2E6B4B; }
     .stat-value.negative { color: #B05A4A; }
     .stat-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
@@ -98,7 +98,7 @@
     .btn-icon:hover { color: var(--brown); background: var(--cream); }
 
     .month-nav { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 2px 0 14px; }
-    .month-nav span { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); min-width: 170px; text-align: center; text-transform: capitalize; }
+    .month-nav span { font-family: 'Fraunces', serif; font-size: 15px; color: var(--text); min-width: 170px; text-align: center; text-transform: capitalize; }
     .month-nav .btn-icon { font-size: 16px; border: 1.5px solid var(--sand); }
 
     .growth-chart-svg { width: 100%; height: auto; overflow: visible; }
@@ -115,7 +115,7 @@
     .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(44,31,26,0.5); z-index: 50; align-items: center; justify-content: center; padding: 16px; }
     .modal-overlay.open { display: flex; }
     .modal-box { background: var(--white); border-radius: var(--radius); padding: 22px; max-width: 420px; width: 100%; max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); margin-bottom: 14px; }
+    .modal-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); margin-bottom: 14px; }
     .modal-row { margin-bottom: 12px; }
     .modal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); margin-bottom: 5px; display: block; }
     .modal-input, .modal-select { width: 100%; border: 1.5px solid var(--sand); border-radius: 8px; padding: 9px 11px; font-family: 'DM Sans', sans-serif; font-size: 13.5px; outline: none; background: var(--white); }
@@ -128,13 +128,13 @@
     .progress-block { margin-bottom: 18px; }
     .progress-block:last-child { margin-bottom: 0; }
     .progress-label-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 7px; gap: 10px; }
-    .progress-label-row span:first-child { font-family: 'DM Serif Display', serif; font-size: 14.5px; color: var(--text); }
+    .progress-label-row span:first-child { font-family: 'Fraunces', serif; font-size: 14.5px; color: var(--text); }
     .progress-label-row span:last-child { color: var(--muted); font-size: 12.5px; text-align: right; }
     .progress-track { background: var(--sand); border-radius: 99px; height: 14px; overflow: hidden; }
     .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--mint), var(--brown-light)); border-radius: 99px; transition: width 0.4s ease; }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />

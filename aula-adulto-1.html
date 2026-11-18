@@ -6,20 +6,20 @@
 <title>Lição 1 · Hello, My Name Is · itsbrendacleto</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --brown-dk: #2C1A0E;
-  --brown:    #5C3A1E;
-  --brown-md: #8B5E3C;
-  --brown-lt: #C4956A;
-  --cream:    #FAF7F4;
-  --sand:     #EDE5DA;
-  --sand-md:  #D9CCBC;
+  --brown-dk: #24213A;
+  --brown:    #56468A;
+  --brown-md: #7A6BAE;
+  --brown-lt: #B3A7D6;
+  --cream:    #FAF8F5;
+  --sand:     #E9E5EF;
+  --sand-md:  #D9D2E8;
   --white:    #FFFFFF;
-  --text:     #2C1A0E;
-  --text-md:  #7A5C40;
-  --text-lt:  #A88B70;
+  --text:     #24213A;
+  --text-md:  #6A6680;
+  --text-lt:  #9B96AE;
   --ok:       #3D7A5E;
   --ok-lt:    #EAF4EF;
   --fail:     #963030;
@@ -51,8 +51,8 @@ body {
   content: '';
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%),
-    radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%);
+    radial-gradient(ellipse at 10% 60%, rgba(179,167,214,.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 90% 20%, rgba(86,70,138,.35) 0%, transparent 50%);
   pointer-events: none;
 }
 .btn-back { position: relative; display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.12); border: 1.5px solid rgba(255,255,255,.22); border-radius: 8px; padding: 6px 14px; font-size: 13px; font-weight: 500; color: #fff; text-decoration: none; transition: all 0.2s; margin-bottom: 16px; }
@@ -76,7 +76,7 @@ body {
   margin-bottom: 7px;
 }
 .h-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-size: clamp(1.9rem, 5.5vw, 2.8rem);
   font-weight: 600;
   color: #fff;
@@ -185,7 +185,7 @@ body {
   margin-bottom: 3px;
 }
 .day-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.55rem;
   font-weight: 600;
   color: var(--brown-dk);
@@ -229,7 +229,7 @@ body {
 .block {
   background: var(--white);
   border-radius: var(--r);
-  box-shadow: 0 2px 14px rgba(44,26,14,.06);
+  box-shadow: 0 2px 14px rgba(36,33,58,.06);
   overflow: hidden;
   margin-bottom: 14px;
 }
@@ -249,7 +249,7 @@ body {
   flex-shrink: 0;
 }
 .block-title {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.08rem;
   font-weight: 600;
   color: var(--brown-dk);
@@ -328,13 +328,13 @@ body {
 .fc-f { background: var(--sand); border-color: var(--sand-md); }
 .fc-b { background: var(--brown-dk); border-color: var(--brown-dk); transform: rotateY(180deg); }
 .fc-en {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-weight: 600; font-size: .92rem;
   color: var(--brown-dk); line-height: 1.25;
 }
 .fc-f .fc-pt { font-size: .68rem; color: var(--text-lt); margin-top: 3px; }
 .fc-b .fc-pt {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-size: .85rem; font-weight: 600;
   color: var(--brown-lt); line-height: 1.2;
 }
@@ -368,7 +368,7 @@ body {
 .ac:hover, .ac.go { background: var(--brown-dk); border-color: var(--brown-dk); transform: scale(1.08); }
 .ac:hover .au, .ac.go .au,
 .ac:hover .al, .ac.go .al { color: #fff; }
-.au { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 1.2rem; color: var(--brown-dk); line-height: 1; }
+.au { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.2rem; color: var(--brown-dk); line-height: 1; }
 .al { font-size: .62rem; color: var(--text-lt); line-height: 1; }
 .alpha-tip {
   margin-top: 12px;
@@ -496,7 +496,7 @@ body {
   background: var(--white);
 }
 .pron-phrase {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Fraunces', serif;
   font-size: 1.02rem; font-weight: 600;
   color: var(--brown-dk); margin-bottom: 3px;
 }
@@ -533,7 +533,7 @@ body {
 .qplbl { font-family:'DM Mono',monospace; font-size:.66rem; color:var(--text-lt); white-space:nowrap; }
 .qq { background:var(--sand); border-radius:var(--rs); padding:16px; text-align:center; margin-bottom:13px; }
 .qq-ctx { font-size:.7rem; color:var(--text-lt); margin-bottom:5px; letter-spacing:.04em; }
-.qq-txt { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:1rem; color:var(--brown-dk); line-height:1.35; }
+.qq-txt { font-family:'Fraunces',serif; font-weight:600; font-size:1rem; color:var(--brown-dk); line-height:1.35; }
 .qopts { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:13px; }
 .qopt {
   background:var(--white); border:1.5px solid var(--sand-md);
@@ -560,7 +560,7 @@ body {
 .btn-next:hover { background:var(--brown); }
 .qres { text-align:center; padding:18px; display:none; }
 .qres.on { display:block; }
-.qres-t { font-family:'Cormorant Garamond',serif; font-size:1.35rem; font-weight:600; color:var(--brown-dk); }
+.qres-t { font-family:'Fraunces',serif; font-size:1.35rem; font-weight:600; color:var(--brown-dk); }
 .qres-s { font-size:.8rem; color:var(--text-md); margin-top:5px; }
 .btn-retry {
   background:var(--sand); color:var(--brown-dk); border:none;
@@ -589,13 +589,13 @@ body {
   backface-visibility:hidden;
   display:flex; align-items:center; justify-content:center; flex-direction:column;
 }
-.mc-f { background:var(--brown-dk); font-family:'Cormorant Garamond',serif; font-size:1rem; font-weight:600; color:rgba(255,255,255,.2); }
+.mc-f { background:var(--brown-dk); font-family:'Fraunces',serif; font-size:1rem; font-weight:600; color:rgba(255,255,255,.2); }
 .mc-b { background:var(--sand); border:1.5px solid var(--sand-md); transform:rotateY(180deg); gap:2px; padding:5px; }
 .mc-lbl { font-family:'DM Sans',sans-serif; font-weight:500; font-size:.58rem; color:var(--brown-dk); text-align:center; line-height:1.2; padding:0 2px; }
 .mc.done .mc-b { background:var(--ok-lt); border-color:var(--ok); }
 .mwin { text-align:center; padding:13px; background:var(--ok-lt); border-radius:var(--rs); margin-top:11px; display:none; }
 .mwin.on { display:block; }
-.mwin-t { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
+.mwin-t { font-family:'Fraunces',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
 
 /* ── FOOTER ── */
 .footer {

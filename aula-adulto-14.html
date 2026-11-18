@@ -6,20 +6,20 @@
 <title>Lição 14 · I Want To... · itsbrendacleto</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
 
 :root {
-  --brown-dk: #2C1A0E;
-  --brown:    #5C3A1E;
-  --brown-md: #8B5E3C;
-  --brown-lt: #C4956A;
-  --cream:    #FAF7F4;
-  --sand:     #EDE5DA;
-  --sand-md:  #D9CCBC;
+  --brown-dk: #24213A;
+  --brown:    #56468A;
+  --brown-md: #7A6BAE;
+  --brown-lt: #B3A7D6;
+  --cream:    #FAF8F5;
+  --sand:     #E9E5EF;
+  --sand-md:  #D9D2E8;
   --white:    #FFFFFF;
-  --text:     #2C1A0E;
-  --text-md:  #7A5C40;
-  --text-lt:  #A88B70;
+  --text:     #24213A;
+  --text-md:  #6A6680;
+  --text-lt:  #9B96AE;
   --ok:       #3D7A5E;
   --ok-lt:    #EAF4EF;
   --fail:     #963030;
@@ -35,12 +35,12 @@
 body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
 
 .header { background: var(--brown-dk); padding: 32px 24px 36px; text-align: center; position: relative; overflow: hidden; }
-.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(196,149,106,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(92,58,30,.35) 0%, transparent 50%); pointer-events:none; }
+.header::before { content:''; position:absolute; inset:0; background: radial-gradient(ellipse at 10% 60%, rgba(179,167,214,.12) 0%, transparent 55%), radial-gradient(ellipse at 90% 20%, rgba(86,70,138,.35) 0%, transparent 50%); pointer-events:none; }
 .btn-back { position:relative; display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.22); border-radius:8px; padding:6px 14px; font-size:13px; font-weight:500; color:#fff; text-decoration:none; transition:all .2s; margin-bottom:16px; }
 .btn-back:hover { background: rgba(255,255,255,.22); }
 .brand { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.16em; text-transform:uppercase; color:var(--brown-lt); position:relative; margin-bottom:14px; }
 .h-eyebrow { font-size:.7rem; font-weight:500; letter-spacing:.12em; text-transform:uppercase; color:rgba(255,255,255,.38); position:relative; margin-bottom:7px; }
-.h-title { font-family:'Cormorant Garamond',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
+.h-title { font-family:'Fraunces',serif; font-size:clamp(1.9rem,5.5vw,2.8rem); font-weight:600; color:#fff; line-height:1.1; position:relative; }
 .h-title em { font-style:italic; color:var(--brown-lt); }
 .h-desc { font-size:.76rem; color:rgba(255,255,255,.38); margin-top:9px; position:relative; letter-spacing:.04em; }
 
@@ -63,17 +63,17 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .day-header { margin-bottom:20px; }
 .day-header-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom:10px; }
 .day-weekday { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-lt); margin-bottom:3px; }
-.day-title { font-family:'Cormorant Garamond',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
+.day-title { font-family:'Fraunces',serif; font-size:1.55rem; font-weight:600; color:var(--brown-dk); line-height:1.1; }
 .day-done-btn { flex-shrink:0; background:var(--sand); border:1.5px solid var(--sand-md); border-radius:20px; padding:7px 14px; font-family:'DM Sans',sans-serif; font-weight:500; font-size:.73rem; color:var(--text-md); cursor:pointer; transition:all .2s; display:flex; align-items:center; gap:5px; margin-top:4px; }
 .day-done-btn:hover { background:var(--sand-md); }
 .day-done-btn.on { background:var(--ok-lt); border-color:var(--ok); color:var(--ok); }
 .day-intro { background:var(--white); border:1.5px solid var(--sand-md); border-radius:var(--rs); padding:13px 15px; font-size:.82rem; color:var(--text-md); line-height:1.6; }
 .day-intro strong { color:var(--brown-dk); font-weight:600; }
 
-.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(44,26,14,.06); overflow:hidden; margin-bottom:14px; }
+.block { background:var(--white); border-radius:var(--r); box-shadow:0 2px 14px rgba(36,33,58,.06); overflow:hidden; margin-bottom:14px; }
 .block-head { padding:14px 18px; border-bottom:1px solid var(--sand); display:flex; align-items:center; gap:11px; }
 .block-icon { width:36px; height:36px; border-radius:9px; background:var(--sand); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
-.block-title { font-family:'Cormorant Garamond',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
+.block-title { font-family:'Fraunces',serif; font-size:1.08rem; font-weight:600; color:var(--brown-dk); }
 .block-sub { font-size:.71rem; color:var(--text-lt); margin-top:1px; }
 .block-body { padding:16px 18px; }
 
@@ -99,9 +99,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .fc-f, .fc-b { position:absolute; inset:0; border-radius:var(--rs); backface-visibility:hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center; border:1.5px solid transparent; }
 .fc-f { background:var(--sand); border-color:var(--sand-md); }
 .fc-b { background:var(--brown-dk); border-color:var(--brown-dk); transform:rotateY(180deg); }
-.fc-en { font-family:'Cormorant Garamond',serif; font-weight:600; font-size:.9rem; color:var(--brown-dk); line-height:1.25; }
+.fc-en { font-family:'Fraunces',serif; font-weight:600; font-size:.9rem; color:var(--brown-dk); line-height:1.25; }
 .fc-f .fc-pt { font-size:.66rem; color:var(--text-lt); margin-top:3px; }
-.fc-b .fc-pt { font-family:'Cormorant Garamond',serif; font-size:.82rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
+.fc-b .fc-pt { font-family:'Fraunces',serif; font-size:.82rem; font-weight:600; color:var(--brown-lt); line-height:1.2; }
 .fc-b .fc-en-back { font-size:.7rem; color:rgba(255,255,255,.55); margin-top:3px; }
 .fc-tap { font-size:.58rem; color:var(--text-lt); margin-top:5px; letter-spacing:.03em; }
 .audio-btn { background:var(--brown-lt); border:none; cursor:pointer; border-radius:50%; width:23px; height:23px; display:flex; align-items:center; justify-content:center; font-size:.62rem; margin-top:5px; transition:transform .15s,background .2s; flex-shrink:0; }
@@ -160,7 +160,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(
 .match-status { text-align:center; margin-top:14px; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-lt); }
 .match-win { text-align:center; padding:13px; background:var(--ok-lt); border-radius:var(--rs); margin-top:12px; display:none; }
 .match-win.on { display:block; }
-.match-win-t { font-family:'Cormorant Garamond',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
+.match-win-t { font-family:'Fraunces',serif; font-size:.95rem; font-weight:600; color:var(--ok); }
 
 /* AUDIO RECORDER */
 .rec-controls { display:flex; gap:10px; justify-content:center; margin-bottom:12px; }
