@@ -888,8 +888,10 @@ html, body {
 .reveal-all-btn:hover { background: var(--ink); }
 
 /* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
-:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
 </style>
 
 <!-- ═══ TOP BAR ══════════════════════════════════════════ -->

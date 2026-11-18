@@ -65,8 +65,10 @@ table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}
 .spk{border:none;background:#ffffffcc;border-radius:50%;width:34px;height:34px;font-size:17px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.12);margin-top:4px}.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;max-width:1000px}.cmp .card{padding:20px 16px;min-height:170px}.cmp .val{font-size:clamp(18px,2.6vw,26px)}.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1000px}.vg>.card{min-height:150px}@media(max-width:600px){.vg{grid-template-columns:1fr 1fr}}.hl{background:var(--yel);border-radius:8px;padding:0 6px}
 @media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
 /* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
-:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
