@@ -4,15 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Frase do Dia | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    :root { --cream: #FAF8F5; --sand: #E9E5EF; --brown: #56468A; --brown-light: #7A6BAE; --mint: #3C8580; --rose: #B9707A; --text: #24213A; --muted: #6A6680; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(36,33,58,0.08); }
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
     header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; }
     .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--white); text-decoration: none; }
-    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+    .header-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--white); font-weight: 400; }
     main { max-width: 580px; margin: 0 auto; padding: 28px 20px; }
 
     .quote-card {
@@ -24,9 +24,9 @@
       position: relative;
       overflow: hidden;
     }
-    .quote-card::before { content: '"'; position: absolute; top: -20px; left: 16px; font-size: 120px; color: rgba(255,255,255,0.06); font-family: 'DM Serif Display', serif; line-height: 1; }
+    .quote-card::before { content: '"'; position: absolute; top: -20px; left: 16px; font-size: 120px; color: rgba(255,255,255,0.06); font-family: 'Fraunces', serif; line-height: 1; }
     .quote-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; }
-    .quote-text { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--white); font-style: italic; line-height: 1.4; margin-bottom: 8px; position: relative; }
+    .quote-text { font-family: 'Fraunces', serif; font-size: 24px; color: var(--white); font-style: italic; line-height: 1.4; margin-bottom: 8px; position: relative; }
     .quote-author { font-size: 13px; color: rgba(255,255,255,0.55); font-weight: 500; margin-bottom: 20px; }
     .btn-audio { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 10px 20px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; color: var(--white); cursor: pointer; transition: all 0.2s; }
     .btn-audio:hover { background: rgba(255,255,255,0.25); }
@@ -36,7 +36,7 @@
     .trans-text { font-size: 16px; color: var(--text); font-style: italic; }
 
     .vocab-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
-    .vocab-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
+    .vocab-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 14px; }
     .vocab-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--sand); }
     .vocab-item:last-child { border-bottom: none; }
     .vocab-word { font-weight: 600; color: var(--text); font-size: 14px; }
@@ -46,7 +46,7 @@
     .btn-next:hover { background: var(--brown-light); }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -517,11 +517,11 @@
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext('2d');
 
-      ctx.fillStyle = '#FAF7F2';
+      ctx.fillStyle = '#FAF8F5';
       ctx.fillRect(0, 0, W, H);
 
-      ctx.fillStyle = 'rgba(92,64,51,0.07)';
-      ctx.font = 'italic 520px "DM Serif Display", Georgia, serif';
+      ctx.fillStyle = 'rgba(36,33,58,0.07)';
+      ctx.font = 'italic 520px "Fraunces", Georgia, serif';
       ctx.textAlign = 'left';
       ctx.fillText('"', 40, 700);
       ctx.textAlign = 'right';
@@ -530,11 +530,11 @@
       ctx.textAlign = 'center';
 
       // Marca no topo — deixa claro de onde vem essa frase
-      ctx.fillStyle = '#5C4033';
-      ctx.font = '400 62px "DM Serif Display", Georgia, serif';
+      ctx.fillStyle = '#56468A';
+      ctx.font = '400 62px "Fraunces", Georgia, serif';
       ctx.fillText('itsbrendacleto', W / 2, 170);
 
-      ctx.fillStyle = '#7A6560';
+      ctx.fillStyle = '#6A6680';
       ctx.font = '500 27px "DM Sans", sans-serif';
       ctx.fillText('Inglês para a vida real', W / 2, 225);
 
@@ -542,30 +542,30 @@
       ctx.font = '600 26px "DM Sans", sans-serif';
       ctx.fillText('F R A S E   D O   D I A', W / 2, 345);
 
-      ctx.font = 'italic 58px "DM Serif Display", Georgia, serif';
+      ctx.font = 'italic 58px "Fraunces", Georgia, serif';
       const quoteLines = getWrappedLines(ctx, q.en, 900);
       const quoteLineHeight = 76;
       const quoteBlockHeight = (quoteLines.length - 1) * quoteLineHeight;
       const quoteStartY = 870 - quoteBlockHeight / 2;
-      ctx.fillStyle = '#2C1F1A';
+      ctx.fillStyle = '#24213A';
       quoteLines.forEach((l, i) => ctx.fillText(l, W / 2, quoteStartY + i * quoteLineHeight));
 
-      ctx.fillStyle = '#7A6560';
+      ctx.fillStyle = '#6A6680';
       ctx.font = '500 32px "DM Sans", sans-serif';
       ctx.fillText(q.author, W / 2, quoteStartY + quoteBlockHeight + 80);
 
       ctx.font = 'italic 36px "DM Sans", sans-serif';
       const transLines = getWrappedLines(ctx, q.pt, 900);
-      ctx.fillStyle = '#2C1F1A';
+      ctx.fillStyle = '#24213A';
       const transStartY = H - 440;
       transLines.forEach((l, i) => ctx.fillText(l, W / 2, transStartY + i * 46));
 
       // Rodapé — chamada pra quem tá vendo o story entender do que se trata
-      ctx.fillStyle = '#5C4033';
+      ctx.fillStyle = '#56468A';
       ctx.font = '600 34px "DM Sans", sans-serif';
       ctx.fillText('Pratique inglês todo dia', W / 2, H - 150);
 
-      ctx.fillStyle = '#7A6560';
+      ctx.fillStyle = '#6A6680';
       ctx.font = '500 28px "DM Sans", sans-serif';
       ctx.fillText('com a itsbrendacleto', W / 2, H - 95);
 

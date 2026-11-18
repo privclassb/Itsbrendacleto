@@ -4,22 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Minha Área | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --cream:  #FAF7F2;
-      --sand:   #EDE8DF;
-      --brown:  #5C4033;
-      --brown-light: #8B6355;
-      --mint:   #A8C5B5;
-      --rose:   #E8A598;
-      --text:   #2C1F1A;
-      --muted:  #7A6560;
+      --cream:  #FAF8F5;
+      --sand:   #E9E5EF;
+      --brown:  #56468A;
+      --brown-light: #7A6BAE;
+      --mint:   #3C8580;
+      --rose:   #B9707A;
+      --text:   #24213A;
+      --muted:  #6A6680;
       --white:  #FFFFFF;
       --radius: 16px;
-      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+      --shadow: 0 2px 16px rgba(36,33,58,0.08);
     }
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
 
@@ -33,7 +33,7 @@
       top: 0;
       z-index: 10;
     }
-    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-brand { font-family: 'Fraunces', serif; font-size: 20px; color: var(--white); }
     .header-right { display: flex; align-items: center; gap: 14px; }
     .streak-pill {
       background: rgba(255,255,255,0.15);
@@ -66,14 +66,14 @@
     }
     .hero-inner { max-width: 720px; margin: 0 auto; }
     .hero-greeting { font-size: 13px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
-    .hero-name { font-family: 'DM Serif Display', serif; font-size: 34px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
+    .hero-name { font-family: 'Fraunces', serif; font-size: 34px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
     .hero-sub { font-size: 15px; color: var(--muted); }
 
     main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
 
     .stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 28px; }
     .stat-card { background: var(--white); border-radius: var(--radius); padding: 18px 16px; text-align: center; box-shadow: var(--shadow); min-width: 0; }
-    .stat-value { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--brown); display: block; overflow-wrap: break-word; }
+    .stat-value { font-family: 'Fraunces', serif; font-size: 28px; color: var(--brown); display: block; overflow-wrap: break-word; }
     .stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
 
     /* Level section */
@@ -113,7 +113,7 @@
     }
 
     .level-title {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 18px;
       color: var(--text);
       font-weight: 400;
@@ -140,7 +140,7 @@
       transition: transform 0.15s, box-shadow 0.15s;
       border: 1.5px solid transparent;
     }
-    .lesson-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(92,64,51,0.12); border-color: var(--sand); }
+    .lesson-item:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(36,33,58,0.12); border-color: var(--sand); }
     .lesson-item.completed { border-color: var(--mint); }
     .lesson-item.locked { opacity: 0.45; pointer-events: none; }
     .lesson-item.review-item { opacity: 0.75; }
@@ -179,7 +179,7 @@
     .teacher-name { font-size: 16px; font-weight: 600; color: var(--white); }
 
     .badges-card { background: var(--white); border-radius: var(--radius); padding: 20px 24px; box-shadow: var(--shadow); }
-    .section-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; }
+    .section-title { font-family: 'Fraunces', serif; font-size: 20px; color: var(--text); font-weight: 400; }
     .badges-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
     .badge-chip {
       display: flex; align-items: center; gap: 6px;
@@ -201,7 +201,7 @@
     }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -320,7 +320,7 @@
       if (document.getElementById('previewModeBanner')) return;
       var banner = document.createElement('div');
       banner.id = 'previewModeBanner';
-      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#24213A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
       banner.innerHTML = '\uD83D\uDD0D Modo visualiza\u00e7\u00e3o \u2014 voc\u00ea \u00e9 a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada \u00e9 salvo) ' +
         '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualiza\u00e7\u00e3o</button>';

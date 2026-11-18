@@ -4,20 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Relatórios | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root { --cream: #FAF7F2; --sand: #EDE8DF; --brown: #5C4033; --brown-light: #8B6355; --mint: #A8C5B5; --rose: #E8A598; --text: #2C1F1A; --muted: #7A6560; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(92,64,51,0.08); }
+    :root { --cream: #FAF8F5; --sand: #E9E5EF; --brown: #56468A; --brown-light: #7A6BAE; --mint: #3C8580; --rose: #B9707A; --text: #24213A; --muted: #6A6680; --white: #FFFFFF; --radius: 16px; --shadow: 0 2px 16px rgba(36,33,58,0.08); }
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
     header { background: var(--brown); padding: 16px 28px; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
     .btn-back { background: rgba(255,255,255,0.15); border: 1.5px solid rgba(255,255,255,0.3); border-radius: 8px; padding: 6px 14px; font-size: 13px; color: var(--white); text-decoration: none; }
-    .header-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--white); font-weight: 400; }
+    .header-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--white); font-weight: 400; }
 
     .hero { background: var(--white); border-bottom: 1px solid var(--sand); padding: 32px 28px; }
     .hero-inner { max-width: 680px; margin: 0 auto; }
     .hero-label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; }
-    .hero-title { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); font-weight: 400; }
+    .hero-title { font-family: 'Fraunces', serif; font-size: 32px; color: var(--text); font-weight: 400; }
 
     main { max-width: 680px; margin: 0 auto; padding: 28px 20px; }
 
@@ -31,9 +31,9 @@
       border: 1.5px solid var(--sand);
       transition: all 0.2s;
     }
-    .report-item:hover { border-color: var(--brown-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(92,64,51,0.12); }
+    .report-item:hover { border-color: var(--brown-light); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(36,33,58,0.12); }
     .report-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; gap: 12px; }
-    .report-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; }
+    .report-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); font-weight: 400; }
     .report-period { background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 3px 12px; font-size: 12px; font-weight: 500; color: var(--muted); white-space: nowrap; }
     .report-preview { font-size: 14px; color: var(--muted); line-height: 1.5; }
     .report-date { font-size: 12px; color: var(--sand); margin-top: 8px; }
@@ -41,20 +41,20 @@
 
     .empty-state { text-align: center; padding: 48px 20px; }
     .empty-icon { font-size: 40px; margin-bottom: 12px; }
-    .empty-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
+    .empty-title { font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); margin-bottom: 6px; font-weight: 400; }
     .empty-sub { font-size: 14px; color: var(--muted); }
 
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
     .modal-overlay.open { display: flex; }
     .modal { background: var(--white); border-radius: 20px; padding: 32px; width: 100%; max-width: 560px; max-height: 82vh; overflow-y: auto; }
     .modal-period { display: inline-block; background: var(--cream); border: 1.5px solid var(--sand); border-radius: 99px; padding: 4px 14px; font-size: 12px; color: var(--muted); margin-bottom: 12px; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); font-weight: 400; margin-bottom: 20px; }
+    .modal-title { font-family: 'Fraunces', serif; font-size: 26px; color: var(--text); font-weight: 400; margin-bottom: 20px; }
     .modal-content { font-size: 15px; color: var(--text); line-height: 1.8; white-space: pre-wrap; }
     .modal-close { margin-top: 24px; width: 100%; padding: 14px; background: var(--brown); border: none; border-radius: 12px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; color: var(--white); cursor: pointer; }
     .modal-close:hover { background: var(--brown-light); }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -162,7 +162,7 @@
       if (document.getElementById('previewModeBanner')) return;
       var banner = document.createElement('div');
       banner.id = 'previewModeBanner';
-      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#24213A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
       banner.innerHTML = '\uD83D\uDD0D Modo visualiza\u00e7\u00e3o \u2014 voc\u00ea \u00e9 a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada \u00e9 salvo) ' +
         '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualiza\u00e7\u00e3o</button>';

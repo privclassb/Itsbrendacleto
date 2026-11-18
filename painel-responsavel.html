@@ -4,25 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Área do Responsável | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream:  #FAF7F2;
-      --sand:   #EDE8DF;
-      --brown:  #5C4033;
-      --brown-light: #8B6355;
-      --mint:   #A8C5B5;
-      --rose:   #E8A598;
-      --lavender: #C3B1E1;
-      --text:   #2C1F1A;
-      --muted:  #7A6560;
+      --cream:  #FAF8F5;
+      --sand:   #E9E5EF;
+      --brown:  #56468A;
+      --brown-light: #7A6BAE;
+      --mint:   #3C8580;
+      --rose:   #B9707A;
+      --lavender: #9B88C9;
+      --text:   #24213A;
+      --muted:  #6A6680;
       --white:  #FFFFFF;
       --radius: 14px;
-      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+      --shadow: 0 2px 16px rgba(36,33,58,0.08);
     }
 
     body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; }
@@ -38,7 +38,7 @@
       z-index: 10;
     }
     .header-left { display: flex; align-items: center; gap: 12px; }
-    .header-brand { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--white); }
+    .header-brand { font-family: 'Fraunces', serif; font-size: 20px; color: var(--white); }
     .header-tag {
       background: rgba(255,255,255,0.15);
       border-radius: 6px;
@@ -67,7 +67,7 @@
       padding: 28px 28px 24px;
     }
     .welcome-strip h1 {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 26px;
       color: var(--text);
       font-weight: 400;
@@ -78,7 +78,7 @@
     main { max-width: 720px; margin: 0 auto; padding: 28px 20px; }
 
     .section-title {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 20px;
       color: var(--text);
       font-weight: 400;
@@ -90,7 +90,7 @@
     /* Progresso */
     .progress-summary { display: flex; gap: 12px; margin-bottom: 18px; }
     .progress-summary-chip { flex: 1; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
-    .progress-summary-value { display: block; font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); }
+    .progress-summary-value { display: block; font-family: 'Fraunces', serif; font-size: 26px; color: var(--brown); }
     .progress-summary-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .progress-activity-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); font-size: 13px; color: var(--text); }
     .progress-activity-row:last-child { border-bottom: none; }
@@ -127,7 +127,7 @@
     .pay-info { flex: 1; min-width: 0; }
     .pay-desc { font-size: 14px; font-weight: 600; color: var(--text); }
     .pay-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .pay-amount { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); flex-shrink: 0; }
+    .pay-amount { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); flex-shrink: 0; }
     .pay-status { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
     .pay-status.paid { background: #1E5C3A; color: white; }
     .pay-status.overdue { background: #C0392B; color: white; }
@@ -138,7 +138,7 @@
     .modal-overlay.open { display: flex; }
     .modal-box { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
     .modal-period { display: inline-block; background: var(--lavender); color: var(--text); border-radius: 99px; padding: 4px 14px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 12px; }
+    .modal-title { font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 12px; }
     .modal-content { font-size: 14px; color: var(--text); line-height: 1.7; white-space: pre-wrap; margin-bottom: 20px; }
     .btn-modal-close { width: 100%; padding: 12px; background: var(--brown); border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; color: white; cursor: pointer; }
     .btn-modal-close:hover { background: var(--brown-light); }
@@ -151,8 +151,8 @@
     .receipt-header { text-align: center; margin-bottom: 14px; padding-bottom: 14px; border-bottom: 1.5px solid var(--sand); }
     .receipt-company { font-size: 13px; font-weight: 700; color: var(--brown); letter-spacing: 1px; }
     .receipt-cnpj { font-size: 12px; color: var(--muted); margin-top: 2px; }
-    .receipt-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); text-align: center; margin-bottom: 22px; }
-    .receipt-amount { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--brown); text-align: center; margin-bottom: 22px; }
+    .receipt-title { font-family: 'Fraunces', serif; font-size: 24px; color: var(--text); text-align: center; margin-bottom: 22px; }
+    .receipt-amount { font-family: 'Fraunces', serif; font-size: 32px; color: var(--brown); text-align: center; margin-bottom: 22px; }
     .receipt-body { font-size: 14px; color: var(--text); line-height: 1.8; margin-bottom: 24px; }
     .receipt-meta { font-size: 13px; color: var(--muted); text-align: right; margin-bottom: 28px; }
     .receipt-signature { text-align: center; font-size: 13px; color: var(--text); }
@@ -172,7 +172,7 @@
     }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -229,8 +229,8 @@
 <div id="pushPermBanner" style="display:none;background:#FFF8E5;border-bottom:1px solid #F0D9A0;padding:10px 20px;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;font-size:13px;">
   <span>Ative as notificações pra receber avisos sobre as aulas.</span>
   <span style="display:flex;gap:8px;">
-    <button type="button" onclick="ativarNotificacoesPush()" style="background:#5C4033;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:13px;">Ativar</button>
-    <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#5C4033;border:1px solid #5C4033;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;">Agora não</button>
+    <button type="button" onclick="ativarNotificacoesPush()" style="background:#56468A;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:600;cursor:pointer;font-size:13px;">Ativar</button>
+    <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#56468A;border:1px solid #56468A;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;">Agora não</button>
   </span>
 </div>
 
@@ -402,7 +402,7 @@
       if (document.getElementById('previewModeBanner')) return;
       var banner = document.createElement('div');
       banner.id = 'previewModeBanner';
-      banner.style.cssText = 'position:relative;z-index:9999;background:#2C1F1A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
+      banner.style.cssText = 'position:relative;z-index:9999;background:#24213A;color:#FFEFD6;padding:9px 16px;font-size:13px;text-align:center;font-family:"DM Sans",sans-serif;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;';
       var previewName = sessionStorage.getItem('__preview_name') || 'aluno';
       banner.innerHTML = '\uD83D\uDD0D Modo visualiza\u00e7\u00e3o \u2014 voc\u00ea \u00e9 a Brenda vendo como <b>' + previewName + '</b> (somente leitura, nada \u00e9 salvo) ' +
         '<button id="previewExitBtn" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:6px;padding:4px 12px;cursor:pointer;font-size:12px;font-family:inherit;">Sair da visualiza\u00e7\u00e3o</button>';
