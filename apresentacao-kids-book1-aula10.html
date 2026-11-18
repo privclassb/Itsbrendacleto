@@ -63,6 +63,8 @@ table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}
 #notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
 #notes.show{display:block}#notes b{font-family:Nunito}
 @media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
+/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>

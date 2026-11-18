@@ -148,6 +148,8 @@ svg.ill{width:100%;height:auto;max-height:58vh;display:block}
 .closing .title{font-size:clamp(40px,6.4vw,84px)}
 .phrase{display:inline-flex;align-items:center;gap:12px;background:#fff;border-radius:999px;padding:10px 12px 10px 22px;box-shadow:var(--shadow);font-family:'Fraunces',serif;font-size:clamp(20px,2.4vw,30px);margin-top:20px}
 .next-up{margin-top:22px;display:inline-flex;gap:10px;align-items:center;background:var(--mint);color:var(--ink);padding:10px 18px;border-radius:999px;font-weight:700}
+/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
 </style>
 </head>
 <body>
