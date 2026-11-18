@@ -4,25 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Painel da Professora | itsbrendacleto</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer onerror="window.__oneSignalScriptFailed = true;" onload="window.__oneSignalScriptFailed = false;"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream:  #FAF7F2;
-      --sand:   #EDE8DF;
-      --brown:  #5C4033;
-      --brown-light: #8B6355;
-      --mint:   #A8C5B5;
-      --rose:   #E8A598;
-      --lavender: #C3B1E1;
-      --text:   #2C1F1A;
-      --muted:  #7A6560;
+      --cream:  #FAF8F5;
+      --sand:   #E9E5EF;
+      --brown:  #56468A;
+      --brown-light: #7A6BAE;
+      --mint:   #3C8580;
+      --rose:   #B9707A;
+      --lavender: #9B88C9;
+      --text:   #24213A;
+      --muted:  #6A6680;
       --white:  #FFFFFF;
       --radius: 14px;
-      --shadow: 0 2px 16px rgba(92,64,51,0.08);
+      --shadow: 0 2px 16px rgba(36,33,58,0.08);
     }
 
     body {
@@ -49,7 +49,7 @@
     }
 
     .header-brand {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 20px;
       color: var(--white);
     }
@@ -86,7 +86,7 @@
     }
 
     .welcome-strip h1 {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 28px;
       color: var(--text);
       font-weight: 400;
@@ -219,7 +219,7 @@
     }
 
     .overview-value {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 36px;
       color: var(--brown);
       display: block;
@@ -273,7 +273,7 @@
 
     /* ── Section title ── */
     .section-title {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 20px;
       color: var(--text);
       font-weight: 400;
@@ -299,7 +299,7 @@
       cursor: pointer;
       transition: box-shadow 0.2s;
     }
-    .student-card:hover { box-shadow: 0 4px 20px rgba(92,64,51,0.14); }
+    .student-card:hover { box-shadow: 0 4px 20px rgba(36,33,58,0.14); }
 
     .student-avatar {
       width: 42px; height: 42px;
@@ -437,7 +437,7 @@
     }
 
     .modal h3 {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
       font-size: 22px;
       color: var(--text);
       margin-bottom: 20px;
@@ -528,7 +528,7 @@
     /* Links Management */
     .links-section { margin-top: 32px; }
     .links-card { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
-    .links-card-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .links-card-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .link-row { display: flex; gap: 10px; margin-bottom: 12px; align-items: center; }
     .link-label { font-size: 13px; font-weight: 600; color: var(--text); width: 130px; flex-shrink: 0; }
     .link-input { flex: 1; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text); background: var(--cream); outline: none; }
@@ -566,7 +566,7 @@
     /* Relatórios */
     .reports-section { margin-top: 32px; }
     .report-form { background: var(--white); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow); margin-bottom: 16px; }
-    .report-form-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .report-form-title { font-family: 'Fraunces', serif; font-size: 20px; color: var(--text); font-weight: 400; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
     .form-row { margin-bottom: 14px; }
     .form-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 6px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
     .form-input { width: 100%; padding: 10px 14px; border: 1.5px solid var(--sand); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--text); background: var(--cream); outline: none; }
@@ -582,7 +582,7 @@
 
     /* Lista de relatórios existentes */
     .report-list { background: var(--white); border-radius: var(--radius); padding: 22px 24px; box-shadow: var(--shadow); }
-    .report-list-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; }
+    .report-list-title { font-family: 'Fraunces', serif; font-size: 18px; color: var(--text); font-weight: 400; margin-bottom: 16px; }
     .report-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     .report-filters .form-select { width: auto; flex: 1; min-width: 140px; padding: 8px 12px; font-size: 13px; }
     .report-filters .btn-report-action { background: var(--cream); border: 1.5px solid var(--sand); color: var(--muted); }
@@ -624,10 +624,10 @@
     /* Aviso grande ao entrar (aulas/relatórios pendentes) */
     .login-notice-box { max-width: 420px; text-align: center; }
     .login-notice-icon { font-size: 44px; margin-bottom: 10px; }
-    .login-notice-title { font-family: 'DM Serif Display', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 8px; }
+    .login-notice-title { font-family: 'Fraunces', serif; font-size: 24px; color: var(--text); font-weight: 400; margin-bottom: 8px; }
     .login-notice-sub { font-size: 14px; color: var(--muted); margin-bottom: 20px; }
     .login-notice-line { background: var(--cream); border-radius: 10px; padding: 12px 16px; margin-bottom: 10px; font-size: 14.5px; color: var(--text); text-align: left; }
-    .login-notice-line strong { color: var(--brown); font-family: 'DM Serif Display', serif; font-size: 17px; }
+    .login-notice-line strong { color: var(--brown); font-family: 'Fraunces', serif; font-size: 17px; }
     .report-status.status-realizada { background: #EFF7F3; color: #1E5C3A; }
     .report-status.status-pendente { background: var(--cream); color: var(--muted); border: 1px solid var(--sand); }
     .report-status.status-cancelada { background: #F3EDF7; color: #6B4C93; }
@@ -662,7 +662,7 @@
     /* Progresso do aluno */
     .progress-summary { display: flex; gap: 12px; margin-bottom: 18px; }
     .progress-summary-chip { flex: 1; background: var(--cream); border-radius: 12px; padding: 14px; text-align: center; }
-    .progress-summary-value { display: block; font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); }
+    .progress-summary-value { display: block; font-family: 'Fraunces', serif; font-size: 26px; color: var(--brown); }
     .progress-summary-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
     .progress-activities-list { max-height: 40vh; overflow-y: auto; }
     .progress-activity-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--sand); font-size: 13px; color: var(--text); }
@@ -673,7 +673,7 @@
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: center; justify-content: center; padding: 20px; -webkit-transform: translateZ(0); transform: translateZ(0); }
     .modal-overlay.open { display: flex; }
     .modal-box { background: var(--white); border-radius: 20px; padding: 28px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 6px; }
+    .modal-title { font-family: 'Fraunces', serif; font-size: 22px; color: var(--text); font-weight: 400; margin-bottom: 6px; }
     .modal-sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
     .modal-row { margin-bottom: 14px; }
     .modal-checkbox-row { background: var(--cream); border-radius: 10px; padding: 12px 14px; }
@@ -696,7 +696,7 @@
     /* Gráfico de crescimento (Financeiro) */
     .growth-stat-row { display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 18px; }
     .growth-stat { flex: 1 1 160px; }
-    .growth-stat-value { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--brown); display: block; }
+    .growth-stat-value { font-family: 'Fraunces', serif; font-size: 26px; color: var(--brown); display: block; }
     .growth-stat-label { font-size: 12px; color: var(--muted); margin-top: 2px; }
     .growth-chart-svg { width: 100%; height: auto; overflow: visible; }
     .growth-bar { fill: var(--brown); }
@@ -711,9 +711,9 @@
 
     .fin-report-summary { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 20px; }
     .fin-report-summary-card { background: var(--cream); border-radius: 10px; padding: 12px; text-align: center; }
-    .fin-report-summary-value { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--brown); display: block; }
+    .fin-report-summary-value { font-family: 'Fraunces', serif; font-size: 18px; color: var(--brown); display: block; }
     .fin-report-summary-label { font-size: 10.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
-    .fin-report-section-title { font-family: 'DM Serif Display', serif; font-size: 16px; color: var(--text); font-weight: 400; margin: 18px 0 10px; }
+    .fin-report-section-title { font-family: 'Fraunces', serif; font-size: 16px; color: var(--text); font-weight: 400; margin: 18px 0 10px; }
     .fin-report-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
     .fin-report-table th, .fin-report-table td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--sand); }
     .fin-report-table th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 10.5px; letter-spacing: 0.4px; }
@@ -818,7 +818,7 @@
     .profile-warning { background: #FFF0EE; color: #C0392B; border-radius: 10px; padding: 10px 14px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
     .profile-inactive-badge { background: var(--muted); color: var(--white); border-radius: 6px; padding: 3px 8px; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-left: 8px; }
     .profile-section { margin-top: 22px; }
-    .profile-section-title { font-family: 'DM Serif Display', serif; font-size: 17px; color: var(--text); font-weight: 400; margin-bottom: 10px; }
+    .profile-section-title { font-family: 'Fraunces', serif; font-size: 17px; color: var(--text); font-weight: 400; margin-bottom: 10px; }
 
     .profile-tab-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--sand); }
     .profile-tab-btn { padding: 7px 14px; border-radius: 99px; border: 1.5px solid var(--sand); background: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--muted); cursor: pointer; transition: all 0.2s; }
@@ -836,10 +836,10 @@
     .btn-modal-save:hover { background: var(--brown-light); }
     .btn-modal-save:disabled { opacity: 0.6; cursor: not-allowed; }
     .modal-error { background: #FFF0EE; border: 1px solid #F5C6C2; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #C0392B; margin-bottom: 14px; display: none; }
-    .modal-success { background: #EFF7F3; border: 1px solid #A8C5B5; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #1E5C3A; margin-bottom: 14px; display: none; }
+    .modal-success { background: #EFF7F3; border: 1px solid #3C8580; border-radius: 8px; padding: 10px 14px; font-size: 13px; color: #1E5C3A; margin-bottom: 14px; display: none; }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -940,7 +940,7 @@
       <div id="pushPermBanner" style="display:none;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:12px 16px;margin-top:4px;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
         <span>Ative as notificações pra receber lembretes de aula e relatório direto no celular.</span>
         <span style="display:flex;gap:8px;">
-          <button type="button" onclick="ativarNotificacoesPush()" style="background:#fff;color:var(--brown,#5C4033);border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">Ativar</button>
+          <button type="button" onclick="ativarNotificacoesPush()" style="background:#fff;color:var(--brown,#56468A);border:none;border-radius:8px;padding:8px 14px;font-weight:600;cursor:pointer;">Ativar</button>
           <button type="button" onclick="document.getElementById('pushPermBanner').style.display='none';" style="background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.4);border-radius:8px;padding:8px 14px;cursor:pointer;">Agora não</button>
         </span>
       </div>
@@ -8775,7 +8775,7 @@
 
     <div class="modal-actions no-print">
       <button class="btn-modal-cancel" onclick="closeLeadsReport()">Fechar</button>
-      <button class="btn-modal-save" style="background:#5C4033;" onclick="downloadLeadsReportCSV()">⬇️ Baixar CSV</button>
+      <button class="btn-modal-save" style="background:#56468A;" onclick="downloadLeadsReportCSV()">⬇️ Baixar CSV</button>
       <button class="btn-modal-save" onclick="printLeadsReport()">🖨️ Imprimir / Salvar PDF</button>
     </div>
   </div>
@@ -8866,7 +8866,7 @@
 
     <div class="modal-actions no-print">
       <button class="btn-modal-cancel" onclick="closeFinanceReport()">Fechar</button>
-      <button class="btn-modal-save" style="background:#5C4033;" onclick="downloadFinanceCSV()">⬇️ Baixar CSV</button>
+      <button class="btn-modal-save" style="background:#56468A;" onclick="downloadFinanceCSV()">⬇️ Baixar CSV</button>
       <button class="btn-modal-save" onclick="printFinanceReport()">🖨️ Imprimir / Salvar PDF</button>
     </div>
   </div>
