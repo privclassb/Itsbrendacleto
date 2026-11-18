@@ -189,7 +189,19 @@
   </div>
 
   <div class="screen" id="screen-adultos">
-    <div class="empty-msg">Em breve.</div>
+    <div class="folder-card" onclick="goTo('adultos-a1')">
+      <span class="folder-name">📁 A1</span>
+      <span class="folder-chevron">›</span>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-adultos-a1">
+    <a class="lesson-item" href="apresentacao-adultos-a1-aula0.html">
+      <span class="name">Aula 0 — Welcome Class</span>
+    </a>
+    <a class="lesson-item" href="apresentacao-adultos-a1-aula1.html">
+      <span class="name">Aula 1 — Hello, My Name Is...</span>
+    </a>
   </div>
 
   <div class="screen" id="screen-auloes">
@@ -226,8 +238,8 @@
 <script>
   // ---- Navegação por pasta: clicar numa pasta leva pra ela (sem acordeão
   // que empurra tudo pra baixo) - cada nível tem o espaço só dele.
-  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', auloes: 'root', pilotos: 'root', extras: 'root', 'workshop-borana': 'root' };
-  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', auloes: 'Aulões', pilotos: 'Pilotos', extras: 'Aulas Extras', 'workshop-borana': 'Workshop Borana' };
+  const FOLDER_PARENT = { kids: 'root', 'kids-book1': 'kids', 'kids-extras': 'kids', adultos: 'root', 'adultos-a1': 'adultos', auloes: 'root', pilotos: 'root', extras: 'root', 'workshop-borana': 'root' };
+  const FOLDER_LABEL = { root: 'Material de Aula', kids: 'Kids', 'kids-book1': 'Book 1', 'kids-extras': 'Aulas Extras', adultos: 'Adultos', 'adultos-a1': 'A1', auloes: 'Aulões', pilotos: 'Pilotos', extras: 'Aulas Extras', 'workshop-borana': 'Workshop Borana' };
 
   function goTo(level) {
     document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + level));
