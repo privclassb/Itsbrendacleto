@@ -64,8 +64,9 @@ table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}
 #notes.show{display:block}#notes b{font-family:Nunito}
 .spk{border:none;background:#ffffffcc;border-radius:50%;width:34px;height:34px;font-size:17px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.12);margin-top:4px}.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;max-width:1000px}.cmp .card{padding:20px 16px;min-height:170px}.cmp .val{font-size:clamp(18px,2.6vw,26px)}.vg{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:1000px}.vg>.card{min-height:150px}@media(max-width:600px){.vg{grid-template-columns:1fr 1fr}}.cmp .card{min-height:120px;padding:14px 12px}.vg>.card{min-height:0!important;padding:10px 10px;gap:3px}.vg .e{font-size:30px}.vg4{grid-template-columns:repeat(4,1fr)!important}.vg4>.card{padding:14px 10px!important;gap:5px!important}.vg4 .e{font-size:48px}.vg4 .val{font-size:clamp(17px,2.2vw,23px)}@media(max-width:600px){.vg4{grid-template-columns:1fr 1fr!important}}.vg .val{font-size:clamp(16px,2vw,21px)}.vg .sm{font-size:13px}.vg .spk{width:28px;height:28px;font-size:14px;margin-top:2px}.vg{gap:12px!important}.hl{background:var(--yel);border-radius:8px;padding:0 6px}
 @media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
-/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
+/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
+:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
@@ -545,7 +546,18 @@ document.getElementById('noteBtn').addEventListener('click',function(){
   if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
   try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
   window.focus(); });
-document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.getElementById('fsBtn').addEventListener('click',function(){
+  var turningOn=!document.body.classList.contains('presenting');
+  if(turningOn){
+    document.body.classList.add('presenting');
+    var e=document.documentElement;
+    if(e.requestFullscreen){ var req=e.requestFullscreen(); if(req&&req.catch) req.catch(function(){}); }
+  } else {
+    document.body.classList.remove('presenting');
+    if(document.fullscreenElement){ document.exitFullscreen(); }
+  }
+});
+document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

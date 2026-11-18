@@ -202,8 +202,9 @@ svg.ill{width:100%;height:auto;max-height:60vh;display:block}
 .next-up{margin-top:26px;display:inline-flex;gap:10px;align-items:center;color:var(--ink2);font-size:.95em}
 .next-up b{color:var(--ink)}
 .next-up .i{color:var(--rose)}
-/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
+/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
+:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
 </style>
 </head>
 <body>
@@ -454,9 +455,18 @@ try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
 /* fullscreen */
 document.getElementById('fsBtn').addEventListener('click',function(){
   var d=document, el=d.documentElement;
-  if(!d.fullscreenElement&&!d.webkitFullscreenElement){ (el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el); }
-  else { (d.exitFullscreen||d.webkitExitFullscreen||function(){}).call(d); }
+  var turningOn=!d.body.classList.contains('presenting');
+  if(turningOn){
+    d.body.classList.add('presenting');
+    var req=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
+    if(req&&req.catch) req.catch(function(){});
+  } else {
+    d.body.classList.remove('presenting');
+    if(d.fullscreenElement||d.webkitFullscreenElement){ (d.exitFullscreen||d.webkitExitFullscreen||function(){}).call(d); }
+  }
 });
+document.addEventListener('fullscreenchange',function(){ if(!(document.fullscreenElement||document.webkitFullscreenElement)) document.body.classList.remove('presenting'); });
+document.addEventListener('webkitfullscreenchange',function(){ if(!(document.fullscreenElement||document.webkitFullscreenElement)) document.body.classList.remove('presenting'); });
 
 [].forEach.call(document.querySelectorAll('.go'),function(b){
 b.addEventListener('click',function(){ go(cur+1); }); });
