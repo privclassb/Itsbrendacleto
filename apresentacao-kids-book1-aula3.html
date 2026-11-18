@@ -178,17 +178,8 @@ document.getElementById('noteBtn').addEventListener('click',function(){
   try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
   window.focus(); });
 document.getElementById('fsBtn').addEventListener('click',function(){
-  var turningOn=!document.body.classList.contains('presenting');
-  if(turningOn){
-    document.body.classList.add('presenting');
-    var e=document.documentElement;
-    if(e.requestFullscreen){ var req=e.requestFullscreen(); if(req&&req.catch) req.catch(function(){}); }
-  } else {
-    document.body.classList.remove('presenting');
-    if(document.fullscreenElement){ document.exitFullscreen(); }
-  }
+  document.body.classList.toggle('presenting');
 });
-document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

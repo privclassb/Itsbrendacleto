@@ -462,13 +462,25 @@ function load(s){
 }
 
 /* 🔊 pronúncia */
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&&sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+  var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+  var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+  for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
 function speakEn(t,btn){
   try{
     var sy=window.speechSynthesis; if(!sy) return;
     sy.cancel();
     var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
-    var vs=sy.getVoices().filter(function(v){ return /en[-_]US/i.test(v.lang); });
-    if(vs.length) u.voice=vs[0];
+    var v=pickBestVoice(sy); if(v) u.voice=v;
     if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
     sy.speak(u);
   }catch(e){}
@@ -480,19 +492,8 @@ try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
 
 /* fullscreen */
 document.getElementById('fsBtn').addEventListener('click',function(){
-  var d=document, el=d.documentElement;
-  var turningOn=!d.body.classList.contains('presenting');
-  if(turningOn){
-    d.body.classList.add('presenting');
-    var req=(el.requestFullscreen||el.webkitRequestFullscreen||function(){}).call(el);
-    if(req&&req.catch) req.catch(function(){});
-  } else {
-    d.body.classList.remove('presenting');
-    if(d.fullscreenElement||d.webkitFullscreenElement){ (d.exitFullscreen||d.webkitExitFullscreen||function(){}).call(d); }
-  }
+  document.body.classList.toggle('presenting');
 });
-document.addEventListener('fullscreenchange',function(){ if(!(document.fullscreenElement||document.webkitFullscreenElement)) document.body.classList.remove('presenting'); });
-document.addEventListener('webkitfullscreenchange',function(){ if(!(document.fullscreenElement||document.webkitFullscreenElement)) document.body.classList.remove('presenting'); });
 
 [].forEach.call(document.querySelectorAll('.go'),function(b){
 b.addEventListener('click',function(){ go(cur+1); }); });
