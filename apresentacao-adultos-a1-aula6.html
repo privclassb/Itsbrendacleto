@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 6 · Talking about sports · A1 Beginners · Inglês para a Vida Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#24213A; --ink2:#6A6680; --line:#E9E5EF;
+  --plum:#56468A; --plum2:#7A6BAE; --plum-s:#F0EDF7;
+  --rose:#B9707A; --rose-s:#F7ECEC;
+  --teal:#3C8580; --teal-s:#E7F1EF;
+  --gold:#C99A3E; --gold-s:#FAF2E1;
+  --bg:#FAF8F5; --card:#FFFFFF;
+  --shadow:0 1px 2px rgba(36,33,58,.04),0 8px 24px rgba(36,33,58,.06);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;font-size:clamp(15px,1.4vw,19px);line-height:1.5}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-height:1.1;letter-spacing:-.015em}
+.i{display:block;flex:none}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none}
+.b1{width:44vw;height:44vw;background:#E4DEF2;top:-18vw;right:-14vw}
+.b2{width:36vw;height:36vw;background:#F2E1E1;bottom:-18vw;left:-14vw}
+
+.top{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tag{font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--plum);white-space:nowrap}
+.tag::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-right:10px;vertical-align:1px}
+.ctl{display:flex;align-items:center;gap:8px}
+.cnt{font-weight:600;color:var(--ink2);font-size:13px;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.ctl button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;background:#fff;color:var(--ink)}
+@media (max-width:640px){.bot .dots{gap:4px;flex-wrap:nowrap;overflow:hidden;padding:0 6px}.bot .dots i{flex:none;width:5px;height:5px}.bot .dots i.on{width:14px}.bot .nav{padding:8px 12px;white-space:nowrap}}
+@media (max-width:640px){.top{padding:0 12px}.tag{font-size:10px;letter-spacing:.12em;overflow:hidden;text-overflow:ellipsis;min-width:0}.tag::before{display:none}.ctl{gap:6px}.ctl button{font-size:12px;padding:6px 8px;white-space:nowrap}.cnt{min-width:auto}#fsBtn{display:none}.bot{padding:0 12px}}
+.ctl button:hover{border-color:var(--plum2);color:var(--plum)}
+.bot{position:fixed;bottom:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.nav{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 18px;cursor:pointer;background:var(--plum);color:#fff}
+#prev{background:#fff;color:var(--plum)}
+.nav:disabled{opacity:.3;cursor:default}
+.dots{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:0 10px}
+.dots i{width:7px;height:7px;border-radius:7px;background:#D8D3E3;cursor:pointer;transition:.25s}
+.dots i.on{width:22px;background:var(--plum)}
+
+.stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
+.slide.on{display:flex;animation:in .4s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:1160px;margin:auto}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,4.5vw,64px);align-items:center}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:14px}
+.eyebrow b{font-family:'Fraunces',serif;font-size:15px;letter-spacing:0;color:var(--plum);font-weight:600}
+.eyebrow::after{content:"";flex:0 0 48px;height:1px;background:currentColor;opacity:.5}
+.title{font-size:clamp(32px,4.6vw,58px)}
+.title em{font-style:italic;color:var(--plum)}
+.lead{font-size:clamp(16px,1.7vw,21px);color:var(--ink2);margin:14px 0 0;max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:clamp(14px,2vw,24px);box-shadow:var(--shadow)}
+
+.say{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;justify-content:center;padding:0;transition:.15s}
+.say:hover{background:var(--plum);border-color:var(--plum);color:#fff}
+.say.playing{background:var(--plum);border-color:var(--plum);color:#fff;animation:pulse .9s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(86,70,138,.15)}}
+.say.lt{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
+.btn{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 16px;cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;gap:8px}
+.btn:hover,.btn.playing{background:var(--plum);color:#fff}
+.btn.solid{background:var(--plum);color:#fff}
+
+/* capa */
+.cover-num{font-family:'Fraunces',serif;font-size:clamp(90px,14vw,190px);line-height:.8;color:var(--plum-s);font-weight:600;-webkit-text-stroke:1.5px var(--plum2);color:transparent}
+.cover .title{font-size:clamp(44px,6.6vw,86px)}
+.cover .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink2);font-size:.9em}
+.cover .meta span{display:flex;align-items:center;gap:8px}
+.cover .meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rose)}
+svg.ill{width:100%;height:auto;max-height:60vh;display:block}
+
+/* greetings do dia */
+.day{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,18px);margin-top:26px}
+@media (max-width:820px){.day{grid-template-columns:repeat(2,1fr)}}
+.tod{border-radius:var(--r);padding:20px 18px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-height:200px}
+.tod .i{color:var(--c)}
+.tod .when{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-top:auto;padding-top:14px}
+.tod .en{font-family:'Fraunces',serif;font-size:clamp(20px,2.1vw,27px);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.tod .pt{color:var(--ink2);font-size:.92em}
+.tod.dark{background:var(--ink);color:#fff;border-color:var(--ink)} .tod.dark .pt{color:#BDB8D0}
+.tod.dark .say{background:transparent;border-color:rgba(255,255,255,.3);color:#fff}
+.note{margin-top:18px;display:flex;align-items:flex-start;gap:12px;color:var(--ink2);background:var(--gold-s);border-radius:12px;padding:12px 16px;max-width:760px}
+.note .i{color:var(--gold);margin-top:2px}
+.note b{color:var(--ink)}
+
+/* listas de vocabulário */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);margin-top:26px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.colh{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.14em;font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.colh .i{color:var(--rose)}
+.vlist{display:grid;gap:10px}
+.vrow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 18px}
+.vrow .tx{flex:1}
+.vrow .en{font-weight:600;font-size:clamp(16px,1.7vw,20px)}
+.vrow .pt{color:var(--ink2);font-size:.88em}
+.badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--rose-s);color:var(--rose);vertical-align:2px}
+
+/* diálogo */
+.dialog{margin-top:16px;display:grid;gap:10px}
+.bub{max-width:80%;padding:12px 16px;border-radius:16px;font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,22px)}
+.bub small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.bub.a{background:var(--plum);color:#fff;border-bottom-left-radius:4px}
+.bub.b{background:#fff;border:1px solid var(--line);justify-self:end;border-bottom-right-radius:4px}
+
+/* name */
+.qline{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.qbig{font-family:'Fraunces',serif;font-size:clamp(30px,4.2vw,54px);font-weight:500}
+.qbig em{color:var(--plum)}
+.qpt{color:var(--ink2);font-size:.95em;margin-top:6px}
+.contr{display:grid;gap:12px;margin-top:28px}
+.pair{display:grid;grid-template-columns:1fr auto 1fr;gap:12px 16px;align-items:center}
+@media (max-width:820px){.pair{grid-template-columns:1fr;gap:6px}.pair .eq{font-size:20px;line-height:1}.contr{gap:20px}}
+.sent{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-family:'Fraunces',serif;font-size:clamp(20px,2.2vw,28px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sent .lbl{display:block;font-family:'DM Sans',sans-serif;margin-bottom:2px}
+.sent .k{color:var(--plum);font-style:italic} .sent .k2{color:var(--rose);font-style:italic}
+.eq{font-family:'Fraunces',serif;font-size:26px;color:var(--ink2);text-align:center}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+
+/* exercício 1.5 */
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.audio-tag{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.steps3{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;color:var(--ink2);font-size:.88em}
+.steps3 span b{font-family:'Fraunces',serif;color:var(--plum);margin-right:4px}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,16px);margin-top:22px}
+@media (max-width:820px){.people{grid-template-columns:repeat(2,1fr)}}
+.person{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:14px;position:relative}
+.person > svg{width:clamp(56px,6vw,76px);height:auto;flex:none}
+.person .lt{font-family:'Fraunces',serif;font-weight:600;color:var(--ink2);font-size:14px;position:absolute;top:10px;left:14px}
+.person .nm{flex:1;font-family:'Fraunces',serif;font-size:clamp(19px,2vw,25px);display:flex;align-items:center;gap:10px}
+.person .box{width:38px;height:38px;border-radius:10px;border:1.5px dashed #CFC8DD;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;flex:none}
+.person .box b{display:none}
+:is(.shown .person,.person.shown) .box{border:0;background:var(--teal)} :is(.shown .person,.person.shown) .box b{display:inline}
+
+/* alfabeto */
+.abc{display:grid;grid-template-columns:repeat(9,1fr);gap:clamp(6px,.9vw,10px);margin-top:24px}
+@media (max-width:820px){.abc{grid-template-columns:repeat(6,1fr)}}
+.ltb{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(24px,3vw,40px);border:1px solid var(--line);border-radius:12px;padding:14px 0;cursor:pointer;color:var(--ink);background:#fff;transition:.15s}
+.ltb:hover,.ltb.playing{background:var(--plum);border-color:var(--plum);color:#fff}
+.ltb.v{color:var(--rose)} .ltb.v:hover,.ltb.v.playing{color:#fff}
+.legend{display:flex;gap:18px;margin-top:14px;color:var(--ink2);font-size:.85em}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+/* grupos de som */
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:24px}
+@media (max-width:820px){.groups{grid-template-columns:repeat(2,1fr)}}
+.grp{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.grp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.grp .snd{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:baseline;justify-content:space-between}
+.grp .snd b{font-family:'Fraunces',serif;font-size:22px;letter-spacing:0;text-transform:none;color:var(--c);font-weight:600}
+.grp .ls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.grp .ls button{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,24px);width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;color:var(--ink)}
+.grp .ls button:hover,.grp .ls button.playing{background:var(--c);border-color:var(--c);color:#fff}
+.grp.tip{background:var(--gold-s);border-color:transparent}
+.grp.tip p{margin:8px 0 0;font-size:.9em;color:var(--ink)}
+
+/* nome completo */
+.namecard{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin-top:24px}
+.namecard .hd{background:var(--plum);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.namecard .hd small{font-size:11px;font-weight:700;letter-spacing:.2em;opacity:.8}
+.namecard .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:24px;font-style:italic}
+.parts{display:grid;grid-template-columns:repeat(3,1fr)}
+.part{padding:16px 14px;border-right:1px solid var(--line)}
+.part:last-child{border-right:0}
+.part .w{font-family:'Fraunces',serif;font-size:clamp(22px,2.5vw,32px)}
+.part .lb{font-weight:600;display:flex;align-items:center;gap:8px;margin-top:8px}
+.part .lp{color:var(--ink2);font-size:.82em}
+.part .lb .say{width:28px;height:28px}
+.full{border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;background:var(--bg)}
+.full span small{font-weight:400;color:var(--ink2)}
+.spell{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.spell button{font-family:'Fraunces',serif;font-size:22px;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer}
+.spell button.playing,.spell button:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.spell .gap{width:14px}
+.mini{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,23px)}
+.mini.q{color:var(--ink2);font-style:italic}
+
+/* 1.9 */
+.example{display:inline-flex;align-items:center;gap:12px;margin-top:10px;color:var(--ink2)}
+.example b{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:.06em;font-weight:500;font-size:1.1em}
+.blanks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;margin-top:24px}
+@media (max-width:820px){.blanks{grid-template-columns:repeat(2,1fr)}}
+.blank{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:60px}
+.blank .num{flex:none;font-family:'Fraunces',serif;color:var(--rose);font-weight:600;width:22px}
+.blank .line{flex:1;border-bottom:1.5px dashed #D6D0E2;height:22px}
+.blank .an{display:none;flex:1;font-family:'Fraunces',serif;font-size:clamp(18px,2vw,23px)}
+.blank .say{display:none}
+:is(.shown .blank,.blank.shown) .line{display:none}:is(.shown .blank,.blank.shown) .an{display:block}:is(.shown .blank,.blank.shown) .say{display:inline-flex}
+
+@media (max-width:600px){.people{grid-template-columns:1fr}.cover-num{display:none}.namecard .hd{flex-direction:column;align-items:flex-start;gap:2px}.part{padding:12px 10px}.blanks{grid-template-columns:1fr 1fr}}
+/* resumo */
+.recap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+@media (max-width:820px){.recap{grid-template-columns:1fr}}
+.recap .card{display:flex;flex-direction:column;gap:10px}
+.recap .card .i{color:var(--plum)}
+.recap .card b{font-family:'Fraunces',serif;font-weight:500;font-size:22px}
+.recap .card span{color:var(--ink2);font-size:.9em}
+.next-up{margin-top:26px;display:inline-flex;gap:10px;align-items:center;color:var(--ink2);font-size:.95em}
+.next-up b{color:var(--ink)}
+.next-up .i{color:var(--rose)}
+
+/* ===== Lesson 6 ===== */
+.sports{columns:4;column-gap:clamp(12px,2vw,22px);margin-top:20px}
+@media (max-width:820px){.sports{columns:2}}
+.fr{break-inside:avoid;margin-bottom:8px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 6px 6px 14px}
+.fr .tx{flex:1;line-height:1.25}
+.fr .en{display:block;font-weight:600;font-size:clamp(15px,1.5vw,18px)}
+.fr .pt{color:var(--ink2);font-size:.82em}
+.fr .say{width:30px;height:30px}
+.bank{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px;padding:12px 14px;border:1px dashed #D6D0E2;border-radius:14px;background:#fff}
+.bank span{font-family:'Fraunces',serif;font-size:clamp(16px,1.6vw,20px);padding:2px 12px;border-radius:8px;background:var(--plum-s)}
+.pics{display:grid;grid-template-columns:repeat(6,1fr);gap:clamp(8px,1.2vw,14px);margin-top:14px}
+@media (max-width:820px){.pics{grid-template-columns:repeat(3,1fr)}}
+.pic{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.pic .ill-i{width:clamp(54px,5.6vw,76px);height:clamp(54px,5.6vw,76px);border-radius:50%;background:var(--plum-s);display:flex;align-items:center;justify-content:center;color:var(--c,var(--plum))}
+.pic .ill-i svg{width:58%;height:58%}
+.pic .ln{display:flex;align-items:center;gap:6px;width:100%;font-size:14px}
+.pic .ln b{font-family:'Fraunces',serif;color:var(--rose);font-weight:600}
+.slot{flex:1;min-height:30px;border-bottom:1.5px dashed #D6D0E2;display:flex;align-items:center;gap:6px;font-family:'Fraunces',serif;font-size:clamp(14px,1.4vw,17px)}
+.slot .a,.slot .say{display:none}
+.slot .say{width:26px;height:26px}
+.shown .slot{border-bottom-color:transparent}.shown .slot .a{display:inline;flex:1}.shown .slot .say{display:inline-flex}
+.vgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(18px,3.5vw,48px);margin-top:20px;align-items:start}
+@media (max-width:820px){.vgrid{grid-template-columns:1fr}}
+.exl{display:grid;gap:10px}
+.exl .grp2{display:grid;gap:10px;padding:12px;border-radius:14px;background:var(--bg);border:1px solid var(--line)}
+.exl .grp2 .lbl{margin:0 0 -2px 4px}
+.sent .p{color:var(--c);font-style:italic;font-weight:600}
+.sent .s{color:var(--rose);font-style:italic;font-weight:600}
+.prn2{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.prn2 div{display:flex;align-items:center;gap:14px;padding:8px 16px;border-bottom:1px solid var(--line)}
+.prn2 div:last-child{border-bottom:0}
+.prn2 b{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(19px,2vw,24px);width:56px}
+.prn2 span{color:var(--ink2);flex:1}
+.prn2 em{font-family:'Fraunces',serif;font-style:italic;color:var(--teal)}
+.prn2 .hs b,.prn2 .hs em{color:var(--rose)}
+.big-ill{color:var(--c);display:flex;justify-content:center}
+.rules3{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,2vw,22px);margin-top:22px}
+@media (max-width:820px){.rules3{grid-template-columns:1fr}}
+.rl{background:#fff;border:1px solid var(--line);border-top:4px solid var(--c);border-radius:var(--r);padding:18px 20px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+.rl .hd{display:flex;align-items:center;gap:12px}
+.rl .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(32px,3.6vw,46px);color:var(--c);flex:1}
+.rl .hd .i{color:var(--c)}
+.rl p{margin:0;font-size:.95em}
+.rl .pt{color:var(--ink2);font-size:.85em;margin-top:-4px}
+.rl .exs{display:grid;gap:6px;margin-top:4px}
+.rl .exs div{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--bg);border-radius:10px;padding:6px 6px 6px 12px;font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,21px)}
+.rl .exs em{color:var(--c);font-weight:600}
+.rl .exs .say{width:28px;height:28px}
+.fix{display:grid;gap:8px;margin-top:18px}
+.fix.two-c{grid-template-columns:1fr 1fr;column-gap:14px}
+@media (max-width:820px){.fix.two-c{grid-template-columns:1fr}}
+.fx{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-family:'Fraunces',serif;font-size:clamp(17px,1.85vw,22px)}
+.fx .n{color:var(--rose);font-weight:600;width:20px;flex:none}
+.fx .w2{flex:1}
+.fx .say{display:none;width:30px;height:30px}
+:is(.shown .fx,.fx.shown) .say{display:inline-flex}
+.gap{display:inline-block;min-width:76px;border-bottom:1.5px dashed #D6D0E2;text-align:center;margin:0 4px}
+.gap .a{display:none;color:var(--teal);font-style:italic;font-weight:600}
+.shown .gap{border-bottom-color:var(--teal)}.shown .gap .a{display:inline}
+.mc{display:grid;gap:8px;margin-top:16px}
+.mq{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;display:grid;grid-template-columns:auto 1fr auto auto;gap:6px 14px;align-items:center}
+@media (max-width:820px){.mq{grid-template-columns:auto 1fr auto}.mq .ops{grid-column:2/4}}
+.mq .n{color:var(--rose);font-weight:600;font-family:'Fraunces',serif}
+.mq .q{font-family:'Fraunces',serif;font-size:clamp(16px,1.7vw,20px)}
+.ops{display:flex;gap:6px}
+.ops span{font-size:14px;border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-weight:600;color:var(--ink2)}
+.shown .ops span.ok{background:var(--teal);border-color:var(--teal);color:#fff}
+.mq .say{display:none;width:30px;height:30px}
+:is(.shown .mq,.mq.shown) .say{display:inline-flex}
+@media (max-width:820px){.recap{grid-template-columns:1fr 1fr!important}}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top">
+  <span class="tag">A1 BEGINNERS · LESSON 6</span>
+  <div class="ctl">
+    <span class="cnt" id="cnt"></span>
+    <button id="noteBtn">📝 Teacher's Guide</button>
+    <button id="fsBtn">⛶ Fullscreen</button>
+  </div>
+</div>
+
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
+<div class="stage" id="stage">
+
+<section class="slide">
+  <div class="wrap two cover">
+    <div>
+      <div class="eyebrow">Talking about</div>
+      <h1 class="title"><em>Sports</em></h1>
+      <p class="lead">Esportes e atividades com play, go e do.</p>
+      <div class="meta"><span>Sports &amp; activities</span><span>To play</span><span>To go</span><span>To do</span></div>
+    </div>
+    <div style="position:relative">
+      <div class="cover-num" style="position:absolute;top:-12%;right:0">06</div>
+      <svg class="ill" viewBox="0 0 420 340" aria-hidden="true" style="position:relative"><g transform="translate(60 90)"><circle r="40" fill="#B9707A" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#B9707A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></g></g><g transform="translate(170 60)"><circle r="40" fill="#56468A" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#56468A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="9.5" cy="9.5" rx="5" ry="6" transform="rotate(-45 9.5 9.5)"/><path d="M13.5 13.5L20 20M7 7l5 5M5.5 9.5l4-4"/><circle cx="19" cy="5" r="1.8"/></g></g><g transform="translate(330 175)"><circle r="40" fill="#3C8580" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#3C8580" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="6.5" r="2"/><path d="M4 12.5l5-3.5 3.5 2.5 4.5-1.5"/><path d="M2 16.5c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1M2 20.5c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1"/></g></g><g transform="translate(100 200)"><circle r="40" fill="#C99A3E" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#C99A3E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6M6 9.5l6 2 6-2M4 19c2-3 5-4.2 8-4.2s6 1.2 8 4.2z"/></g></g><g transform="translate(215 165)"><circle r="40" fill="#7A6BAE" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#7A6BAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8l3.3 2.4-1.3 3.9H10l-1.3-3.9zM12 3v5M3.6 9.5l5.1.9M20.4 9.5l-5.1.9M6.7 19.3l3.3-5M17.3 19.3l-3.3-5"/></g></g><g transform="translate(320 285)"><circle r="40" fill="#B9707A" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#B9707A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="16" r="4"/><circle cx="18" cy="16" r="4"/><path d="M6 16l4-7h5l3 7M10 9l3 7h-7M14 5h2"/></g></g><g transform="translate(195 285)"><circle r="40" fill="#3C8580" opacity=".14"/><g transform="translate(-20 -20) scale(1.67)" fill="none" stroke="#3C8580" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="15" cy="4" r="2"/><path d="M6 21l3.5-5 3 1.5 1-5.5-3-1.5-3.5 2.5M12.5 12l3.5 3.5 3-1M10 9.5l2.5-2.5 3 2"/></g></g></svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>01</b> Sports and activities</div>
+    <h2 class="title">Esportes e <em>atividades</em></h2>
+    <div class="sports"><div class="fr"><div class="tx"><span class="en">Soccer</span><span class="pt">futebol</span></div><button class="say " data-say="Soccer" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Football</span><span class="pt">futebol americano</span></div><button class="say " data-say="Football" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Basketball</span><span class="pt">basquete</span></div><button class="say " data-say="Basketball" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Volleyball</span><span class="pt">vôlei</span></div><button class="say " data-say="Volleyball" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Hockey</span><span class="pt">hockey</span></div><button class="say " data-say="Hockey" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Tennis</span><span class="pt">tênis</span></div><button class="say " data-say="Tennis" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Swimming</span><span class="pt">natação</span></div><button class="say " data-say="Swimming" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Surfing</span><span class="pt">surf</span></div><button class="say " data-say="Surfing" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Skiing</span><span class="pt">esquiar</span></div><button class="say " data-say="Skiing" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Skating</span><span class="pt">patinar</span></div><button class="say " data-say="Skating" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Running</span><span class="pt">corrida</span></div><button class="say " data-say="Running" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Cycling</span><span class="pt">ciclismo</span></div><button class="say " data-say="Cycling" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Gymnastics</span><span class="pt">ginástica</span></div><button class="say " data-say="Gymnastics" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Yoga</span><span class="pt">yoga</span></div><button class="say " data-say="Yoga" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Karate</span><span class="pt">karatê</span></div><button class="say " data-say="Karate" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Work out</span><span class="pt">malhar</span></div><button class="say " data-say="Work out" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>02</b> Practice</div>
+      <h2 class="title">Match the words <em>to the pictures</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="bank"><span>tennis</span><span>soccer</span><span>swimming</span><span>hockey</span><span>yoga</span><span>skiing</span><span>volleyball</span><span>karate</span><span>surfing</span><span>skating</span><span>basketball</span><span>gymnastics</span></div>
+    <div class="pics"><div class="pic" style="--c:#56468A"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20c3-3 6-9 15-17-1 9-7 15-15 17z"/><path d="M8 15l4-4"/></svg></div><div class="ln"><b>1</b><div class="slot"><span class="a">surfing</span><button class="say " data-say="surfing" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#B9707A"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 3 3 9.8 0 12.8M18.4 5.6c-3 3-3 9.8 0 12.8"/></svg></div><div class="ln"><b>2</b><div class="slot"><span class="a">basketball</span><button class="say " data-say="basketball" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#3C8580"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3L9 18.5A2.5 2.5 0 0 1 6.7 20H3"/><ellipse cx="17" cy="19" rx="3.2" ry="1.4"/></svg></div><div class="ln"><b>3</b><div class="slot"><span class="a">hockey</span><button class="say " data-say="hockey" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#C99A3E"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18.5l20-3M2 21.5l20-3"/><path d="M8 3.5l-1.5 12.5M17 3l-1.5 11.5"/><circle cx="8" cy="3.5" r=".6"/><circle cx="17" cy="3" r=".6"/></svg></div><div class="ln"><b>4</b><div class="slot"><span class="a">skiing</span><button class="say " data-say="skiing" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#7A6BAE"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v7M16 2v7"/><circle cx="8" cy="12" r="3"/><circle cx="16" cy="12" r="3"/><path d="M5 21h14"/></svg></div><div class="ln"><b>5</b><div class="slot"><span class="a">gymnastics</span><button class="say " data-say="gymnastics" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#8C5E86"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3c-1.2 4 0 8 3.2 10.3M3.4 9.2c4-1.2 8.2-.2 10.6 3.6M7.8 20c.8-4 3.8-7 8.4-7.6"/></svg></div><div class="ln"><b>6</b><div class="slot"><span class="a">volleyball</span><button class="say " data-say="volleyball" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#56468A"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="9.5" cy="9.5" rx="5" ry="6" transform="rotate(-45 9.5 9.5)"/><path d="M13.5 13.5L20 20M7 7l5 5M5.5 9.5l4-4"/><circle cx="19" cy="5" r="1.8"/></svg></div><div class="ln"><b>7</b><div class="slot"><span class="a">tennis</span><button class="say " data-say="tennis" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#B9707A"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h5v8h5.5a3.5 3.5 0 0 1 3.5 3.5V16H6z"/><circle cx="8.5" cy="19.5" r="1.6"/><circle cx="17" cy="19.5" r="1.6"/></svg></div><div class="ln"><b>8</b><div class="slot"><span class="a">skating</span><button class="say " data-say="skating" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#3C8580"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17" cy="6.5" r="2"/><path d="M4 12.5l5-3.5 3.5 2.5 4.5-1.5"/><path d="M2 16.5c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1M2 20.5c2 0 2-1 4-1s2 1 4 1 2-1 4-1 2 1 4 1 2-1 4-1"/></svg></div><div class="ln"><b>9</b><div class="slot"><span class="a">swimming</span><button class="say " data-say="swimming" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#C99A3E"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9.5h18v4H3z"/><rect x="10" y="8.5" width="4" height="6" rx="1"/><path d="M10.5 14.5L8 21M13.5 14.5L16 21"/></svg></div><div class="ln"><b>10</b><div class="slot"><span class="a">karate</span><button class="say " data-say="karate" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#7A6BAE"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6M6 9.5l6 2 6-2M4 19c2-3 5-4.2 8-4.2s6 1.2 8 4.2z"/></svg></div><div class="ln"><b>11</b><div class="slot"><span class="a">yoga</span><button class="say " data-say="yoga" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic" style="--c:#8C5E86"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8l3.3 2.4-1.3 3.9H10l-1.3-3.9zM12 3v5M3.6 9.5l5.1.9M20.4 9.5l-5.1.9M6.7 19.3l3.3-5M17.3 19.3l-3.3-5"/></svg></div><div class="ln"><b>12</b><div class="slot"><span class="a">soccer</span><button class="say " data-say="soccer" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>03</b> To play</div>
+    <div class="qline"><div class="qbig">To <em>play</em></div><button class="say " data-say="To play" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div>
+    <div class="qpt">jogar</div>
+    <div class="vgrid">
+      <div class="exl"><div class="grp2"><div class="sent" style="--c:#56468A"><span>I <span class="p">play</span> soccer.</span><button class="say " data-say="I play soccer." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#56468A"><span>They <span class="p">play</span> basketball.</span><button class="say " data-say="They play basketball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div><div class="grp2"><div class="sent" style="--c:#B9707A"><span>She <span class="s">plays</span> volleyball.</span><button class="say " data-say="She plays volleyball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span>He <span class="s">plays</span> football.</span><button class="say " data-say="He plays football." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div>
+      <div class="prn2"><div class=""><b>I</b><span>eu</span><em>play</em></div><div class=""><b>You</b><span>você / vocês</span><em>play</em></div><div class="hs"><b>He</b><span>ele</span><em>plays</em></div><div class="hs"><b>She</b><span>ela</span><em>plays</em></div><div class="hs"><b>It</b><span>objetos / animais</span><em>plays</em></div><div class=""><b>We</b><span>nós</span><em>play</em></div><div class=""><b>They</b><span>eles</span><em>play</em></div></div>
+    </div>
+    <div class="note" style="max-width:none"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>Com <b>he, she, it</b>: play → <b>plays</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>04</b> To go</div>
+    <div class="qline"><div class="qbig">To <em>go</em></div><button class="say " data-say="To go" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div>
+    <div class="qpt">ir</div>
+    <div class="vgrid">
+      <div class="exl"><div class="grp2"><div class="sent" style="--c:#3C8580"><span>I <span class="p">go</span> running.</span><button class="say " data-say="I go running." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#3C8580"><span>You <span class="p">go</span> surfing.</span><button class="say " data-say="You go surfing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div><div class="grp2"><div class="sent" style="--c:#B9707A"><span>She <span class="s">goes</span> skating.</span><button class="say " data-say="She goes skating." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span>He <span class="s">goes</span> cycling.</span><button class="say " data-say="He goes cycling." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div>
+      <div class="prn2"><div class=""><b>I</b><span>eu</span><em>go</em></div><div class=""><b>You</b><span>você / vocês</span><em>go</em></div><div class="hs"><b>He</b><span>ele</span><em>goes</em></div><div class="hs"><b>She</b><span>ela</span><em>goes</em></div><div class="hs"><b>It</b><span>objetos / animais</span><em>goes</em></div><div class=""><b>We</b><span>nós</span><em>go</em></div><div class=""><b>They</b><span>eles</span><em>go</em></div></div>
+    </div>
+    <div class="note" style="max-width:none"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>Com <b>he, she, it</b>: go → <b>goes</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>05</b> To do</div>
+    <div class="qline"><div class="qbig">To <em>do</em></div><button class="say " data-say="To do" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div>
+    <div class="qpt">fazer</div>
+    <div class="vgrid">
+      <div class="exl"><div class="grp2"><div class="sent" style="--c:#C99A3E"><span>I <span class="p">do</span> yoga.</span><button class="say " data-say="I do yoga." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div><div class="grp2"><div class="sent" style="--c:#B9707A"><span>She <span class="s">does</span> karate.</span><button class="say " data-say="She does karate." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div>
+      <div class="prn2"><div class=""><b>I</b><span>eu</span><em>do</em></div><div class=""><b>You</b><span>você / vocês</span><em>do</em></div><div class="hs"><b>He</b><span>ele</span><em>does</em></div><div class="hs"><b>She</b><span>ela</span><em>does</em></div><div class="hs"><b>It</b><span>objetos / animais</span><em>does</em></div><div class=""><b>We</b><span>nós</span><em>do</em></div><div class=""><b>They</b><span>eles</span><em>do</em></div></div>
+    </div>
+    <div class="note" style="max-width:none"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>Com <b>he, she, it</b>: do → <b>does</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>06</b> Go, play or do?</div>
+    <h2 class="title">Go, play <em>or do?</em></h2>
+    <div class="rules3"><div class="rl" style="--c:#3C8580"><div class="hd"><b>Go</b><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="4" r="2"/><path d="M6 21l3.5-5 3 1.5 1-5.5-3-1.5-3.5 2.5M12.5 12l3.5 3.5 3-1M10 9.5l2.5-2.5 3 2"/></svg></div><p>Go is often used with activities that end in <b>-ing</b>. You go somewhere to do something.</p><div class="pt">atividades terminadas em -ing</div><div class="exs"><div><span><em>go</em> running</span><button class="say " data-say="go running" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div><span><em>go</em> swimming</span><button class="say " data-say="go swimming" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="rl" style="--c:#56468A"><div class="hd"><b>Play</b><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8l3.3 2.4-1.3 3.9H10l-1.3-3.9zM12 3v5M3.6 9.5l5.1.9M20.4 9.5l-5.1.9M6.7 19.3l3.3-5M17.3 19.3l-3.3-5"/></svg></div><p>Play is used with <b>ball sports</b> and competitive games where you play against others.</p><div class="pt">esportes com bola e jogos competitivos</div><div class="exs"><div><span><em>play</em> football</span><button class="say " data-say="play football" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div><span><em>play</em> tennis</span><button class="say " data-say="play tennis" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="rl" style="--c:#C99A3E"><div class="hd"><b>Do</b><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6M6 9.5l6 2 6-2M4 19c2-3 5-4.2 8-4.2s6 1.2 8 4.2z"/></svg></div><p>Do is used for recreational activities and a <b>non-team sport</b>. You don't use a ball.</p><div class="pt">atividades individuais, sem bola</div><div class="exs"><div><span><em>do</em> yoga</span><button class="say " data-say="do yoga" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div><span><em>do</em> exercise</span><button class="say " data-say="do exercise" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>Practice</b> 1</div>
+      <h2 class="title">Go, play <em>or do?</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="fix two-c"><div class="fx"><span class="n">1</span><span class="w2"><span class="gap"><span class="a">go</span></span> surfing.</span><button class="say " data-say="go surfing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">2</span><span class="w2"><span class="gap"><span class="a">play</span></span> basketball.</span><button class="say " data-say="play basketball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">3</span><span class="w2"><span class="gap"><span class="a">do</span></span> karate.</span><button class="say " data-say="do karate." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">4</span><span class="w2"><span class="gap"><span class="a">go</span></span> skiing.</span><button class="say " data-say="go skiing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">5</span><span class="w2"><span class="gap"><span class="a">do</span></span> gymnastics.</span><button class="say " data-say="do gymnastics." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">6</span><span class="w2"><span class="gap"><span class="a">do</span></span> yoga.</span><button class="say " data-say="do yoga." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">7</span><span class="w2"><span class="gap"><span class="a">go</span></span> skating.</span><button class="say " data-say="go skating." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">8</span><span class="w2"><span class="gap"><span class="a">play</span></span> baseball.</span><button class="say " data-say="play baseball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>Practice</b> 2</div>
+      <h2 class="title">Choose the <em>correct option</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="mc"><div class="mq"><span class="n">1</span><span class="q">What do you do in your free time? I like to <span class="gap"><span class="a">go</span></span> swimming.</span><span class="ops"><span class="">a) do</span><span class="">b) play</span><span class="ok">c) go</span></span><button class="say " data-say="What do you do in your free time? I like to go swimming." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="mq"><span class="n">2</span><span class="q">Jack and Hannah <span class="gap"><span class="a">play</span></span> basketball on Thursdays.</span><span class="ops"><span class="ok">a) play</span><span class="">b) do</span><span class="">c) go</span></span><button class="say " data-say="Jack and Hannah play basketball on Thursdays." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="mq"><span class="n">3</span><span class="q">What are you doing this weekend? I am going to <span class="gap"><span class="a">go</span></span> surfing.</span><span class="ops"><span class="ok">a) go</span><span class="">b) do</span><span class="">c) play</span></span><button class="say " data-say="What are you doing this weekend? I am going to go surfing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="mq"><span class="n">4</span><span class="q">Kaite <span class="gap"><span class="a">does</span></span> yoga with her mum on Sundays.</span><span class="ops"><span class="ok">a) does</span><span class="">b) plays</span><span class="">c) goes</span></span><button class="say " data-say="Kaite does yoga with her mum on Sundays." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="mq"><span class="n">5</span><span class="q">Johnny <span class="gap"><span class="a">plays</span></span> football with his friends at the weekend.</span><span class="ops"><span class="ok">a) plays</span><span class="">b) does</span><span class="">c) go</span></span><button class="say " data-say="Johnny plays football with his friends at the weekend." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>Practice</b> 3</div>
+      <h2 class="title">Complete <em>the sentences</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="fix"><div class="fx"><span class="n">1</span><span class="w2">She <span class="gap"><span class="a">plays</span></span> tennis on the weekend.</span><button class="say " data-say="She plays tennis on the weekend." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">2</span><span class="w2">Kenny <span class="gap"><span class="a">does</span></span> yoga every day.</span><button class="say " data-say="Kenny does yoga every day." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">3</span><span class="w2">Paula <span class="gap"><span class="a">does</span></span> karate in her free time.</span><button class="say " data-say="Paula does karate in her free time." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">4</span><span class="w2">On Tuesdays, Laura always <span class="gap"><span class="a">plays</span></span> basketball with her dad.</span><button class="say " data-say="On Tuesdays, Laura always plays basketball with her dad." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">5</span><span class="w2">What are you doing tomorrow? I am going to <span class="gap"><span class="a">go</span></span> swimming.</span><button class="say " data-say="What are you doing tomorrow? I am going to go swimming." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">6</span><span class="w2">I am going to Canada this winter. I am going to <span class="gap"><span class="a">go</span></span> skiing.</span><button class="say " data-say="I am going to Canada this winter. I am going to go skiing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">7</span><span class="w2">In his free time, John <span class="gap"><span class="a">plays</span></span> baseball.</span><button class="say " data-say="In his free time, John plays baseball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">8</span><span class="w2">Johnny <span class="gap"><span class="a">does</span></span> exercise every morning.</span><button class="say " data-say="Johnny does exercise every morning." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">Today you learned</div>
+    <h2 class="title">Let's <em>play!</em></h2>
+    <div class="recap" style="grid-template-columns:repeat(4,1fr)">
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3c-1.2 4 0 8 3.2 10.3M3.4 9.2c4-1.2 8.2-.2 10.6 3.6M7.8 20c.8-4 3.8-7 8.4-7.6"/></svg><b>Sports</b><span>soccer, swimming, yoga…</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8l3.3 2.4-1.3 3.9H10l-1.3-3.9zM12 3v5M3.6 9.5l5.1.9M20.4 9.5l-5.1.9M6.7 19.3l3.3-5M17.3 19.3l-3.3-5"/></svg><b>Play</b><span>esportes com bola · plays</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="15" cy="4" r="2"/><path d="M6 21l3.5-5 3 1.5 1-5.5-3-1.5-3.5 2.5M12.5 12l3.5 3.5 3-1M10 9.5l2.5-2.5 3 2"/></svg><b>Go</b><span>atividades com -ing · goes</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="4.5" r="2"/><path d="M12 7v6M6 9.5l6 2 6-2M4 19c2-3 5-4.2 8-4.2s6 1.2 8 4.2z"/></svg><b>Do</b><span>atividades sem bola · does</span></div>
+    </div>
+    <div class="next-up"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Próxima aula: <b>Lesson 7 · Negative sentences</b></div>
+  </div>
+</section>
+
+</div>
+
+<div class="bot">
+  <button class="nav" id="prev">◀ Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav" id="next">Next ▶</button>
+</div>
+
+<script>
+(function(){
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots');
+slides.forEach(function(_,i){ var d=document.createElement('i');
+d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+
+function go(i){
+  if(i<0||i>=slides.length) return; cur=i;
+  slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+  [].forEach.call(dots.children,function(d,k){
+d.classList.toggle('on',k===i); });
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=i===0;
+  document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); // carrega o iframe do jogo na primeira vez que o slide aparece
+  try{ location.hash='s'+(i+1); }catch(e){}
+}
+
+/* lazy load dos jogos + nomes dos times/alunos */
+function nameVal(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
+function jsSafe(t){ return JSON.stringify(t).slice(1,-1).replace(/</g,'\\u003c'); }
+function load(s){
+  var f=s.querySelector('iframe[data-srcdoc]'); if(!f||f.getAttribute('srcdoc')) return;
+  var h=f.getAttribute('data-srcdoc');
+  h=h.split('__TEAM_A__').join(jsSafe(nameVal('teamA')||'Team A'));
+  h=h.split('__TEAM_B__').join(jsSafe(nameVal('teamB')));
+  f.setAttribute('srcdoc',h);
+}
+
+/* 🔊 pronúncia */
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&&sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+  var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+  var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+  for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speakEn(t,btn){
+  try{
+    var sy=window.speechSynthesis; if(!sy) return;
+    sy.cancel();
+    var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
+    var v=pickBestVoice(sy); if(v) u.voice=v;
+    if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
+    sy.speak(u);
+  }catch(e){}
+}
+window.speakEn=speakEn;
+[].forEach.call(document.querySelectorAll('.say'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
+
+/* revelar respostas (answer key) e letras clicáveis */
+[].forEach.call(document.querySelectorAll('[data-ak]'),function(b){
+  var a=b.closest('.rv-area'); if(!a) return;
+  var ic=b.querySelector('svg'); ic=ic?ic.outerHTML+' ':'';
+  var its=[].slice.call(a.querySelectorAll('.fx,.person,.blank,.trow:not(.ex),.tc,.pic,.mq,.q2'));
+  its.sort(function(x,y){ return (+x.getAttribute('data-ord')||0)-(+y.getAttribute('data-ord')||0); });
+  function n(){ return its.filter(function(x){ return x.classList.contains('shown'); }).length; }
+  function upd(){ var k=n(); b.innerHTML = k<its.length ? ic+'Próxima resposta <small class="akn">'+k+'/'+its.length+'</small>' : 'Esconder respostas'; }
+  its.forEach(function(it){ it.classList.add('ri'); it.addEventListener('click',function(e){ if(e.target.closest('.say')) return; it.classList.toggle('shown'); upd(); }); });
+  b.addEventListener('click',function(){ var nx=its.filter(function(x){ return !x.classList.contains('shown'); })[0];
+    if(nx){ nx.classList.add('shown'); try{ nx.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} } else its.forEach(function(x){ x.classList.remove('shown'); }); upd(); });
+  upd(); });
+[].forEach.call(document.querySelectorAll('.say-l'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+
+
+/* fullscreen */
+document.getElementById('fsBtn').addEventListener('click',function(){
+  document.body.classList.toggle('presenting');
+});
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
+
+[].forEach.call(document.querySelectorAll('.go'),function(b){
+b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){
+go(cur+1); });
+document.addEventListener('keydown',function(e){
+  if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1);
+});
+var h=parseInt((location.hash||'').replace('#s',''),10);
+go(h>0&&h<=slides.length?h-1:0);
+})();
+
+var nw=null;
+var GUIDE="<h1>Teachers Guide · Lesson 6 · Talking about sports<\/h1>\n<p class=\"meta\">Adultos A1 · Beginners · 60 min · sports and activities, to play, to go, to do<\/p>\n<div class=\"toc\"><a href=\"#obj\">Objetivo<\/a> · <a href=\"#roteiro\">Roteiro<\/a> · <a href=\"#warm\">Warm-up<\/a> · <a href=\"#voc\">Sports<\/a> · <a href=\"#play\">To play<\/a> · <a href=\"#go\">To go<\/a> · <a href=\"#do\">To do<\/a> · <a href=\"#ex\">Exercícios<\/a><\/div>\n\n<h2 id=\"obj\">🎯 Objetivo da aula<\/h2>\n<p>O aluno aprende o vocabulário de esportes e atividades e quando usar <i>play<\/i>, <i>go<\/i> e <i>do<\/i>, incluindo a terceira pessoa (plays, goes, does).<\/p>\n\n<h2 id=\"roteiro\">🗺️ Roteiro rápido<\/h2>\n<table>\n<tr><th>Slide<\/th><th>Conteúdo<\/th><th>Tempo<\/th><\/tr>\n<tr><td>—<\/td><td>Warm-up (perguntas, oral)<\/td><td>3 min<\/td><\/tr>\n<tr><td>2–3<\/td><td>Sports and activities + associação<\/td><td>10 min<\/td><\/tr>\n<tr><td>4<\/td><td>To play → <b>drills<\/b> (oral)<\/td><td>7 min<\/td><\/tr>\n<tr><td>5<\/td><td>To go → <b>drills<\/b> (oral)<\/td><td>7 min<\/td><\/tr>\n<tr><td>6<\/td><td>To do → <b>drills<\/b> (oral)<\/td><td>7 min<\/td><\/tr>\n<tr><td>7<\/td><td>Go, play or do? (imagem explicativa)<\/td><td>5 min<\/td><\/tr>\n<tr><td>8–10<\/td><td>Exercícios<\/td><td>18 min<\/td><\/tr>\n<tr><td>11<\/td><td>Resumo, dúvidas e feedback<\/td><td>3 min<\/td><\/tr>\n<\/table>\n\n<h2 id=\"warm\">💬 Talking about sports<\/h2>\n<p>Iniciar aula com perguntas de warm up<\/p>\n<ol class=\"small\">\n<li>Do you like sports?<\/li>\n<li>Do you have a favorite sport?<\/li>\n<\/ol>\n\n<h2 id=\"voc\">⚽ Slides 2–3 · Sports and activities<\/h2>\n<p>Apresentar vocabulário e aplicar atividade de associação para fixar.<\/p>\n<table><tr><th>1<\/th><th>2<\/th><th>3<\/th><th>4<\/th><th>5<\/th><th>6<\/th><\/tr><tr><td>surfing<\/td><td>basketball<\/td><td>hockey<\/td><td>skiing<\/td><td>gymnastics<\/td><td>volleyball<\/td><\/tr>\n<tr><th>7<\/th><th>8<\/th><th>9<\/th><th>10<\/th><th>11<\/th><th>12<\/th><\/tr><tr><td>tennis<\/td><td>skating<\/td><td>swimming<\/td><td>karate<\/td><td>yoga<\/td><td>soccer<\/td><\/tr><\/table>\n\n<h2 id=\"play\">🏀 Slide 4 · To play<\/h2>\n<p>Explicar o uso do verbo com o vocabulário de esportes e aplicar drills para a fixação<\/p>\n<p><b>Drills:<\/b><\/p>\n<ol class=\"small\">\n<li>Eu jogo futebol \\ basquete \\ tênis<\/li>\n<li>Ele joga hockey \\ volei \\ futebol americano<\/li>\n<li>Você joga basquete \\ nós \\ ela<\/li>\n<li>Eles jogam futebol \\ ela \\ eu<\/li>\n<\/ol>\n\n<h2 id=\"go\">🏃 Slide 5 · To go<\/h2>\n<p>Explicar o uso com esse vocabulário e drills para fixação<\/p>\n<p><b>Drills:<\/b><\/p>\n<ol class=\"small\">\n<li>Eu pratico natação \\ surf \\ patinação<\/li>\n<li>Ela pratica ciclismo \\ corrida \\ esqui<\/li>\n<li>Eles correm \\ nós \\ ela<\/li>\n<li>Ele esquia \\ ela \\ eu<\/li>\n<\/ol>\n\n<h2 id=\"do\">🧘 Slide 6 · To do<\/h2>\n<p>Explicar e drils<\/p>\n<p><b>Drills:<\/b><\/p>\n<ol class=\"small\">\n<li>Eu faço yoga \\ karatê \\ ginástica<\/li>\n<li>Ela faz yoga \\ ele \\ nós<\/li>\n<li>Eles fazem karatê \\ ela \\ eu<\/li>\n<li>Eu faço ginástica \\ você \\ eles<\/li>\n<\/ol>\n\n<h2 id=\"ex\">📝 Slides 7–10 · Imagem explicativa e exercícios<\/h2>\n<p>Depois dos drills, reforçar o uso de cada verbo com a imagem explicativa e aplicar os exercícios para melhor fixação do contexto geral.<\/p>\n<table>\n<tr><th>#<\/th><th>Practice 1<\/th><th>Practice 2<\/th><th>Practice 3<\/th><\/tr>\n<tr><td>1<\/td><td>go<\/td><td>c) go<\/td><td>plays<\/td><\/tr>\n<tr><td>2<\/td><td>play<\/td><td>a) play<\/td><td>does<\/td><\/tr>\n<tr><td>3<\/td><td>do<\/td><td>a) go<\/td><td>does<\/td><\/tr>\n<tr><td>4<\/td><td>go<\/td><td>a) does<\/td><td>plays<\/td><\/tr>\n<tr><td>5<\/td><td>do<\/td><td>a) plays<\/td><td>go<\/td><\/tr>\n<tr><td>6<\/td><td>do<\/td><td><\/td><td>go<\/td><\/tr>\n<tr><td>7<\/td><td>go<\/td><td><\/td><td>plays<\/td><\/tr>\n<tr><td>8<\/td><td>play<\/td><td><\/td><td>does<\/td><\/tr>\n<\/table>\n<div class=\"tip\">💜 Finalizar aula perguntando se ficou dúvidas e dar pequeno feedback.<\/div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 6</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+</script>
+</body>
+</html>
