@@ -63,8 +63,9 @@ table.tb{border-collapse:separate;border-spacing:6px;max-width:900px;width:100%}
 #notes{position:fixed;right:12px;bottom:66px;width:min(360px,90vw);max-height:40vh;overflow:auto;background:#fff;border-radius:16px;box-shadow:0 6px 24px rgba(0,0,0,.2);padding:14px 16px;z-index:30;display:none;font-size:14px;line-height:1.5}
 #notes.show{display:block}#notes b{font-family:Nunito}
 @media(max-width:600px){.tag{display:none}.nav{padding:10px 16px;white-space:nowrap}.ctl button{white-space:nowrap}.bot{padding:0 6px;gap:4px}.dots{gap:4px}table.tb{border-spacing:3px}.tb th,.tb td{padding:6px 4px;font-size:13px}}
-/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
+/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
+:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
@@ -149,7 +150,18 @@ document.getElementById('noteBtn').addEventListener('click',function(){
   if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
   try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
   window.focus(); });
-document.getElementById('fsBtn').addEventListener('click',function(){ var e=document.documentElement; if(document.fullscreenElement){ document.exitFullscreen(); } else if(e.requestFullscreen){ e.requestFullscreen(); } });
+document.getElementById('fsBtn').addEventListener('click',function(){
+  var turningOn=!document.body.classList.contains('presenting');
+  if(turningOn){
+    document.body.classList.add('presenting');
+    var e=document.documentElement;
+    if(e.requestFullscreen){ var req=e.requestFullscreen(); if(req&&req.catch) req.catch(function(){}); }
+  } else {
+    document.body.classList.remove('presenting');
+    if(document.fullscreenElement){ document.exitFullscreen(); }
+  }
+});
+document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

@@ -887,8 +887,9 @@ html, body {
 }
 .reveal-all-btn:hover { background: var(--ink); }
 
-/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
-:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
+/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot,body.presenting .top,body.presenting .bot{display:none}
+:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage,body.presenting .stage{top:0;bottom:0}
 </style>
 
 <!-- ═══ TOP BAR ══════════════════════════════════════════ -->
@@ -1846,12 +1847,16 @@ document.addEventListener('keydown', e => {
 // ─── FULLSCREEN ─────────────────────────────────────────
 
 function toggleFS() {
-  if (!document.fullscreenElement) {
+  var turningOn = !document.body.classList.contains('presenting');
+  if (turningOn) {
+    document.body.classList.add('presenting');
     document.documentElement.requestFullscreen().catch(() => {});
   } else {
-    document.exitFullscreen().catch(() => {});
+    document.body.classList.remove('presenting');
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
   }
 }
+document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) document.body.classList.remove('presenting'); });
 
 // ─── SWEAR WORDS BOARD ───────────────────────────────────
 
