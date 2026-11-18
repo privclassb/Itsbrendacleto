@@ -887,6 +887,8 @@ html, body {
 }
 .reveal-all-btn:hover { background: var(--ink); }
 
+/* FULLSCREEN-CLEAN-PATCH: tela cheia sem barras */
+:fullscreen .top,:fullscreen .bot,:-webkit-full-screen .top,:-webkit-full-screen .bot,:-moz-full-screen .top,:-moz-full-screen .bot{display:none}:fullscreen .stage,:-webkit-full-screen .stage,:-moz-full-screen .stage{top:0;bottom:0}
 </style>
 
 <!-- ═══ TOP BAR ══════════════════════════════════════════ -->
