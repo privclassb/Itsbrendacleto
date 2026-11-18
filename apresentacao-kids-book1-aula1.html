@@ -68,10 +68,13 @@ body.presenting .top,body.presenting .bot{display:none}
 body.presenting .stage{top:0;bottom:0}
 :fullscreen .top,:fullscreen .bot{display:none}
 :fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 1</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
 <div class="stage" id="stage">
 <script>
 window.speakEn = (function(){
@@ -206,6 +209,9 @@ document.getElementById('noteBtn').addEventListener('click',function(){
 document.getElementById('fsBtn').addEventListener('click',function(){
   document.body.classList.toggle('presenting');
 });
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

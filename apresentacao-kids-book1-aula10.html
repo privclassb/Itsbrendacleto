@@ -68,10 +68,13 @@ body.presenting .top,body.presenting .bot{display:none}
 body.presenting .stage{top:0;bottom:0}
 :fullscreen .top,:fullscreen .bot{display:none}
 :fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 10</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
 <div class="stage" id="stage">
 <section class="slide "><div class="cover"><div class="emo"></div><div class="kick">KIDS ENGLISH · DAILY ROUTINE</div><h1>Talking About<br>My Daily Routine!</h1><div class="pill">⏰🪥🛏️ Routine · meals · AT + time</div></div></section>
 <section class="slide "><h2>🔢 Get ready: Number Game!</h2><p class="sub">How to play</p><div class="steps"><div class="st"><span class="n">1</span><div>A <b>number card</b> appears: hours, minutes, teens and tens.</div></div><div class="st"><span class="n">2</span><div>Say the number <b>in English</b>!</div></div><div class="st"><span class="n">3</span><div>Tap the card to check the answer. ✅</div></div><div class="st"><span class="n">4</span><div>Careful with <b>TEEN</b> vs <b>TY</b>: thirTEEN or thirTY? 👂</div></div></div><button class="go" data-go="next">Ready? Let's play! ▶</button></section>
@@ -647,6 +650,9 @@ document.getElementById('noteBtn').addEventListener('click',function(){
 document.getElementById('fsBtn').addEventListener('click',function(){
   document.body.classList.toggle('presenting');
 });
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();
