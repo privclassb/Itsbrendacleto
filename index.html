@@ -4,24 +4,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>itsbrendacleto — Inglês para a Vida Real</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --cream: #FAF7F2;
-      --sand: #EDE8DF;
-      --brown: #5C4033;
-      --brown-light: #8B6355;
-      --mint: #A8C5B5;
-      --rose: #E8A598;
-      --text: #2C1F1A;
-      --text-muted: #7A6560;
+      --cream: #FAF8F5;
+      --sand: #E9E5EF;
+      --brown: #56468A;
+      --brown-light: #7A6BAE;
+      --mint: #3C8580;
+      --rose: #B9707A;
+      --text: #24213A;
+      --text-muted: #6A6680;
       --white: #FFFFFF;
       --radius: 16px;
-      --shadow: 0 4px 24px rgba(92,64,51,0.10);
+      --shadow: 0 4px 24px rgba(36,33,58,0.08);
     }
 
     body {
@@ -40,7 +40,7 @@
       position: fixed;
       top: -120px; right: -120px;
       width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(168,197,181,0.35) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(60,133,128,0.22) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -49,7 +49,7 @@
       position: fixed;
       bottom: -100px; left: -100px;
       width: 350px; height: 350px;
-      background: radial-gradient(circle, rgba(232,165,152,0.25) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(185,112,122,0.20) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
     }
@@ -71,7 +71,9 @@
     }
 
     .brand-name {
-      font-family: 'DM Serif Display', serif;
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-weight: 500;
       font-size: 28px;
       color: var(--brown);
       letter-spacing: -0.5px;
@@ -104,11 +106,11 @@
     .divider-dot span:nth-child(3) { background: var(--brown-light); opacity: 0.4; }
 
     h2 {
-      font-family: 'DM Serif Display', serif;
-      font-size: 22px;
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
       color: var(--text);
       margin-bottom: 6px;
-      font-weight: 400;
+      font-weight: 500;
     }
 
     .subtitle {
@@ -146,7 +148,7 @@
 
     input:focus {
       border-color: var(--mint);
-      box-shadow: 0 0 0 3px rgba(168,197,181,0.2);
+      box-shadow: 0 0 0 3px rgba(60,133,128,0.18);
       background: var(--white);
     }
 
@@ -299,7 +301,7 @@
     .profile-option-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
   </style>
   <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#5C4033" />
+  <meta name="theme-color" content="#56468A" />
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
   <meta name="mobile-web-app-capable" content="yes" />
