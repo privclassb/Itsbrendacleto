@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lesson 3 · Practice: introducing yourself · A1 Beginners · Inglês para a Vida Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#24213A; --ink2:#6A6680; --line:#E9E5EF;
+  --plum:#56468A; --plum2:#7A6BAE; --plum-s:#F0EDF7;
+  --rose:#B9707A; --rose-s:#F7ECEC;
+  --teal:#3C8580; --teal-s:#E7F1EF;
+  --gold:#C99A3E; --gold-s:#FAF2E1;
+  --bg:#FAF8F5; --card:#FFFFFF;
+  --shadow:0 1px 2px rgba(36,33,58,.04),0 8px 24px rgba(36,33,58,.06);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;font-size:clamp(15px,1.4vw,19px);line-height:1.5}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-height:1.1;letter-spacing:-.015em}
+.i{display:block;flex:none}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none}
+.b1{width:44vw;height:44vw;background:#E4DEF2;top:-18vw;right:-14vw}
+.b2{width:36vw;height:36vw;background:#F2E1E1;bottom:-18vw;left:-14vw}
+
+.top{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tag{font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--plum);white-space:nowrap}
+.tag::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-right:10px;vertical-align:1px}
+.ctl{display:flex;align-items:center;gap:8px}
+.cnt{font-weight:600;color:var(--ink2);font-size:13px;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.ctl button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;background:#fff;color:var(--ink)}
+@media (max-width:640px){.bot .dots{gap:4px;flex-wrap:nowrap;overflow:hidden;padding:0 6px}.bot .dots i{flex:none;width:5px;height:5px}.bot .dots i.on{width:14px}.bot .nav{padding:8px 12px;white-space:nowrap}}
+@media (max-width:640px){.top{padding:0 12px}.tag{font-size:10px;letter-spacing:.12em;overflow:hidden;text-overflow:ellipsis;min-width:0}.tag::before{display:none}.ctl{gap:6px}.ctl button{font-size:12px;padding:6px 8px;white-space:nowrap}.cnt{min-width:auto}#fsBtn{display:none}.bot{padding:0 12px}}
+.ctl button:hover{border-color:var(--plum2);color:var(--plum)}
+.bot{position:fixed;bottom:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.nav{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 18px;cursor:pointer;background:var(--plum);color:#fff}
+#prev{background:#fff;color:var(--plum)}
+.nav:disabled{opacity:.3;cursor:default}
+.dots{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:0 10px}
+.dots i{width:7px;height:7px;border-radius:7px;background:#D8D3E3;cursor:pointer;transition:.25s}
+.dots i.on{width:22px;background:var(--plum)}
+
+.stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
+.slide.on{display:flex;animation:in .4s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:1160px;margin:auto}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,4.5vw,64px);align-items:center}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:14px}
+.eyebrow b{font-family:'Fraunces',serif;font-size:15px;letter-spacing:0;color:var(--plum);font-weight:600}
+.eyebrow::after{content:"";flex:0 0 48px;height:1px;background:currentColor;opacity:.5}
+.title{font-size:clamp(32px,4.6vw,58px)}
+.title em{font-style:italic;color:var(--plum)}
+.lead{font-size:clamp(16px,1.7vw,21px);color:var(--ink2);margin:14px 0 0;max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:clamp(14px,2vw,24px);box-shadow:var(--shadow)}
+
+.say{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;justify-content:center;padding:0;transition:.15s}
+.say:hover{background:var(--plum);border-color:var(--plum);color:#fff}
+.say.playing{background:var(--plum);border-color:var(--plum);color:#fff;animation:pulse .9s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(86,70,138,.15)}}
+.say.lt{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
+.btn{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 16px;cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;gap:8px}
+.btn:hover,.btn.playing{background:var(--plum);color:#fff}
+.btn.solid{background:var(--plum);color:#fff}
+
+/* capa */
+.cover-num{font-family:'Fraunces',serif;font-size:clamp(90px,14vw,190px);line-height:.8;color:var(--plum-s);font-weight:600;-webkit-text-stroke:1.5px var(--plum2);color:transparent}
+.cover .title{font-size:clamp(44px,6.6vw,86px)}
+.cover .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink2);font-size:.9em}
+.cover .meta span{display:flex;align-items:center;gap:8px}
+.cover .meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rose)}
+svg.ill{width:100%;height:auto;max-height:60vh;display:block}
+
+/* greetings do dia */
+.day{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,18px);margin-top:26px}
+@media (max-width:820px){.day{grid-template-columns:repeat(2,1fr)}}
+.tod{border-radius:var(--r);padding:20px 18px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-height:200px}
+.tod .i{color:var(--c)}
+.tod .when{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-top:auto;padding-top:14px}
+.tod .en{font-family:'Fraunces',serif;font-size:clamp(20px,2.1vw,27px);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.tod .pt{color:var(--ink2);font-size:.92em}
+.tod.dark{background:var(--ink);color:#fff;border-color:var(--ink)} .tod.dark .pt{color:#BDB8D0}
+.tod.dark .say{background:transparent;border-color:rgba(255,255,255,.3);color:#fff}
+.note{margin-top:18px;display:flex;align-items:flex-start;gap:12px;color:var(--ink2);background:var(--gold-s);border-radius:12px;padding:12px 16px;max-width:760px}
+.note .i{color:var(--gold);margin-top:2px}
+.note b{color:var(--ink)}
+
+/* listas de vocabulário */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);margin-top:26px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.colh{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.14em;font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.colh .i{color:var(--rose)}
+.vlist{display:grid;gap:10px}
+.vrow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 18px}
+.vrow .tx{flex:1}
+.vrow .en{font-weight:600;font-size:clamp(16px,1.7vw,20px)}
+.vrow .pt{color:var(--ink2);font-size:.88em}
+.badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--rose-s);color:var(--rose);vertical-align:2px}
+
+/* diálogo */
+.dialog{margin-top:16px;display:grid;gap:10px}
+.bub{max-width:80%;padding:12px 16px;border-radius:16px;font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,22px)}
+.bub small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.bub.a{background:var(--plum);color:#fff;border-bottom-left-radius:4px}
+.bub.b{background:#fff;border:1px solid var(--line);justify-self:end;border-bottom-right-radius:4px}
+
+/* name */
+.qline{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.qbig{font-family:'Fraunces',serif;font-size:clamp(30px,4.2vw,54px);font-weight:500}
+.qbig em{color:var(--plum)}
+.qpt{color:var(--ink2);font-size:.95em;margin-top:6px}
+.contr{display:grid;gap:12px;margin-top:28px}
+.pair{display:grid;grid-template-columns:1fr auto 1fr;gap:12px 16px;align-items:center}
+@media (max-width:820px){.pair{grid-template-columns:1fr;gap:6px}.pair .eq{font-size:20px;line-height:1}.contr{gap:20px}}
+.sent{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-family:'Fraunces',serif;font-size:clamp(20px,2.2vw,28px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sent .lbl{display:block;font-family:'DM Sans',sans-serif;margin-bottom:2px}
+.sent .k{color:var(--plum);font-style:italic} .sent .k2{color:var(--rose);font-style:italic}
+.eq{font-family:'Fraunces',serif;font-size:26px;color:var(--ink2);text-align:center}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+
+/* exercício 1.5 */
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.audio-tag{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.steps3{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;color:var(--ink2);font-size:.88em}
+.steps3 span b{font-family:'Fraunces',serif;color:var(--plum);margin-right:4px}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,16px);margin-top:22px}
+@media (max-width:820px){.people{grid-template-columns:repeat(2,1fr)}}
+.person{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:14px;position:relative}
+.person > svg{width:clamp(56px,6vw,76px);height:auto;flex:none}
+.person .lt{font-family:'Fraunces',serif;font-weight:600;color:var(--ink2);font-size:14px;position:absolute;top:10px;left:14px}
+.person .nm{flex:1;font-family:'Fraunces',serif;font-size:clamp(19px,2vw,25px);display:flex;align-items:center;gap:10px}
+.person .box{width:38px;height:38px;border-radius:10px;border:1.5px dashed #CFC8DD;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;flex:none}
+.person .box b{display:none}
+:is(.shown .person,.person.shown) .box{border:0;background:var(--teal)} :is(.shown .person,.person.shown) .box b{display:inline}
+
+/* alfabeto */
+.abc{display:grid;grid-template-columns:repeat(9,1fr);gap:clamp(6px,.9vw,10px);margin-top:24px}
+@media (max-width:820px){.abc{grid-template-columns:repeat(6,1fr)}}
+.ltb{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(24px,3vw,40px);border:1px solid var(--line);border-radius:12px;padding:14px 0;cursor:pointer;color:var(--ink);background:#fff;transition:.15s}
+.ltb:hover,.ltb.playing{background:var(--plum);border-color:var(--plum);color:#fff}
+.ltb.v{color:var(--rose)} .ltb.v:hover,.ltb.v.playing{color:#fff}
+.legend{display:flex;gap:18px;margin-top:14px;color:var(--ink2);font-size:.85em}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+/* grupos de som */
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:24px}
+@media (max-width:820px){.groups{grid-template-columns:repeat(2,1fr)}}
+.grp{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.grp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.grp .snd{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:baseline;justify-content:space-between}
+.grp .snd b{font-family:'Fraunces',serif;font-size:22px;letter-spacing:0;text-transform:none;color:var(--c);font-weight:600}
+.grp .ls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.grp .ls button{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,24px);width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;color:var(--ink)}
+.grp .ls button:hover,.grp .ls button.playing{background:var(--c);border-color:var(--c);color:#fff}
+.grp.tip{background:var(--gold-s);border-color:transparent}
+.grp.tip p{margin:8px 0 0;font-size:.9em;color:var(--ink)}
+
+/* nome completo */
+.namecard{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin-top:24px}
+.namecard .hd{background:var(--plum);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.namecard .hd small{font-size:11px;font-weight:700;letter-spacing:.2em;opacity:.8}
+.namecard .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:24px;font-style:italic}
+.parts{display:grid;grid-template-columns:repeat(3,1fr)}
+.part{padding:16px 14px;border-right:1px solid var(--line)}
+.part:last-child{border-right:0}
+.part .w{font-family:'Fraunces',serif;font-size:clamp(22px,2.5vw,32px)}
+.part .lb{font-weight:600;display:flex;align-items:center;gap:8px;margin-top:8px}
+.part .lp{color:var(--ink2);font-size:.82em}
+.part .lb .say{width:28px;height:28px}
+.full{border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;background:var(--bg)}
+.full span small{font-weight:400;color:var(--ink2)}
+.spell{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.spell button{font-family:'Fraunces',serif;font-size:22px;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer}
+.spell button.playing,.spell button:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.spell .gap{width:14px}
+.mini{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,23px)}
+.mini.q{color:var(--ink2);font-style:italic}
+
+/* 1.9 */
+.example{display:inline-flex;align-items:center;gap:12px;margin-top:10px;color:var(--ink2)}
+.example b{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:.06em;font-weight:500;font-size:1.1em}
+.blanks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;margin-top:24px}
+@media (max-width:820px){.blanks{grid-template-columns:repeat(2,1fr)}}
+.blank{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:60px}
+.blank .num{flex:none;font-family:'Fraunces',serif;color:var(--rose);font-weight:600;width:22px}
+.blank .line{flex:1;border-bottom:1.5px dashed #D6D0E2;height:22px}
+.blank .an{display:none;flex:1;font-family:'Fraunces',serif;font-size:clamp(18px,2vw,23px)}
+.blank .say{display:none}
+:is(.shown .blank,.blank.shown) .line{display:none}:is(.shown .blank,.blank.shown) .an{display:block}:is(.shown .blank,.blank.shown) .say{display:inline-flex}
+
+@media (max-width:600px){.people{grid-template-columns:1fr}.cover-num{display:none}.namecard .hd{flex-direction:column;align-items:flex-start;gap:2px}.part{padding:12px 10px}.blanks{grid-template-columns:1fr 1fr}}
+/* resumo */
+.recap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+@media (max-width:820px){.recap{grid-template-columns:1fr}}
+.recap .card{display:flex;flex-direction:column;gap:10px}
+.recap .card .i{color:var(--plum)}
+.recap .card b{font-family:'Fraunces',serif;font-weight:500;font-size:22px}
+.recap .card span{color:var(--ink2);font-size:.9em}
+.next-up{margin-top:26px;display:inline-flex;gap:10px;align-items:center;color:var(--ink2);font-size:.95em}
+.next-up b{color:var(--ink)}
+.next-up .i{color:var(--rose)}
+
+/* ===== Lesson 3 ===== */
+.slide.game{flex-direction:column;align-items:stretch;gap:10px}
+.gh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.gh span{font-family:'Fraunces',serif;font-size:clamp(24px,2.8vw,34px)}
+.gh small{color:var(--ink2);font-size:14px}
+.slide.game iframe{flex:1;width:100%;border:1px solid var(--line);border-radius:18px;background:var(--bg);min-height:380px}
+.bank{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:18px;padding:14px 16px;border:1px dashed #D6D0E2;border-radius:14px;background:#fff}
+.bank span{font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,22px);padding:2px 12px;border-radius:8px;background:var(--plum-s)}
+.times{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,18px);margin-top:18px}
+@media (max-width:700px){.times{grid-template-columns:1fr}}
+.tc{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;box-shadow:var(--shadow)}
+.tc .i{margin:0 auto;color:var(--c)}
+.tc .t{font-family:'Fraunces',serif;font-size:clamp(34px,4vw,52px);margin:6px 0 10px}
+.slot{min-height:44px;border-bottom:1.5px dashed #D6D0E2;display:flex;align-items:center;justify-content:center;gap:10px;font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,23px)}
+.slot .a,.slot .say{display:none}
+.shown .slot{border-bottom-color:transparent}.shown .slot .a{display:inline}.shown .slot .say{display:inline-flex}
+.q2{margin-top:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-family:'Fraunces',serif;font-size:clamp(19px,2vw,25px)}
+.q2 .a{display:none;font-family:'DM Sans',sans-serif;font-size:.75em;color:var(--teal);font-weight:600}
+:is(.shown .q2,.q2.shown) .a{display:inline}
+.jobs{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:24px}
+@media (max-width:820px){.jobs{grid-template-columns:repeat(2,1fr)}}
+.job{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:6px;box-shadow:var(--shadow)}
+.job .i{color:var(--c)}
+.job .en{font-weight:600;font-size:clamp(16px,1.6vw,20px);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px}
+.job .pt{color:var(--ink2);font-size:.86em}
+.job .alt{font-size:.82em;color:var(--ink2);display:flex;align-items:center;gap:6px}
+.job .alt .say{width:26px;height:26px}
+.pics{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:16px}
+@media (max-width:820px){.pics{grid-template-columns:repeat(2,1fr)}}
+.pic{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.pic .ill-i{width:clamp(64px,7vw,90px);height:clamp(64px,7vw,90px);border-radius:50%;background:var(--plum-s);display:flex;align-items:center;justify-content:center;color:var(--plum)}
+.pic .ill-i svg{width:55%;height:55%}
+.pic .ln{display:flex;align-items:center;gap:8px;width:100%}
+.pic .ln b{font-family:'Fraunces',serif;color:var(--rose);font-weight:600}
+.pic .ln .slot{flex:1;min-height:32px;justify-content:flex-start}
+.be{display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(18px,3vw,40px);margin-top:22px;align-items:center}
+@media (max-width:820px){.be{grid-template-columns:1fr}}
+.betab{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.berow{display:grid;grid-template-columns:70px 1fr 1fr 44px;align-items:center;padding:7px 14px;border-bottom:1px solid var(--line);gap:10px}
+.berow:last-child{border-bottom:0}
+.berow .p{font-family:'Fraunces',serif;font-size:clamp(19px,2vw,24px)}
+.berow .pt{color:var(--ink2);font-size:.86em}
+.berow .f{font-family:'Fraunces',serif;font-size:clamp(19px,2vw,24px)}
+.berow .f em{font-style:italic;color:var(--c);font-weight:600}
+.berow .say{width:30px;height:30px}
+.forms{display:grid;gap:12px}
+.form{border-radius:var(--r);padding:16px 18px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--c);display:flex;align-items:baseline;gap:16px}
+.form b{font-family:'Fraunces',serif;font-size:clamp(30px,3.4vw,44px);color:var(--c);font-weight:600;min-width:72px}
+.form span{color:var(--ink2)}
+.form span strong{color:var(--ink);font-weight:600}
+.jsent{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-top:24px}
+@media (max-width:820px){.jsent{grid-template-columns:1fr}}
+.jsent .sent .i{color:var(--plum);opacity:.7}
+.sent .l{display:flex;align-items:center;gap:14px}
+.fix{display:grid;gap:10px;margin-top:22px;max-width:860px}
+.fx{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 16px;font-family:'Fraunces',serif;font-size:clamp(18px,2vw,24px)}
+.fx .n{color:var(--rose);font-weight:600;width:22px}
+.fx .w{flex:1}
+.fx .c{display:none;color:var(--teal)}
+.fx .say{display:none}
+:is(.shown .fx,.fx.shown) .w{text-decoration:line-through;text-decoration-color:var(--rose);color:var(--ink2);flex:none}
+:is(.shown .fx,.fx.shown) .c{display:inline;flex:1}:is(.shown .fx,.fx.shown) .say{display:inline-flex}
+.gap{display:inline-block;min-width:80px;border-bottom:1.5px dashed #D6D0E2;text-align:center;margin:0 4px}
+.gap .a{display:none;color:var(--teal);font-style:italic;font-weight:600}
+.shown .gap{border-bottom-color:var(--teal)}.shown .gap .a{display:inline}
+.qs{display:grid;gap:14px;margin-top:26px}
+.qq{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px 20px;font-family:'Fraunces',serif;font-size:clamp(22px,2.6vw,32px)}
+.qq .n{color:var(--rose);font-weight:600;font-size:.8em;width:26px}
+.qq .t{flex:1}
+.dlg{margin-top:20px;background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.dl{display:grid;grid-template-columns:90px 1fr 40px;gap:12px;align-items:center;padding:9px 18px;border-bottom:1px solid var(--line)}
+.dl:last-child{border-bottom:0}
+.dl .who{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.dl.you{background:var(--plum-s)}
+.dl.you .who{color:var(--plum)}
+.dl .tx{font-family:'Fraunces',serif;font-size:clamp(17px,1.9vw,22px)}
+.dl .say{width:30px;height:30px}
+.blk{display:inline-block;min-width:120px;border-bottom:1.5px dashed var(--plum2);margin:0 4px;vertical-align:-2px}
+.aan{display:inline-flex;gap:4px;margin-right:4px}
+.aan i{font-style:normal;border:1px solid var(--plum2);border-radius:6px;padding:0 6px;font-size:.85em}
+.sent .k3{color:var(--teal);font-style:italic}:is(.shown .fx,.fx.shown) .w2 + .say{display:inline-flex}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top">
+  <span class="tag">A1 BEGINNERS · LESSON 3</span>
+  <div class="ctl">
+    <span class="cnt" id="cnt"></span>
+    <button id="noteBtn">📝 Teacher's Guide</button>
+    <button id="fsBtn">⛶ Fullscreen</button>
+  </div>
+</div>
+
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
+<div class="stage" id="stage">
+
+<section class="slide">
+  <div class="wrap two cover">
+    <div>
+      <div class="eyebrow">Practice</div>
+      <h1 class="title">Introducing <em>yourself</em></h1>
+      <p class="lead">Profissões e o verbo <i>to be</i>.</p>
+      <div class="meta"><span>Review</span><span>Jobs</span><span>Verb to be</span></div>
+    </div>
+    <div style="position:relative">
+      <div class="cover-num" style="position:absolute;top:-10%;right:0">03</div>
+      <svg class="ill" viewBox="0 0 420 345" aria-hidden="true" style="position:relative">
+        <g transform="translate(70 90)"><circle r="44" fill="#56468A" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#56468A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h7M7 11h5M9 20l3-4 3 4"/></g></g><g transform="translate(180 60)"><circle r="44" fill="#B9707A" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#B9707A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3v6a4 4 0 0 0 8 0V3M5 3h2M13 3h2M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/></g></g><g transform="translate(90 200)"><circle r="44" fill="#3C8580" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#3C8580" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V9l8 4.5V16l-8-2.5V18l2.5 2v1.5L12 20.5l-4 1V20l2.5-2v-4.5l-8 2.5v-2.5l8-4.5z"/></g></g><g transform="translate(200 170)"><circle r="44" fill="#C99A3E" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#C99A3E" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14a4 4 0 0 1-.8-7.9A5 5 0 0 1 12 3a5 5 0 0 1 5.8 3.1A4 4 0 0 1 17 14v6H7z"/><path d="M7 17h10"/></g></g><g transform="translate(320 190)"><circle r="44" fill="#7A6BAE" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#7A6BAE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 13h18M11 13v2h2v-2"/></g></g><g transform="translate(170 270)"><circle r="44" fill="#B9707A" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#B9707A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V8M10.5 8h3M2 20h20"/></g></g><g transform="translate(300 290)"><circle r="44" fill="#3C8580" opacity=".14"/><g transform="translate(-22 -22) scale(1.85)" fill="none" stroke="#3C8580" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l9-9M14.5 3.5l6 6-2 2-2-2-3.5 3.5-4-4 3.5-3.5-2-2z"/></g></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide game">
+  <div class="gh"><span>Spin the wheel: <em style="color:var(--plum)">countries &amp; nationalities</em></span><small>Warm-up</small></div>
+  <iframe title="Spin the wheel" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);display:flex;align-items:center;justify-content:center;gap:clamp(18px,4vw,56px);padding:16px 24px;flex-wrap:wrap;overflow:auto}
+.wheel-box{position:relative;width:min(82vh,46vw,470px);aspect-ratio:1}
+@media (max-width:700px){.wheel-box{width:min(78vw,340px)}}
+#wheel{width:100%;height:100%;transition:transform 4.2s cubic-bezier(.17,.67,.12,1);display:block}
+.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:14px solid transparent;border-right:14px solid transparent;border-top:24px solid var(--ink);filter:drop-shadow(0 2px 2px rgba(0,0,0,.15));z-index:2}
+.hub{position:absolute;inset:0;margin:auto;width:22%;height:22%;border-radius:50%;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:&#x27;Fraunces&#x27;,serif;font-weight:600;color:var(--plum);font-size:clamp(14px,1.8vw,18px);box-shadow:0 4px 14px rgba(36,33,58,.12);cursor:pointer}
+.panel{width:min(420px,90vw);display:flex;flex-direction:column;gap:14px}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px 20px;box-shadow:0 8px 24px rgba(36,33,58,.06)}
+.big{font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(28px,3.6vw,44px);font-weight:500;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:1.3em}
+.big.muted{color:#C8C2D6;font-style:italic;font-size:clamp(20px,2.4vw,28px)}
+.nat .big{color:var(--plum)}
+.say{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.say:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.btns{display:flex;gap:10px;flex-wrap:wrap}
+button.b{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--plum);background:var(--plum);color:#fff}
+button.b.o{background:#fff;color:var(--plum)}
+button.b:disabled{opacity:.35;cursor:default}
+.used{display:flex;flex-wrap:wrap;gap:6px;font-size:13px;color:var(--ink2)}
+.used span{background:var(--plum-s);border-radius:6px;padding:2px 8px}
+.hidden{visibility:hidden}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;wheel-box&quot;&gt;
+  &lt;div class=&quot;pointer&quot;&gt;&lt;/div&gt;
+  &lt;svg id=&quot;wheel&quot; viewBox=&quot;-210 -210 420 420&quot;&gt;&lt;/svg&gt;
+  &lt;div class=&quot;hub&quot; id=&quot;hub&quot;&gt;SPIN&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;panel&quot;&gt;
+  &lt;div class=&quot;card&quot;&gt;&lt;div class=&quot;lbl&quot;&gt;Country&lt;/div&gt;&lt;div class=&quot;big muted&quot; id=&quot;country&quot;&gt;Spin the wheel!&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;card nat&quot;&gt;&lt;div class=&quot;lbl&quot;&gt;Nationality&lt;/div&gt;&lt;div class=&quot;big&quot; id=&quot;nat&quot;&gt;&lt;span class=&quot;hidden&quot; id=&quot;natTx&quot;&gt;—&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;btns&quot;&gt;
+    &lt;button class=&quot;b&quot; id=&quot;spin&quot;&gt;↻ Spin&lt;/button&gt;
+    &lt;button class=&quot;b o&quot; id=&quot;show&quot; disabled&gt;Show nationality&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;div class=&quot;used&quot; id=&quot;used&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+var D=[[&quot;The USA&quot;,&quot;American&quot;],[&quot;Canada&quot;,&quot;Canadian&quot;],[&quot;Mexico&quot;,&quot;Mexican&quot;],[&quot;Brazil&quot;,&quot;Brazilian&quot;],[&quot;Argentina&quot;,&quot;Argentinian&quot;],[&quot;The UK&quot;,&quot;British&quot;],[&quot;Portugal&quot;,&quot;Portuguese&quot;],[&quot;Spain&quot;,&quot;Spanish&quot;],[&quot;France&quot;,&quot;French&quot;],[&quot;Italy&quot;,&quot;Italian&quot;],[&quot;Germany&quot;,&quot;German&quot;],[&quot;Switzerland&quot;,&quot;Swiss&quot;],[&quot;Poland&quot;,&quot;Polish&quot;],[&quot;Greece&quot;,&quot;Greek&quot;],[&quot;Russia&quot;,&quot;Russian&quot;],[&quot;Turkey&quot;,&quot;Turkish&quot;],[&quot;Egypt&quot;,&quot;Egyptian&quot;],[&quot;India&quot;,&quot;Indian&quot;],[&quot;China&quot;,&quot;Chinese&quot;],[&quot;Japan&quot;,&quot;Japanese&quot;],[&quot;South Korea&quot;,&quot;South Korean&quot;],[&quot;Australia&quot;,&quot;Australian&quot;]];
+var C=[&quot;#56468A&quot;,&quot;#B9707A&quot;,&quot;#3C8580&quot;,&quot;#C99A3E&quot;,&quot;#7A6BAE&quot;,&quot;#8C5E86&quot;];
+var N=D.length, seg=360/N, w=document.getElementById(&#x27;wheel&#x27;), rot=0, cur=-1, busy=false;
+var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.7&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
+function pt(a,r){ var t=(a-90)*Math.PI/180; return [r*Math.cos(t), r*Math.sin(t)]; }
+var h=&#x27;&#x27;;
+D.forEach(function(d,i){
+  var a0=i*seg, a1=a0+seg, p0=pt(a0,200), p1=pt(a1,200);
+  h+=&#x27;&lt;path d=&quot;M0 0 L&#x27;+p0[0].toFixed(1)+&#x27; &#x27;+p0[1].toFixed(1)+&#x27; A200 200 0 0 1 &#x27;+p1[0].toFixed(1)+&#x27; &#x27;+p1[1].toFixed(1)+&#x27; Z&quot; fill=&quot;&#x27;+C[i%C.length]+&#x27;&quot; stroke=&quot;#fff&quot; stroke-width=&quot;2&quot;/&gt;&#x27;;
+  var mid=a0+seg/2;
+  h+=&#x27;&lt;text transform=&quot;rotate(&#x27;+(mid-90).toFixed(2)+&#x27;) translate(190 0)&quot; text-anchor=&quot;end&quot; dominant-baseline=&quot;middle&quot; font-family=&quot;DM Sans,sans-serif&quot; font-size=&quot;12.5&quot; font-weight=&quot;600&quot; fill=&quot;#fff&quot;&gt;&#x27;+d[0]+&#x27;&lt;/text&gt;&#x27;;
+});
+w.innerHTML=h;
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=s.getVoices().filter(function(x){return /en[-_]US/i.test(x.lang);}); if(v.length) u.voice=v[0]; s.speak(u);}catch(e){} }
+function spin(){
+  if(busy) return; busy=true;
+  var i=Math.floor(Math.random()*N); if(i===cur) i=(i+1)%N;
+  var target=360-(i*seg+seg/2);
+  var base=rot-(rot%360);
+  rot=base+360*5+target;
+  w.style.transform=&#x27;rotate(&#x27;+rot+&#x27;deg)&#x27;;
+  document.getElementById(&#x27;country&#x27;).className=&#x27;big muted&#x27;; document.getElementById(&#x27;country&#x27;).textContent=&#x27;…&#x27;;
+  document.getElementById(&#x27;nat&#x27;).innerHTML=&#x27;&lt;span class=&quot;hidden&quot; id=&quot;natTx&quot;&gt;—&lt;/span&gt;&#x27;; document.getElementById(&#x27;show&#x27;).disabled=true;
+  setTimeout(function(){
+    cur=i; busy=false;
+    var c=document.getElementById(&#x27;country&#x27;); c.className=&#x27;big&#x27;;
+    var name=D[i][0];
+    c.innerHTML=&#x27;&lt;span&gt;&#x27;+name+&#x27;&lt;/span&gt;&lt;button class=&quot;say&quot; title=&quot;Ouvir&quot;&gt;&#x27;+SPK+&#x27;&lt;/button&gt;&#x27;;
+    c.querySelector(&#x27;.say&#x27;).onclick=function(){ speak(name.replace(&#x27;The UK&#x27;,&#x27;The U.K.&#x27;).replace(&#x27;The USA&#x27;,&#x27;The U.S.A.&#x27;)); };
+    document.getElementById(&#x27;show&#x27;).disabled=false;
+    var u=document.getElementById(&#x27;used&#x27;), s=document.createElement(&#x27;span&#x27;); s.textContent=name; u.appendChild(s);
+  },4300);
+}
+document.getElementById(&#x27;spin&#x27;).onclick=spin; document.getElementById(&#x27;hub&#x27;).onclick=spin;
+document.getElementById(&#x27;show&#x27;).onclick=function(){
+  if(cur&lt;0) return; var n=D[cur][1], el=document.getElementById(&#x27;nat&#x27;);
+  el.innerHTML=&#x27;&lt;span&gt;&#x27;+n+&#x27;&lt;/span&gt;&lt;button class=&quot;say&quot; title=&quot;Ouvir&quot;&gt;&#x27;+SPK+&#x27;&lt;/button&gt;&#x27;;
+  el.querySelector(&#x27;.say&#x27;).onclick=function(){ speak(n); };
+};
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>01</b> Review</div>
+      <h2 class="title">Match the greeting <em>to the time</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="bank"><span>Good morning</span><span>Good evening</span><span>Good afternoon</span></div>
+    <div class="times"><div class="tc" style="--c:#B9707A"><svg class="i" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/></svg><div class="t">14:00</div><div class="slot"><span class="a">Good afternoon</span><button class="say " data-say="Good afternoon" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div><div class="tc" style="--c:#C99A3E"><svg class="i" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v3M4.9 9.9l1.4 1.4M19.1 9.9l-1.4 1.4M8 21h8"/></svg><div class="t">9:00</div><div class="slot"><span class="a">Good morning</span><button class="say " data-say="Good morning" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div><div class="tc" style="--c:#56468A"><svg class="i" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16h18M7 16a5 5 0 0 1 10 0M5 20h14M12 3v6M9.5 6.5L12 9l2.5-2.5"/></svg><div class="t">20:00</div><div class="slot"><span class="a">Good evening</span><button class="say " data-say="Good evening" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div>
+    <div class="q2">Can you name two other ways to greet people in English? <span class="a">Hi! · Hello! · What's up? · Nice to meet you!</span></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>02</b> Jobs</div>
+    <h2 class="title">As <em>profissões</em></h2>
+    <div class="jobs"><div class="job" style="--c:#56468A"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h7M7 11h5M9 20l3-4 3 4"/></svg><div class="en">Teacher <button class="say " data-say="Teacher" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">professor(a)</div></div><div class="job" style="--c:#3C8580"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 13h18M11 13v2h2v-2"/></svg><div class="en">Businessman <button class="say " data-say="Businessman" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="alt">/ Businesswoman <button class="say " data-say="Businesswoman" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">empresário(a)</div></div><div class="job" style="--c:#B9707A"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v6a4 4 0 0 0 8 0V3M5 3h2M13 3h2M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/></svg><div class="en">Doctor <button class="say " data-say="Doctor" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">médico(a)</div></div><div class="job" style="--c:#7A6BAE"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11c0-4.5 3-7 7-7s7 2.5 7 7z"/><path d="M12 6v3.5M10.25 7.75h3.5M7 11v2a5 5 0 0 0 10 0v-2M9.5 20h5"/></svg><div class="en">Nurse <button class="say " data-say="Nurse" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">enfermeiro(a)</div></div><div class="job" style="--c:#C99A3E"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l9-9M14.5 3.5l6 6-2 2-2-2-3.5 3.5-4-4 3.5-3.5-2-2z"/></svg><div class="en">Carpenter <button class="say " data-say="Carpenter" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">carpinteiro(a)</div></div><div class="job" style="--c:#56468A"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V9l8 4.5V16l-8-2.5V18l2.5 2v1.5L12 20.5l-4 1V20l2.5-2v-4.5l-8 2.5v-2.5l8-4.5z"/></svg><div class="en">Pilot <button class="say " data-say="Pilot" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">piloto</div></div><div class="job" style="--c:#3C8580"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V8M10.5 8h3M2 20h20"/></svg><div class="en">Waiter <button class="say " data-say="Waiter" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="alt">/ Waitress <button class="say " data-say="Waitress" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">garçom / garçonete</div></div><div class="job" style="--c:#B9707A"><svg class="i" viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14a4 4 0 0 1-.8-7.9A5 5 0 0 1 12 3a5 5 0 0 1 5.8 3.1A4 4 0 0 1 17 14v6H7z"/><path d="M7 17h10"/></svg><div class="en">Chef <button class="say " data-say="Chef" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="pt">chefe de cozinha</div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>03</b> Jobs</div>
+      <h2 class="title">Match the words <em>to the pictures</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="bank"><span>teacher</span><span>businessman</span><span>doctor</span><span>nurse</span><span>carpenter</span><span>pilot</span><span>waiter</span><span>chef</span></div>
+    <div class="pics"><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21l9-9M14.5 3.5l6 6-2 2-2-2-3.5 3.5-4-4 3.5-3.5-2-2z"/></svg></div><div class="ln"><b>1</b><div class="slot"><span class="a">carpenter</span><button class="say " data-say="carpenter" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V9l8 4.5V16l-8-2.5V18l2.5 2v1.5L12 20.5l-4 1V20l2.5-2v-4.5l-8 2.5v-2.5l8-4.5z"/></svg></div><div class="ln"><b>2</b><div class="slot"><span class="a">pilot</span><button class="say " data-say="pilot" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v6a4 4 0 0 0 8 0V3M5 3h2M13 3h2M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/></svg></div><div class="ln"><b>3</b><div class="slot"><span class="a">doctor</span><button class="say " data-say="doctor" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17h18M5 17a7 7 0 0 1 14 0M12 10V8M10.5 8h3M2 20h20"/></svg></div><div class="ln"><b>4</b><div class="slot"><span class="a">waiter</span><button class="say " data-say="waiter" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 11c0-4.5 3-7 7-7s7 2.5 7 7z"/><path d="M12 6v3.5M10.25 7.75h3.5M7 11v2a5 5 0 0 0 10 0v-2M9.5 20h5"/></svg></div><div class="ln"><b>5</b><div class="slot"><span class="a">nurse</span><button class="say " data-say="nurse" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14a4 4 0 0 1-.8-7.9A5 5 0 0 1 12 3a5 5 0 0 1 5.8 3.1A4 4 0 0 1 17 14v6H7z"/><path d="M7 17h10"/></svg></div><div class="ln"><b>6</b><div class="slot"><span class="a">chef</span><button class="say " data-say="chef" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 13h18M11 13v2h2v-2"/></svg></div><div class="ln"><b>7</b><div class="slot"><span class="a">businessman</span><button class="say " data-say="businessman" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div><div class="pic"><div class="ill-i"><svg class="i" viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h7M7 11h5M9 20l3-4 3 4"/></svg></div><div class="ln"><b>8</b><div class="slot"><span class="a">teacher</span><button class="say " data-say="teacher" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>04</b> Grammar</div>
+    <div class="qline"><div class="qbig">Verb <em>to be</em></div></div>
+    <div class="qpt">ser / estar</div>
+    <div class="be">
+      <div class="betab"><div class="berow" style="--c:#56468A"><span class="p">I</span><span class="pt">eu</span><span class="f">I <em>am</em></span><button class="say " data-say="I am" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#3C8580"><span class="p">You</span><span class="pt">você / vocês</span><span class="f">You <em>are</em></span><button class="say " data-say="You are" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#B9707A"><span class="p">He</span><span class="pt">ele</span><span class="f">He <em>is</em></span><button class="say " data-say="He is" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#B9707A"><span class="p">She</span><span class="pt">ela</span><span class="f">She <em>is</em></span><button class="say " data-say="She is" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#B9707A"><span class="p">It</span><span class="pt">objetos / animais</span><span class="f">It <em>is</em></span><button class="say " data-say="It is" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#3C8580"><span class="p">We</span><span class="pt">nós</span><span class="f">We <em>are</em></span><button class="say " data-say="We are" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="berow" style="--c:#3C8580"><span class="p">They</span><span class="pt">eles / elas</span><span class="f">They <em>are</em></span><button class="say " data-say="They are" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="forms">
+        <div class="form" style="--c:#56468A"><b>am</b><span>com <strong>I</strong></span></div>
+        <div class="form" style="--c:#B9707A"><b>is</b><span>com <strong>he, she, it</strong></span></div>
+        <div class="form" style="--c:#3C8580"><b>are</b><span>com <strong>you, we, they</strong></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>05</b> Talking about jobs</div>
+    <div class="qline"><div class="qbig">What is <em>your job?</em></div><button class="say " data-say="What is your job?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div>
+    <div class="qpt">Qual é a sua profissão?</div>
+    <div class="jsent"><div class="sent"><span class="l"><svg class="i" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M7 8h7M7 11h5M9 20l3-4 3 4"/></svg><span>I <span class="k">am</span> a teacher.</span></span><button class="say " data-say="I am a teacher." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent"><span class="l"><svg class="i" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3v6a4 4 0 0 0 8 0V3M5 3h2M13 3h2M10 13v2a5 5 0 0 0 10 0v-2"/><circle cx="20" cy="11" r="2"/></svg><span>She <span class="k2">is</span> a doctor.</span></span><button class="say " data-say="She is a doctor." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent"><span class="l"><svg class="i" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 3.5c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5V9l8 4.5V16l-8-2.5V18l2.5 2v1.5L12 20.5l-4 1V20l2.5-2v-4.5l-8 2.5v-2.5l8-4.5z"/></svg><span>They <span class="k3">are</span> pilots.</span></span><button class="say " data-say="They are pilots." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent"><span class="l"><svg class="i" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 14a4 4 0 0 1-.8-7.9A5 5 0 0 1 12 3a5 5 0 0 1 5.8 3.1A4 4 0 0 1 17 14v6H7z"/><path d="M7 17h10"/></svg><span>We <span class="k3">are</span> chefs.</span></span><button class="say " data-say="We are chefs." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    <div class="note" style="max-width:none"><svg class="i" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg><div>No singular, a profissão vem com <b>a</b> ou <b>an</b>: <b>a</b> teacher, <b>an</b> engineer (antes de som de vogal). No plural, sem artigo: they are <b>pilots</b>.</div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>Task 1</b> Practice</div>
+      <h2 class="title">Fix the <em>mistakes</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="fix"><div class="fx"><span class="n">1</span><span class="w">I are Jonathan.</span><span class="c">I am Jonathan.</span><button class="say " data-say="I am Jonathan." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">2</span><span class="w">He am not 6 years old.</span><span class="c">He is not 6 years old.</span><button class="say " data-say="He is not 6 years old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">3</span><span class="w">They is from The USA.</span><span class="c">They are from the USA.</span><button class="say " data-say="They are from the USA." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">4</span><span class="w">We am 20 years old.</span><span class="c">We are 20 years old.</span><button class="say " data-say="We are 20 years old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">5</span><span class="w">She are not a dentist.</span><span class="c">She is not a dentist.</span><button class="say " data-say="She is not a dentist." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">6</span><span class="w">It are raining.</span><span class="c">It is raining.</span><button class="say " data-say="It is raining." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>Task 2</b> Practice</div>
+      <h2 class="title">Complete with <em>am / is / are</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="fix"><div class="fx"><span class="n">1</span><span class="w2" style="flex:1">Susana <span class="gap"><span class="a">is</span></span> 23 years old.</span><button class="say " data-say="Susana is 23 years old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">2</span><span class="w2" style="flex:1">We <span class="gap"><span class="a">are</span></span> from Australia.</span><button class="say " data-say="We are from Australia." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">3</span><span class="w2" style="flex:1">He <span class="gap"><span class="a">is</span></span> a vet.</span><button class="say " data-say="He is a vet." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">4</span><span class="w2" style="flex:1">They <span class="gap"><span class="a">are</span></span> old.</span><button class="say " data-say="They are old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">5</span><span class="w2" style="flex:1">She <span class="gap"><span class="a">is</span></span> a doctor.</span><button class="say " data-say="She is a doctor." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fx"><span class="n">6</span><span class="w2" style="flex:1">I <span class="gap"><span class="a">am</span></span> 20 years old.</span><button class="say " data-say="I am 20 years old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap two">
+    <div>
+      <div class="eyebrow"><b>06</b> Speaking</div>
+      <h2 class="title">Answer <em>the questions</em></h2>
+      <div class="qs"><div class="qq"><span class="n">1</span><span class="t">How old are you?</span><button class="say " data-say="How old are you?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="qq"><span class="n">2</span><span class="t">Where are you from?</span><button class="say " data-say="Where are you from?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="qq"><span class="n">3</span><span class="t">What is your job?</span><button class="say " data-say="What is your job?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    </div>
+    <svg class="ill" viewBox="0 0 360 300" aria-hidden="true" style="max-width:360px;margin:auto">
+      <circle cx="180" cy="150" r="120" fill="#F0EDF7"/>
+      <g transform="translate(116 70) scale(5.3)" fill="none" stroke="#56468A" stroke-width=".9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></g>
+      <rect x="236" y="56" width="96" height="44" rx="14" fill="#B9707A"/><text x="284" y="84" text-anchor="middle" font-family="Fraunces,serif" font-style="italic" font-size="18" fill="#fff">and you?</text>
+      <circle cx="60" cy="230" r="6" fill="#C99A3E"/><circle cx="300" cy="240" r="4" fill="#3C8580"/>
+    </svg>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>07</b> Speaking</div>
+    <h2 class="title">Complete the dialogue <em>with your information</em></h2>
+    <div class="dlg"><div class="dl"><span class="who">Person</span><span class="tx">Hello! What is your name?</span><button class="say " data-say="Hello! What is your name?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="dl you"><span class="who">You</span><span class="tx">My name is <span class="blk"></span>. What is your name?</span><span></span></div><div class="dl"><span class="who">Person</span><span class="tx">My name is Joan. I am from South Africa. Where are you from?</span><button class="say " data-say="My name is Joan. I am from South Africa. Where are you from?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="dl you"><span class="who">You</span><span class="tx">I am from <span class="blk"></span>. What do you do?</span><span></span></div><div class="dl"><span class="who">Person</span><span class="tx">I am a teacher. What do you do?</span><button class="say " data-say="I am a teacher. What do you do?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="dl you"><span class="who">You</span><span class="tx">I'm <span class="aan"><i>a</i>/<i>an</i></span><span class="blk"></span>. How old are you?</span><span></span></div><div class="dl"><span class="who">Person</span><span class="tx">I am 25 years old, and you?</span><button class="say " data-say="I am 25 years old, and you?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="dl you"><span class="who">You</span><span class="tx">I am <span class="blk"></span> years old.</span><span></span></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">Today you learned</div>
+    <h2 class="title">Nice to <em>meet you,</em> again!</h2>
+    <div class="recap">
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 13h18M11 13v2h2v-2"/></svg><b>Jobs</b><span>teacher, doctor, pilot, chef…</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1-4L16 5l3 3L8 19zM14 7l3 3"/></svg><b>Verb to be</b><span>I am · he / she / it is · you / we / they are</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-4 3.5-6 7-6s6.2 2 7 6"/></svg><b>Introducing yourself</b><span>age, country and job</span></div>
+    </div>
+    <div class="next-up"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Próxima aula: <b>Lesson 4 · Talking about food</b></div>
+  </div>
+</section>
+
+</div>
+
+<div class="bot">
+  <button class="nav" id="prev">◀ Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav" id="next">Next ▶</button>
+</div>
+
+<script>
+(function(){
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots');
+slides.forEach(function(_,i){ var d=document.createElement('i');
+d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+
+function go(i){
+  if(i<0||i>=slides.length) return; cur=i;
+  slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+  [].forEach.call(dots.children,function(d,k){
+d.classList.toggle('on',k===i); });
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=i===0;
+  document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); // carrega o iframe do jogo na primeira vez que o slide aparece
+  try{ location.hash='s'+(i+1); }catch(e){}
+}
+
+/* lazy load dos jogos + nomes dos times/alunos */
+function nameVal(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
+function jsSafe(t){ return JSON.stringify(t).slice(1,-1).replace(/</g,'\\u003c'); }
+function load(s){
+  var f=s.querySelector('iframe[data-srcdoc]'); if(!f||f.getAttribute('srcdoc')) return;
+  var h=f.getAttribute('data-srcdoc');
+  h=h.split('__TEAM_A__').join(jsSafe(nameVal('teamA')||'Team A'));
+  h=h.split('__TEAM_B__').join(jsSafe(nameVal('teamB')));
+  f.setAttribute('srcdoc',h);
+}
+
+/* 🔊 pronúncia */
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&&sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+  var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+  var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+  for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speakEn(t,btn){
+  try{
+    var sy=window.speechSynthesis; if(!sy) return;
+    sy.cancel();
+    var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
+    var v=pickBestVoice(sy); if(v) u.voice=v;
+    if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
+    sy.speak(u);
+  }catch(e){}
+}
+window.speakEn=speakEn;
+[].forEach.call(document.querySelectorAll('.say'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
+
+/* revelar respostas (answer key) e letras clicáveis */
+[].forEach.call(document.querySelectorAll('[data-ak]'),function(b){
+  var a=b.closest('.rv-area'); if(!a) return;
+  var ic=b.querySelector('svg'); ic=ic?ic.outerHTML+' ':'';
+  var its=[].slice.call(a.querySelectorAll('.fx,.person,.blank,.trow:not(.ex),.tc,.pic,.mq,.q2'));
+  its.sort(function(x,y){ return (+x.getAttribute('data-ord')||0)-(+y.getAttribute('data-ord')||0); });
+  function n(){ return its.filter(function(x){ return x.classList.contains('shown'); }).length; }
+  function upd(){ var k=n(); b.innerHTML = k<its.length ? ic+'Próxima resposta <small class="akn">'+k+'/'+its.length+'</small>' : 'Esconder respostas'; }
+  its.forEach(function(it){ it.classList.add('ri'); it.addEventListener('click',function(e){ if(e.target.closest('.say')) return; it.classList.toggle('shown'); upd(); }); });
+  b.addEventListener('click',function(){ var nx=its.filter(function(x){ return !x.classList.contains('shown'); })[0];
+    if(nx){ nx.classList.add('shown'); try{ nx.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} } else its.forEach(function(x){ x.classList.remove('shown'); }); upd(); });
+  upd(); });
+[].forEach.call(document.querySelectorAll('.say-l'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+
+
+/* fullscreen */
+document.getElementById('fsBtn').addEventListener('click',function(){
+  document.body.classList.toggle('presenting');
+});
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
+
+[].forEach.call(document.querySelectorAll('.go'),function(b){
+b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){
+go(cur+1); });
+document.addEventListener('keydown',function(e){
+  if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1);
+});
+var h=parseInt((location.hash||'').replace('#s',''),10);
+go(h>0&&h<=slides.length?h-1:0);
+})();
+
+var nw=null;
+var GUIDE="<h1>Teachers Guide · Lesson 3 · Practice: introducing yourself<\/h1>\n<p class=\"meta\">Adultos A1 · Beginners · 60 min · review, jobs, verb to be<\/p>\n<div class=\"toc\"><a href=\"#obj\">Objetivo<\/a> · <a href=\"#roteiro\">Roteiro<\/a> · <a href=\"#warm\">Warm-up<\/a> · <a href=\"#greet\">Greetings<\/a> · <a href=\"#jobs\">Jobs<\/a> · <a href=\"#be\">Verb to be<\/a> · <a href=\"#tasks\">Tasks<\/a> · <a href=\"#fim\">Speaking<\/a><\/div>\n\n<h2 id=\"obj\">🎯 Objetivo da aula<\/h2>\n<p>Revisar países, nacionalidades e greetings, apresentar as profissões e o verbo <i>to be<\/i> (para falar de profissões) e praticar toda a parte de introdução inicial.<\/p>\n\n<h2 id=\"roteiro\">🗺️ Roteiro rápido<\/h2>\n<table>\n<tr><th>Slide<\/th><th>Conteúdo<\/th><th>Tempo<\/th><\/tr>\n<tr><td>2<\/td><td>Warm-up: Spin the wheel (countries and nationalities)<\/td><td>7 min<\/td><\/tr>\n<tr><td>3<\/td><td>Match the greetings<\/td><td>5 min<\/td><\/tr>\n<tr><td>4–5<\/td><td>Jobs + match the pictures<\/td><td>12 min<\/td><\/tr>\n<tr><td>6–7<\/td><td>Verb to be + talking about jobs → <b>drills<\/b> (oral)<\/td><td>13 min<\/td><\/tr>\n<tr><td>8–9<\/td><td>Task 1 e Task 2<\/td><td>10 min<\/td><\/tr>\n<tr><td>10–11<\/td><td>Answer the questions + complete the dialogue<\/td><td>10 min<\/td><\/tr>\n<tr><td>12<\/td><td>Resumo e feedback<\/td><td>3 min<\/td><\/tr>\n<\/table>\n\n<h2 id=\"warm\">🌍 Slide 2 · Warm-up · countries and nationalities<\/h2>\n<p>Iniciar aula com warm up - countries and nationalities.<\/p>\n<ol class=\"small\">\n<li>Clique em <b>Spin<\/b> (ou no centro da roda). O aluno lê o país em voz alta.<\/li>\n<li>O aluno diz a nacionalidade. Depois, clique em <b>Show nationality<\/b> para conferir; o 🔊 ajuda na pronúncia.<\/li>\n<li>Se quiser, peça uma frase completa: <i>\"I'm from Brazil. I'm Brazilian.\"<\/i><\/li>\n<\/ol>\n\n<h2 id=\"greet\">👋 Slide 3 · Greetings<\/h2>\n<p>Relembrar greetings com exercício match the greetings. Depois, clique em <b>Answer key<\/b>.<\/p>\n<table><tr><th>9:00<\/th><th>14:00<\/th><th>20:00<\/th><\/tr><tr><td>Good morning<\/td><td>Good afternoon<\/td><td>Good evening<\/td><\/tr><\/table>\n<p>Outras formas de cumprimentar: Hi! · Hello! · What's up? · Nice to meet you!<\/p>\n\n<h2 id=\"jobs\">💼 Slides 4–5 · Jobs<\/h2>\n<p>Apresentar vocabulário e fixar com exercício associação de imagens - provavelmente a profissão do aluno não estará na listagem, mas é importante ensinar a ele como falar da sua profissão, escreva no chat e o faça repetir para trabalhar a pronúncia.<\/p>\n<table><tr><th>1<\/th><th>2<\/th><th>3<\/th><th>4<\/th><th>5<\/th><th>6<\/th><th>7<\/th><th>8<\/th><\/tr><tr><td>carpenter<\/td><td>pilot<\/td><td>doctor<\/td><td>waiter<\/td><td>nurse<\/td><td>chef<\/td><td>businessman<\/td><td>teacher<\/td><\/tr><\/table>\n\n<h2 id=\"be\">✏️ Slides 6–7 · Verb to be<\/h2>\n<p>Apresentar verb to be para uso somente de profissões e fixar com exercícios, após isso, drills para fixação.<\/p>\n<p><b>Drills (oral):<\/b><\/p>\n<ol class=\"small\">\n<li>Eu sou professora \\ empresária \\ garçonete<\/li>\n<li>Ela é médica \\ enfermeira \\ piloto<\/li>\n<li>Eles são pilotos \\ carpinteiros \\ garçom<\/li>\n<\/ol>\n\n<h2 id=\"tasks\">📝 Slides 8–9 · Tasks<\/h2>\n<table>\n<tr><th>#<\/th><th>Task 1 · Fix the mistakes<\/th><th>Task 2 · am / is / are<\/th><\/tr>\n<tr><td>1<\/td><td>I <b>am<\/b> Jonathan.<\/td><td>is<\/td><\/tr>\n<tr><td>2<\/td><td>He <b>is<\/b> not 6 years old.<\/td><td>are<\/td><\/tr>\n<tr><td>3<\/td><td>They <b>are<\/b> from the USA.<\/td><td>is<\/td><\/tr>\n<tr><td>4<\/td><td>We <b>are<\/b> 20 years old.<\/td><td>are<\/td><\/tr>\n<tr><td>5<\/td><td>She <b>is<\/b> not a dentist.<\/td><td>is<\/td><\/tr>\n<tr><td>6<\/td><td>It <b>is<\/b> raining.<\/td><td>am<\/td><\/tr>\n<\/table>\n\n<h2 id=\"fim\">🎤 Slides 10–11 · Speaking<\/h2>\n<p>Finalizar com answer the questions para praticar toda essa parte de introdução inicial e complete the dialogue.<\/p>\n<div class=\"tip\">💜 Para fechar, pergunte se ficou alguma dúvida e dê um feedback curto sobre o desempenho do aluno.<\/div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Lesson 3</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+</script>
+</body>
+</html>
