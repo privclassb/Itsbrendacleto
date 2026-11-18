@@ -68,10 +68,13 @@ body.presenting .top,body.presenting .bot{display:none}
 body.presenting .stage{top:0;bottom:0}
 :fullscreen .top,:fullscreen .bot{display:none}
 :fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 8</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
 <div class="stage" id="stage">
 <section class="slide "><div class="cover"><div class="emo"></div><div class="kick">MY FAMILY & MY PETS</div><h1>Talking About<br>My Family!</h1><div class="pill">👨‍👩‍👧‍👦🐶🐱</div></div></section>
 <section class="slide "><h2>👨‍👩‍👧‍👦 Family Members</h2><p class="sub">Who is in your family?</p><div class="row"><div class="card" style="background:#F2A7C3"><div class=e>👩</div><div class="lab">Mom</div><div class=sm><i>Mãe</i></div></div><div class="card" style="background:#9fdcf2"><div class=e>👨</div><div class="lab">Dad</div><div class=sm><i>Pai</i></div></div><div class="card" style="background:#A8E6CF"><div class=e>👧</div><div class="lab">Sister</div><div class=sm><i>Irmã</i></div></div><div class="card" style="background:#C9A8E8"><div class=e>👦</div><div class="lab">Brother</div><div class=sm><i>Irmão</i></div></div><div class="card" style="background:#FFD97D"><div class=e>👵</div><div class="lab">Grandma</div><div class=sm><i>Avó</i></div></div><div class="card" style="background:#FFB3A7"><div class=e>👴</div><div class="lab">Grandpa</div><div class=sm><i>Avô</i></div></div><div class="card" style="background:#F2A7C3"><div class=e>👩‍🦰</div><div class="lab">Aunt</div><div class=sm><i>Tia</i></div></div><div class="card" style="background:#9fdcf2"><div class=e>👨‍🦱</div><div class="lab">Uncle</div><div class=sm><i>Tio</i></div></div><div class="card" style="background:#A8E6CF"><div class=e>🧒</div><div class="lab">Cousin</div><div class=sm><i>Primo(a)</i></div></div><div class="card" style="background:#C9A8E8"><div class=e>👶</div><div class="lab">Baby</div><div class=sm><i>Bebê</i></div></div></div></section>
@@ -155,6 +158,9 @@ document.getElementById('noteBtn').addEventListener('click',function(){
 document.getElementById('fsBtn').addEventListener('click',function(){
   document.body.classList.toggle('presenting');
 });
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

@@ -207,6 +207,8 @@ body.presenting .top,body.presenting .bot{display:none}
 body.presenting .stage{top:0;bottom:0}
 :fullscreen .top,:fullscreen .bot{display:none}
 :fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 </style>
 </head>
 <body>
@@ -220,6 +222,7 @@ body.presenting .stage{top:0;bottom:0}
   </div>
 </div>
 
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
 <div class="stage" id="stage">
 
 <section class="slide">
@@ -470,6 +473,9 @@ try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
 document.getElementById('fsBtn').addEventListener('click',function(){
   document.body.classList.toggle('presenting');
 });
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
 
 [].forEach.call(document.querySelectorAll('.go'),function(b){
 b.addEventListener('click',function(){ go(cur+1); }); });
