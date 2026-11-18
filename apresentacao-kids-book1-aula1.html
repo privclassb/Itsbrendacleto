@@ -76,9 +76,17 @@ window.speakEn = (function(){
   var enVoice = null;
   function pickVoice(){
     try{
-      var vs = speechSynthesis.getVoices();
-      if(!vs || !vs.length) return null;
-      return vs.filter(function(v){ return v.lang==='en-US'; })[0] || vs.filter(function(v){ return /^en-/i.test(v.lang); })[0] || null;
+      var voices = speechSynthesis.getVoices();
+      if(!voices || !voices.length) return null;
+      var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+      var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+      var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+      var good = voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+      if(!good.length) good = voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+      var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+      for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+      if(good.length) return good[0];
+      return voices.filter(isEnUS)[0] || voices.filter(isEn)[0] || null;
     }catch(e){ return null; }
   }
   if('speechSynthesis' in window){
@@ -150,7 +158,7 @@ var CO=[&#x27;#9fdcf2&#x27;,&#x27;#F2A7C3&#x27;,&#x27;#A8E6CF&#x27;,&#x27;#FFD97
 function $(i){return document.getElementById(i);}
 function nm(){return [].map.call(document.querySelectorAll(&#x27;#names input&#x27;),function(i){return i.value.trim();}).filter(Boolean);}
 function who(){var N=nm();$(&#x27;turn&#x27;).textContent=N.length?&#x27;👉 &#x27;+N[turn%N.length]+&#x27; is up! 🎤&#x27;:&#x27;&#x27;;}
-var _enV=null;function _pickV(){try{var vs=speechSynthesis.getVoices();if(!vs||!vs.length)return null;return vs.filter(function(v){return v.lang===&#x27;en-US&#x27;;})[0]||vs.filter(function(v){return /^en-/i.test(v.lang);})[0]||null;}catch(e){return null;}}if(&#x27;speechSynthesis&#x27; in window){_enV=_pickV();speechSynthesis.onvoiceschanged=function(){_enV=_pickV()||_enV;};}var _sT=null;function say(t){try{speechSynthesis.cancel();clearTimeout(_sT);_sT=setTimeout(function(){var u=new SpeechSynthesisUtterance(t);u.lang=&#x27;en-US&#x27;;u.rate=.8;u.pitch=1;u.volume=1;if(_enV)u.voice=_enV;speechSynthesis.speak(u);},60);}catch(e){}}
+var _enV=null;function _pickV(){try{var vs=speechSynthesis.getVoices();if(!vs||!vs.length)return null;var isEnUS=function(v){return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;;};var isEn=function(v){return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0;};var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;var good=vs.filter(function(v){return isEnUS(v)&amp;&amp;!BAD.test(v.name);});if(!good.length)good=vs.filter(function(v){return isEn(v)&amp;&amp;!BAD.test(v.name);});var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];for(var i=0;i&lt;PREF.length;i++){for(var j=0;j&lt;good.length;j++){if(good[j].name===PREF[i])return good[j];}}if(good.length)return good[0];return vs.filter(isEnUS)[0]||vs.filter(isEn)[0]||null;}catch(e){return null;}}if(&#x27;speechSynthesis&#x27; in window){_enV=_pickV();speechSynthesis.onvoiceschanged=function(){_enV=_pickV()||_enV;};}var _sT=null;function say(t){try{speechSynthesis.cancel();clearTimeout(_sT);_sT=setTimeout(function(){var u=new SpeechSynthesisUtterance(t);u.lang=&#x27;en-US&#x27;;u.rate=.8;u.pitch=1;u.volume=1;if(_enV)u.voice=_enV;speechSynthesis.speak(u);},60);}catch(e){}}
 function draw(){var b=$(&#x27;bn&#x27;);b.innerHTML=&#x27;&#x27;;b.style.setProperty(&#x27;--c&#x27;,color);nameL.forEach(function(c){var x=document.createElement(&#x27;b&#x27;);x.textContent=c;b.appendChild(x);});if(!nameL.length)b.innerHTML=&#x27;&lt;span style=&quot;color:#ccc;font-family:Nunito;font-weight:900;font-size:28px&quot;&gt;_ _ _ _&lt;/span&gt;&#x27;;}
 &#x27;ABCDEFGHIJKLMNOPQRSTUVWXYZ&#x27;.split(&#x27;&#x27;).forEach(function(c){var k=document.createElement(&#x27;button&#x27;);k.className=&#x27;k&#x27;;k.textContent=c;k.onclick=function(){if(nameL.length&lt;12){nameL.push(c);say(c);draw();}};$(&#x27;kb&#x27;).appendChild(k);});
 CO.forEach(function(c){var i=document.createElement(&#x27;i&#x27;);i.style.background=c;i.onclick=function(){color=c;draw();};$(&#x27;cols&#x27;).appendChild(i);});
@@ -194,17 +202,8 @@ document.getElementById('noteBtn').addEventListener('click',function(){
   try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
   window.focus(); });
 document.getElementById('fsBtn').addEventListener('click',function(){
-  var turningOn=!document.body.classList.contains('presenting');
-  if(turningOn){
-    document.body.classList.add('presenting');
-    var e=document.documentElement;
-    if(e.requestFullscreen){ var req=e.requestFullscreen(); if(req&&req.catch) req.catch(function(){}); }
-  } else {
-    document.body.classList.remove('presenting');
-    if(document.fullscreenElement){ document.exitFullscreen(); }
-  }
+  document.body.classList.toggle('presenting');
 });
-document.addEventListener('fullscreenchange',function(){ if(!document.fullscreenElement) document.body.classList.remove('presenting'); });
 document.addEventListener('keydown',function(e){ if(/INPUT|TEXTAREA/.test((e.target.tagName||''))||e.target.isContentEditable) return; if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1); if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1); });
 var h=parseInt((location.hash||'').replace('#s',''),10); go(h>0&&h<=slides.length?h-1:0);
 })();

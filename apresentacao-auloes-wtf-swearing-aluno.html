@@ -1847,16 +1847,8 @@ document.addEventListener('keydown', e => {
 // ─── FULLSCREEN ─────────────────────────────────────────
 
 function toggleFS() {
-  var turningOn = !document.body.classList.contains('presenting');
-  if (turningOn) {
-    document.body.classList.add('presenting');
-    document.documentElement.requestFullscreen().catch(() => {});
-  } else {
-    document.body.classList.remove('presenting');
-    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
-  }
+  document.body.classList.toggle('presenting');
 }
-document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement) document.body.classList.remove('presenting'); });
 
 // ─── SWEAR WORDS BOARD ───────────────────────────────────
 
