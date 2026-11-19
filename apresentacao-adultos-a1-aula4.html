@@ -43,6 +43,12 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-heig
 .dots i.on{width:22px;background:var(--plum)}
 
 .stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
 .slide.on{display:flex;animation:in .4s ease}
 @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -280,14 +286,7 @@ svg.ill{width:100%;height:auto;max-height:60vh;display:block}
 .sent2 .st{color:var(--ink)}
 .sent2 .st.empty{color:#B8B2C8;font-style:italic;font-family:'DM Sans',sans-serif;font-size:13px}
 .say.sm2{width:30px;height:30px}
-.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
-body.presenting .top,body.presenting .bot{display:none}
-body.presenting .stage{top:0;bottom:0}
-:fullscreen .top,:fullscreen .bot{display:none}
-:fullscreen .stage{top:0;bottom:0}
-.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
-body.presenting .exit-presenting{display:flex}
-</style>
+.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}</style>
 </head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
@@ -503,7 +502,7 @@ try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
   b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
 
 [].forEach.call(document.querySelectorAll('[data-pz]'),function(b){
-  b.addEventListener('click',function(){ var p=document.getElementById('pz'); p.classList.toggle('join'); b.lastChild.textContent=p.classList.contains('join')?' Separar as peças':' Montar a frase'; if(p.classList.contains('join')) speakEn('I eat bread and ham.'); }); });
+  b.addEventListener('click',function(){ var p=document.getElementById('pz'); p.classList.toggle('join'); b.lastChild.textContent=p.classList.contains('join')?' Separar as peças':' Montar a frase';  }); });
 
 (function(){
   var plates=[].slice.call(document.querySelectorAll('.plate')); if(!plates.length) return;
