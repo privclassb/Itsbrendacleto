@@ -43,6 +43,12 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-heig
 .dots i.on{width:22px;background:var(--plum)}
 
 .stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
 .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
 .slide.on{display:flex;animation:in .4s ease}
 @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -234,14 +240,7 @@ svg.ill{width:100%;height:auto;max-height:60vh;display:block}
 .gap{display:inline-block;min-width:84px;border-bottom:1.5px dashed #D6D0E2;text-align:center;margin:0 4px}
 .gap .a{display:none;color:var(--teal);font-style:italic;font-weight:600}
 .shown .gap{border-bottom-color:var(--teal)}.shown .gap .a{display:inline}
-.fix{grid-auto-flow:column;grid-template-rows:repeat(5,auto)}@media (max-width:820px){.fix{grid-auto-flow:row;grid-template-rows:none}}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}/* FULLSCREEN-CLEAN-PATCH: apresentacao limpa (fullscreen real OU clique no botao, mesmo se o navegador bloquear o fullscreen de verdade -- ex.: compartilhando tela no Meet) */
-body.presenting .top,body.presenting .bot{display:none}
-body.presenting .stage{top:0;bottom:0}
-:fullscreen .top,:fullscreen .bot{display:none}
-:fullscreen .stage{top:0;bottom:0}
-.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
-body.presenting .exit-presenting{display:flex}
-</style>
+.fix{grid-auto-flow:column;grid-template-rows:repeat(5,auto)}@media (max-width:820px){.fix{grid-auto-flow:row;grid-template-rows:none}}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}</style>
 </head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
@@ -330,14 +329,25 @@ var C=[&quot;#56468A&quot;,&quot;#B9707A&quot;,&quot;#3C8580&quot;,&quot;#C99A3E
 var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;20&quot; height=&quot;20&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.7&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
 var $=function(x){return document.getElementById(x);}, i=0, seen={};
 $(&#x27;sayw&#x27;).innerHTML=SPK;
-function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=s.getVoices().filter(function(x){return /en[-_]US/i.test(x.lang);}); if(v.length) u.voice=v[0]; s.speak(u);}catch(e){} }
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+  var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
 function show(){ var d=D[i]; $(&#x27;pic&#x27;).style.setProperty(&#x27;--c&#x27;,C[i%C.length]);
   $(&#x27;pic&#x27;).innerHTML=&#x27;&lt;img alt=&quot;&quot; src=&quot;&#x27;+d.img+&#x27;&quot;&gt;&#x27;;
   $(&#x27;wt&#x27;).textContent=d.w; $(&#x27;pt&#x27;).textContent=d.pt;
   var r=!!seen[i]; $(&#x27;word&#x27;).classList.toggle(&#x27;show&#x27;,r); $(&#x27;pt&#x27;).classList.toggle(&#x27;show&#x27;,r); $(&#x27;ask&#x27;).style.display=r?&#x27;none&#x27;:&#x27;&#x27;; $(&#x27;rev&#x27;).style.display=r?&#x27;none&#x27;:&#x27;&#x27;;
   $(&#x27;prev&#x27;).disabled=i===0; $(&#x27;next&#x27;).disabled=i===D.length-1;
   var ds=$(&#x27;dots&#x27;); ds.innerHTML=&#x27;&#x27;; D.forEach(function(_,k){ var e=document.createElement(&#x27;i&#x27;); e.className=k===i?&#x27;on&#x27;:(seen[k]?&#x27;seen&#x27;:&#x27;&#x27;); ds.appendChild(e); }); }
-$(&#x27;rev&#x27;).onclick=function(){ seen[i]=true; show(); speak(D[i].w.replace(&#x27; / &#x27;,&#x27;, &#x27;)); };
+$(&#x27;rev&#x27;).onclick=function(){ seen[i]=true; show(); };
 $(&#x27;sayw&#x27;).onclick=function(){ speak(D[i].w.replace(&#x27; / &#x27;,&#x27;, &#x27;)); };
 $(&#x27;prev&#x27;).onclick=function(){ if(i&gt;0){ i--; show(); } };
 $(&#x27;next&#x27;).onclick=function(){ if(i&lt;D.length-1){ i++; show(); } };
@@ -413,14 +423,25 @@ var N=12, Q=[], i=0, sc=0, res=[];
 var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.7&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
 var $=function(x){return document.getElementById(x);};
 $(&#x27;sayw&#x27;).innerHTML=SPK;
-function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=s.getVoices().filter(function(x){return /en[-_]US/i.test(x.lang);}); if(v.length) u.voice=v[0]; s.speak(u);}catch(e){} }
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+  var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
 function shuf(a){ a=a.slice(); for(var k=a.length-1;k&gt;0;k--){ var j=Math.floor(Math.random()*(k+1)); var t=a[k]; a[k]=a[j]; a[j]=t; } return a; }
 function prog(){ var p=$(&#x27;prog&#x27;); p.innerHTML=&#x27;&#x27;; for(var k=0;k&lt;N;k++){ var e=document.createElement(&#x27;i&#x27;); e.className=k&lt;res.length?(res[k]?&#x27;ok&#x27;:&#x27;no&#x27;):(k===i?&#x27;now&#x27;:&#x27;&#x27;); p.appendChild(e);} $(&#x27;sc&#x27;).textContent=sc; }
 function show(){ var q=Q[i]; $(&#x27;w&#x27;).textContent=q[0]; var o=$(&#x27;opts&#x27;); o.innerHTML=&#x27;&#x27;;
   [&#x27;play&#x27;,&#x27;go&#x27;,&#x27;do&#x27;].forEach(function(v){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;opt-btn&#x27;; b.textContent=v.toUpperCase();
     b.onclick=function(){ var ok=v===q[1]; [].forEach.call(o.children,function(x){ x.disabled=true; if(x.textContent.toLowerCase()===q[1]) x.classList.add(&#x27;right&#x27;); });
       if(!ok) b.classList.add(&#x27;wrong&#x27;); else sc++; res.push(ok);
-      $(&#x27;w&#x27;).innerHTML=&#x27;&lt;span class=&quot;v&quot;&gt;&#x27;+q[1]+&#x27;&lt;/span&gt; &#x27;+q[0]; speak(q[1]+&#x27; &#x27;+q[0]);
+      $(&#x27;w&#x27;).innerHTML=&#x27;&lt;span class=&quot;v&quot;&gt;&#x27;+q[1]+&#x27;&lt;/span&gt; &#x27;+q[0];
       $(&#x27;sayw&#x27;).classList.remove(&#x27;hide&#x27;); $(&#x27;nx&#x27;).classList.remove(&#x27;hide&#x27;); prog(); };
     o.appendChild(b); });
   $(&#x27;sayw&#x27;).classList.add(&#x27;hide&#x27;); $(&#x27;nx&#x27;).classList.add(&#x27;hide&#x27;); prog(); }
@@ -514,7 +535,18 @@ var Q=[{&quot;svg&quot;: &quot;&lt;path d=\&quot;M6 3v6a2 2 0 0 0 4 0V3M8 9v12M1
 var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.7&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
 var $=function(x){return document.getElementById(x);};
 $(&#x27;sayw&#x27;).innerHTML=SPK;
-function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=s.getVoices().filter(function(x){return /en[-_]US/i.test(x.lang);}); if(v.length) u.voice=v[0]; s.speak(u);}catch(e){} }
+function pickBestVoice(sy){
+  var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+  var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+  var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+  var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+  if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+  if(good.length) return good[0];
+  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
 function full(q){ return q.a+&#x27; &#x27;+q.r+&#x27; &#x27;+q.b; }
 function prog(){ var p=$(&#x27;prog&#x27;); p.innerHTML=&#x27;&#x27;; Q.forEach(function(_,k){ var e=document.createElement(&#x27;i&#x27;); e.className=k&lt;res.length?(res[k]?&#x27;ok&#x27;:&#x27;no&#x27;):(k===i?&#x27;now&#x27;:&#x27;&#x27;); p.appendChild(e); }); $(&#x27;sc&#x27;).textContent=sc; }
 function show(){ var q=Q[i];
@@ -523,7 +555,7 @@ function show(){ var q=Q[i];
   var o=$(&#x27;opts&#x27;); o.innerHTML=&#x27;&#x27;;
   [&quot;don&#x27;t&quot;,&quot;doesn&#x27;t&quot;].forEach(function(v){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;opt-btn&#x27;; b.textContent=v;
     b.onclick=function(){ var ok=v===q.r; [].forEach.call(o.children,function(x){ x.disabled=true; if(x.textContent===q.r) x.classList.add(&#x27;right&#x27;); });
-      if(!ok) b.classList.add(&#x27;wrong&#x27;); else sc++; res.push(ok); $(&#x27;g&#x27;).textContent=q.r; speak(full(q));
+      if(!ok) b.classList.add(&#x27;wrong&#x27;); else sc++; res.push(ok); $(&#x27;g&#x27;).textContent=q.r;
       $(&#x27;sayw&#x27;).classList.remove(&#x27;hide&#x27;); $(&#x27;nx&#x27;).classList.remove(&#x27;hide&#x27;); prog(); };
     o.appendChild(b); });
   $(&#x27;sayw&#x27;).classList.add(&#x27;hide&#x27;); $(&#x27;nx&#x27;).classList.add(&#x27;hide&#x27;); prog(); }
