@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review 1 · A1 Beginners · Inglês para a Vida Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--mint:#3C8580;
+  --ink:#24213A; --ink2:#6A6680; --line:#E9E5EF;
+  --plum:#56468A; --plum2:#7A6BAE; --plum-s:#F0EDF7;
+  --rose:#B9707A; --rose-s:#F7ECEC;
+  --teal:#3C8580; --teal-s:#E7F1EF;
+  --gold:#C99A3E; --gold-s:#FAF2E1;
+  --bg:#FAF8F5; --card:#FFFFFF;
+  --shadow:0 1px 2px rgba(36,33,58,.04),0 8px 24px rgba(36,33,58,.06);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;font-size:clamp(15px,1.4vw,19px);line-height:1.5}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-height:1.1;letter-spacing:-.015em}
+.i{display:block;flex:none}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none}
+.b1{width:44vw;height:44vw;background:#E4DEF2;top:-18vw;right:-14vw}
+.b2{width:36vw;height:36vw;background:#F2E1E1;bottom:-18vw;left:-14vw}
+
+.top{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tag{font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--plum);white-space:nowrap}
+.tag::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-right:10px;vertical-align:1px}
+.ctl{display:flex;align-items:center;gap:8px}
+.cnt{font-weight:600;color:var(--ink2);font-size:13px;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.ctl button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;background:#fff;color:var(--ink)}
+@media (max-width:640px){.bot .dots{gap:4px;flex-wrap:nowrap;overflow:hidden;padding:0 6px}.bot .dots i{flex:none;width:5px;height:5px}.bot .dots i.on{width:14px}.bot .nav{padding:8px 12px;white-space:nowrap}}
+@media (max-width:640px){.top{padding:0 12px}.tag{font-size:10px;letter-spacing:.12em;overflow:hidden;text-overflow:ellipsis;min-width:0}.tag::before{display:none}.ctl{gap:6px}.ctl button{font-size:12px;padding:6px 8px;white-space:nowrap}.cnt{min-width:auto}#fsBtn{display:none}.bot{padding:0 12px}}
+.ctl button:hover{border-color:var(--plum2);color:var(--plum)}
+.bot{position:fixed;bottom:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.nav{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 18px;cursor:pointer;background:var(--plum);color:#fff}
+#prev{background:#fff;color:var(--plum)}
+.nav:disabled{opacity:.3;cursor:default}
+.dots{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:0 10px}
+.dots i{width:7px;height:7px;border-radius:7px;background:#D8D3E3;cursor:pointer;transition:.25s}
+.dots i.on{width:22px;background:var(--plum)}
+
+.stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
+.slide.on{display:flex;animation:in .4s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:1160px;margin:auto}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,4.5vw,64px);align-items:center}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:14px}
+.eyebrow b{font-family:'Fraunces',serif;font-size:15px;letter-spacing:0;color:var(--plum);font-weight:600}
+.eyebrow::after{content:"";flex:0 0 48px;height:1px;background:currentColor;opacity:.5}
+.title{font-size:clamp(32px,4.6vw,58px)}
+.title em{font-style:italic;color:var(--plum)}
+.lead{font-size:clamp(16px,1.7vw,21px);color:var(--ink2);margin:14px 0 0;max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:clamp(14px,2vw,24px);box-shadow:var(--shadow)}
+
+.say{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;justify-content:center;padding:0;transition:.15s}
+.say:hover{background:var(--plum);border-color:var(--plum);color:#fff}
+.say.playing{background:var(--plum);border-color:var(--plum);color:#fff;animation:pulse .9s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(86,70,138,.15)}}
+.say.lt{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
+.btn{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 16px;cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;gap:8px}
+.btn:hover,.btn.playing{background:var(--plum);color:#fff}
+.btn.solid{background:var(--plum);color:#fff}
+
+/* capa */
+.cover-num{font-family:'Fraunces',serif;font-size:clamp(90px,14vw,190px);line-height:.8;color:var(--plum-s);font-weight:600;-webkit-text-stroke:1.5px var(--plum2);color:transparent}
+.cover .title{font-size:clamp(44px,6.6vw,86px)}
+.cover .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink2);font-size:.9em}
+.cover .meta span{display:flex;align-items:center;gap:8px}
+.cover .meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rose)}
+svg.ill{width:100%;height:auto;max-height:60vh;display:block}
+
+/* greetings do dia */
+.day{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,18px);margin-top:26px}
+@media (max-width:820px){.day{grid-template-columns:repeat(2,1fr)}}
+.tod{border-radius:var(--r);padding:20px 18px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-height:200px}
+.tod .i{color:var(--c)}
+.tod .when{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-top:auto;padding-top:14px}
+.tod .en{font-family:'Fraunces',serif;font-size:clamp(20px,2.1vw,27px);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.tod .pt{color:var(--ink2);font-size:.92em}
+.tod.dark{background:var(--ink);color:#fff;border-color:var(--ink)} .tod.dark .pt{color:#BDB8D0}
+.tod.dark .say{background:transparent;border-color:rgba(255,255,255,.3);color:#fff}
+.note{margin-top:18px;display:flex;align-items:flex-start;gap:12px;color:var(--ink2);background:var(--gold-s);border-radius:12px;padding:12px 16px;max-width:760px}
+.note .i{color:var(--gold);margin-top:2px}
+.note b{color:var(--ink)}
+
+/* listas de vocabulário */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);margin-top:26px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.colh{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.14em;font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.colh .i{color:var(--rose)}
+.vlist{display:grid;gap:10px}
+.vrow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 18px}
+.vrow .tx{flex:1}
+.vrow .en{font-weight:600;font-size:clamp(16px,1.7vw,20px)}
+.vrow .pt{color:var(--ink2);font-size:.88em}
+.badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--rose-s);color:var(--rose);vertical-align:2px}
+
+/* diálogo */
+.dialog{margin-top:16px;display:grid;gap:10px}
+.bub{max-width:80%;padding:12px 16px;border-radius:16px;font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,22px)}
+.bub small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.bub.a{background:var(--plum);color:#fff;border-bottom-left-radius:4px}
+.bub.b{background:#fff;border:1px solid var(--line);justify-self:end;border-bottom-right-radius:4px}
+
+/* name */
+.qline{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.qbig{font-family:'Fraunces',serif;font-size:clamp(30px,4.2vw,54px);font-weight:500}
+.qbig em{color:var(--plum)}
+.qpt{color:var(--ink2);font-size:.95em;margin-top:6px}
+.contr{display:grid;gap:12px;margin-top:28px}
+.pair{display:grid;grid-template-columns:1fr auto 1fr;gap:12px 16px;align-items:center}
+@media (max-width:820px){.pair{grid-template-columns:1fr;gap:6px}.pair .eq{font-size:20px;line-height:1}.contr{gap:20px}}
+.sent{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-family:'Fraunces',serif;font-size:clamp(20px,2.2vw,28px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sent .lbl{display:block;font-family:'DM Sans',sans-serif;margin-bottom:2px}
+.sent .k{color:var(--plum);font-style:italic} .sent .k2{color:var(--rose);font-style:italic}
+.eq{font-family:'Fraunces',serif;font-size:26px;color:var(--ink2);text-align:center}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+
+/* exercício 1.5 */
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.audio-tag{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.steps3{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;color:var(--ink2);font-size:.88em}
+.steps3 span b{font-family:'Fraunces',serif;color:var(--plum);margin-right:4px}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,16px);margin-top:22px}
+@media (max-width:820px){.people{grid-template-columns:repeat(2,1fr)}}
+.person{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:14px;position:relative}
+.person > svg{width:clamp(56px,6vw,76px);height:auto;flex:none}
+.person .lt{font-family:'Fraunces',serif;font-weight:600;color:var(--ink2);font-size:14px;position:absolute;top:10px;left:14px}
+.person .nm{flex:1;font-family:'Fraunces',serif;font-size:clamp(19px,2vw,25px);display:flex;align-items:center;gap:10px}
+.person .box{width:38px;height:38px;border-radius:10px;border:1.5px dashed #CFC8DD;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;flex:none}
+.person .box b{display:none}
+:is(.shown .person,.person.shown) .box{border:0;background:var(--teal)} :is(.shown .person,.person.shown) .box b{display:inline}
+
+/* alfabeto */
+.abc{display:grid;grid-template-columns:repeat(9,1fr);gap:clamp(6px,.9vw,10px);margin-top:24px}
+@media (max-width:820px){.abc{grid-template-columns:repeat(6,1fr)}}
+.ltb{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(24px,3vw,40px);border:1px solid var(--line);border-radius:12px;padding:14px 0;cursor:pointer;color:var(--ink);background:#fff;transition:.15s}
+.ltb:hover,.ltb.playing{background:var(--plum);border-color:var(--plum);color:#fff}
+.ltb.v{color:var(--rose)} .ltb.v:hover,.ltb.v.playing{color:#fff}
+.legend{display:flex;gap:18px;margin-top:14px;color:var(--ink2);font-size:.85em}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+/* grupos de som */
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:24px}
+@media (max-width:820px){.groups{grid-template-columns:repeat(2,1fr)}}
+.grp{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.grp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.grp .snd{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:baseline;justify-content:space-between}
+.grp .snd b{font-family:'Fraunces',serif;font-size:22px;letter-spacing:0;text-transform:none;color:var(--c);font-weight:600}
+.grp .ls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.grp .ls button{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,24px);width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;color:var(--ink)}
+.grp .ls button:hover,.grp .ls button.playing{background:var(--c);border-color:var(--c);color:#fff}
+.grp.tip{background:var(--gold-s);border-color:transparent}
+.grp.tip p{margin:8px 0 0;font-size:.9em;color:var(--ink)}
+
+/* nome completo */
+.namecard{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin-top:24px}
+.namecard .hd{background:var(--plum);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.namecard .hd small{font-size:11px;font-weight:700;letter-spacing:.2em;opacity:.8}
+.namecard .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:24px;font-style:italic}
+.parts{display:grid;grid-template-columns:repeat(3,1fr)}
+.part{padding:16px 14px;border-right:1px solid var(--line)}
+.part:last-child{border-right:0}
+.part .w{font-family:'Fraunces',serif;font-size:clamp(22px,2.5vw,32px)}
+.part .lb{font-weight:600;display:flex;align-items:center;gap:8px;margin-top:8px}
+.part .lp{color:var(--ink2);font-size:.82em}
+.part .lb .say{width:28px;height:28px}
+.full{border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;background:var(--bg)}
+.full span small{font-weight:400;color:var(--ink2)}
+.spell{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.spell button{font-family:'Fraunces',serif;font-size:22px;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer}
+.spell button.playing,.spell button:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.spell .gap{width:14px}
+.mini{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,23px)}
+.mini.q{color:var(--ink2);font-style:italic}
+
+/* 1.9 */
+.example{display:inline-flex;align-items:center;gap:12px;margin-top:10px;color:var(--ink2)}
+.example b{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:.06em;font-weight:500;font-size:1.1em}
+.blanks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;margin-top:24px}
+@media (max-width:820px){.blanks{grid-template-columns:repeat(2,1fr)}}
+.blank{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:60px}
+.blank .num{flex:none;font-family:'Fraunces',serif;color:var(--rose);font-weight:600;width:22px}
+.blank .line{flex:1;border-bottom:1.5px dashed #D6D0E2;height:22px}
+.blank .an{display:none;flex:1;font-family:'Fraunces',serif;font-size:clamp(18px,2vw,23px)}
+.blank .say{display:none}
+:is(.shown .blank,.blank.shown) .line{display:none}:is(.shown .blank,.blank.shown) .an{display:block}:is(.shown .blank,.blank.shown) .say{display:inline-flex}
+
+@media (max-width:600px){.people{grid-template-columns:1fr}.cover-num{display:none}.namecard .hd{flex-direction:column;align-items:flex-start;gap:2px}.part{padding:12px 10px}.blanks{grid-template-columns:1fr 1fr}}
+/* resumo */
+.recap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+@media (max-width:820px){.recap{grid-template-columns:1fr}}
+.recap .card{display:flex;flex-direction:column;gap:10px}
+.recap .card .i{color:var(--plum)}
+.recap .card b{font-family:'Fraunces',serif;font-weight:500;font-size:22px}
+.recap .card span{color:var(--ink2);font-size:.9em}
+.next-up{margin-top:26px;display:inline-flex;gap:10px;align-items:center;color:var(--ink2);font-size:.95em}
+.next-up b{color:var(--ink)}
+.next-up .i{color:var(--rose)}
+
+/* ===== Review 1 ===== */
+.vcols{columns:2;column-gap:clamp(12px,2vw,22px);margin-top:20px;max-width:960px}
+@media (max-width:520px){.vcols{columns:1}}
+.fr{break-inside:avoid;margin-bottom:8px;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 8px 7px 14px}
+.fr .tx{flex:1;line-height:1.25}
+.fr .en{display:block;font-weight:600;font-size:clamp(15px,1.5vw,18px)}
+.fr .pt{color:var(--ink2);font-size:.82em}
+.fr .say{width:30px;height:30px}
+.act{display:grid;grid-template-columns:1.2fr .8fr;gap:clamp(16px,3vw,36px);margin-top:22px;align-items:start}
+@media (max-width:820px){.act{grid-template-columns:1fr}}
+.act .vcols{margin-top:0}
+.rule{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow);display:grid;gap:12px}
+.rule .who{font-family:'Fraunces',serif;font-size:clamp(22px,2.4vw,30px)}
+.rule .who b{color:var(--rose);font-weight:600}
+.rule .ex{display:grid;gap:6px;font-size:.95em;color:var(--ink2)}
+.rule .ex i{font-style:normal;color:var(--ink)} .rule .ex i u{text-decoration:none;color:var(--rose);font-weight:600}
+.neg{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.6vw,32px);margin-top:24px}
+@media (max-width:820px){.neg{grid-template-columns:1fr}}
+.ng2{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:grid;gap:10px;align-content:start}
+.ng2 .hd{display:flex;align-items:baseline;gap:12px;padding:2px 6px 4px}
+.ng2 .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(30px,3.4vw,44px);color:var(--c)}
+.ng2 .hd span{color:var(--ink2);font-size:.9em}
+.sent .k{color:var(--plum);font-style:italic;font-weight:600}
+.sent .k2{color:var(--rose);font-style:italic;font-weight:600}
+.slide.game{flex-direction:column;align-items:stretch;gap:10px}
+.gh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.gh span{font-family:'Fraunces',serif;font-size:clamp(24px,2.8vw,34px)}
+.gh small{color:var(--ink2);font-size:14px}
+.slide.game iframe{flex:1;width:100%;border:1px solid var(--line);border-radius:18px;background:var(--bg);min-height:380px}
+.sa{display:grid;gap:10px;margin-top:22px;max-width:820px}
+.sa-i{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 18px;cursor:pointer;font-family:'Fraunces',serif;font-size:clamp(17px,1.9vw,23px);user-select:none}
+.sa-i .bx{flex:none;width:30px;height:30px;border-radius:8px;border:2px solid var(--teal);display:flex;align-items:center;justify-content:center;color:transparent}
+.sa-i.on{border-color:var(--teal);background:var(--teal-s,#E7F1EF)}
+.sa-i.on .bx{background:var(--teal);color:#fff}
+.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top">
+  <span class="tag">A1 BEGINNERS · REVIEW 1</span>
+  <div class="ctl">
+    <span class="cnt" id="cnt"></span>
+    <button id="noteBtn">📝 Teacher's Guide</button>
+    <button id="fsBtn">⛶ Fullscreen</button>
+  </div>
+</div>
+
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
+<div class="stage" id="stage">
+
+<section class="slide">
+  <div class="wrap two cover">
+    <div>
+      <div class="eyebrow">Review 1</div>
+      <h1 class="title">Let's <em>review!</em></h1>
+      <p class="lead">Revisão do primeiro bloco: lições 1 a 10.</p>
+      <div class="meta"><span>Greetings</span><span>Third person</span><span>Negatives</span><span>Interrogatives</span></div>
+    </div>
+    <div style="position:relative">
+      <div class="cover-num" style="position:absolute;top:-12%;left:0">R1</div>
+      <svg class="ill" viewBox="0 0 420 330" aria-hidden="true" style="position:relative">
+        <circle cx="235" cy="170" r="125" fill="#F0EDF7"/>
+        <rect x="160" y="62" width="160" height="210" rx="16" fill="#fff" stroke="#E9E5EF" stroke-width="3"/>
+        <rect x="205" y="50" width="70" height="26" rx="8" fill="#56468A"/>
+        <g stroke-linecap="round" stroke-width="5" fill="none">
+          <path d="M186 112 l9 9 16 -18" stroke="#3C8580"/><path d="M226 112 h66" stroke="#E9E5EF"/>
+          <path d="M186 160 l9 9 16 -18" stroke="#3C8580"/><path d="M226 160 h56" stroke="#E9E5EF"/>
+          <path d="M186 208 l9 9 16 -18" stroke="#3C8580"/><path d="M226 208 h62" stroke="#E9E5EF"/>
+        </g>
+        <path d="M330 210 l34 -34 14 14 -34 34 -20 6z" fill="#C99A3E"/><path d="M364 176 l8 -8 14 14 -8 8z" fill="#B9707A"/>
+        <circle cx="110" cy="110" r="10" fill="#B9707A"/><circle cx="350" cy="90" r="7" fill="#C99A3E"/><circle cx="96" cy="250" r="6" fill="#7A6BAE"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>01</b> Greetings</div>
+    <h2 class="title">Hello <em>again!</em></h2>
+    <div class="vcols"><div class="fr"><div class="tx"><span class="en">Hi! / Hello!</span><span class="pt">Oi! / Olá!</span></div><button class="say " data-say="Hi! / Hello!" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Good morning!</span><span class="pt">Bom dia!</span></div><button class="say " data-say="Good morning!" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Good afternoon!</span><span class="pt">Boa tarde!</span></div><button class="say " data-say="Good afternoon!" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Good evening!</span><span class="pt">Boa noite!</span></div><button class="say " data-say="Good evening!" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">What's your name?</span><span class="pt">Qual é o seu nome?</span></div><button class="say " data-say="What&#x27;s your name?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">My name is…</span><span class="pt">Meu nome é…</span></div><button class="say " data-say="My name is…" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Nice to meet you.</span><span class="pt">Prazer em conhecer você.</span></div><button class="say " data-say="Nice to meet you." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">How are you?</span><span class="pt">Como você está?</span></div><button class="say " data-say="How are you?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">How old are you?</span><span class="pt">Quantos anos você tem?</span></div><button class="say " data-say="How old are you?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">I'm 25 years old.</span><span class="pt">Eu tenho 25 anos.</span></div><button class="say " data-say="I&#x27;m 25 years old." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">Where are you from?</span><span class="pt">De onde você é?</span></div><button class="say " data-say="Where are you from?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">I'm from Brazil.</span><span class="pt">Eu sou do Brasil.</span></div><button class="say " data-say="I&#x27;m from Brazil." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>02</b> Actions</div>
+    <h2 class="title">Verbs <em>&amp; third person</em></h2>
+    <div class="act">
+      <div class="vcols"><div class="fr"><div class="tx"><span class="en">To eat</span><span class="pt">comer</span></div><button class="say " data-say="To eat" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To drink</span><span class="pt">beber</span></div><button class="say " data-say="To drink" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To live</span><span class="pt">morar</span></div><button class="say " data-say="To live" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To work</span><span class="pt">trabalhar</span></div><button class="say " data-say="To work" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To play</span><span class="pt">jogar</span></div><button class="say " data-say="To play" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To go</span><span class="pt">ir / praticar</span></div><button class="say " data-say="To go" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To do</span><span class="pt">fazer</span></div><button class="say " data-say="To do" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="fr"><div class="tx"><span class="en">To have</span><span class="pt">ter</span></div><button class="say " data-say="To have" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="rule">
+        <div class="who"><b>He · she · it</b> + s</div>
+        <div class="ex"><i>I eat → she eat<u>s</u></i><i>I go → he go<u>es</u></i><i>I have → she <u>has</u></i></div>
+        <div class="sent" style="--c:#B9707A"><span>She <span class="k2">has</span> two brothers.</span><button class="say " data-say="She has two brothers." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>03</b> Negatives</div>
+    <h2 class="title">Don't <em>&amp; doesn't</em></h2>
+    <div class="neg">
+      <div class="ng2" style="--c:#56468A"><div class="hd"><b>don't</b><span>I · you · we · they</span></div><div class="sent" style="--c:#56468A"><span>I <span class="k">don&#x27;t</span> eat fish.</span><button class="say " data-say="I don&#x27;t eat fish." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#56468A"><span>They <span class="k">don&#x27;t</span> have pets.</span><button class="say " data-say="They don&#x27;t have pets." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="ng2" style="--c:#B9707A"><div class="hd"><b>doesn't</b><span>he · she · it</span></div><div class="sent" style="--c:#B9707A"><span>She <span class="k2">doesn&#x27;t</span> drink milk.</span><button class="say " data-say="She doesn&#x27;t drink milk." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span>He <span class="k2">doesn&#x27;t</span> have a cat.</span><button class="say " data-say="He doesn&#x27;t have a cat." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>04</b> Interrogatives</div>
+    <h2 class="title">Do <em>&amp; does</em></h2>
+    <div class="neg">
+      <div class="ng2" style="--c:#56468A"><div class="hd"><b>Do</b><span>I · you · we · they</span></div><div class="sent" style="--c:#56468A"><span><span class="k">Do</span> you have a brother?</span><button class="say " data-say="Do you have a brother?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#56468A"><span><span class="k">Do</span> they play soccer?</span><button class="say " data-say="Do they play soccer?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="ng2" style="--c:#B9707A"><div class="hd"><b>Does</b><span>he · she · it</span></div><div class="sent" style="--c:#B9707A"><span><span class="k2">Does</span> she work in Italy?</span><button class="say " data-say="Does she work in Italy?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span><span class="k2">Does</span> he eat fruits?</span><button class="say " data-say="Does he eat fruits?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide game">
+  <div class="gh"><span>3 options: <em style="color:var(--plum)">? · + · −</em></span></div>
+  <iframe title="3 options" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+&lt;meta charset=&quot;UTF-8&quot;&gt;
+&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--mint:#3C8580;--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);padding:16px 22px;overflow:auto}
+.f{font-family:&#x27;Fraunces&#x27;,Georgia,serif}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.say{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.say:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+button.b{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--plum);background:var(--plum);color:#fff}
+button.b.o{background:#fff;color:var(--plum)}
+button.b:disabled{opacity:.35;cursor:default}
+
+body{display:flex;flex-direction:column;gap:12px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.prog{display:flex;gap:5px;flex:1;max-width:320px}
+.prog i{flex:1;height:5px;border-radius:5px;background:#E3DEEC}
+.prog i.done{background:var(--teal)} .prog i.now{background:var(--plum)}
+.rows{flex:1;display:grid;grid-template-rows:repeat(3,1fr);gap:10px;min-height:0}
+.r{display:grid;grid-template-columns:clamp(120px,17vw,190px) 1fr;gap:12px;align-items:stretch}
+.tag3{border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#fff;font-weight:600;letter-spacing:.12em;font-size:clamp(11px,1.2vw,13px);text-transform:uppercase}
+.tag3 b{font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(28px,3.4vw,40px);line-height:1;letter-spacing:0;font-weight:500}
+.r.q .tag3{background:var(--plum)} .r.a .tag3{background:var(--teal)} .r.n .tag3{background:var(--rose)}
+.box{position:relative;background:#fff;border:1.5px solid var(--line);border-radius:16px;display:flex;align-items:center;gap:14px;padding:10px clamp(14px,2vw,26px);font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(20px,2.6vw,34px);line-height:1.25}
+.box .tx{flex:1}
+.box.given{border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,154,62,.15)}
+.box.hid{cursor:pointer;background:repeating-linear-gradient(135deg,#fff 0 14px,#FAF8F5 14px 28px)}
+.box.hid .tx,.box.hid .say{visibility:hidden}
+.box.hid::after{content:&#x27;Clique para revelar&#x27;;position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-family:&#x27;DM Sans&#x27;,sans-serif;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+.nav{display:flex;gap:10px;justify-content:flex-end;align-items:center}
+.nav .lbl{margin-right:auto}
+@media (max-width:640px){.r{grid-template-columns:86px 1fr}.tag3{font-size:9px;letter-spacing:.06em}.tag3 b{font-size:24px}.box{font-size:18px}}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;div class=&quot;top&quot;&gt;&lt;div class=&quot;lbl&quot;&gt;Say the other forms · click to reveal&lt;/div&gt;&lt;div class=&quot;prog&quot; id=&quot;prog&quot;&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;rows&quot;&gt;
+  &lt;div class=&quot;r q&quot;&gt;&lt;div class=&quot;tag3&quot;&gt;&lt;b&gt;?&lt;/b&gt;Question&lt;/div&gt;&lt;div class=&quot;box&quot; id=&quot;b0&quot;&gt;&lt;span class=&quot;tx&quot;&gt;&lt;/span&gt;&lt;button class=&quot;say&quot; title=&quot;Ouvir&quot;&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;r a&quot;&gt;&lt;div class=&quot;tag3&quot;&gt;&lt;b&gt;+&lt;/b&gt;Affirmative&lt;/div&gt;&lt;div class=&quot;box&quot; id=&quot;b1&quot;&gt;&lt;span class=&quot;tx&quot;&gt;&lt;/span&gt;&lt;button class=&quot;say&quot; title=&quot;Ouvir&quot;&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+  &lt;div class=&quot;r n&quot;&gt;&lt;div class=&quot;tag3&quot;&gt;&lt;b&gt;−&lt;/b&gt;Negative&lt;/div&gt;&lt;div class=&quot;box&quot; id=&quot;b2&quot;&gt;&lt;span class=&quot;tx&quot;&gt;&lt;/span&gt;&lt;button class=&quot;say&quot; title=&quot;Ouvir&quot;&gt;&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;nav&quot;&gt;&lt;span class=&quot;lbl&quot; id=&quot;cnt&quot;&gt;&lt;/span&gt;&lt;button class=&quot;b o&quot; id=&quot;pv&quot;&gt;◀ Back&lt;/button&gt;&lt;button class=&quot;b&quot; id=&quot;nx&quot;&gt;Next ▶&lt;/button&gt;&lt;/div&gt;
+&lt;script&gt;
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+    var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+    var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];
+    for(var i=0;i&lt;PREF.length;i++){ for(var j=0;j&lt;good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+
+// g = forma dada (0 question, 1 affirmative, 2 negative)
+var Q=[
+ {g:0,f:[&quot;Do you play soccer?&quot;,&quot;I play soccer.&quot;,&quot;I don&#x27;t play soccer.&quot;]},
+ {g:1,f:[&quot;Does she drink coffee?&quot;,&quot;She drinks coffee.&quot;,&quot;She doesn&#x27;t drink coffee.&quot;]},
+ {g:2,f:[&quot;Do they have pets?&quot;,&quot;They have pets.&quot;,&quot;They don&#x27;t have pets.&quot;]},
+ {g:0,f:[&quot;Does your mom work in Italy?&quot;,&quot;My mom works in Italy.&quot;,&quot;My mom doesn&#x27;t work in Italy.&quot;]},
+ {g:1,f:[&quot;Do Sam and Bob go swimming?&quot;,&quot;Sam and Bob go swimming.&quot;,&quot;Sam and Bob don&#x27;t go swimming.&quot;]},
+ {g:2,f:[&quot;Does your dog eat bread?&quot;,&quot;My dog eats bread.&quot;,&quot;My dog doesn&#x27;t eat bread.&quot;]},
+ {g:0,f:[&quot;Do doctors work with people?&quot;,&quot;Doctors work with people.&quot;,&quot;Doctors don&#x27;t work with people.&quot;]},
+ {g:1,f:[&quot;Does your brother have two children?&quot;,&quot;My brother has two children.&quot;,&quot;My brother doesn&#x27;t have two children.&quot;]},
+ {g:2,f:[&quot;Do you and your sister live in Brazil?&quot;,&quot;My sister and I live in Brazil.&quot;,&quot;My sister and I don&#x27;t live in Brazil.&quot;]}
+];
+var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
+var $=function(x){return document.getElementById(x);};
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
+var i=0;
+[0,1,2].forEach(function(k){ var b=$(&#x27;b&#x27;+k), s=b.querySelector(&#x27;.say&#x27;); s.innerHTML=SPK;
+  s.addEventListener(&#x27;click&#x27;,function(e){ e.stopPropagation(); if(!b.classList.contains(&#x27;hid&#x27;)) speak(Q[i].f[k]); });
+  b.addEventListener(&#x27;click&#x27;,function(){ b.classList.remove(&#x27;hid&#x27;); }); });
+function show(){ var q=Q[i];
+  [0,1,2].forEach(function(k){ var b=$(&#x27;b&#x27;+k); b.querySelector(&#x27;.tx&#x27;).textContent=q.f[k];
+    b.className=&#x27;box&#x27;+(k===q.g?&#x27; given&#x27;:&#x27; hid&#x27;); });
+  var p=$(&#x27;prog&#x27;); p.innerHTML=&#x27;&#x27;; Q.forEach(function(_,k){ var e=document.createElement(&#x27;i&#x27;); e.className=k&lt;i?&#x27;done&#x27;:(k===i?&#x27;now&#x27;:&#x27;&#x27;); p.appendChild(e); });
+  $(&#x27;cnt&#x27;).textContent=(i+1)+&#x27; / &#x27;+Q.length; $(&#x27;pv&#x27;).disabled=i===0; $(&#x27;nx&#x27;).disabled=i===Q.length-1; }
+$(&#x27;pv&#x27;).onclick=function(){ if(i&gt;0){ i--; show(); } };
+$(&#x27;nx&#x27;).onclick=function(){ if(i&lt;Q.length-1){ i++; show(); } };
+try{ speechSynthesis.getVoices(); }catch(e){}
+show();
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+"></iframe>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>05</b> Self assessment</div>
+    <h2 class="title">I <em>can…</em></h2>
+    <div class="sa"><div class="sa-i"><span class="bx"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"/></svg></span>I can greet people and talk about my personal information.</div><div class="sa-i"><span class="bx"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"/></svg></span>I can talk about food and meals.</div><div class="sa-i"><span class="bx"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"/></svg></span>I can talk about sports.</div><div class="sa-i"><span class="bx"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"/></svg></span>I can talk about my family and pets.</div><div class="sa-i"><span class="bx"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 12.5l4 4 8-9"/></svg></span>I can use negative and interrogative sentences.</div></div>
+  </div>
+</section>
+
+</div>
+
+<div class="bot">
+  <button class="nav" id="prev">◀ Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav" id="next">Next ▶</button>
+</div>
+
+<script>
+(function(){
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots');
+slides.forEach(function(_,i){ var d=document.createElement('i');
+d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+
+function go(i){
+  if(i<0||i>=slides.length) return; cur=i;
+  slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+  [].forEach.call(dots.children,function(d,k){
+d.classList.toggle('on',k===i); });
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=i===0;
+  document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); // carrega o iframe do jogo na primeira vez que o slide aparece
+  try{ location.hash='s'+(i+1); }catch(e){}
+}
+
+/* lazy load dos jogos + nomes dos times/alunos */
+function nameVal(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
+function jsSafe(t){ return JSON.stringify(t).slice(1,-1).replace(/</g,'\\u003c'); }
+function load(s){
+  var f=s.querySelector('iframe[data-srcdoc]'); if(!f||f.getAttribute('srcdoc')) return;
+  var h=f.getAttribute('data-srcdoc');
+  h=h.split('__TEAM_A__').join(jsSafe(nameVal('teamA')||'Team A'));
+  h=h.split('__TEAM_B__').join(jsSafe(nameVal('teamB')));
+  f.setAttribute('srcdoc',h);
+}
+
+/* 🔊 pronúncia */
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&&sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+    var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+    var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+    for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speakEn(t,btn){
+    try{
+        var sy=window.speechSynthesis; if(!sy) return;
+        sy.cancel();
+        var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
+        var v=pickBestVoice(sy); if(v) u.voice=v;
+        if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
+        sy.speak(u);
+    }catch(e){}
+}
+window.speakEn=speakEn;
+[].forEach.call(document.querySelectorAll('.say'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
+
+/* revelar respostas (answer key) e letras clicáveis */
+[].forEach.call(document.querySelectorAll('[data-ak]'),function(b){
+  var a=b.closest('.rv-area'); if(!a) return;
+  var ic=b.querySelector('svg'); ic=ic?ic.outerHTML+' ':'';
+  var its=[].slice.call(a.querySelectorAll('.fx,.person,.blank,.trow:not(.ex),.tc,.pic,.mq,.q2'));
+  its.sort(function(x,y){ return (+x.getAttribute('data-ord')||0)-(+y.getAttribute('data-ord')||0); });
+  function n(){ return its.filter(function(x){ return x.classList.contains('shown'); }).length; }
+  function upd(){ var k=n(); b.innerHTML = k<its.length ? ic+'Próxima resposta <small class="akn">'+k+'/'+its.length+'</small>' : 'Esconder respostas'; }
+  its.forEach(function(it){ it.classList.add('ri'); it.addEventListener('click',function(e){ if(e.target.closest('.say')) return; it.classList.toggle('shown'); upd(); }); });
+  b.addEventListener('click',function(){ var nx=its.filter(function(x){ return !x.classList.contains('shown'); })[0];
+    if(nx){ nx.classList.add('shown'); try{ nx.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} } else its.forEach(function(x){ x.classList.remove('shown'); }); upd(); });
+  upd(); });
+[].forEach.call(document.querySelectorAll('.say-l'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+
+
+/* fullscreen */
+document.getElementById('fsBtn').addEventListener('click',function(){
+  document.body.classList.toggle('presenting');
+});
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
+
+[].forEach.call(document.querySelectorAll('.go'),function(b){
+b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){
+go(cur+1); });
+document.addEventListener('keydown',function(e){
+  if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1);
+});
+var h=parseInt((location.hash||'').replace('#s',''),10);
+go(h>0&&h<=slides.length?h-1:0);
+})();
+
+var nw=null;
+var GUIDE="<h1>Teachers Guide · Review 1<\/h1>\n<p class=\"meta\">Adultos A1 · Beginners · 60 min · revisão das lições 1 a 10<\/p>\n<div class=\"toc\"><a href=\"#obj\">Objetivo<\/a> · <a href=\"#roteiro\">Roteiro<\/a> · <a href=\"#greet\">Greetings<\/a> · <a href=\"#act\">Ações<\/a> · <a href=\"#neg\">Negatives<\/a> · <a href=\"#int\">Interrogatives<\/a> · <a href=\"#atv\">Atividade 1<\/a> · <a href=\"#fim\">Self assessment<\/a><\/div>\n\n<h2 id=\"obj\">🎯 Objetivo da aula<\/h2>\n<p>Revisão de todo o conteúdo visto no primeiro bloco<\/p>\n\n<h2 id=\"roteiro\">🗺️ Roteiro rápido<\/h2>\n<table>\n<tr><th>Slide<\/th><th>Conteúdo<\/th><th>Tempo<\/th><\/tr>\n<tr><td>2<\/td><td>Greetings e apresentações<\/td><td>5 min<\/td><\/tr>\n<tr><td>3<\/td><td>Ações + terceira pessoa → <b>drills<\/b> (oral)<\/td><td>15 min<\/td><\/tr>\n<tr><td>4<\/td><td>Negatives → <b>drills<\/b> (oral)<\/td><td>10 min<\/td><\/tr>\n<tr><td>5<\/td><td>Interrogatives → <b>drills<\/b> (oral)<\/td><td>10 min<\/td><\/tr>\n<tr><td>6<\/td><td>Atividade 1 · 3 options (Cool English)<\/td><td>10 min<\/td><\/tr>\n<tr><td>7<\/td><td>Self assessment + feedback<\/td><td>10 min<\/td><\/tr>\n<\/table>\n\n<h2 id=\"greet\">👋 Slide 2 · Greetings<\/h2>\n<p>Iniciar revisão relembrando os greetings e apresentações.<\/p>\n\n<h2 id=\"act\">🔁 Slide 3 · Ações e terceira pessoa<\/h2>\n<p>Relembrar as ações vistas até aqui e regra da terceira pessoa, depois aplicar drills.<\/p>\n<ol class=\"small\">\n<li>Eu como pão no café da manhã \\ torrada \\ cereal<\/li>\n<li>Você come arroz no almoço \\ macarrão \\ carne<\/li>\n<li>Eu bebo suco no jantar \\ limonada \\ refri<\/li>\n<li>Ela bebe cerveja \\ café \\ chá<\/li>\n<li>Eu moro na Itália \\ Argentina \\ México<\/li>\n<li>Ele mora na Alemanha \\ Japão \\ China<\/li>\n<li>Ela trabalha com animais \\ comida \\ beleza<\/li>\n<li>Eu trabalho com tecnologia \\ pessoas \\ plantas<\/li>\n<li>Nós jogamos futebol \\ volei \\ basquete<\/li>\n<li>Eu faço natação \\ surf \\ corrida<\/li>\n<li>Eu faço yoga \\ karatê \\ ginástica<\/li>\n<li>Você tem dois irmãos \\ irmãs \\ primos<\/li>\n<li>Ela tem uma sogra \\ cunhado \\ padrasto<\/li>\n<li>Ele tem 3 gatos \\ cachorros \\ coelhos<\/li>\n<li>Ela tem uma cobra \\ pássaro \\ porquinho da índia<\/li>\n<\/ol>\n\n<h2 id=\"neg\">➖ Slide 4 · Negatives<\/h2>\n<p>Relembrar estrutura de frases negativas e aplicar drills<\/p>\n<p><b>Change into negatives:<\/b><\/p>\n<ol class=\"small\">\n<li>I have cats<\/li>\n<li>She works with food<\/li>\n<li>He lives in Italy<\/li>\n<li>They have 2 children<\/li>\n<li>You eat pasta<\/li>\n<li>They drink juice<\/li>\n<li>They play soccer<\/li>\n<li>I do yoga<\/li>\n<li>He goes swimming<\/li>\n<li>We live in Portugal<\/li>\n<\/ol>\n\n<h2 id=\"int\">❓ Slide 5 · Interrogatives<\/h2>\n<p>Relembrar estrutura interrogativa e aplicar drills<\/p>\n<p><b>Change into interrogatives:<\/b><\/p>\n<ol class=\"small\">\n<li>They swim every day<\/li>\n<li>My brother drinks milk<\/li>\n<li>They live in Japan<\/li>\n<li>She has a stepfather<\/li>\n<li>We play basketball<\/li>\n<li>He eats noodles<\/li>\n<li>They have birds<\/li>\n<li>We work in Australia<\/li>\n<li>She works with children<\/li>\n<li>I eat bread and ham<\/li>\n<\/ol>\n\n<h2 id=\"atv\">🎯 Slide 6 · Atividade 1<\/h2>\n<p>Aplicar atividade 1 - cool english<\/p>\n<div class=\"tip\">💡 Recriada da atividade <b>3 options<\/b> (Simple Present · Cool English). Em cada tela aparece uma forma (com borda dourada); o aluno diz as outras duas em voz alta e você clica no quadro para revelar. O 🔊 só toca quando você clica nele. As frases foram adaptadas para usar só o vocabulário do bloco 1.<\/div>\n\n<h2 id=\"fim\">✅ Slide 7 · Self assessment<\/h2>\n<p>Finalizar review com self assessment e feedback.<\/p>\n<div class=\"tip\">💡 Clique em cada frase para marcar o que o aluno sente que já consegue fazer.<\/div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Review 1</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+
+/* self assessment: clique para marcar */
+[].forEach.call(document.querySelectorAll('.sa-i'),function(x){ x.addEventListener('click',function(){ x.classList.toggle('on'); }); });
+</script>
+</body>
+</html>

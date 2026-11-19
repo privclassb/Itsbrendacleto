@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lesson 9 · Practice talking about family · A1 Beginners · Inglês para a Vida Real</title>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
+:root{--mint:#3C8580;
   --ink:#24213A; --ink2:#6A6680; --line:#E9E5EF;
   --plum:#56468A; --plum2:#7A6BAE; --plum-s:#F0EDF7;
   --rose:#B9707A; --rose-s:#F7ECEC;
@@ -43,12 +43,6 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-heig
 .dots i.on{width:22px;background:var(--plum)}
 
 .stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
-body.presenting .top,body.presenting .bot{display:none}
-body.presenting .stage{top:0;bottom:0}
-:fullscreen .top,:fullscreen .bot{display:none}
-:fullscreen .stage{top:0;bottom:0}
-.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
-body.presenting .exit-presenting{display:flex}
 .slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
 .slide.on{display:flex;animation:in .4s ease}
 @keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
@@ -235,7 +229,14 @@ svg.ill{width:100%;height:auto;max-height:60vh;display:block}
 .qrow.shown .chips{opacity:.45}
 .qf{grid-template-columns:1fr 1fr;column-gap:14px}
 @media (max-width:820px){.qf{grid-template-columns:1fr}}
-.qrow.fx{font-family:inherit;font-size:inherit;display:grid}.qf{grid-auto-flow:column;grid-template-rows:repeat(3,auto)}@media (max-width:820px){.qf{grid-auto-flow:row;grid-template-rows:none}}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}</style>
+.qrow.fx{font-family:inherit;font-size:inherit;display:grid}.qf{grid-auto-flow:column;grid-template-rows:repeat(3,auto)}@media (max-width:820px){.qf{grid-auto-flow:row;grid-template-rows:none}}.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
+</style>
 </head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
@@ -279,9 +280,9 @@ svg.ill{width:100%;height:auto;max-height:60vh;display:block}
 &lt;head&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap rel=&quot;stylesheet&quot;&gt;
 &lt;style&gt;
-:root{--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
+:root{--mint:#3C8580;--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);padding:16px 22px;overflow:auto}
@@ -324,19 +325,22 @@ body{display:grid;grid-template-columns:1fr 220px;gap:16px;align-items:center}
   &lt;button class=&quot;b o&quot; id=&quot;reset&quot;&gt;↺ Reset&lt;/button&gt;
 &lt;/div&gt;
 &lt;script&gt;
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+    var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+    var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];
+    for(var i=0;i&lt;PREF.length;i++){ for(var j=0;j&lt;good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+
 var L=[&quot;aunt&quot;, &quot;cousin&quot;, &quot;father&quot;, &quot;grandfather&quot;, &quot;grandmother&quot;, &quot;mother&quot;, &quot;sister&quot;, &quot;uncle&quot;], sel=null, done=0, last=&#x27;&#x27;;
 var $=function(x){return document.getElementById(x);};
-function pickBestVoice(sy){
-  var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
-  var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
-  var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
-  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
-  var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
-  if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
-  if(good.length) return good[0];
-  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
-  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
-}
 function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
 function build(){ var c=$(&#x27;lbls&#x27;); c.innerHTML=&#x27;&#x27;; sel=null; done=0; $(&#x27;msg&#x27;).textContent=&#x27;Toque na palavra e depois no lugar certo.&#x27;;
   L.slice().sort(function(){return Math.random()-.5;}).forEach(function(w){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;lb&#x27;; b.textContent=w;
@@ -355,15 +359,15 @@ $(&#x27;reset&#x27;).onclick=build; build();
 </section>
 
 <section class="slide game">
-  <div class="gh"><span>Family review: <em style="color:var(--plum)">multiple choice</em></span><small>Cool English</small></div>
+  <div class="gh"><span>Family review: <em style="color:var(--plum)">multiple choice</em></span></div>
   <iframe title="Family review" data-srcdoc="&lt;!DOCTYPE html&gt;
 &lt;html lang=&quot;en&quot;&gt;
 &lt;head&gt;
 &lt;meta charset=&quot;UTF-8&quot;&gt;
 &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&amp;family=DM+Sans:opsz,wght@9..40,400;9..40,600;9..40,700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap rel=&quot;stylesheet&quot;&gt;
 &lt;style&gt;
-:root{--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
+:root{--mint:#3C8580;--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%}
 body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);padding:16px 22px;overflow:auto}
@@ -415,21 +419,24 @@ body{display:flex;flex-direction:column;gap:14px}
   &lt;button class=&quot;b&quot; id=&quot;again&quot;&gt;🔄 Play again&lt;/button&gt;
 &lt;/div&gt;
 &lt;script&gt;
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+    var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+    var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];
+    for(var i=0;i&lt;PREF.length;i++){ for(var j=0;j&lt;good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+
 var Q=[{&quot;a&quot;: &quot;Peter has the same mom and dad as me, he is my&quot;, &quot;r&quot;: &quot;brother&quot;, &quot;o&quot;: [&quot;mother&quot;, &quot;brother&quot;, &quot;cousin&quot;, &quot;father&quot;, &quot;uncle&quot;, &quot;grandfather&quot;]}, {&quot;a&quot;: &quot;He is our mom&#x27;s dad, so he is our&quot;, &quot;r&quot;: &quot;grandfather&quot;, &quot;o&quot;: [&quot;father&quot;, &quot;fiancée&quot;, &quot;widower&quot;, &quot;stepfather&quot;, &quot;grandfather&quot;, &quot;uncle&quot;]}, {&quot;a&quot;: &quot;They are my mom and my dad, so they are my&quot;, &quot;r&quot;: &quot;parents&quot;, &quot;o&quot;: [&quot;parents&quot;, &quot;cousins&quot;, &quot;sons&quot;, &quot;grandparents&quot;, &quot;siblings&quot;, &quot;godparents&quot;]}, {&quot;a&quot;: &quot;He is my sister&#x27;s son, so he is my&quot;, &quot;r&quot;: &quot;nephew&quot;, &quot;o&quot;: [&quot;niece&quot;, &quot;cousin&quot;, &quot;nephew&quot;, &quot;husband&quot;, &quot;wife&quot;, &quot;foster parents&quot;]}, {&quot;a&quot;: &quot;She is my mom&#x27;s niece, so she is my&quot;, &quot;r&quot;: &quot;cousin&quot;, &quot;o&quot;: [&quot;aunt&quot;, &quot;niece&quot;, &quot;stepsister&quot;, &quot;widow&quot;, &quot;half-sister&quot;, &quot;cousin&quot;]}, {&quot;a&quot;: &quot;He is my dad&#x27;s brother, so he is my&quot;, &quot;r&quot;: &quot;uncle&quot;, &quot;o&quot;: [&quot;father&quot;, &quot;sibling&quot;, &quot;ex-husband&quot;, &quot;uncle&quot;, &quot;cousin&quot;, &quot;parent&quot;]}, {&quot;a&quot;: &quot;She is my wife&#x27;s mother, so she is my&quot;, &quot;r&quot;: &quot;mother-in-law&quot;, &quot;o&quot;: [&quot;sister-in-law&quot;, &quot;stepmother&quot;, &quot;niece&quot;, &quot;aunt&quot;, &quot;half-sister&quot;, &quot;mother-in-law&quot;]}, {&quot;a&quot;: &quot;He is my mom&#x27;s new husband, so he&#x27;s my&quot;, &quot;r&quot;: &quot;stepfather&quot;, &quot;o&quot;: [&quot;widower&quot;, &quot;fiancée&quot;, &quot;stepfather&quot;, &quot;godfather&quot;, &quot;father-in-law&quot;, &quot;uncle&quot;]}, {&quot;a&quot;: &quot;She has the same mom as me but a different dad, so she&#x27;s my&quot;, &quot;r&quot;: &quot;half-sister&quot;, &quot;o&quot;: [&quot;aunt&quot;, &quot;sister&quot;, &quot;stepsister&quot;, &quot;half-sister&quot;, &quot;mother&quot;, &quot;cousin&quot;]}], i=0, sc=0, res=[];
 var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.7&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
 var $=function(x){return document.getElementById(x);};
 $(&#x27;sayw&#x27;).innerHTML=SPK;
-function pickBestVoice(sy){
-  var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
-  var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
-  var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
-  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
-  var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
-  if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
-  if(good.length) return good[0];
-  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
-  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
-}
 function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
 function full(q){ return q.a+&#x27; &#x27;+q.r+&#x27;.&#x27;; }
 function prog(){ var p=$(&#x27;prog&#x27;); p.innerHTML=&#x27;&#x27;; Q.forEach(function(_,k){ var e=document.createElement(&#x27;i&#x27;); e.className=k&lt;res.length?(res[k]?&#x27;ok&#x27;:&#x27;no&#x27;):(k===i?&#x27;now&#x27;:&#x27;&#x27;); p.appendChild(e); }); $(&#x27;sc&#x27;).textContent=sc; }
@@ -528,27 +535,27 @@ function load(s){
 
 /* 🔊 pronúncia */
 function pickBestVoice(sy){
-  var voices=(sy.getVoices&&sy.getVoices())||[];
-  var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
-  var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
-  var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
-  var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
-  if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
-  var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
-  for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
-  if(good.length) return good[0];
-  var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
-  var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+    var voices=(sy.getVoices&&sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+    var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+    var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+    for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
 }
 function speakEn(t,btn){
-  try{
-    var sy=window.speechSynthesis; if(!sy) return;
-    sy.cancel();
-    var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
-    var v=pickBestVoice(sy); if(v) u.voice=v;
-    if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
-    sy.speak(u);
-  }catch(e){}
+    try{
+        var sy=window.speechSynthesis; if(!sy) return;
+        sy.cancel();
+        var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
+        var v=pickBestVoice(sy); if(v) u.voice=v;
+        if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
+        sy.speak(u);
+    }catch(e){}
 }
 window.speakEn=speakEn;
 [].forEach.call(document.querySelectorAll('.say'),function(b){
