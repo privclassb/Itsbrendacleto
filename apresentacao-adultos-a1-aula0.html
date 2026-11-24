@@ -23,7 +23,7 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:600;margin:0;line-heig
 
 /* barras */
 .top{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;z-index:5;background:rgba(251,248,246,.82);backdrop-filter:blur(8px);border-bottom:1px solid #EEE8F3}
-.tag{font-weight:800;font-size:13px;letter-spacing:.12em;color:var(--violet);background:var(--lav);padding:7px 14px;border-radius:999px;white-space:nowrap}
+.tag{font-weight:800;font-size:13px;letter-spacing:.12em;color:var(--violet);background:var(--lav);padding:7px 14px;border-radius:999px;white-space:nowrap}.left{display:flex;align-items:center;gap:10px;min-width:0}.exit-btn{border:0;border-radius:999px;padding:8px 14px;font:inherit;font-size:13px;font-weight:700;background:#fff;color:var(--ink);box-shadow:0 2px 0 rgba(45,42,74,.08);text-decoration:none;white-space:nowrap}.exit-btn:hover{background:var(--lav)}@media (max-width:640px){.exit-btn{font-size:12px;padding:6px 10px}}
 .ctl{display:flex;align-items:center;gap:10px}
 .cnt{font-weight:700;color:var(--ink2);font-size:14px;min-width:54px;text-align:center}
 .ctl button{font:inherit;font-size:14px;font-weight:700;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;background:#fff;color:var(--ink);box-shadow:0 2px 0 rgba(45,42,74,.08)}
@@ -158,7 +158,7 @@ body.presenting .exit-presenting{display:flex}
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
 <div class="top">
-  <span class="tag">🤝 A1 BEGINNERS · WELCOME CLASS</span>
+  <div class="left"><a class="exit-btn" href="material-de-aula.html">← Sair</a><span class="tag">🤝 A1 BEGINNERS · WELCOME CLASS</span></div>
   <div class="ctl">
     <span class="cnt" id="cnt"></span>
     <button id="noteBtn">📝 Teacher's Guide</button>
