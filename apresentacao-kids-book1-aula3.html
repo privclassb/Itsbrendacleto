@@ -10,7 +10,7 @@ body{background:linear-gradient(#ffffffe6,#ffffffe6),repeating-linear-gradient(0
 .blob{position:fixed;border-radius:50%;opacity:.8;z-index:0;pointer-events:none}
 .b1{width:260px;height:260px;background:var(--pink);left:-90px;top:-90px}.b2{width:240px;height:240px;background:var(--mint);right:-80px;bottom:-80px}
 .top{position:fixed;top:0;left:0;right:0;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;z-index:20;background:#ffffffd9;backdrop-filter:blur(4px)}
-.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}
+.tag{background:var(--pink);color:#fff;font-weight:900;font-size:12px;padding:6px 14px;border-radius:20px;font-family:Nunito}.left{display:flex;align-items:center;gap:8px;flex:none}.exit-btn{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:13px;color:var(--dark);text-decoration:none;white-space:nowrap;flex:none}@media(max-width:600px){.exit-btn{padding:7px 8px;font-size:12px}}@media(max-width:340px){.exit-btn{padding:6px 6px;font-size:11px}}
 .ctl{display:flex;gap:8px;align-items:center}.ctl button{border:none;background:#fff;border-radius:12px;padding:7px 12px;font-weight:900;font-family:Nunito;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.1);font-size:14px}
 .ctl .cnt{font-weight:900;font-size:13px;color:#888;min-width:44px;text-align:center}
 .stage{position:fixed;top:46px;bottom:56px;left:0;right:0;z-index:5}
@@ -73,7 +73,7 @@ body.presenting .exit-presenting{display:flex}
 </style></head>
 <body>
 <div class="blob b1"></div><div class="blob b2"></div>
-<div class="top"><span class="tag">⭐ KIDS EDITION · LESSON 3</span><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
+<div class="top"><div class="left"><a class="exit-btn" href="material-de-aula.html">← Sair</a><span class="tag">⭐ KIDS EDITION · LESSON 3</span></div><div class="ctl"><span class="cnt" id="cnt"></span><button id="noteBtn">📝 Teacher's Guide</button><button id="fsBtn">⛶ Fullscreen</button></div></div>
 <button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
 <div class="stage" id="stage">
 <section class="slide "><div class="cover"><div class="emo"></div><div class="kick">LET'S TRAVEL</div><h1>Around<br>the World!</h1><div class="pill">🌍🗺️✈️</div></div></section>
