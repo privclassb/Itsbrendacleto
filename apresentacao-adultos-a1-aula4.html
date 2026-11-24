@@ -510,9 +510,9 @@ try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
   plates.forEach(function(p){ M[p.getAttribute('data-meal')]={f:[],d:[]}; });
   function lst(a){ a=a.map(function(x){ return x.toLowerCase(); }); return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1]; }
   function sent(m){ var o=M[m], s='';
-    if(o.f.length) s='I eat '+lst(o.f)+' for '+m;
-    if(o.d.length) s+=(s?' and I drink ':'I drink ')+lst(o.d)+(o.f.length?'':' for '+m);
-    return s?s+'.':''; }
+    if(o.f.length) s='I eat '+lst(o.f);
+    if(o.d.length) s+=(s?' and I drink ':'I drink ')+lst(o.d);
+    return s?s+' for '+m+'.':''; }
   function render(){ plates.forEach(function(p){ var m=p.getAttribute('data-meal'), o=M[m], it=p.querySelector('.items'); it.innerHTML='';
       ['f','d'].forEach(function(t){ o[t].forEach(function(x,k){ var b=document.createElement('button'); b.textContent=x; if(t==='d') b.className='d';
         b.addEventListener('click',function(e){ e.stopPropagation(); o[t].splice(k,1); render(); }); it.appendChild(b); }); });
