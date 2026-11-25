@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Output frequency · A1 Beginners · Inglês para a Vida Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--mint:#3C8580;
+  --ink:#24213A; --ink2:#6A6680; --line:#E9E5EF;
+  --plum:#56468A; --plum2:#7A6BAE; --plum-s:#F0EDF7;
+  --rose:#B9707A; --rose-s:#F7ECEC;
+  --teal:#3C8580; --teal-s:#E7F1EF;
+  --gold:#C99A3E; --gold-s:#FAF2E1;
+  --bg:#FAF8F5; --card:#FFFFFF;
+  --shadow:0 1px 2px rgba(36,33,58,.04),0 8px 24px rgba(36,33,58,.06);
+  --r:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg);overflow:hidden;font-size:clamp(15px,1.4vw,19px);line-height:1.5}
+h1,h2,h3{font-family:'Fraunces',Georgia,serif;font-weight:500;margin:0;line-height:1.1;letter-spacing:-.015em}
+.i{display:block;flex:none}
+.blob{position:fixed;border-radius:50%;filter:blur(80px);opacity:.35;z-index:0;pointer-events:none}
+.b1{width:44vw;height:44vw;background:#E4DEF2;top:-18vw;right:-14vw}
+.b2{width:36vw;height:36vw;background:#F2E1E1;bottom:-18vw;left:-14vw}
+
+.top{position:fixed;top:0;left:0;right:0;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.tag{font-weight:700;font-size:12px;letter-spacing:.18em;color:var(--plum);white-space:nowrap}.left{display:flex;align-items:center;gap:10px;min-width:0}.exit-btn{border:1px solid var(--line);border-radius:10px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;background:#fff;color:var(--ink);text-decoration:none;white-space:nowrap}.exit-btn:hover{background:var(--plum-s)}@media (max-width:640px){.exit-btn{font-size:12px;padding:6px 8px}}
+.tag::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--rose);margin-right:10px;vertical-align:1px}
+.ctl{display:flex;align-items:center;gap:8px}
+.cnt{font-weight:600;color:var(--ink2);font-size:13px;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.ctl button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer;background:#fff;color:var(--ink)}
+@media (max-width:640px){.bot .dots{gap:4px;flex-wrap:nowrap;overflow:hidden;padding:0 6px}.bot .dots i{flex:none;width:5px;height:5px}.bot .dots i.on{width:14px}.bot .nav{padding:8px 12px;white-space:nowrap}}
+@media (max-width:640px){.top{padding:0 12px}.tag{font-size:10px;letter-spacing:.12em;overflow:hidden;text-overflow:ellipsis;min-width:0}.tag::before{display:none}.ctl{gap:6px}.ctl button{font-size:12px;padding:6px 8px;white-space:nowrap}.cnt{min-width:auto}#fsBtn{display:none}.bot{padding:0 12px}}
+.ctl button:hover{border-color:var(--plum2);color:var(--plum)}
+.bot{position:fixed;bottom:0;left:0;right:0;height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;z-index:5;background:rgba(250,248,245,.86);backdrop-filter:blur(8px);border-top:1px solid var(--line)}
+.nav{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 18px;cursor:pointer;background:var(--plum);color:#fff}
+#prev{background:#fff;color:var(--plum)}
+.nav:disabled{opacity:.3;cursor:default}
+.dots{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;padding:0 10px}
+.dots i{width:7px;height:7px;border-radius:7px;background:#D8D3E3;cursor:pointer;transition:.25s}
+.dots i.on{width:22px;background:var(--plum)}
+
+.stage{position:fixed;top:58px;bottom:62px;left:0;right:0;z-index:1}
+.slide{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:clamp(16px,2.8vw,40px) clamp(20px,5.5vw,84px);overflow:auto}
+.slide.on{display:flex;animation:in .4s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.wrap{width:100%;max-width:1160px;margin:auto}
+.two{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(20px,4.5vw,64px);align-items:center}
+@media (max-width:820px){.two{grid-template-columns:1fr}}
+
+.eyebrow{display:flex;align-items:center;gap:12px;font-size:12px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--rose);margin-bottom:14px}
+.eyebrow b{font-family:'Fraunces',serif;font-size:15px;letter-spacing:0;color:var(--plum);font-weight:600}
+.eyebrow::after{content:"";flex:0 0 48px;height:1px;background:currentColor;opacity:.5}
+.title{font-size:clamp(32px,4.6vw,58px)}
+.title em{font-style:italic;color:var(--plum)}
+.lead{font-size:clamp(16px,1.7vw,21px);color:var(--ink2);margin:14px 0 0;max-width:620px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:clamp(14px,2vw,24px);box-shadow:var(--shadow)}
+
+.say{flex:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;justify-content:center;padding:0;transition:.15s}
+.say:hover{background:var(--plum);border-color:var(--plum);color:#fff}
+.say.playing{background:var(--plum);border-color:var(--plum);color:#fff;animation:pulse .9s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 6px rgba(86,70,138,.15)}}
+.say.lt{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.35);color:#fff}
+.btn{font:inherit;font-weight:600;font-size:14px;border:1px solid var(--plum);border-radius:10px;padding:9px 16px;cursor:pointer;background:#fff;color:var(--plum);display:inline-flex;align-items:center;gap:8px}
+.btn:hover,.btn.playing{background:var(--plum);color:#fff}
+.btn.solid{background:var(--plum);color:#fff}
+
+/* capa */
+.cover-num{font-family:'Fraunces',serif;font-size:clamp(90px,14vw,190px);line-height:.8;color:var(--plum-s);font-weight:600;-webkit-text-stroke:1.5px var(--plum2);color:transparent}@media (max-width:820px){.cover-num{display:none}}
+.cover .title{font-size:clamp(44px,6.6vw,86px)}
+.cover .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;color:var(--ink2);font-size:.9em}
+.cover .meta span{display:flex;align-items:center;gap:8px}
+.cover .meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rose)}
+svg.ill{width:100%;height:auto;max-height:60vh;display:block}
+
+/* greetings do dia */
+.day{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.5vw,18px);margin-top:26px}
+@media (max-width:820px){.day{grid-template-columns:repeat(2,1fr)}}
+.tod{border-radius:var(--r);padding:20px 18px;border:1px solid var(--line);background:#fff;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:6px;min-height:200px}
+.tod .i{color:var(--c)}
+.tod .when{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--c);margin-top:auto;padding-top:14px}
+.tod .en{font-family:'Fraunces',serif;font-size:clamp(20px,2.1vw,27px);display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.tod .pt{color:var(--ink2);font-size:.92em}
+.tod.dark{background:var(--ink);color:#fff;border-color:var(--ink)} .tod.dark .pt{color:#BDB8D0}
+.tod.dark .say{background:transparent;border-color:rgba(255,255,255,.3);color:#fff}
+.note{margin-top:18px;display:flex;align-items:flex-start;gap:12px;color:var(--ink2);background:var(--gold-s);border-radius:12px;padding:12px 16px;max-width:760px}
+.note .i{color:var(--gold);margin-top:2px}
+.note b{color:var(--ink)}
+
+/* listas de vocabulário */
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(16px,3vw,40px);margin-top:26px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.colh{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.14em;font-size:12px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+.colh .i{color:var(--rose)}
+.vlist{display:grid;gap:10px}
+.vrow{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 18px}
+.vrow .tx{flex:1}
+.vrow .en{font-weight:600;font-size:clamp(16px,1.7vw,20px)}
+.vrow .pt{color:var(--ink2);font-size:.88em}
+.badge{display:inline-block;margin-left:8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:6px;background:var(--rose-s);color:var(--rose);vertical-align:2px}
+
+/* diálogo */
+.dialog{margin-top:16px;display:grid;gap:10px}
+.bub{max-width:80%;padding:12px 16px;border-radius:16px;font-family:'Fraunces',serif;font-size:clamp(17px,1.8vw,22px)}
+.bub small{display:block;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+.bub.a{background:var(--plum);color:#fff;border-bottom-left-radius:4px}
+.bub.b{background:#fff;border:1px solid var(--line);justify-self:end;border-bottom-right-radius:4px}
+
+/* name */
+.qline{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.qbig{font-family:'Fraunces',serif;font-size:clamp(30px,4.2vw,54px);font-weight:500}
+.qbig em{color:var(--plum)}
+.qpt{color:var(--ink2);font-size:.95em;margin-top:6px}
+.contr{display:grid;gap:12px;margin-top:28px}
+.pair{display:grid;grid-template-columns:1fr auto 1fr;gap:12px 16px;align-items:center}
+@media (max-width:820px){.pair{grid-template-columns:1fr;gap:6px}.pair .eq{font-size:20px;line-height:1}.contr{gap:20px}}
+.sent{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-family:'Fraunces',serif;font-size:clamp(20px,2.2vw,28px);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sent .lbl{display:block;font-family:'DM Sans',sans-serif;margin-bottom:2px}
+.sent .k{color:var(--plum);font-style:italic} .sent .k2{color:var(--rose);font-style:italic}
+.eq{font-family:'Fraunces',serif;font-size:26px;color:var(--ink2);text-align:center}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ink2)}
+
+/* exercício 1.5 */
+.hrow{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.audio-tag{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-weight:700;font-size:12px;letter-spacing:.16em;text-transform:uppercase;margin-bottom:12px}
+.steps3{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;color:var(--ink2);font-size:.88em}
+.steps3 span b{font-family:'Fraunces',serif;color:var(--plum);margin-right:4px}
+.people{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.6vw,16px);margin-top:22px}
+@media (max-width:820px){.people{grid-template-columns:repeat(2,1fr)}}
+.person{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:14px;position:relative}
+.person > svg{width:clamp(56px,6vw,76px);height:auto;flex:none}
+.person .lt{font-family:'Fraunces',serif;font-weight:600;color:var(--ink2);font-size:14px;position:absolute;top:10px;left:14px}
+.person .nm{flex:1;font-family:'Fraunces',serif;font-size:clamp(19px,2vw,25px);display:flex;align-items:center;gap:10px}
+.person .box{width:38px;height:38px;border-radius:10px;border:1.5px dashed #CFC8DD;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;flex:none}
+.person .box b{display:none}
+:is(.shown .person,.person.shown) .box{border:0;background:var(--teal)} :is(.shown .person,.person.shown) .box b{display:inline}
+
+/* alfabeto */
+.abc{display:grid;grid-template-columns:repeat(9,1fr);gap:clamp(6px,.9vw,10px);margin-top:24px}
+@media (max-width:820px){.abc{grid-template-columns:repeat(6,1fr)}}
+.ltb{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(24px,3vw,40px);border:1px solid var(--line);border-radius:12px;padding:14px 0;cursor:pointer;color:var(--ink);background:#fff;transition:.15s}
+.ltb:hover,.ltb.playing{background:var(--plum);border-color:var(--plum);color:#fff}
+.ltb.v{color:var(--rose)} .ltb.v:hover,.ltb.v.playing{color:#fff}
+.legend{display:flex;gap:18px;margin-top:14px;color:var(--ink2);font-size:.85em}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+
+/* grupos de som */
+.groups{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(10px,1.4vw,16px);margin-top:24px}
+@media (max-width:820px){.groups{grid-template-columns:repeat(2,1fr)}}
+.grp{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;position:relative;overflow:hidden}
+.grp::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c)}
+.grp .snd{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2);display:flex;align-items:baseline;justify-content:space-between}
+.grp .snd b{font-family:'Fraunces',serif;font-size:22px;letter-spacing:0;text-transform:none;color:var(--c);font-weight:600}
+.grp .ls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.grp .ls button{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,24px);width:clamp(38px,3.4vw,46px);height:clamp(38px,3.4vw,46px);border-radius:10px;border:1px solid var(--line);background:var(--bg);cursor:pointer;color:var(--ink)}
+.grp .ls button:hover,.grp .ls button.playing{background:var(--c);border-color:var(--c);color:#fff}
+.grp.tip{background:var(--gold-s);border-color:transparent}
+.grp.tip p{margin:8px 0 0;font-size:.9em;color:var(--ink)}
+
+/* nome completo */
+.namecard{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;margin-top:24px}
+.namecard .hd{background:var(--plum);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center}
+.namecard .hd small{font-size:11px;font-weight:700;letter-spacing:.2em;opacity:.8}
+.namecard .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:24px;font-style:italic}
+.parts{display:grid;grid-template-columns:repeat(3,1fr)}
+.part{padding:16px 14px;border-right:1px solid var(--line)}
+.part:last-child{border-right:0}
+.part .w{font-family:'Fraunces',serif;font-size:clamp(22px,2.5vw,32px)}
+.part .lb{font-weight:600;display:flex;align-items:center;gap:8px;margin-top:8px}
+.part .lp{color:var(--ink2);font-size:.82em}
+.part .lb .say{width:28px;height:28px}
+.full{border-top:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600;background:var(--bg)}
+.full span small{font-weight:400;color:var(--ink2)}
+.spell{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.spell button{font-family:'Fraunces',serif;font-size:22px;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer}
+.spell button.playing,.spell button:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+.spell .gap{width:14px}
+.mini{font-family:'Fraunces',serif;font-size:clamp(18px,1.9vw,23px)}
+.mini.q{color:var(--ink2);font-style:italic}
+
+/* 1.9 */
+.example{display:inline-flex;align-items:center;gap:12px;margin-top:10px;color:var(--ink2)}
+.example b{font-family:'Fraunces',serif;color:var(--ink);letter-spacing:.06em;font-weight:500;font-size:1.1em}
+.blanks{display:grid;grid-template-columns:repeat(3,1fr);gap:10px 14px;margin-top:24px}
+@media (max-width:820px){.blanks{grid-template-columns:repeat(2,1fr)}}
+.blank{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;min-height:60px}
+.blank .num{flex:none;font-family:'Fraunces',serif;color:var(--rose);font-weight:600;width:22px}
+.blank .line{flex:1;border-bottom:1.5px dashed #D6D0E2;height:22px}
+.blank .an{display:none;flex:1;font-family:'Fraunces',serif;font-size:clamp(18px,2vw,23px)}
+.blank .say{display:none}
+:is(.shown .blank,.blank.shown) .line{display:none}:is(.shown .blank,.blank.shown) .an{display:block}:is(.shown .blank,.blank.shown) .say{display:inline-flex}
+
+@media (max-width:600px){.people{grid-template-columns:1fr}.cover-num{display:none}.namecard .hd{flex-direction:column;align-items:flex-start;gap:2px}.part{padding:12px 10px}.blanks{grid-template-columns:1fr 1fr}}
+/* resumo */
+.recap{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:28px}
+@media (max-width:820px){.recap{grid-template-columns:1fr}}
+.recap .card{display:flex;flex-direction:column;gap:10px}
+.recap .card .i{color:var(--plum)}
+.recap .card b{font-family:'Fraunces',serif;font-weight:500;font-size:22px}
+.recap .card span{color:var(--ink2);font-size:.9em}
+.next-up{margin-top:26px;display:inline-flex;gap:10px;align-items:center;color:var(--ink2);font-size:.95em}
+.next-up b{color:var(--ink)}
+.next-up .i{color:var(--rose)}
+
+/* ===== Output frequency ===== */
+.freq{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(18px,4vw,48px);margin-top:12px;align-items:start}
+@media (max-width:820px){.freq{grid-template-columns:1fr}}
+.scale{display:grid;gap:8px}
+.lv{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 12px}
+.lv .bar{width:64px;height:10px;border-radius:6px;background:linear-gradient(90deg,var(--c) var(--p),#EEE9F3 var(--p))}
+.lv b{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(17px,1.8vw,22px)} .lv b small{font-family:'DM Sans',sans-serif;color:var(--ink2);font-size:.62em;margin-left:8px;font-weight:400}
+.lv .say{width:30px;height:30px}
+.ex2{display:grid;gap:8px}
+.ng2{background:var(--bg);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:grid;gap:7px;align-content:start}
+.ng2 .hd{display:flex;align-items:baseline;gap:12px;padding:2px 6px}
+.ng2 .hd b{font-family:'Fraunces',serif;font-weight:500;font-size:clamp(22px,2.4vw,30px);color:var(--c)}
+.ex2 .sent{padding-top:8px;padding-bottom:8px}
+.sent .k{color:var(--rose);font-style:italic;font-weight:600}
+.ho{display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2.6vw,32px);margin-top:20px}
+@media (max-width:820px){.ho{grid-template-columns:1fr}}
+.pt3{color:var(--ink2);margin-top:4px}
+.wk{display:grid;gap:8px;margin-top:16px;max-width:900px}
+.wr{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 10px 6px 16px}
+.wr .tx b{display:block;font-family:'Fraunces',serif;font-weight:500;font-size:clamp(18px,2vw,24px)}
+.wr .tx span{color:var(--ink2);font-size:.88em}
+.wdots{display:flex;gap:5px}
+.wdots i{width:clamp(22px,2.6vw,30px);height:clamp(22px,2.6vw,30px);border-radius:8px;background:#EEE9F3;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:10px;font-weight:600;color:#B5AEC4}
+.wdots i.on{background:var(--plum);color:#fff}
+@media (max-width:520px){.wr{grid-template-columns:1fr auto}.wdots{grid-column:1/-1}}
+.wo{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(3,auto);gap:9px 14px;margin-top:16px}
+@media (max-width:820px){.wo{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}}
+.fx{display:flex;align-items:flex-start;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 14px;flex-wrap:wrap}
+.fx .n{color:var(--rose);font-weight:600;font-family:'Fraunces',serif;width:20px}
+.fx .w2{flex:1;display:flex;flex-wrap:wrap;gap:5px}
+.fx .w2 i{font-style:normal;padding:2px 9px;border-radius:7px;background:var(--plum-s);font-size:clamp(14px,1.4vw,17px)}
+.fx .ans{display:none;width:100%;padding-left:30px;font-family:'Fraunces',serif;font-style:italic;font-weight:600;color:var(--teal);font-size:clamp(16px,1.7vw,21px)}
+.fx .say{display:none;width:30px;height:30px}
+.fx.shown .ans{display:block} .fx.shown .say{display:inline-flex}
+.mc{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(4,auto);gap:6px 14px;margin-top:10px}
+@media (max-width:820px){.mc{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}}
+.mq{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px 12px;display:grid;gap:4px}
+.mq .q{display:flex;gap:10px;align-items:center;font-family:'Fraunces',serif;font-size:clamp(15px,1.55vw,19px)}
+.mq .q .n{color:var(--rose);font-weight:600;width:20px;flex:none}
+.mq .q .w2{flex:1}
+.mq .q .say{display:none;width:28px;height:28px}
+.mq.shown .q .say{display:inline-flex}
+.mq .op{display:flex;gap:6px;padding-left:30px;flex-wrap:wrap}
+.mq .op i{font-style:normal;font-size:.82em;padding:1px 8px;border-radius:8px;border:1px solid var(--line);color:var(--ink2)}
+.mq.shown .op i.ok{background:var(--teal);border-color:var(--teal);color:#fff}
+.mq.shown .op i:not(.ok){opacity:.45;text-decoration:line-through}
+.gap{display:inline-block;min-width:90px;border-bottom:1.5px dashed #D6D0E2;text-align:center;margin:0 3px}
+.gap .a{display:none;color:var(--teal);font-style:italic;font-weight:600}
+.shown .gap{border-bottom-color:var(--teal)} .shown .gap .a{display:inline}
+.bank{display:flex;flex-wrap:wrap;gap:6px 8px;margin-top:12px;padding:8px 12px;border:1px dashed #D6D0E2;border-radius:12px;background:#fff}
+.bank span{font-family:'Fraunces',serif;font-size:clamp(15px,1.6vw,19px);padding:1px 10px;border-radius:8px;background:var(--plum-s)}
+.rt{display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(5,auto);gap:8px 14px;margin-top:12px}
+@media (max-width:820px){.rt{grid-template-columns:1fr;grid-auto-flow:row;grid-template-rows:none}}
+.ri2{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-family:'Fraunces',serif;font-size:clamp(15px,1.6vw,20px)}
+.ri2 .n{color:var(--rose);font-weight:600;width:22px}
+.ri2 .pick{display:inline-block;min-width:96px;border:0;border-bottom:1.5px dashed #D6D0E2;background:none;font:inherit;font-style:italic;font-weight:600;color:var(--plum);cursor:pointer;padding:0 4px}
+.ri2 .pick:empty::before{content:'clique';font-family:'DM Sans',sans-serif;font-style:normal;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#CFC8DD}
+.slide.game{flex-direction:column;align-items:stretch;gap:10px}
+.gh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.gh span{font-family:'Fraunces',serif;font-size:clamp(24px,2.8vw,34px)}
+.slide.game iframe{flex:1;width:100%;border:1px solid var(--line);border-radius:18px;background:var(--bg);min-height:380px}
+.ri{cursor:pointer;transition:border-color .15s}.ri:hover{border-color:var(--plum2)}.akn{font-weight:500;opacity:.7;margin-left:4px}
+body.presenting .top,body.presenting .bot{display:none}
+body.presenting .stage{top:0;bottom:0}
+:fullscreen .top,:fullscreen .bot{display:none}
+:fullscreen .stage{top:0;bottom:0}
+.exit-presenting{display:none;position:fixed;top:10px;right:10px;z-index:50;border:0;border-radius:999px;width:34px;height:34px;background:rgba(0,0,0,.45);color:#fff;font-size:16px;line-height:1;cursor:pointer;align-items:center;justify-content:center}
+body.presenting .exit-presenting{display:flex}
+</style>
+</head>
+<body>
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="top">
+  <div class="left"><a class="exit-btn" href="material-de-aula.html">← Sair</a><span class="tag">A1 BEGINNERS · OUTPUT FREQUENCY</span></div>
+  <div class="ctl">
+    <span class="cnt" id="cnt"></span>
+    <button id="noteBtn">📝 Teacher's Guide</button>
+    <button id="fsBtn">⛶ Fullscreen</button>
+  </div>
+</div>
+
+<button class="exit-presenting" id="exitPresentBtn" title="Sair da apresentação (Esc)">✕</button>
+<div class="stage" id="stage">
+
+<section class="slide">
+  <div class="wrap two cover">
+    <div>
+      <div class="eyebrow">Practice talking about</div>
+      <h1 class="title">Frequency</h1>
+      <p class="lead">Com que frequência você faz cada coisa: always, never, once a week, every day…</p>
+      <div class="meta"><span>Adverbs of frequency</span><span>How often?</span><span>Once a week</span></div>
+    </div>
+    <div style="position:relative">
+      <svg class="ill" viewBox="0 0 420 330" aria-hidden="true">
+        <circle cx="220" cy="170" r="125" fill="#F0EDF7"/>
+        <g stroke-linecap="round" stroke-width="18">
+          <path d="M220 60v28" stroke="#3C8580"/><path d="M220 106v28" stroke="#3C8580" opacity=".8"/><path d="M220 152v28" stroke="#7A6BAE"/>
+          <path d="M220 198v28" stroke="#C99A3E"/><path d="M220 244v28" stroke="#B9707A"/>
+        </g>
+        <g font-family="Fraunces, serif" font-size="20" fill="#24213A"><text x="248" y="81">always</text><text x="248" y="173">often</text><text x="248" y="265">never</text></g>
+        <circle cx="110" cy="96" r="9" fill="#C99A3E"/><circle cx="120" cy="250" r="7" fill="#B9707A"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>01</b> Review</div>
+    <h2 class="title">Frequency</h2>
+    <div class="freq">
+      <div class="scale"><div class="lv" style="--c:#3C8580;--p:100%"><span class="bar"></span><b>Always<small>sempre</small></b><button class="say " data-say="Always" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="lv" style="--c:#3C8580;--p:85%"><span class="bar"></span><b>Usually<small>geralmente</small></b><button class="say " data-say="Usually" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="lv" style="--c:#7A6BAE;--p:65%"><span class="bar"></span><b>Often<small>frequentemente</small></b><button class="say " data-say="Often" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="lv" style="--c:#C99A3E;--p:45%"><span class="bar"></span><b>Sometimes<small>às vezes</small></b><button class="say " data-say="Sometimes" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="lv" style="--c:#B9707A;--p:20%"><span class="bar"></span><b>Rarely<small>raramente</small></b><button class="say " data-say="Rarely" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="lv" style="--c:#B9707A;--p:3%"><span class="bar"></span><b>Never<small>nunca</small></b><button class="say " data-say="Never" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="ex2">
+        <div class="ng2" style="--c:#56468A"><div class="hd"><b>affirmative</b></div><div class="sent" style="--c:#56468A"><span>Sarah <span class="k">always</span> does cardio.</span><button class="say " data-say="Sarah always does cardio." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#56468A"><span>I <span class="k">usually</span> exercise at the gym.</span><button class="say " data-say="I usually exercise at the gym." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+        <div class="ng2" style="--c:#B9707A"><div class="hd"><b>negative</b></div><div class="sent" style="--c:#B9707A"><span>They don&#x27;t <span class="k">always</span> go surfing.</span><button class="say " data-say="They don&#x27;t always go surfing." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span>She doesn&#x27;t <span class="k">often</span> cook.</span><button class="say " data-say="She doesn&#x27;t often cook." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>02</b> Review</div>
+    <h2 class="title">How <em>often?</em></h2>
+    <div class="pt3">Com que frequência?</div>
+    <div class="ho">
+      <div class="ng2" style="--c:#56468A"><div class="hd"><b>do</b></div><div class="sent" style="--c:#56468A"><span>How often <span class="k">do</span> you walk the dog?</span><button class="say " data-say="How often do you walk the dog?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#56468A"><span>How often <span class="k">do</span> they cook?</span><button class="say " data-say="How often do they cook?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+      <div class="ng2" style="--c:#B9707A"><div class="hd"><b>does</b></div><div class="sent" style="--c:#B9707A"><span>How often <span class="k">does</span> she drink beer?</span><button class="say " data-say="How often does she drink beer?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="sent" style="--c:#B9707A"><span>How often <span class="k">does</span> he watch TV?</span><button class="say " data-say="How often does he watch TV?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>03</b> Vocabulary</div>
+    <h2 class="title">Weekly <em>frequency</em></h2>
+    <div class="wk"><div class="wr"><div class="tx"><b>Once a week</b><span>uma vez por semana</span></div><div class="wdots"><i class="on">M</i><i class="">T</i><i class="">W</i><i class="">T</i><i class="">F</i><i class="">S</i><i class="">S</i></div><button class="say " data-say="Once a week" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="wr"><div class="tx"><b>Twice a week</b><span>duas vezes por semana</span></div><div class="wdots"><i class="on">M</i><i class="">T</i><i class="">W</i><i class="on">T</i><i class="">F</i><i class="">S</i><i class="">S</i></div><button class="say " data-say="Twice a week" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="wr"><div class="tx"><b>Three times a week</b><span>três vezes por semana</span></div><div class="wdots"><i class="on">M</i><i class="">T</i><i class="on">W</i><i class="">T</i><i class="on">F</i><i class="">S</i><i class="">S</i></div><button class="say " data-say="Three times a week" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="wr"><div class="tx"><b>Every day</b><span>todos os dias</span></div><div class="wdots"><i class="on">M</i><i class="on">T</i><i class="on">W</i><i class="on">T</i><i class="on">F</i><i class="on">S</i><i class="on">S</i></div><button class="say " data-say="Every day" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="wr"><div class="tx"><b>Every other day</b><span>dia sim, dia não</span></div><div class="wdots"><i class="on">M</i><i class="">T</i><i class="on">W</i><i class="">T</i><i class="on">F</i><i class="">S</i><i class="on">S</i></div><button class="say " data-say="Every other day" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>04</b> Practice</div>
+      <h2 class="title" style="font-size:clamp(26px,3vw,40px)">Word <em>order</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="wo"><div class="fx" data-ord="1"><span class="n">1</span><span class="w2"><i>basketball</i><i>she</i><i>plays</i><i>often</i></span><button class="say " data-say="She often plays basketball." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">She often plays basketball.</span></div><div class="fx" data-ord="2"><span class="n">2</span><span class="w2"><i>drink</i><i>they</i><i>usually</i><i>for breakfast</i><i>tea</i><i>don't</i></span><button class="say " data-say="They don&#x27;t usually drink tea for breakfast." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">They don't usually drink tea for breakfast.</span></div><div class="fx" data-ord="3"><span class="n">3</span><span class="w2"><i>sugar</i><i>they</i><i>in their coffee</i><i>always</i><i>have</i></span><button class="say " data-say="They always have sugar in their coffee." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">They always have sugar in their coffee.</span></div><div class="fx" data-ord="4"><span class="n">4</span><span class="w2"><i>parents</i><i>my</i><i>the movies</i><i>don't</i><i>to</i><i>go</i><i>often</i></span><button class="say " data-say="My parents don&#x27;t often go to the movies." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">My parents don't often go to the movies.</span></div><div class="fx" data-ord="5"><span class="n">5</span><span class="w2"><i>I</i><i>bad</i><i>never</i><i>dreams</i><i>have</i></span><button class="say " data-say="I never have bad dreams." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">I never have bad dreams.</span></div><div class="fx" data-ord="6"><span class="n">6</span><span class="w2"><i>does</i><i>rap music</i><i>listen</i><i>Ben</i><i>sometimes</i><i>to</i><i>?</i></span><button class="say " data-say="Does Ben sometimes listen to rap music?" title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button><span class="ans">Does Ben sometimes listen to rap music?</span></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap rv-area">
+    <div class="hrow">
+      <div><div class="eyebrow"><b>05</b> Practice</div>
+      <h2 class="title" style="font-size:clamp(26px,3vw,40px)">Multiple <em>choice</em></h2></div>
+      <button class="btn" data-ak><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg> Answer key</button>
+    </div>
+    <div class="mc"><div class="mq" data-ord="1"><div class="q"><span class="n">1</span><span class="w2">My aunt <span class="gap"><span class="a">always listens</span></span> to music on her headphones.</span><button class="say " data-say="My aunt always listens to music on her headphones." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) listens always</i><i class="">b) alway listen</i><i class="">c) listen alway</i><i class="ok">d) always listens</i></div></div><div class="mq" data-ord="2"><div class="q"><span class="n">2</span><span class="w2">He only goes to the gym twice a year. He <span class="gap"><span class="a">rarely</span></span> works out.</span><button class="say " data-say="He only goes to the gym twice a year. He rarely works out." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) usually</i><i class="ok">b) rarely</i><i class="">c) often</i><i class="">d) normally</i></div></div><div class="mq" data-ord="3"><div class="q"><span class="n">3</span><span class="w2">She <span class="gap"><span class="a">never eats</span></span> broccoli, she hates it.</span><button class="say " data-say="She never eats broccoli, she hates it." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) eats never</i><i class="">b) often eats</i><i class="ok">c) never eats</i><i class="">d) eats usually</i></div></div><div class="mq" data-ord="4"><div class="q"><span class="n">4</span><span class="w2">They play tennis once a week. They <span class="gap"><span class="a">often</span></span> play tennis.</span><button class="say " data-say="They play tennis once a week. They often play tennis." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="ok">a) often</i><i class="">b) hardly ever</i><i class="">c) rarely</i><i class="">d) never</i></div></div><div class="mq" data-ord="5"><div class="q"><span class="n">5</span><span class="w2">He <span class="gap"><span class="a">normally walks</span></span> to school by himself.</span><button class="say " data-say="He normally walks to school by himself." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) walks never</i><i class="">b) walk normally</i><i class="ok">c) normally walks</i><i class="">d) normally walk</i></div></div><div class="mq" data-ord="6"><div class="q"><span class="n">6</span><span class="w2">She <span class="gap"><span class="a">hardly ever plays</span></span> with her toys. She doesn't like them.</span><button class="say " data-say="She hardly ever plays with her toys. She doesn&#x27;t like them." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) ever hardly plays</i><i class="">b) hardly plays ever</i><i class="">c) plays hardly ever</i><i class="ok">d) hardly ever plays</i></div></div><div class="mq" data-ord="7"><div class="q"><span class="n">7</span><span class="w2">The girls <span class="gap"><span class="a">frequently go</span></span> shopping together.</span><button class="say " data-say="The girls frequently go shopping together." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="">a) ever go</i><i class="">b) go frequently</i><i class="">c) go never</i><i class="ok">d) frequently go</i></div></div><div class="mq" data-ord="8"><div class="q"><span class="n">8</span><span class="w2">He <span class="gap"><span class="a">occasionally goes</span></span> fishing with his spear.</span><button class="say " data-say="He occasionally goes fishing with his spear." title="Ouvir"><svg class="i" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z" fill="currentColor"/><path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round"/></svg></button></div><div class="op"><i class="ok">a) occasionally goes</i><i class="">b) ever goes</i><i class="">c) goes ever</i><i class="">d) goes occasionally</i></div></div></div>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow"><b>06</b> Your turn</div>
+    <h2 class="title" style="font-size:clamp(26px,3vw,40px)">My <em>routine</em></h2>
+    <div class="bank"><span>always</span><span>usually</span><span>often</span><span>sometimes</span><span>rarely</span><span>never</span></div>
+    <div class="rt"><div class="ri2"><span class="n">1</span><span>I <button class="pick"></button> wake up early in the morning.</span></div><div class="ri2"><span class="n">2</span><span>I <button class="pick"></button> have a cup of coffee in the morning.</span></div><div class="ri2"><span class="n">3</span><span>I <button class="pick"></button> have a healthy breakfast.</span></div><div class="ri2"><span class="n">4</span><span>I <button class="pick"></button> brush my teeth in the morning.</span></div><div class="ri2"><span class="n">5</span><span>I <button class="pick"></button> do some exercise in my day.</span></div><div class="ri2"><span class="n">6</span><span>I <button class="pick"></button> get stuck in traffic.</span></div><div class="ri2"><span class="n">7</span><span>I <button class="pick"></button> snack too much throughout the day.</span></div><div class="ri2"><span class="n">8</span><span>I <button class="pick"></button> watch TV at night.</span></div><div class="ri2"><span class="n">9</span><span>I <button class="pick"></button> take a shower before bed.</span></div><div class="ri2"><span class="n">10</span><span>I <button class="pick"></button> go to bed early.</span></div></div>
+  </div>
+</section>
+
+<section class="slide game">
+  <div class="gh"><span>Correct <em style="color:var(--plum)">the mistakes</em></span></div>
+  <iframe title="Correct the mistakes" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--mint:#3C8580;--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);padding:16px 22px;overflow:auto}
+.f{font-family:&#x27;Fraunces&#x27;,Georgia,serif}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.say{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.say:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+button.b{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--plum);background:var(--plum);color:#fff}
+button.b.o{background:#fff;color:var(--plum)}
+button.b:disabled{opacity:.35;cursor:default}
+
+body{display:flex;flex-direction:column;gap:12px}
+.teams{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tm{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 8px 6px 14px}
+.tm input{font:inherit;font-weight:600;border:0;background:none;width:110px;color:var(--c);outline:none}
+.tm .sc{font-family:&#x27;Fraunces&#x27;,serif;font-size:26px;min-width:30px;text-align:center}
+.tm button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:16px;color:var(--ink2)}
+.grid{flex:1;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px;min-height:0}
+.tile{border:0;border-radius:14px;background:var(--c);color:#fff;font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(24px,4vw,40px);cursor:pointer;box-shadow:0 6px 16px rgba(36,33,58,.12);transition:transform .12s}
+.tile:hover{transform:translateY(-2px)}
+.tile.done{background:#E9E5EF;color:#B5AEC4;box-shadow:none}
+.card{position:fixed;inset:0;background:rgba(250,248,245,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
+.card.on{display:flex}
+.card .n{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.card .q{font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(26px,4.2vw,48px);line-height:1.2;max-width:900px;display:flex;align-items:center;gap:14px;justify-content:center}
+.card .q.bad{color:var(--rose);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(185,112,122,.5)}
+.card .ans{font-family:&#x27;Fraunces&#x27;,serif;font-style:italic;font-size:clamp(24px,3.8vw,42px);color:var(--teal);display:none;align-items:center;gap:14px}
+.card .ans.on{display:flex}
+.scale{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:820px}
+.scale span{padding:6px 14px;border-radius:999px;background:var(--plum-s);font-weight:600;color:var(--plum)}
+.acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class=&quot;teams&quot; id=&quot;teams&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;grid&quot; id=&quot;grid&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;card&quot; id=&quot;card&quot;&gt;
+  &lt;div class=&quot;n&quot; id=&quot;cn&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;q&quot; id=&quot;cq&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;scale&quot; id=&quot;cs&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;ans&quot; id=&quot;ca&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;acts&quot; id=&quot;acts&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+    var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+    var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];
+    for(var i=0;i&lt;PREF.length;i++){ for(var j=0;j&lt;good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+
+var MODE=&quot;fix&quot;, ITEMS=[{&quot;q&quot;: &quot;They go never to London.&quot;, &quot;a&quot;: &quot;They never go to London.&quot;}, {&quot;q&quot;: &quot;Dad doesn&#x27;t listen usually to music.&quot;, &quot;a&quot;: &quot;Dad doesn&#x27;t usually listen to music.&quot;}, {&quot;q&quot;: &quot;Lisa gets always up early.&quot;, &quot;a&quot;: &quot;Lisa always gets up early.&quot;}, {&quot;q&quot;: &quot;Jill doesn&#x27;t drink often milk.&quot;, &quot;a&quot;: &quot;Jill doesn&#x27;t often drink milk.&quot;}, {&quot;q&quot;: &quot;I don&#x27;t play normally computer games.&quot;, &quot;a&quot;: &quot;I don&#x27;t normally play computer games.&quot;}, {&quot;q&quot;: &quot;We go normally to the beach in the summer.&quot;, &quot;a&quot;: &quot;We normally go to the beach in the summer.&quot;}, {&quot;q&quot;: &quot;She has sometimes coffee with milk.&quot;, &quot;a&quot;: &quot;She sometimes has coffee with milk.&quot;}, {&quot;q&quot;: &quot;He sometimes does walks the dog.&quot;, &quot;a&quot;: &quot;He sometimes walks the dog.&quot;}, {&quot;q&quot;: &quot;She rarely doesn&#x27;t take the bus to work.&quot;, &quot;a&quot;: &quot;She rarely takes the bus to work.&quot;}], LBL=&quot;Find and fix the mistake&quot;;
+var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
+var $=function(x){return document.getElementById(x);};
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
+function sayBtn(t){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;say&#x27;; b.title=&#x27;Ouvir&#x27;; b.innerHTML=SPK; b.onclick=function(e){ e.stopPropagation(); speak(t); }; return b; }
+var COLORS=[&#x27;#56468A&#x27;,&#x27;#B9707A&#x27;,&#x27;#3C8580&#x27;,&#x27;#C99A3E&#x27;,&#x27;#7A6BAE&#x27;,&#x27;#2F6F6A&#x27;];
+var T=[{n:&#x27;Team A&#x27;,s:0,c:&#x27;#56468A&#x27;},{n:&#x27;Team B&#x27;,s:0,c:&#x27;#B9707A&#x27;}];
+try{ var nm=(window.frameElement&amp;&amp;window.frameElement.getAttribute(&#x27;data-names&#x27;))||&#x27;&#x27;; }catch(e){}
+function teams(){ var w=$(&#x27;teams&#x27;); w.innerHTML=&#x27;&#x27;; T.forEach(function(t,i){ var d=document.createElement(&#x27;div&#x27;); d.className=&#x27;tm&#x27;; d.style.setProperty(&#x27;--c&#x27;,t.c);
+  d.innerHTML=&#x27;&lt;input value=&quot;&#x27;+t.n+&#x27;&quot;&gt;&lt;button&gt;−&lt;/button&gt;&lt;span class=&quot;sc&quot;&gt;&#x27;+t.s+&#x27;&lt;/span&gt;&lt;button&gt;+&lt;/button&gt;&#x27;;
+  d.querySelector(&#x27;input&#x27;).oninput=function(){ t.n=this.value; };
+  var bs=d.querySelectorAll(&#x27;button&#x27;); bs[0].onclick=function(){ t.s=Math.max(0,t.s-1); teams(); }; bs[1].onclick=function(){ t.s++; teams(); };
+  w.appendChild(d); }); }
+var cur=-1;
+function grid(){ var g=$(&#x27;grid&#x27;); g.innerHTML=&#x27;&#x27;; var cols=ITEMS.length&gt;12?6:(ITEMS.length&gt;8?5:3); g.style.setProperty(&#x27;--cols&#x27;,cols);
+  ITEMS.forEach(function(it,i){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;tile&#x27;+(it.done?&#x27; done&#x27;:&#x27;&#x27;); b.style.setProperty(&#x27;--c&#x27;,COLORS[i%COLORS.length]); b.textContent=i+1; b.onclick=function(){ open(i); }; g.appendChild(b); }); }
+function open(i){ cur=i; var it=ITEMS[i]; $(&#x27;cn&#x27;).textContent=LBL+&#x27; · &#x27;+(i+1);
+  var q=$(&#x27;cq&#x27;); q.innerHTML=&#x27;&#x27;; q.className=&#x27;q&#x27;+(MODE===&#x27;fix&#x27;?&#x27; bad&#x27;:&#x27;&#x27;); var s=document.createElement(&#x27;span&#x27;); s.textContent=it.q; q.appendChild(s); if(MODE===&#x27;guess&#x27;) q.appendChild(sayBtn(it.q));
+  var sc=$(&#x27;cs&#x27;); sc.innerHTML=&#x27;&#x27;; if(MODE===&#x27;guess&#x27;){ [&#x27;always&#x27;,&#x27;usually&#x27;,&#x27;often&#x27;,&#x27;sometimes&#x27;,&#x27;rarely&#x27;,&#x27;never&#x27;].forEach(function(w){ var e=document.createElement(&#x27;span&#x27;); e.textContent=w; sc.appendChild(e); }); }
+  var a=$(&#x27;ca&#x27;); a.className=&#x27;ans&#x27;; a.innerHTML=&#x27;&#x27;; if(MODE===&#x27;fix&#x27;){ var t=document.createElement(&#x27;span&#x27;); t.textContent=it.a; a.appendChild(t); a.appendChild(sayBtn(it.a)); }
+  var ac=$(&#x27;acts&#x27;); ac.innerHTML=&#x27;&#x27;;
+  if(MODE===&#x27;fix&#x27;){ var r=document.createElement(&#x27;button&#x27;); r.className=&#x27;b&#x27;; r.textContent=&#x27;Mostrar correção&#x27;; r.onclick=function(){ a.classList.add(&#x27;on&#x27;); r.disabled=true; }; ac.appendChild(r); }
+  T.forEach(function(t,k){ var p=document.createElement(&#x27;button&#x27;); p.className=&#x27;b o&#x27;; p.textContent=&#x27;+1 &#x27;+t.n; p.onclick=function(){ t.s++; teams(); close(); }; ac.appendChild(p); });
+  var c=document.createElement(&#x27;button&#x27;); c.className=&#x27;b o&#x27;; c.textContent=&#x27;Voltar&#x27;; c.onclick=close; ac.appendChild(c);
+  $(&#x27;card&#x27;).classList.add(&#x27;on&#x27;); }
+function close(){ if(cur&gt;=0) ITEMS[cur].done=true; cur=-1; $(&#x27;card&#x27;).classList.remove(&#x27;on&#x27;); grid(); }
+try{ speechSynthesis.getVoices(); }catch(e){}
+teams(); grid();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+</section>
+
+<section class="slide game">
+  <div class="gh"><span>How often <em style="color:var(--plum)">do you…?</em></span></div>
+  <iframe title="How often do you" data-srcdoc="&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;&lt;head&gt;&lt;meta charset=&quot;UTF-8&quot;&gt;&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+&lt;link href=&quot;https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap rel=&quot;stylesheet&quot;&gt;
+&lt;style&gt;
+:root{--mint:#3C8580;--ink:#24213A;--ink2:#6A6680;--line:#E9E5EF;--plum:#56468A;--plum2:#7A6BAE;--plum-s:#F0EDF7;--rose:#B9707A;--rose-s:#F7ECEC;--teal:#3C8580;--teal-s:#E7F1EF;--gold:#C99A3E;--gold-s:#FAF2E1;--bg:#FAF8F5;--ok:#3C8580;--bad:#B9707A}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:&#x27;DM Sans&#x27;,system-ui,sans-serif;color:var(--ink);background:var(--bg);padding:16px 22px;overflow:auto}
+.f{font-family:&#x27;Fraunces&#x27;,Georgia,serif}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.say{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--plum);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0}
+.say:hover{background:var(--plum);color:#fff;border-color:var(--plum)}
+button.b{font:inherit;font-weight:600;font-size:15px;border-radius:10px;padding:10px 18px;cursor:pointer;border:1px solid var(--plum);background:var(--plum);color:#fff}
+button.b.o{background:#fff;color:var(--plum)}
+button.b:disabled{opacity:.35;cursor:default}
+
+body{display:flex;flex-direction:column;gap:12px}
+.teams{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.tm{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px 8px 6px 14px}
+.tm input{font:inherit;font-weight:600;border:0;background:none;width:110px;color:var(--c);outline:none}
+.tm .sc{font-family:&#x27;Fraunces&#x27;,serif;font-size:26px;min-width:30px;text-align:center}
+.tm button{width:30px;height:30px;border-radius:50%;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:16px;color:var(--ink2)}
+.grid{flex:1;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:10px;min-height:0}
+.tile{border:0;border-radius:14px;background:var(--c);color:#fff;font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(24px,4vw,40px);cursor:pointer;box-shadow:0 6px 16px rgba(36,33,58,.12);transition:transform .12s}
+.tile:hover{transform:translateY(-2px)}
+.tile.done{background:#E9E5EF;color:#B5AEC4;box-shadow:none}
+.card{position:fixed;inset:0;background:rgba(250,248,245,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center}
+.card.on{display:flex}
+.card .n{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+.card .q{font-family:&#x27;Fraunces&#x27;,serif;font-size:clamp(26px,4.2vw,48px);line-height:1.2;max-width:900px;display:flex;align-items:center;gap:14px;justify-content:center}
+.card .q.bad{color:var(--rose);text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:rgba(185,112,122,.5)}
+.card .ans{font-family:&#x27;Fraunces&#x27;,serif;font-style:italic;font-size:clamp(24px,3.8vw,42px);color:var(--teal);display:none;align-items:center;gap:14px}
+.card .ans.on{display:flex}
+.scale{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:820px}
+.scale span{padding:6px 14px;border-radius:999px;background:var(--plum-s);font-weight:600;color:var(--plum)}
+.acts{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;
+&lt;div class=&quot;teams&quot; id=&quot;teams&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;grid&quot; id=&quot;grid&quot;&gt;&lt;/div&gt;
+&lt;div class=&quot;card&quot; id=&quot;card&quot;&gt;
+  &lt;div class=&quot;n&quot; id=&quot;cn&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;q&quot; id=&quot;cq&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;scale&quot; id=&quot;cs&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;ans&quot; id=&quot;ca&quot;&gt;&lt;/div&gt;
+  &lt;div class=&quot;acts&quot; id=&quot;acts&quot;&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&amp;&amp;sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().replace(&#x27;_&#x27;,&#x27;-&#x27;)===&#x27;en-us&#x27;; };
+    var isEn=function(v){ return v.lang&amp;&amp;v.lang.toLowerCase().indexOf(&#x27;en&#x27;)===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&amp;&amp;!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&amp;&amp;!BAD.test(v.name); });
+    var PREF=[&#x27;Google US English&#x27;,&#x27;Samantha&#x27;,&#x27;Ava&#x27;,&#x27;Allison&#x27;,&#x27;Microsoft Zira Desktop&#x27;,&#x27;Microsoft Zira&#x27;,&#x27;Microsoft Aria Online (Natural) - English (United States)&#x27;,&#x27;Microsoft Jenny Online (Natural) - English (United States)&#x27;,&#x27;Victoria&#x27;,&#x27;Susan&#x27;];
+    for(var i=0;i&lt;PREF.length;i++){ for(var j=0;j&lt;good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+
+var MODE=&quot;guess&quot;, ITEMS=[{&quot;q&quot;: &quot;How often do you watch a movie at the cinema?&quot;}, {&quot;q&quot;: &quot;How often do you eat Italian food?&quot;}, {&quot;q&quot;: &quot;How often do you drink coffee in the morning?&quot;}, {&quot;q&quot;: &quot;How often do you read a newspaper?&quot;}, {&quot;q&quot;: &quot;How often do you listen to hip hop music?&quot;}, {&quot;q&quot;: &quot;How often do you exercise?&quot;}, {&quot;q&quot;: &quot;How often do you go to the beach?&quot;}, {&quot;q&quot;: &quot;How often do you eat chocolate?&quot;}, {&quot;q&quot;: &quot;How often do you eat fast food?&quot;}, {&quot;q&quot;: &quot;How often do you play video games?&quot;}, {&quot;q&quot;: &quot;How often do you go shopping?&quot;}, {&quot;q&quot;: &quot;How often do you clean your room?&quot;}, {&quot;q&quot;: &quot;How often do you watch anime?&quot;}, {&quot;q&quot;: &quot;How often do you read books?&quot;}, {&quot;q&quot;: &quot;How often do you do homework?&quot;}, {&quot;q&quot;: &quot;How often do you sing in the shower?&quot;}, {&quot;q&quot;: &quot;How often do you use social media?&quot;}, {&quot;q&quot;: &quot;How often do you come to class late?&quot;}, {&quot;q&quot;: &quot;How often do you come to class on time?&quot;}, {&quot;q&quot;: &quot;How often do you change your passwords?&quot;}], LBL=&quot;Guess the answer&quot;;
+var SPK=&#x27;&lt;svg viewBox=&quot;0 0 24 24&quot; width=&quot;18&quot; height=&quot;18&quot;&gt;&lt;path d=&quot;M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z&quot; fill=&quot;currentColor&quot;/&gt;&lt;path d=&quot;M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.6 7.6 0 0 1 0 11&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.6&quot; fill=&quot;none&quot; stroke-linecap=&quot;round&quot;/&gt;&lt;/svg&gt;&#x27;;
+var $=function(x){return document.getElementById(x);};
+function speak(t){ try{ var s=speechSynthesis; s.cancel(); var u=new SpeechSynthesisUtterance(t); u.lang=&#x27;en-US&#x27;; u.rate=.85; var v=pickBestVoice(s); if(v) u.voice=v; s.speak(u);}catch(e){} }
+function sayBtn(t){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;say&#x27;; b.title=&#x27;Ouvir&#x27;; b.innerHTML=SPK; b.onclick=function(e){ e.stopPropagation(); speak(t); }; return b; }
+var COLORS=[&#x27;#56468A&#x27;,&#x27;#B9707A&#x27;,&#x27;#3C8580&#x27;,&#x27;#C99A3E&#x27;,&#x27;#7A6BAE&#x27;,&#x27;#2F6F6A&#x27;];
+var T=[{n:&#x27;Team A&#x27;,s:0,c:&#x27;#56468A&#x27;},{n:&#x27;Team B&#x27;,s:0,c:&#x27;#B9707A&#x27;}];
+try{ var nm=(window.frameElement&amp;&amp;window.frameElement.getAttribute(&#x27;data-names&#x27;))||&#x27;&#x27;; }catch(e){}
+function teams(){ var w=$(&#x27;teams&#x27;); w.innerHTML=&#x27;&#x27;; T.forEach(function(t,i){ var d=document.createElement(&#x27;div&#x27;); d.className=&#x27;tm&#x27;; d.style.setProperty(&#x27;--c&#x27;,t.c);
+  d.innerHTML=&#x27;&lt;input value=&quot;&#x27;+t.n+&#x27;&quot;&gt;&lt;button&gt;−&lt;/button&gt;&lt;span class=&quot;sc&quot;&gt;&#x27;+t.s+&#x27;&lt;/span&gt;&lt;button&gt;+&lt;/button&gt;&#x27;;
+  d.querySelector(&#x27;input&#x27;).oninput=function(){ t.n=this.value; };
+  var bs=d.querySelectorAll(&#x27;button&#x27;); bs[0].onclick=function(){ t.s=Math.max(0,t.s-1); teams(); }; bs[1].onclick=function(){ t.s++; teams(); };
+  w.appendChild(d); }); }
+var cur=-1;
+function grid(){ var g=$(&#x27;grid&#x27;); g.innerHTML=&#x27;&#x27;; var cols=ITEMS.length&gt;12?6:(ITEMS.length&gt;8?5:3); g.style.setProperty(&#x27;--cols&#x27;,cols);
+  ITEMS.forEach(function(it,i){ var b=document.createElement(&#x27;button&#x27;); b.className=&#x27;tile&#x27;+(it.done?&#x27; done&#x27;:&#x27;&#x27;); b.style.setProperty(&#x27;--c&#x27;,COLORS[i%COLORS.length]); b.textContent=i+1; b.onclick=function(){ open(i); }; g.appendChild(b); }); }
+function open(i){ cur=i; var it=ITEMS[i]; $(&#x27;cn&#x27;).textContent=LBL+&#x27; · &#x27;+(i+1);
+  var q=$(&#x27;cq&#x27;); q.innerHTML=&#x27;&#x27;; q.className=&#x27;q&#x27;+(MODE===&#x27;fix&#x27;?&#x27; bad&#x27;:&#x27;&#x27;); var s=document.createElement(&#x27;span&#x27;); s.textContent=it.q; q.appendChild(s); if(MODE===&#x27;guess&#x27;) q.appendChild(sayBtn(it.q));
+  var sc=$(&#x27;cs&#x27;); sc.innerHTML=&#x27;&#x27;; if(MODE===&#x27;guess&#x27;){ [&#x27;always&#x27;,&#x27;usually&#x27;,&#x27;often&#x27;,&#x27;sometimes&#x27;,&#x27;rarely&#x27;,&#x27;never&#x27;].forEach(function(w){ var e=document.createElement(&#x27;span&#x27;); e.textContent=w; sc.appendChild(e); }); }
+  var a=$(&#x27;ca&#x27;); a.className=&#x27;ans&#x27;; a.innerHTML=&#x27;&#x27;; if(MODE===&#x27;fix&#x27;){ var t=document.createElement(&#x27;span&#x27;); t.textContent=it.a; a.appendChild(t); a.appendChild(sayBtn(it.a)); }
+  var ac=$(&#x27;acts&#x27;); ac.innerHTML=&#x27;&#x27;;
+  if(MODE===&#x27;fix&#x27;){ var r=document.createElement(&#x27;button&#x27;); r.className=&#x27;b&#x27;; r.textContent=&#x27;Mostrar correção&#x27;; r.onclick=function(){ a.classList.add(&#x27;on&#x27;); r.disabled=true; }; ac.appendChild(r); }
+  T.forEach(function(t,k){ var p=document.createElement(&#x27;button&#x27;); p.className=&#x27;b o&#x27;; p.textContent=&#x27;+1 &#x27;+t.n; p.onclick=function(){ t.s++; teams(); close(); }; ac.appendChild(p); });
+  var c=document.createElement(&#x27;button&#x27;); c.className=&#x27;b o&#x27;; c.textContent=&#x27;Voltar&#x27;; c.onclick=close; ac.appendChild(c);
+  $(&#x27;card&#x27;).classList.add(&#x27;on&#x27;); }
+function close(){ if(cur&gt;=0) ITEMS[cur].done=true; cur=-1; $(&#x27;card&#x27;).classList.remove(&#x27;on&#x27;); grid(); }
+try{ speechSynthesis.getVoices(); }catch(e){}
+teams(); grid();
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;"></iframe>
+</section>
+
+<section class="slide">
+  <div class="wrap">
+    <div class="eyebrow">Today you practiced</div>
+    <h2 class="title">How <em>often?</em></h2>
+    <div class="recap">
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><b>Adverbs</b><span>I usually exercise at the gym.</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18h18M6 18a6 6 0 0 1 12 0M12 4v3M4.9 9.9l1.4 1.4M19.1 9.9l-1.4 1.4M8 21h8"/></svg><b>Weekly frequency</b><span>We play soccer twice a week.</span></div>
+      <div class="card"><svg class="i" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h16v10H9l-5 4z"/></svg><b>How often?</b><span>How often do you cook?</span></div>
+    </div>
+    <div class="next-up"><svg class="i" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg> Próxima aula: <b>Lesson 13 · Telling the time</b></div>
+  </div>
+</section>
+
+</div>
+
+<div class="bot">
+  <button class="nav" id="prev">◀ Back</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav" id="next">Next ▶</button>
+</div>
+
+<script>
+(function(){
+var slides=[].slice.call(document.querySelectorAll('.slide')); var cur=0;
+var dots=document.getElementById('dots');
+slides.forEach(function(_,i){ var d=document.createElement('i');
+d.addEventListener('click',function(){go(i);}); dots.appendChild(d); });
+
+function go(i){
+  if(i<0||i>=slides.length) return; cur=i;
+  slides.forEach(function(s,k){ s.classList.toggle('on',k===i); });
+  [].forEach.call(dots.children,function(d,k){
+d.classList.toggle('on',k===i); });
+  document.getElementById('cnt').textContent=(i+1)+' / '+slides.length;
+  document.getElementById('prev').disabled=i===0;
+  document.getElementById('next').disabled=i===slides.length-1;
+  load(slides[i]); // carrega o iframe do jogo na primeira vez que o slide aparece
+  try{ location.hash='s'+(i+1); }catch(e){}
+}
+
+/* lazy load dos jogos + nomes dos times/alunos */
+function nameVal(id){ var el=document.getElementById(id); return el?(el.value||'').trim():''; }
+function jsSafe(t){ return JSON.stringify(t).slice(1,-1).replace(/</g,'\\u003c'); }
+function load(s){
+  var f=s.querySelector('iframe[data-srcdoc]'); if(!f||f.getAttribute('srcdoc')) return;
+  var h=f.getAttribute('data-srcdoc');
+  h=h.split('__TEAM_A__').join(jsSafe(nameVal('teamA')||'Team A'));
+  h=h.split('__TEAM_B__').join(jsSafe(nameVal('teamB')));
+  f.setAttribute('srcdoc',h);
+}
+
+/* 🔊 pronúncia */
+function pickBestVoice(sy){
+    var voices=(sy.getVoices&&sy.getVoices())||[];
+    var isEnUS=function(v){ return v.lang&&v.lang.toLowerCase().replace('_','-')==='en-us'; };
+    var isEn=function(v){ return v.lang&&v.lang.toLowerCase().indexOf('en')===0; };
+    var BAD=/^(albert|bad news|bahh|bells|boing|bubbles|cellos|deranged|eddy|flo|fred|good news|grandma|grandpa|hysterical|jester|junior|kathy|organ|pipe organ|ralph|reed|rocko|sandy|shelley|superstar|trinoids|whisper|wobble|zarvox)/i;
+    var good=voices.filter(function(v){ return isEnUS(v)&&!BAD.test(v.name); });
+    if(!good.length) good=voices.filter(function(v){ return isEn(v)&&!BAD.test(v.name); });
+    var PREF=['Google US English','Samantha','Ava','Allison','Microsoft Zira Desktop','Microsoft Zira','Microsoft Aria Online (Natural) - English (United States)','Microsoft Jenny Online (Natural) - English (United States)','Victoria','Susan'];
+    for(var i=0;i<PREF.length;i++){ for(var j=0;j<good.length;j++){ if(good[j].name===PREF[i]) return good[j]; } }
+    if(good.length) return good[0];
+    var anyEnUS=voices.filter(isEnUS); if(anyEnUS.length) return anyEnUS[0];
+    var anyEn=voices.filter(isEn); return anyEn[0]||voices[0]||null;
+}
+function speakEn(t,btn){
+    try{
+        var sy=window.speechSynthesis; if(!sy) return;
+        sy.cancel();
+        var u=new SpeechSynthesisUtterance(t); u.lang='en-US'; u.rate=0.85;
+        var v=pickBestVoice(sy); if(v) u.voice=v;
+        if(btn){ btn.classList.add('playing'); u.onend=u.onerror=function(){ btn.classList.remove('playing'); }; }
+        sy.speak(u);
+    }catch(e){}
+}
+window.speakEn=speakEn;
+[].forEach.call(document.querySelectorAll('.say'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+try{ if(window.speechSynthesis) speechSynthesis.getVoices(); }catch(e){}
+
+/* revelar respostas (answer key) e letras clicáveis */
+[].forEach.call(document.querySelectorAll('[data-ak]'),function(b){
+  var a=b.closest('.rv-area'); if(!a) return;
+  var ic=b.querySelector('svg'); ic=ic?ic.outerHTML+' ':'';
+  var its=[].slice.call(a.querySelectorAll('.fx,.person,.blank,.trow:not(.ex),.tc,.pic,.mq,.q2'));
+  its.sort(function(x,y){ return (+x.getAttribute('data-ord')||0)-(+y.getAttribute('data-ord')||0); });
+  function n(){ return its.filter(function(x){ return x.classList.contains('shown'); }).length; }
+  function upd(){ var k=n(); b.innerHTML = k<its.length ? ic+'Próxima resposta <small class="akn">'+k+'/'+its.length+'</small>' : 'Esconder respostas'; }
+  its.forEach(function(it){ it.classList.add('ri'); it.addEventListener('click',function(e){ if(e.target.closest('.say')) return; it.classList.toggle('shown'); upd(); }); });
+  b.addEventListener('click',function(){ var nx=its.filter(function(x){ return !x.classList.contains('shown'); })[0];
+    if(nx){ nx.classList.add('shown'); try{ nx.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} } else its.forEach(function(x){ x.classList.remove('shown'); }); upd(); });
+  upd(); });
+[].forEach.call(document.querySelectorAll('.say-l'),function(b){
+  b.addEventListener('click',function(){ speakEn(b.getAttribute('data-say'),b); }); });
+
+
+/* fullscreen */
+document.getElementById('fsBtn').addEventListener('click',function(){
+  document.body.classList.toggle('presenting');
+});
+var exitPresentBtn=document.getElementById('exitPresentBtn');
+if(exitPresentBtn) exitPresentBtn.addEventListener('click',function(){ document.body.classList.remove('presenting'); });
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'&&document.body.classList.contains('presenting')) document.body.classList.remove('presenting'); });
+
+[].forEach.call(document.querySelectorAll('.go'),function(b){
+b.addEventListener('click',function(){ go(cur+1); }); });
+document.getElementById('prev').addEventListener('click',function(){ go(cur-1); });
+document.getElementById('next').addEventListener('click',function(){
+go(cur+1); });
+document.addEventListener('keydown',function(e){
+  if(/INPUT|TEXTAREA/.test((e.target.tagName||''))) return;
+  if(e.key==='ArrowRight'||e.key==='PageDown') go(cur+1);
+  if(e.key==='ArrowLeft'||e.key==='PageUp') go(cur-1);
+});
+var h=parseInt((location.hash||'').replace('#s',''),10);
+go(h>0&&h<=slides.length?h-1:0);
+})();
+
+var nw=null;
+var GUIDE="<h1>Teachers Guide · Output frequency<\/h1>\n<p class=\"meta\">Adultos A1 · Beginners · 60 min · adverbs of frequency, how often?, weekly frequency<\/p>\n<div class=\"toc\"><a href=\"#obj\">Objetivo<\/a> · <a href=\"#roteiro\">Roteiro<\/a> · <a href=\"#p1\">1 Revisão<\/a> · <a href=\"#p2\">2 Weekly frequency<\/a> · <a href=\"#p3\">3 Exercises<\/a> · <a href=\"#p4\">4 Jogo<\/a><\/div>\n\n<h2 id=\"obj\">🎯 Objetivo da aula<\/h2>\n<p>Output frequency<\/p>\n\n<h2 id=\"roteiro\">🗺️ Roteiro rápido<\/h2>\n<table>\n<tr><th>Slide<\/th><th>Conteúdo<\/th><th>Tempo<\/th><\/tr>\n<tr><td>2–3<\/td><td>Revisão: frequency e how often?<\/td><td>7 min<\/td><\/tr>\n<tr><td>4<\/td><td>Weekly frequency → <b>drills<\/b> (oral)<\/td><td>13 min<\/td><\/tr>\n<tr><td>5–8<\/td><td>Exercises: word order, multiple choice, my routine, correct the mistakes<\/td><td>30 min<\/td><\/tr>\n<tr><td>9<\/td><td>Jogo How often do you…? (caso sobre tempo)<\/td><td>10 min<\/td><\/tr>\n<\/table>\n\n<h2 id=\"p1\">🔁 Passo 1 · Slides 2–3 · Revisão<\/h2>\n<p>Iniciar aula relembrando o conteúdo anterior<\/p>\n\n<h2 id=\"p2\">📅 Passo 2 · Slide 4 · Weekly frequency<\/h2>\n<p>e explicando sobre a frequência semanal. Fazer leitura do vocabulário e drills para fixação.<\/p>\n<div class=\"tip\">💡 Os quadradinhos mostram os dias da semana em que a ação acontece (once a week = 1 dia, every other day = dia sim, dia não).<\/div>\n<p><b>Drills:<\/b><\/p>\n<ol class=\"small\">\n<li>Com que frequência você se exercita? \\ vai para a academia \\ passeia com o cachorro<\/li>\n<li>Com que frequência ela cozinha? \\ lê \\ assiste tv<\/li>\n<li>Nós jogamos futebol 1x na semana \\ 2x \\ 4x<\/li>\n<li>Ela raramente bebe café \\ frequentemente \\ geralmente<\/li>\n<li>Ele come massa todos os dias \\ dia sim, dia não \\ 3x na semana<\/li>\n<li>Eu sempre leio no final de semana \\ pedalo \\ corro<\/li>\n<\/ol>\n\n<h2 id=\"p3\">✏️ Passo 3 · Slides 5–8 · Exercises<\/h2>\n<p>Aplicar exercícios de fixação do Cool english<\/p>\n<ol class=\"small\">\n<li>word order<\/li>\n<li>multiple choice<\/li>\n<li>my routine<\/li>\n<li>correct the mistakes<\/li>\n<\/ol>\n<div class=\"tip\">💡 Recriados do Cool English (Adverbs of Frequency). Ficaram de fora os itens com estruturas que os alunos ainda não viram (verb to be + advérbio, can, would, present continuous, horários); alguns foram adaptados (ex.: \"at seven am\" → \"early\", \"before 10pm\" → \"early\", \"before leaving the house\" → \"in the morning\"). Expressões novas (get stuck in traffic, snack too much, spear…) foram mantidas: o vocabulário novo aparece de forma implícita. Advérbios novos como normally, occasionally, hardly ever e frequently foram mantidos de propósito.<br><br>\n<b>Word order (slide 5)<\/b> e <b>multiple choice (slide 6)<\/b>: respostas uma por uma com <b>Próxima resposta<\/b> ou clicando no item.<br>\n<b>My routine (slide 7)<\/b>: clique na lacuna para escolher o advérbio que o aluno disser (always → usually → often → sometimes → rarely → never).<br>\n<b>Correct the mistakes (slide 8)<\/b>: tabuleiro com placar de 2 times (dá para renomear). Clique no número, o aluno corrige a frase, clique em <b>Mostrar correção<\/b> e dê o ponto.<\/div>\n\n<h2 id=\"p4\">🎲 Passo 4 · Slide 9 · Jogo<\/h2>\n<p>Caso sobre tempo, finalizar aula com competição no baamboozle.<\/p>\n<div class=\"tip\">💡 Recriado do Baamboozle (How Often Do You…?). Um aluno escolhe um número e tenta adivinhar com que frequência o colega (ou a professora) faz aquilo; quem responde diz a frase completa (I often eat chocolate). Acertou o palpite, ganha o ponto. Ficaram de fora só as perguntas com horários (before 11pm, before 6am).<\/div>";
+var GCSS='body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:18px 22px 60px;background:#fffdf5;color:#333;line-height:1.55;font-size:15px;max-width:820px}h1{font-size:21px;margin:0 0 6px}h2{scroll-margin-top:56px;font-size:18px;margin:28px 0 8px;padding:8px 12px;background:#FFD97D;border-radius:10px}.meta{color:#666}.toc{position:sticky;top:0;background:#fffdf5ee;padding:8px 0;border-bottom:1px solid #eee;font-size:13px}.toc a{color:#2a8fb8;text-decoration:none;font-weight:bold}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:14px}th,td{border:1px solid #ddd;padding:6px 9px;text-align:left}th{background:#A8E6CF}.tip{background:#eef9ff;border-left:4px solid #5BC4E8;padding:8px 12px;border-radius:6px}code{background:#eee;padding:1px 5px;border-radius:4px}ol.small{font-size:13.5px}li{margin:4px 0}@media print{.toc{display:none}}';
+function guideDoc(){ return '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Teachers Guide · Output frequency</title><style>'+GCSS+'</style></head><body>'+GUIDE+'</body></html>'; }
+
+document.getElementById('noteBtn').addEventListener('click',function(){
+  if(nw&&!nw.closed){ window.focus(); return; }
+  var left=Math.max(0,(screen.availWidth||screen.width)-500), top=40;
+  try{ nw=window.open('','guiaProfessora','width=480,height=720,left='+left+',top='+top+',resizable=yes,scrollbars=yes'); }catch(e){ nw=null; }
+  if(!nw){ alert("Seu navegador bloqueou a nova aba do Teacher's Guide. Permita pop-ups para este site (icone de bloqueio na barra de endereco) e clique de novo."); return; }
+  try{ nw.document.write(guideDoc()); nw.document.close(); }catch(e){ try{nw.close();}catch(_){} nw=null; alert("Nao foi possivel abrir o Teacher's Guide. Tente novamente."); return; }
+  window.focus(); });
+
+/* my routine: clique na lacuna para escolher a frequência */
+(function(){ var L=['always','usually','often','sometimes','rarely','never',''];
+  [].forEach.call(document.querySelectorAll('.ri2 .pick'),function(c){ c.addEventListener('click',function(){ var i=L.indexOf(c.textContent); c.textContent=L[(i+1)%L.length]; }); });
+})();
+</script>
+</body>
+</html>
